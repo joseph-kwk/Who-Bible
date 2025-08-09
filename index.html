@@ -60,6 +60,31 @@
             <input id="file-input" type="file" accept="application/json" style="display:none" />
           </div>
 
+          <div class="study-controls">
+            <div class="row">
+              <label for="sort-select">Sort</label>
+              <select id="sort-select">
+                <option value="name-asc">Name (A–Z)</option>
+                <option value="name-desc">Name (Z–A)</option>
+              </select>
+            </div>
+            <div class="row filters">
+              <label>Filters</label>
+              <div class="chips">
+                <label class="chip"><input type="checkbox" id="filter-mother" /> Mother known</label>
+                <label class="chip"><input type="checkbox" id="filter-occupation" /> Occupation known</label>
+                <label class="chip"><input type="checkbox" id="filter-age" /> Age notes</label>
+              </div>
+            </div>
+            <div class="row" style="justify-content:space-between; align-items:center; gap:8px">
+              <div class="muted small">People: <span id="people-count">0</span></div>
+              <div class="inline-actions">
+                <button id="btn-expand-all">Expand all</button>
+                <button id="btn-collapse-all">Collapse all</button>
+              </div>
+            </div>
+          </div>
+
           <div class="people-list card" id="people-list" style="padding:8px;">
             <!-- populated by JS -->
           </div>
@@ -121,17 +146,34 @@
     </div>
   </div>
 
-  <!-- Ambient FX Layer (decorative) -->
-  <div id="fx-layer" aria-hidden="true">
-    <canvas id="fireworks-canvas"></canvas>
-    <div class="clouds">
-      <div class="cloud c1"></div>
-      <div class="cloud c2"></div>
-      <div class="cloud c3"></div>
+  <!-- Challenge Player Setup Modal -->
+  <div id="players-modal" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Challenge Setup</h2>
+        <button id="btn-players-close" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <label for="p1-name">Player 1 name</label>
+          <input id="p1-name" type="text" placeholder="P1" />
+        </div>
+        <div class="row">
+          <label for="p2-name">Player 2 name</label>
+          <input id="p2-name" type="text" placeholder="P2" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-players-cancel">Cancel</button>
+        <button id="btn-players-start" class="primary">Start Challenge</button>
+      </div>
     </div>
-    <div class="wave"></div>
-    <div id="flash"></div>
   </div>
+
+  <!-- Toast Notifications -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  
 </body>
 </html>
 

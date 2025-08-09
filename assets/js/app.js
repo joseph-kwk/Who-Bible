@@ -89,9 +89,23 @@ const summaryStatsEl = document.getElementById('summary-stats');
 const summaryListEl = document.getElementById('summary-list');
 const btnSummaryClose = document.getElementById('btn-summary-close');
 const btnPlayAgain = document.getElementById('btn-play-again');
-// FX
-const fireworksCanvas = document.getElementById('fireworks-canvas');
-const flashEl = document.getElementById('flash');
+// Toasts & Study/Challenge UI
+const toastContainer = document.getElementById('toast-container');
+const sortSelect = document.getElementById('sort-select');
+const filterMother = document.getElementById('filter-mother');
+const filterOccupation = document.getElementById('filter-occupation');
+const filterAge = document.getElementById('filter-age');
+const peopleCountEl = document.getElementById('people-count');
+const btnExpandAll = document.getElementById('btn-expand-all');
+const btnCollapseAll = document.getElementById('btn-collapse-all');
+const playersModal = document.getElementById('players-modal');
+const btnPlayersClose = document.getElementById('btn-players-close');
+const btnPlayersCancel = document.getElementById('btn-players-cancel');
+const btnPlayersStart = document.getElementById('btn-players-start');
+const p1NameInput = document.getElementById('p1-name');
+const p2NameInput = document.getElementById('p2-name');
+// Toasts
+const toastContainer = document.getElementById('toast-container');
 
 // =========================
 // Init
@@ -129,6 +143,14 @@ function attachHandlers(){
   fileInput.addEventListener('change', handleImportFile);
   searchPerson.addEventListener('input', e=>renderPeopleList(e.target.value));
 
+  // Study controls
+  sortSelect?.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  filterMother?.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  filterOccupation?.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  filterAge?.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  btnExpandAll?.addEventListener('click', ()=>toggleAllDetails(true));
+  btnCollapseAll?.addEventListener('click', ()=>toggleAllDetails(false));
+
   // Keyboard navigation on answers
   answersEl.addEventListener('keydown', onAnswersKeyDown);
 
@@ -148,8 +170,8 @@ function attachHandlers(){
   btnSummaryClose.addEventListener('click', hideSummaryModal);
   btnPlayAgain.addEventListener('click', ()=>{ hideSummaryModal(); startSolo(); });
 
-  // Initialize fireworks
-  initFireworks();
+  // Welcome toast
+  showToast({ title: 'Welcome to Who-Bible', msg: 'Choose a mode to begin. Use Theme to toggle light/dark.', type: 'info', timeout: 4000 });
 }
 
 function setMode(mode){
@@ -169,22 +191,17 @@ function setMode(mode){
 // =========================
 function startSolo(){
   prepareQuiz('solo');
+  showToast({ title: 'Solo Mode', msg: 'Answer at your own pace. Good luck!', type: 'info' });
 }
 
 function startTimed(){
   prepareQuiz('timed');
+  const secs = parseInt(timeLimitInput.value)||60;
+  showToast({ title: 'Timed Mode', msg: `You have ${secs}s. You can pause if needed.`, type: 'warn' });
 }
 
 function startChallenge(){
-  // Optionally prompt for player names
-  const name1 = prompt('Player 1 name?', 'P1') || 'P1';
-  const name2 = prompt('Player 2 name?', 'P2') || 'P2';
-  state.players = [ { name: name1, score: 0 }, { name: name2, score: 0 } ];
-  state.currentPlayerIndex = 0;
-  currentPlayerEl.textContent = '1';
-  p1ScoreEl.textContent = '0';
-  p2ScoreEl.textContent = '0';
-  prepareQuiz('challenge');
+  openPlayersModal();
 }
 
 function prepareQuiz(mode){
@@ -205,6 +222,7 @@ function prepareQuiz(mode){
   if(mode==='timed'){
     const secs = parseInt(timeLimitInput.value) || 60;
     startTimer(secs);
+    scheduleTimeWarnings();
   } else {
     stopTimer();
   }
@@ -344,8 +362,7 @@ function handleAnswer(choice,q, el){
   });
   if(!correct) el.classList.add('incorrect');
 
-  // Tiny animation feedback
-  el.classList.add(correct ? 'pulse-correct' : 'shake-wrong');
+  // Visual feedback simplified (no animations)
 
   if(correct){
     state.score += 10;
@@ -355,12 +372,12 @@ function handleAnswer(choice,q, el){
       state.players[state.currentPlayerIndex].score += 10;
       updateChallengeScores();
     }
-    // FX: streak flash and small burst
-    triggerFlash();
-    spawnBurst(2 + Math.min(8, state.streak));
+    // FX removed
+    showToast({ title: 'Correct!', msg: `+10 points${state.mode==='challenge'?` for ${state.players[state.currentPlayerIndex].name}`:''}`, type: 'success', timeout: 1500 });
   }else{
     state.streak = 0;
     afterRef.innerText = `Incorrect. Correct: ${q.answer}. Ref: ${(q.ref||[]).join(', ')}`;
+    showToast({ title: 'Incorrect', msg: `Correct is ${q.answer}`, type: 'error', timeout: 1800 });
   }
 
   scoreEl.innerText = state.score;
@@ -373,6 +390,8 @@ function handleAnswer(choice,q, el){
   if(state.mode==='challenge'){
     state.currentPlayerIndex = (state.currentPlayerIndex + 1) % 2;
     currentPlayerEl.textContent = String(state.currentPlayerIndex + 1);
+    const nextName = state.players[state.currentPlayerIndex].name;
+    showToast({ title: 'Next turn', msg: `Player: ${nextName}`, type: 'info', timeout: 1200 });
   }
 
   btnNext.disabled = false;
@@ -399,8 +418,14 @@ function endQuiz(){
 
   // Show summary modal
   showSummaryModal();
-  // Big fireworks at end
-  spawnBurst(25);
+  // FX removed
+  showToast({ title: 'Quiz complete', msg: `Your score: ${state.score}${state.mode==='challenge'?`. ${winnerText()}`:''}`, type: 'success', timeout: 5000 });
+}
+
+function winnerText(){
+  const [p1,p2] = state.players;
+  if(p1.score===p2.score) return 'Tie game';
+  return `Winner: ${p1.score>p2.score?p1.name:p2.name}`;
 }
 
 // =========================
@@ -415,6 +440,10 @@ function startTimer(seconds){
     if(state.paused) return;
     state.timerSecondsRemaining -= 1;
     timeRemainingEl.textContent = String(Math.max(0, state.timerSecondsRemaining));
+    // Timer styling thresholds
+    timerEl.classList.remove('warn','danger');
+    if(state.timerSecondsRemaining <= 5) timerEl.classList.add('danger');
+    else if(state.timerSecondsRemaining <= 15) timerEl.classList.add('warn');
     if(state.timerSecondsRemaining <= 0){
       stopTimer();
       endQuiz();
@@ -433,6 +462,7 @@ function togglePause(){
   if(state.mode!=='timed') return;
   state.paused = !state.paused;
   btnPause.textContent = state.paused ? 'Resume' : 'Pause';
+  showToast({ title: state.paused ? 'Paused' : 'Resumed', msg: state.paused ? 'Timer paused.' : 'Timer running.', type: 'info', timeout: 1200 });
 }
 
 // =========================
@@ -440,7 +470,15 @@ function togglePause(){
 // =========================
 function renderPeopleList(filter){
   peopleList.innerHTML='';
-  const arr = state.people.filter(p=>!filter || p.name.toLowerCase().includes(filter.toLowerCase()));
+  let arr = state.people.filter(p=>!filter || p.name.toLowerCase().includes(filter.toLowerCase()));
+  if(filterMother?.checked) arr = arr.filter(p=>!!p.mother);
+  if(filterOccupation?.checked) arr = arr.filter(p=>!!p.occupation);
+  if(filterAge?.checked) arr = arr.filter(p=>!!p.age_notes);
+  if(sortSelect){
+    if(sortSelect.value==='name-asc') arr.sort((a,b)=>a.name.localeCompare(b.name));
+    if(sortSelect.value==='name-desc') arr.sort((a,b)=>b.name.localeCompare(a.name));
+  }
+  if(peopleCountEl) peopleCountEl.textContent = String(arr.length);
   for(const p of arr){
     const item = document.createElement('div');
     item.className = 'person-item';
@@ -467,6 +505,32 @@ function renderPeopleList(filter){
   }
 }
 
+function toggleAllDetails(expand){
+  const items = peopleList.querySelectorAll('.person-details');
+  items.forEach(el=>{ el.style.display = expand ? 'block' : 'none'; });
+}
+
+function openPlayersModal(){
+  p1NameInput.value = 'P1';
+  p2NameInput.value = 'P2';
+  playersModal.style.display = 'flex';
+  const close = ()=>{ playersModal.style.display = 'none'; };
+  btnPlayersClose.onclick = close;
+  btnPlayersCancel.onclick = close;
+  btnPlayersStart.onclick = ()=>{
+    const name1 = (p1NameInput.value||'P1').trim() || 'P1';
+    const name2 = (p2NameInput.value||'P2').trim() || 'P2';
+    playersModal.style.display = 'none';
+    state.players = [ { name: name1, score: 0 }, { name: name2, score: 0 } ];
+    state.currentPlayerIndex = 0;
+    currentPlayerEl.textContent = '1';
+    p1ScoreEl.textContent = '0';
+    p2ScoreEl.textContent = '0';
+    prepareQuiz('challenge');
+    showToast({ title: 'Challenge Mode', msg: `${name1} vs ${name2}. Alternate turns each question.`, type: 'info' });
+  };
+}
+
 // =========================
 // Import/Export & Persistence
 // =========================
@@ -485,12 +549,12 @@ async function handleImportFile(e){
       state.people = parsed;
       savePeopleDataToLocalStorage(parsed);
       renderPeopleList();
-      alert('Imported ' + state.people.length + ' people.');
+      showToast({ title: 'Import successful', msg: `Loaded ${state.people.length} people.`, type: 'success' });
     } else {
-      alert('JSON must be an array of people');
+      showToast({ title: 'Invalid JSON', msg: 'JSON must be an array of people', type: 'error' });
     }
   }catch(err){
-    alert('Invalid JSON: ' + (err?.message||String(err)));
+    showToast({ title: 'Invalid JSON', msg: (err?.message||String(err)), type: 'error' });
   } finally {
     e.target.value = '';
   }
@@ -501,7 +565,7 @@ function resetData(){
     localStorage.removeItem('peopleData');
     state.people = DEFAULT_PEOPLE_DATA.slice();
     renderPeopleList();
-    alert('Data reset.');
+    showToast({ title: 'Dataset reset', msg: 'Restored built-in entries.', type: 'success' });
   }
 }
 
@@ -607,66 +671,39 @@ function hideSummaryModal(){
 }
 
 // =========================
-// FX: Fireworks + Flash
+// Toasts
 // =========================
-let fwCtx, fwW, fwH, particles=[];
-function initFireworks(){
-  if(!fireworksCanvas) return;
-  const dpr = Math.max(1, window.devicePixelRatio || 1);
-  const resize=()=>{
-    fwW = fireworksCanvas.clientWidth; fwH = fireworksCanvas.clientHeight;
-    fireworksCanvas.width = Math.floor(fwW * dpr);
-    fireworksCanvas.height = Math.floor(fwH * dpr);
-    fwCtx = fireworksCanvas.getContext('2d');
-    fwCtx.setTransform(dpr,0,0,dpr,0,0);
+function showToast({ title, msg, type='info', timeout=3000 }){
+  if(!toastContainer) return;
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `
+    <div>
+      <div class="title">${title||''}</div>
+      <div class="msg">${msg||''}</div>
+    </div>
+    <div class="close" aria-label="Close">✕</div>
+  `;
+  const closer = el.querySelector('.close');
+  closer.addEventListener('click',()=>{ el.remove(); });
+  toastContainer.appendChild(el);
+  if(timeout>0){ setTimeout(()=>{ el.remove(); }, timeout); }
+}
+
+function scheduleTimeWarnings(){
+  if(state.mode!=='timed') return;
+  // Lightweight warnings when passing thresholds
+  const warnAt = new Set([30, 10, 5]);
+  const check = ()=>{
+    const t = state.timerSecondsRemaining;
+    if(warnAt.has(t)){
+      showToast({ title: 'Time warning', msg: `${t}s remaining`, type: t<=5?'error':'warn', timeout: 1200 });
+      warnAt.delete(t);
+    }
+    if(state.timerId) requestAnimationFrame(check);
   };
-  window.addEventListener('resize', resize);
-  resize();
-  requestAnimationFrame(tickFireworks);
+  requestAnimationFrame(check);
 }
 
-function spawnBurst(count){
-  if(!fwCtx) return;
-  const cx = Math.random()*fwW; const cy = Math.random()*fwH*0.5 + fwH*0.1;
-  for(let i=0;i<count;i++){
-    const angle = Math.random()*Math.PI*2;
-    const speed = Math.random()*2+1;
-    const life = Math.random()*60+40;
-    particles.push({ x:cx, y:cy, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed-1, life, max:life, color:randomAccent() });
-  }
-}
-
-function tickFireworks(){
-  if(!fwCtx){ requestAnimationFrame(tickFireworks); return; }
-  fwCtx.clearRect(0,0,fwW,fwH);
-  for(let i=particles.length-1;i>=0;i--){
-    const p = particles[i];
-    p.x += p.vx; p.y += p.vy; p.vy += 0.02; p.life -= 1;
-    const alpha = Math.max(0, p.life / p.max);
-    fwCtx.fillStyle = withAlpha(p.color, alpha);
-    fwCtx.beginPath(); fwCtx.arc(p.x, p.y, 2, 0, Math.PI*2); fwCtx.fill();
-    if(p.life<=0) particles.splice(i,1);
-  }
-  requestAnimationFrame(tickFireworks);
-}
-
-function withAlpha(hex, a){
-  // hex like #aabbcc
-  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
-  return `rgba(${r},${g},${b},${a})`;
-}
-
-function randomAccent(){
-  // Use CSS variables; fallback palette
-  const styles = getComputedStyle(document.body);
-  const a = styles.getPropertyValue('--accent').trim() || '#8b5cf6';
-  const b = styles.getPropertyValue('--accent-2').trim() || '#22d3ee';
-  return Math.random()<0.5 ? a : b;
-}
-
-function triggerFlash(){
-  if(!flashEl) return;
-  flashEl.classList.add('flash-on');
-  setTimeout(()=>flashEl.classList.remove('flash-on'), 120);
-}
+// FX removed per request
 
