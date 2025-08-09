@@ -41,7 +41,10 @@ const state = {
   currentPlayerIndex: 0,
   timerSecondsRemaining: 0,
   timerId: null,
-  people: []
+  people: [],
+  results: [],
+  paused: false,
+  theme: 'dark'
 };
 
 // =========================
@@ -62,6 +65,7 @@ const qtotalEl = document.getElementById('qtotal');
 const afterRef = document.getElementById('after-ref');
 const btnNext = document.getElementById('btn-next');
 const btnQuit = document.getElementById('btn-quit');
+const btnPause = document.getElementById('btn-pause');
 const peopleList = document.getElementById('people-list');
 const searchPerson = document.getElementById('search-person');
 const difficultySel = document.getElementById('difficulty');
@@ -77,6 +81,13 @@ const challengeStatusEl = document.getElementById('challenge-status');
 const currentPlayerEl = document.getElementById('current-player');
 const p1ScoreEl = document.getElementById('p1-score');
 const p2ScoreEl = document.getElementById('p2-score');
+const progressBarEl = document.getElementById('progress-bar');
+const btnTheme = document.getElementById('btn-theme');
+const modalEl = document.getElementById('summary-modal');
+const summaryStatsEl = document.getElementById('summary-stats');
+const summaryListEl = document.getElementById('summary-list');
+const btnSummaryClose = document.getElementById('btn-summary-close');
+const btnPlayAgain = document.getElementById('btn-play-again');
 
 // =========================
 // Init
@@ -85,6 +96,16 @@ init();
 
 function init(){
   state.people = loadPeopleDataFromLocalStorage() || DEFAULT_PEOPLE_DATA.slice();
+  // Load persisted settings/theme
+  const savedSettings = loadSettings();
+  if(savedSettings){
+    difficultySel.value = savedSettings.difficulty ?? difficultySel.value;
+    numQuestionsInput.value = String(savedSettings.numQuestions ?? numQuestionsInput.value);
+    timeLimitInput.value = String(savedSettings.timeLimit ?? timeLimitInput.value);
+    applyTheme(savedSettings.theme || 'dark');
+  } else {
+    applyTheme('dark');
+  }
   renderPeopleList();
   attachHandlers();
 }
@@ -96,6 +117,7 @@ function attachHandlers(){
   btnStudy.addEventListener('click', ()=>{ setMode('study'); renderPeopleList(); });
   btnNext.addEventListener('click', nextQuestion);
   btnQuit.addEventListener('click', quitQuiz);
+  btnPause.addEventListener('click', togglePause);
   btnExport.addEventListener('click', exportJson);
   btnImport.addEventListener('click', ()=>fileInput.click());
   btnResetData.addEventListener('click', resetData);
@@ -104,6 +126,22 @@ function attachHandlers(){
 
   // Keyboard navigation on answers
   answersEl.addEventListener('keydown', onAnswersKeyDown);
+
+  // Persist settings
+  difficultySel.addEventListener('change', saveSettingsFromUI);
+  numQuestionsInput.addEventListener('change', saveSettingsFromUI);
+  timeLimitInput.addEventListener('change', saveSettingsFromUI);
+
+  // Theme toggle
+  btnTheme.addEventListener('click', ()=>{
+    const next = state.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    saveSettingsFromUI();
+  });
+
+  // Modal handlers
+  btnSummaryClose.addEventListener('click', hideSummaryModal);
+  btnPlayAgain.addEventListener('click', ()=>{ hideSummaryModal(); startSolo(); });
 }
 
 function setMode(mode){
@@ -144,7 +182,7 @@ function startChallenge(){
 function prepareQuiz(mode){
   setMode(mode);
   afterRef.innerText='';
-  state.score = 0; state.streak = 0; state.qnum = 0;
+  state.score = 0; state.streak = 0; state.qnum = 0; state.results = []; state.paused = false;
   const count = parseInt(numQuestionsInput.value) || 10;
   const difficulty = difficultySel.value;
   state.questions = pickQuestionSet(count, difficulty);
@@ -154,6 +192,7 @@ function prepareQuiz(mode){
   streakEl.innerText = state.streak;
   btnNext.disabled = true;
   timerEl.style.display = (mode==='timed') ? 'inline-flex' : 'none';
+  btnPause.style.display = (mode==='timed') ? 'inline-block' : 'none';
   challengeStatusEl.style.display = (mode==='challenge') ? 'inline-flex' : 'none';
   if(mode==='timed'){
     const secs = parseInt(timeLimitInput.value) || 60;
@@ -225,6 +264,7 @@ function nextQuestion(){
   scoreEl.innerText = state.score;
   streakEl.innerText = state.streak;
   renderQuestion(state.current);
+  updateProgress();
 }
 
 function renderQuestion(q){
@@ -251,17 +291,39 @@ function renderQuestion(q){
 }
 
 function makeChoices(q){
-  // Build choices: correct + 3 distractors
+  const choices = new Set([q.answer]);
+  const distractors = getDistractors(q);
+  for(const d of distractors){
+    choices.add(d);
+    if(choices.size>=4) break;
+  }
+  // Fallback to names if not enough
   const names = state.people.map(p=>p.name);
-  const choices = new Set();
-  choices.add(q.answer);
-  while(choices.size < 4){
+  while(choices.size<4){
     const pick = names[Math.floor(Math.random()*names.length)];
     choices.add(pick);
   }
   const arr = Array.from(choices);
   shuffle(arr);
   return arr;
+}
+
+function getDistractors(q){
+  const results = [];
+  if(q.type==='occupation'){
+    const pool = state.people.map(p=>p.occupation).filter(Boolean).filter(x=>normalize(x)!==normalize(q.answer));
+    shuffle(pool); results.push(...pool);
+  } else if(q.type==='age'){
+    const pool = state.people.map(p=>p.age_notes).filter(Boolean).filter(x=>normalize(x)!==normalize(q.answer));
+    shuffle(pool); results.push(...pool);
+  } else if(q.type==='whoMother'){
+    const pool = state.people.map(p=>p.mother).filter(Boolean).filter(x=>normalize(x)!==normalize(q.answer));
+    shuffle(pool); results.push(...pool);
+  } else {
+    const pool = state.people.map(p=>p.name).filter(x=>normalize(x)!==normalize(q.answer));
+    shuffle(pool); results.push(...pool);
+  }
+  return results;
 }
 
 function handleAnswer(choice,q, el){
@@ -273,6 +335,9 @@ function handleAnswer(choice,q, el){
     if(normalize(node.innerText) === normalize(q.answer)) node.classList.add('correct');
   });
   if(!correct) el.classList.add('incorrect');
+
+  // Tiny animation feedback
+  el.classList.add(correct ? 'pulse-correct' : 'shake-wrong');
 
   if(correct){
     state.score += 10;
@@ -289,6 +354,9 @@ function handleAnswer(choice,q, el){
 
   scoreEl.innerText = state.score;
   streakEl.innerText = state.streak;
+
+  // Record result
+  state.results.push({ prompt: q.prompt, chosen: choice, correctAnswer: q.answer, correct, ref: q.ref||[] });
 
   // For challenge mode, alternate player each question
   if(state.mode==='challenge'){
@@ -317,6 +385,9 @@ function endQuiz(){
   stopTimer();
   state.current=null; state.questions=[]; state.qnum=0; state.qtotal=0;
   btnNext.disabled = true;
+
+  // Show summary modal
+  showSummaryModal();
 }
 
 // =========================
@@ -328,6 +399,7 @@ function startTimer(seconds){
   timeRemainingEl.textContent = String(state.timerSecondsRemaining);
   timerEl.style.display = 'inline-flex';
   state.timerId = setInterval(()=>{
+    if(state.paused) return;
     state.timerSecondsRemaining -= 1;
     timeRemainingEl.textContent = String(Math.max(0, state.timerSecondsRemaining));
     if(state.timerSecondsRemaining <= 0){
@@ -342,6 +414,12 @@ function stopTimer(){
     clearInterval(state.timerId);
     state.timerId = null;
   }
+}
+
+function togglePause(){
+  if(state.mode!=='timed') return;
+  state.paused = !state.paused;
+  btnPause.textContent = state.paused ? 'Resume' : 'Pause';
 }
 
 // =========================
@@ -455,5 +533,63 @@ function onAnswersKeyDown(e){
   }else if(e.key.toLowerCase()==='q'){
     btnQuit.click();
   }
+}
+
+function updateProgress(){
+  if(!progressBarEl) return;
+  const answered = Math.max(0, state.qnum - 1);
+  const pct = state.qtotal ? Math.round((answered / state.qtotal) * 100) : 0;
+  progressBarEl.style.width = pct + '%';
+}
+
+// Theme
+function applyTheme(theme){
+  state.theme = theme;
+  if(theme==='light') document.body.classList.add('light');
+  else document.body.classList.remove('light');
+}
+
+function saveSettingsFromUI(){
+  const settings = {
+    difficulty: difficultySel.value,
+    numQuestions: parseInt(numQuestionsInput.value)||10,
+    timeLimit: parseInt(timeLimitInput.value)||60,
+    theme: state.theme
+  };
+  try{ localStorage.setItem('settings', JSON.stringify(settings)); }catch(_){/* ignore */}
+}
+
+function loadSettings(){
+  try{
+    const txt = localStorage.getItem('settings');
+    if(!txt) return null;
+    return JSON.parse(txt);
+  }catch(_){ return null; }
+}
+
+// Summary modal
+function showSummaryModal(){
+  if(!modalEl) return;
+  const total = state.results.length;
+  const correct = state.results.filter(r=>r.correct).length;
+  const accuracy = total ? Math.round((correct/total)*100) : 0;
+  summaryStatsEl.innerHTML = `Answered: ${total} • Correct: ${correct} • Accuracy: ${accuracy}%`;
+  summaryListEl.innerHTML = '';
+  state.results.forEach(r=>{
+    const div = document.createElement('div');
+    div.className = 'summary-item ' + (r.correct?'correct':'incorrect');
+    div.innerHTML = `
+      <div><strong>Q:</strong> ${r.prompt}</div>
+      <div><strong>Your answer:</strong> ${r.chosen}</div>
+      <div><strong>Correct:</strong> ${r.correctAnswer}</div>
+      <div class="ref"><strong>Refs:</strong> ${(r.ref||[]).join(', ')}</div>
+    `;
+    summaryListEl.appendChild(div);
+  });
+  modalEl.style.display = 'flex';
+}
+
+function hideSummaryModal(){
+  if(modalEl) modalEl.style.display = 'none';
 }
 
