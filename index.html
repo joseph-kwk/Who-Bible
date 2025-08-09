@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Bible People Challenge</title>
+  <title>Who-Bible</title>
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
   <div class="app">
     <header>
       <div>
-        <h1>Bible People Challenge</h1>
+        <h1>Who-Bible</h1>
         <div class="muted">Who did this? At what age? Who's mother? Occupations & events — accurate refs included.</div>
       </div>
       <div class="controls">
@@ -24,6 +24,47 @@
 
     <main>
       <div class="grid">
+        <aside class="card">
+          <div class="brand" aria-hidden="false">
+            <div class="brand-title">Who-Bible</div>
+            <div class="brand-desc">A beautiful, accurate, and extensible Bible people challenge. Learn who did what, ages, mothers, occupations, and events — with verse references.</div>
+          </div>
+          <div style="margin-bottom:10px">
+            <label for="difficulty">Difficulty</label>
+            <select id="difficulty">
+              <option value="easy">Beginner</option>
+              <option value="medium" selected>Intermediate</option>
+              <option value="hard">Expert</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom:10px">
+            <label for="num-questions"># Questions</label>
+            <input id="num-questions" type="text" value="10" />
+          </div>
+
+          <div style="margin-bottom:10px">
+            <label for="time-limit">Timed: seconds</label>
+            <input id="time-limit" type="text" value="60" />
+          </div>
+
+          <div style="margin-bottom:6px">
+            <label for="search-person">Study: search people</label>
+            <input id="search-person" type="text" placeholder="Type a name (e.g. Moses)" />
+          </div>
+          <div style="display:flex; gap:8px; margin-bottom:10px">
+            <button id="btn-shuffle-list" title="Shuffle study list">Shuffle List</button>
+            <button id="btn-export">Export JSON</button>
+            <button id="btn-import">Import JSON</button>
+            <button id="btn-reset-data">Reset Data</button>
+            <input id="file-input" type="file" accept="application/json" style="display:none" />
+          </div>
+
+          <div class="people-list card" id="people-list" style="padding:8px;">
+            <!-- populated by JS -->
+          </div>
+        </aside>
+
         <section class="card" id="game-area">
           <div id="welcome">
             <p class="muted">Choose a mode to begin. The dataset is editable via Import, and persisted to your browser. Each question shows a verse reference after you answer.</p>
@@ -52,43 +93,6 @@
             </div>
           </div>
         </section>
-
-        <aside class="card">
-          <div style="margin-bottom:10px">
-            <label for="difficulty">Difficulty</label>
-            <select id="difficulty">
-              <option value="easy">Beginner</option>
-              <option value="medium" selected>Intermediate</option>
-              <option value="hard">Expert</option>
-            </select>
-          </div>
-
-          <div style="margin-bottom:10px">
-            <label for="num-questions"># Questions</label>
-            <input id="num-questions" type="text" value="10" />
-          </div>
-
-          <div style="margin-bottom:10px">
-            <label for="time-limit">Timed: seconds</label>
-            <input id="time-limit" type="text" value="60" />
-          </div>
-
-          <div style="margin-bottom:10px">
-            <label for="search-person">Study: search people</label>
-            <input id="search-person" type="text" placeholder="Type a name (e.g. Moses)" />
-          </div>
-
-          <div class="people-list card" id="people-list" style="padding:8px;">
-            <!-- populated by JS -->
-          </div>
-
-          <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
-            <button id="btn-export">Export JSON</button>
-            <button id="btn-import">Import JSON</button>
-            <button id="btn-reset-data">Reset Data</button>
-            <input id="file-input" type="file" accept="application/json" style="display:none" />
-          </div>
-        </aside>
       </div>
 
       <footer>
@@ -115,6 +119,18 @@
         <button id="btn-play-again" class="primary">Play Again</button>
       </div>
     </div>
+  </div>
+
+  <!-- Ambient FX Layer (decorative) -->
+  <div id="fx-layer" aria-hidden="true">
+    <canvas id="fireworks-canvas"></canvas>
+    <div class="clouds">
+      <div class="cloud c1"></div>
+      <div class="cloud c2"></div>
+      <div class="cloud c3"></div>
+    </div>
+    <div class="wave"></div>
+    <div id="flash"></div>
   </div>
 </body>
 </html>

@@ -74,6 +74,7 @@ const timeLimitInput = document.getElementById('time-limit');
 const btnExport = document.getElementById('btn-export');
 const btnImport = document.getElementById('btn-import');
 const btnResetData = document.getElementById('btn-reset-data');
+const btnShuffleList = document.getElementById('btn-shuffle-list');
 const fileInput = document.getElementById('file-input');
 const timerEl = document.getElementById('timer');
 const timeRemainingEl = document.getElementById('time-remaining');
@@ -88,6 +89,9 @@ const summaryStatsEl = document.getElementById('summary-stats');
 const summaryListEl = document.getElementById('summary-list');
 const btnSummaryClose = document.getElementById('btn-summary-close');
 const btnPlayAgain = document.getElementById('btn-play-again');
+// FX
+const fireworksCanvas = document.getElementById('fireworks-canvas');
+const flashEl = document.getElementById('flash');
 
 // =========================
 // Init
@@ -121,6 +125,7 @@ function attachHandlers(){
   btnExport.addEventListener('click', exportJson);
   btnImport.addEventListener('click', ()=>fileInput.click());
   btnResetData.addEventListener('click', resetData);
+  btnShuffleList?.addEventListener('click', ()=>{ shuffle(state.people); renderPeopleList(searchPerson.value); });
   fileInput.addEventListener('change', handleImportFile);
   searchPerson.addEventListener('input', e=>renderPeopleList(e.target.value));
 
@@ -142,6 +147,9 @@ function attachHandlers(){
   // Modal handlers
   btnSummaryClose.addEventListener('click', hideSummaryModal);
   btnPlayAgain.addEventListener('click', ()=>{ hideSummaryModal(); startSolo(); });
+
+  // Initialize fireworks
+  initFireworks();
 }
 
 function setMode(mode){
@@ -347,6 +355,9 @@ function handleAnswer(choice,q, el){
       state.players[state.currentPlayerIndex].score += 10;
       updateChallengeScores();
     }
+    // FX: streak flash and small burst
+    triggerFlash();
+    spawnBurst(2 + Math.min(8, state.streak));
   }else{
     state.streak = 0;
     afterRef.innerText = `Incorrect. Correct: ${q.answer}. Ref: ${(q.ref||[]).join(', ')}`;
@@ -388,6 +399,8 @@ function endQuiz(){
 
   // Show summary modal
   showSummaryModal();
+  // Big fireworks at end
+  spawnBurst(25);
 }
 
 // =========================
@@ -591,5 +604,69 @@ function showSummaryModal(){
 
 function hideSummaryModal(){
   if(modalEl) modalEl.style.display = 'none';
+}
+
+// =========================
+// FX: Fireworks + Flash
+// =========================
+let fwCtx, fwW, fwH, particles=[];
+function initFireworks(){
+  if(!fireworksCanvas) return;
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const resize=()=>{
+    fwW = fireworksCanvas.clientWidth; fwH = fireworksCanvas.clientHeight;
+    fireworksCanvas.width = Math.floor(fwW * dpr);
+    fireworksCanvas.height = Math.floor(fwH * dpr);
+    fwCtx = fireworksCanvas.getContext('2d');
+    fwCtx.setTransform(dpr,0,0,dpr,0,0);
+  };
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(tickFireworks);
+}
+
+function spawnBurst(count){
+  if(!fwCtx) return;
+  const cx = Math.random()*fwW; const cy = Math.random()*fwH*0.5 + fwH*0.1;
+  for(let i=0;i<count;i++){
+    const angle = Math.random()*Math.PI*2;
+    const speed = Math.random()*2+1;
+    const life = Math.random()*60+40;
+    particles.push({ x:cx, y:cy, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed-1, life, max:life, color:randomAccent() });
+  }
+}
+
+function tickFireworks(){
+  if(!fwCtx){ requestAnimationFrame(tickFireworks); return; }
+  fwCtx.clearRect(0,0,fwW,fwH);
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy; p.vy += 0.02; p.life -= 1;
+    const alpha = Math.max(0, p.life / p.max);
+    fwCtx.fillStyle = withAlpha(p.color, alpha);
+    fwCtx.beginPath(); fwCtx.arc(p.x, p.y, 2, 0, Math.PI*2); fwCtx.fill();
+    if(p.life<=0) particles.splice(i,1);
+  }
+  requestAnimationFrame(tickFireworks);
+}
+
+function withAlpha(hex, a){
+  // hex like #aabbcc
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function randomAccent(){
+  // Use CSS variables; fallback palette
+  const styles = getComputedStyle(document.body);
+  const a = styles.getPropertyValue('--accent').trim() || '#8b5cf6';
+  const b = styles.getPropertyValue('--accent-2').trim() || '#22d3ee';
+  return Math.random()<0.5 ? a : b;
+}
+
+function triggerFlash(){
+  if(!flashEl) return;
+  flashEl.classList.add('flash-on');
+  setTimeout(()=>flashEl.classList.remove('flash-on'), 120);
 }
 
