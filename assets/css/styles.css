@@ -1,0 +1,36 @@
+:root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#60a5fa;--good:#10b981;--bad:#ef4444}
+*{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+body{margin:0;background:linear-gradient(180deg,var(--bg),#071025);color:#e6eef8;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px}
+.app{width:100%;max-width:980px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+h1{font-size:20px;margin:0}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button{background:var(--card);border:1px solid rgba(255,255,255,0.04);color:inherit;padding:8px 12px;border-radius:8px;cursor:pointer}
+button.primary{background:linear-gradient(90deg,var(--accent),#7dd3fc);color:#022c43;font-weight:700}
+main{background:rgba(255,255,255,0.02);padding:18px;border-radius:12px;box-shadow:0 6px 24px rgba(2,6,23,0.6)}
+.grid{display:grid;grid-template-columns:1fr 320px;gap:16px}
+.card{background:rgba(255,255,255,0.01);padding:12px;border-radius:10px}
+.question{font-size:18px;margin-bottom:14px}
+.answers{display:flex;flex-direction:column;gap:8px}
+.ans{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;outline:none}
+.ans:focus{box-shadow:0 0 0 2px rgba(96,165,250,0.5)}
+.ans.correct{background:rgba(16,185,129,0.2);border-color:rgba(16,185,129,0.6)}
+.ans.incorrect{background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.6)}
+.ans.disabled{opacity:0.6;pointer-events:none}
+.status{margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.muted{color:var(--muted);font-size:13px}
+.small{font-size:13px}
+.timer{background:rgba(255,255,255,0.05);padding:4px 8px;border-radius:6px}
+.people-list{max-height:480px;overflow:auto}
+.person-item{padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.02);margin-bottom:8px}
+.person-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.person-details{margin-top:6px;color:#d2dbea;font-size:13px}
+label{display:block;margin-bottom:6px;font-size:13px}
+input[type=text],select,textarea{width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.2);color:inherit}
+footer{margin-top:14px;font-size:13px;color:var(--muted)}
+.ref{font-size:13px;color:var(--muted)}
+
+@media (max-width: 860px){
+  .grid{grid-template-columns:1fr}
+}
+
