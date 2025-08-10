@@ -98,6 +98,9 @@ const filterMother = document.getElementById('filter-mother');
 const filterOccupation = document.getElementById('filter-occupation');
 const filterAge = document.getElementById('filter-age');
 const peopleCountEl = document.getElementById('people-count');
+
+// Language selector
+const languageSelect = document.getElementById('language-select');
 const btnShuffleList = document.getElementById('btn-shuffle-list');
 const btnExpandAll = document.getElementById('btn-expand-all');
 const btnCollapseAll = document.getElementById('btn-collapse-all');
@@ -137,13 +140,21 @@ function init(){
   } else {
     applyTheme('dark');
   }
+  
+  // Initialize language system
+  initLanguage();
+  
   renderPeopleList();
   attachHandlers();
   // Welcome toast
-  showToast({ title: 'Welcome to Who-Bible', msg: 'Configure your settings and choose a mode to begin!', type: 'info', timeout: 4000 });
+  showToast({ title: getText('brandTitle'), msg: getText('welcomeMessage'), type: 'info', timeout: 4000 });
 }
 
 function attachHandlers(){
+  // Logo click handler
+  const logoSection = document.querySelector('.logo-section');
+  logoSection.addEventListener('click', showSetup);
+  
   // Mode buttons
   btnSolo.addEventListener('click', startSolo);
   btnTimed.addEventListener('click', startTimed);
@@ -179,6 +190,11 @@ function attachHandlers(){
   difficultySel.addEventListener('change', saveSettingsFromUI);
   numQuestionsInput.addEventListener('change', saveSettingsFromUI);
   timeLimitInput.addEventListener('change', saveSettingsFromUI);
+  
+  // Language selector
+  languageSelect.addEventListener('change', (e) => {
+    setLanguage(e.target.value);
+  });
   
   // Theme toggle
   btnTheme.addEventListener('click', ()=>{
@@ -234,7 +250,7 @@ function startSolo(){
   showGame();
   gameTitle.textContent = 'Solo Mode';
   prepareQuiz('solo');
-  showToast({ title: 'Solo Mode', msg: 'Answer at your own pace. Good luck!', type: 'info' });
+  showToast({ title: getText('soloStart'), msg: getText('soloStartMsg'), type: 'info' });
 }
 
 function startTimed(){
@@ -242,7 +258,7 @@ function startTimed(){
   gameTitle.textContent = 'Timed Mode';
   prepareQuiz('timed');
   const secs = parseInt(timeLimitInput.value)||60;
-  showToast({ title: 'Timed Mode', msg: `You have ${secs}s. You can pause if needed.`, type: 'warn' });
+  showToast({ title: getText('timedStart'), msg: getText('timedStartMsg'), type: 'warn' });
 }
 
 function startChallenge(){
@@ -261,12 +277,12 @@ function startChallengeFromModal(){
   p1ScoreEl.textContent = '0';
   p2ScoreEl.textContent = '0';
   prepareQuiz('challenge');
-  showToast({ title: 'Challenge Mode', msg: `${name1} vs ${name2}. Alternate turns each question.`, type: 'info' });
+  showToast({ title: getText('challengeStart'), msg: getText('challengeStartMsg'), type: 'info' });
 }
 
 function startStudy(){
   showStudy();
-  showToast({ title: 'Study Mode', msg: 'Browse and learn about Bible people. Use filters and search to find specific information.', type: 'info' });
+  showToast({ title: getText('studyStart'), msg: getText('studyStartMsg'), type: 'info' });
 }
 
 function prepareQuiz(mode){
@@ -320,22 +336,24 @@ function pickQuestionSet(count, difficulty){
   for(const person of selected){
     const t = types[Math.floor(Math.random()*types.length)];
     if(t==='whoDid'){
-      questions.push({type:'whoDid',prompt:`Who is known for: ${person.notable_events?.[0] || 'a notable event'}?`,answer:person.name,ref:person.verses});
+      const event = person.notable_events?.[0] || getText('fallbackEvent');
+      questions.push({type:'whoDid',prompt:getText('questionWhoDid', {event}),answer:person.name,ref:person.verses});
     }else if(t==='whoMother'){
-      if(person.mother) questions.push({type:'whoMother',prompt:`Who was the mother of ${person.name}?`,answer:person.mother,ref:person.verses});
+      if(person.mother) questions.push({type:'whoMother',prompt:getText('questionWhoMother', {name: person.name}),answer:person.mother,ref:person.verses});
     }else if(t==='occupation'){
-      if(person.occupation) questions.push({type:'occupation',prompt:`What was ${person.name}'s occupation or role?`,answer:person.occupation,ref:person.verses});
+      if(person.occupation) questions.push({type:'occupation',prompt:getText('questionOccupation', {name: person.name}),answer:person.occupation,ref:person.verses});
     }else if(t==='age'){
-      if(person.age_notes) questions.push({type:'age',prompt:`Which age-note is correct for ${person.name}?`,answer:person.age_notes,ref:person.verses});
+      if(person.age_notes) questions.push({type:'age',prompt:getText('questionAge', {name: person.name}),answer:person.age_notes,ref:person.verses});
     }else if(t==='event'){
-      if(person.notable_events && person.notable_events.length>0) questions.push({type:'event',prompt:`Which person is linked to: ${person.notable_events[0]}?`,answer:person.name,ref:person.verses});
+      if(person.notable_events && person.notable_events.length>0) questions.push({type:'event',prompt:getText('questionEvent', {event: person.notable_events[0]}),answer:person.name,ref:person.verses});
     }
   }
   // ensure we have at least count questions; fill with simple ones
   let i = 0;
   while(questions.length < count && i < state.people.length){
     const p = state.people[i++];
-    questions.push({type:'whoDid',prompt:`Who is known for: ${p.notable_events?.[0] || 'a notable event'}?`,answer:p.name,ref:p.verses});
+    const event = p.notable_events?.[0] || getText('fallbackEvent');
+    questions.push({type:'whoDid',prompt:getText('questionWhoDid', {event}),answer:p.name,ref:p.verses});
   }
   return questions.slice(0, count);
 }
@@ -447,11 +465,11 @@ function handleAnswer(choice,q, el){
       state.players[state.currentPlayerIndex].score += 10;
       updateChallengeScores();
     }
-    showToast({ title: 'Correct!', msg: `+10 points${state.mode==='challenge'?` for ${state.players[state.currentPlayerIndex].name}`:''}`, type: 'success', timeout: 1500 });
+    showToast({ title: getText('correctAnswer'), msg: getText('correctMsg'), type: 'success', timeout: 1500 });
   }else{
     state.streak = 0;
     afterRef.innerText = `Incorrect. Correct: ${q.answer}. Ref: ${(q.ref||[]).join(', ')}`;
-    showToast({ title: 'Incorrect', msg: `Correct is ${q.answer}`, type: 'error', timeout: 1800 });
+    showToast({ title: getText('wrongAnswer'), msg: getText('wrongMsg', { answer: q.answer }), type: 'error', timeout: 1800 });
   }
 
   scoreEl.innerText = state.score;
@@ -465,7 +483,7 @@ function handleAnswer(choice,q, el){
     state.currentPlayerIndex = (state.currentPlayerIndex + 1) % 2;
     currentPlayerEl.textContent = String(state.currentPlayerIndex + 1);
     const nextName = state.players[state.currentPlayerIndex].name;
-    showToast({ title: 'Next turn', msg: `Player: ${nextName}`, type: 'info', timeout: 1200 });
+    showToast({ title: getText('challengeTurn', { player: nextName }), msg: getText('challengeTurnMsg', { player: nextName }), type: 'info', timeout: 1200 });
   }
 
   btnNext.disabled = false;
@@ -601,12 +619,12 @@ async function handleImportFile(e){
       state.people = parsed;
       savePeopleDataToLocalStorage(parsed);
       renderPeopleList();
-      showToast({ title: 'Import successful', msg: `Loaded ${state.people.length} people.`, type: 'success' });
+      showToast({ title: getText('importSuccess'), msg: getText('importMsg'), type: 'success' });
     } else {
-      showToast({ title: 'Invalid JSON', msg: 'JSON must be an array of people', type: 'error' });
+      showToast({ title: getText('importError'), msg: getText('importErrorMsg'), type: 'error' });
     }
   }catch(err){
-    showToast({ title: 'Invalid JSON', msg: (err?.message||String(err)), type: 'error' });
+    showToast({ title: getText('importError'), msg: (err?.message||String(err)), type: 'error' });
   } finally {
     e.target.value = '';
   }
@@ -617,7 +635,7 @@ function resetData(){
     localStorage.removeItem('peopleData');
     state.people = DEFAULT_PEOPLE_DATA.slice();
     renderPeopleList();
-    showToast({ title: 'Dataset reset', msg: 'Restored built-in entries.', type: 'success' });
+    showToast({ title: getText('resetSuccess'), msg: getText('resetMsg'), type: 'success' });
   }
 }
 
@@ -702,7 +720,7 @@ function showSummaryModal(){
   const total = state.results.length;
   const correct = state.results.filter(r=>r.correct).length;
   const accuracy = total ? Math.round((correct/total)*100) : 0;
-  summaryStatsEl.innerHTML = `Answered: ${total} • Correct: ${correct} • Accuracy: ${accuracy}%`;
+  summaryStatsEl.innerHTML = getText('summaryStats', { score: correct, total: total, percentage: accuracy, streak: state.streak });
   summaryListEl.innerHTML = '';
   state.results.forEach(r=>{
     const div = document.createElement('div');
@@ -760,7 +778,7 @@ function scheduleTimeWarnings(){
   const check = ()=>{
     const t = state.timerSecondsRemaining;
     if(warnAt.has(t)){
-      showToast({ title: 'Time warning', msg: `${t}s remaining`, type: t<=5?'error':'warn', timeout: 1200 });
+      showToast({ title: getText('timeWarning'), msg: getText('timeWarningMsg', { time: t }), type: t<=5?'error':'warn', timeout: 1200 });
       warnAt.delete(t);
     }
     if(state.timerId) requestAnimationFrame(check);

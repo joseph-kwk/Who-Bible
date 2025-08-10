@@ -4,17 +4,49 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Who-Bible</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png" />
+  <link rel="apple-touch-icon" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <script src="assets/js/translations.js" defer></script>
 </head>
 <body>
   <div class="app">
     <header>
-      <div>
-        <h1>Who-Bible</h1>
-        <div class="muted">Who did this? At what age? Who's mother? Occupations & events — accurate refs included.</div>
-      </div>
-      <div class="controls">
-        <button id="btn-theme" title="Toggle theme">Theme</button>
+      <div class="header-content">
+        <div class="logo-section">
+          <img src="assets/images/logo.png" alt="Who-Bible Logo" class="logo" />
+          <div class="title-section">
+            <h1>Who-Bible</h1>
+            <div class="muted">Who did this? At what age? Who's mother? Occupations & events — accurate refs included.</div>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="language-selector">
+            <select id="language-select">
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+              <option value="es">Español</option>
+            </select>
+          </div>
+          <button id="btn-theme" title="Toggle theme" class="theme-toggle" data-title-key="toggleTheme">
+            <div class="theme-icon">
+              <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/>
+                <line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              </svg>
+              <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+            </div>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -50,28 +82,28 @@
           <div class="setup-section">
             <h3>Game Modes</h3>
             <div class="mode-buttons">
-              <button id="btn-solo" class="mode-btn primary">
+              <button id="btn-solo" class="mode-btn primary" data-mode="solo">
                 <div class="mode-icon">📚</div>
                 <div class="mode-text">
                   <div class="mode-title">Solo Mode</div>
                   <div class="mode-desc">Practice at your own pace</div>
                 </div>
               </button>
-              <button id="btn-timed" class="mode-btn">
+              <button id="btn-timed" class="mode-btn" data-mode="timed">
                 <div class="mode-icon">⏱️</div>
                 <div class="mode-text">
                   <div class="mode-title">Timed Mode</div>
                   <div class="mode-desc">Race against the clock</div>
                 </div>
               </button>
-              <button id="btn-challenge" class="mode-btn">
+              <button id="btn-challenge" class="mode-btn" data-mode="challenge">
                 <div class="mode-icon">⚔️</div>
                 <div class="mode-text">
                   <div class="mode-title">Challenge Mode</div>
                   <div class="mode-desc">Two players compete</div>
                 </div>
               </button>
-              <button id="btn-study" class="mode-btn">
+              <button id="btn-study" class="mode-btn" data-mode="study">
                 <div class="mode-icon">🔍</div>
                 <div class="mode-text">
                   <div class="mode-title">Study Mode</div>
@@ -185,7 +217,7 @@
   <div id="summary-modal" class="modal-overlay" style="display:none">
     <div class="modal">
       <div class="modal-header">
-        <h2>Quiz Summary</h2>
+        <h2 id="summary-modal-title">Quiz Summary</h2>
         <button id="btn-summary-close" aria-label="Close">✕</button>
       </div>
       <div class="modal-body">
@@ -202,16 +234,16 @@
   <div id="players-modal" class="modal-overlay" style="display:none">
     <div class="modal">
       <div class="modal-header">
-        <h2>Challenge Setup</h2>
+        <h2 id="challenge-modal-title">Challenge Setup</h2>
         <button id="btn-players-close" aria-label="Close">✕</button>
       </div>
       <div class="modal-body">
         <div class="row">
-          <label for="p1-name">Player 1 name</label>
+          <label for="p1-name" id="p1-name-label">Player 1 name</label>
           <input id="p1-name" type="text" placeholder="P1" />
         </div>
         <div class="row">
-          <label for="p2-name">Player 2 name</label>
+          <label for="p2-name" id="p2-name-label">Player 2 name</label>
           <input id="p2-name" type="text" placeholder="P2" />
         </div>
       </div>
@@ -224,6 +256,44 @@
 
   <!-- Toast Notifications -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <img src="assets/images/logo.png" alt="Who-Bible Logo" class="footer-logo" />
+        <div class="footer-title">Who-Bible</div>
+      </div>
+      <div class="footer-info">
+        <p>A beautiful, accurate, and extensible Bible people challenge</p>
+        <p>Learn who did what, ages, mothers, occupations, and events — with verse references</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-section">
+          <h4>Game Modes</h4>
+          <ul>
+            <li>Solo Mode - Practice at your own pace</li>
+            <li>Timed Mode - Race against the clock</li>
+            <li>Challenge Mode - Two players compete</li>
+            <li>Study Mode - Explore all Bible people</li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Features</h4>
+          <ul>
+            <li>Multiple difficulty levels</li>
+            <li>Customizable quiz length</li>
+            <li>Accurate verse references</li>
+            <li>Dark and light themes</li>
+            <li>Multi-language support</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Who-Bible. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
 </body>
 </html>
