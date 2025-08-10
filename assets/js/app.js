@@ -50,12 +50,28 @@ const state = {
 // =========================
 // Elements
 // =========================
+// Panels
+const setupPanel = document.getElementById('setup-panel');
+const gameArea = document.getElementById('game-area');
+const studyPanel = document.getElementById('study-panel');
+
+// Setup elements
 const btnSolo = document.getElementById('btn-solo');
 const btnTimed = document.getElementById('btn-timed');
 const btnChallenge = document.getElementById('btn-challenge');
 const btnStudy = document.getElementById('btn-study');
+const difficultySel = document.getElementById('difficulty');
+const numQuestionsInput = document.getElementById('num-questions');
+const timeLimitInput = document.getElementById('time-limit');
+const btnExport = document.getElementById('btn-export');
+const btnImport = document.getElementById('btn-import');
+const btnResetData = document.getElementById('btn-reset-data');
+const fileInput = document.getElementById('file-input');
+
+// Game elements
+const btnBackToSetup = document.getElementById('btn-back-to-setup');
+const gameTitle = document.getElementById('game-title');
 const quizEl = document.getElementById('quiz');
-const welcomeEl = document.getElementById('welcome');
 const qText = document.getElementById('question-text');
 const answersEl = document.getElementById('answers');
 const scoreEl = document.getElementById('score');
@@ -66,16 +82,6 @@ const afterRef = document.getElementById('after-ref');
 const btnNext = document.getElementById('btn-next');
 const btnQuit = document.getElementById('btn-quit');
 const btnPause = document.getElementById('btn-pause');
-const peopleList = document.getElementById('people-list');
-const searchPerson = document.getElementById('search-person');
-const difficultySel = document.getElementById('difficulty');
-const numQuestionsInput = document.getElementById('num-questions');
-const timeLimitInput = document.getElementById('time-limit');
-const btnExport = document.getElementById('btn-export');
-const btnImport = document.getElementById('btn-import');
-const btnResetData = document.getElementById('btn-reset-data');
-const btnShuffleList = document.getElementById('btn-shuffle-list');
-const fileInput = document.getElementById('file-input');
 const timerEl = document.getElementById('timer');
 const timeRemainingEl = document.getElementById('time-remaining');
 const challengeStatusEl = document.getElementById('challenge-status');
@@ -83,28 +89,35 @@ const currentPlayerEl = document.getElementById('current-player');
 const p1ScoreEl = document.getElementById('p1-score');
 const p2ScoreEl = document.getElementById('p2-score');
 const progressBarEl = document.getElementById('progress-bar');
-const btnTheme = document.getElementById('btn-theme');
-const modalEl = document.getElementById('summary-modal');
-const summaryStatsEl = document.getElementById('summary-stats');
-const summaryListEl = document.getElementById('summary-list');
-const btnSummaryClose = document.getElementById('btn-summary-close');
-const btnPlayAgain = document.getElementById('btn-play-again');
-// Toasts & Study/Challenge UI
-const toastContainer = document.getElementById('toast-container');
+
+// Study elements
+const btnBackFromStudy = document.getElementById('btn-back-from-study');
+const searchPerson = document.getElementById('search-person');
 const sortSelect = document.getElementById('sort-select');
 const filterMother = document.getElementById('filter-mother');
 const filterOccupation = document.getElementById('filter-occupation');
 const filterAge = document.getElementById('filter-age');
 const peopleCountEl = document.getElementById('people-count');
+const btnShuffleList = document.getElementById('btn-shuffle-list');
 const btnExpandAll = document.getElementById('btn-expand-all');
 const btnCollapseAll = document.getElementById('btn-collapse-all');
+const peopleList = document.getElementById('people-list');
+
+// Modal elements
+const modalEl = document.getElementById('summary-modal');
+const summaryStatsEl = document.getElementById('summary-stats');
+const summaryListEl = document.getElementById('summary-list');
+const btnSummaryClose = document.getElementById('btn-summary-close');
+const btnPlayAgain = document.getElementById('btn-play-again');
 const playersModal = document.getElementById('players-modal');
 const btnPlayersClose = document.getElementById('btn-players-close');
 const btnPlayersCancel = document.getElementById('btn-players-cancel');
 const btnPlayersStart = document.getElementById('btn-players-start');
 const p1NameInput = document.getElementById('p1-name');
 const p2NameInput = document.getElementById('p2-name');
-// Toasts
+
+// Theme and toasts
+const btnTheme = document.getElementById('btn-theme');
 const toastContainer = document.getElementById('toast-container');
 
 // =========================
@@ -126,86 +139,138 @@ function init(){
   }
   renderPeopleList();
   attachHandlers();
+  // Welcome toast
+  showToast({ title: 'Welcome to Who-Bible', msg: 'Configure your settings and choose a mode to begin!', type: 'info', timeout: 4000 });
 }
 
 function attachHandlers(){
+  // Mode buttons
   btnSolo.addEventListener('click', startSolo);
   btnTimed.addEventListener('click', startTimed);
   btnChallenge.addEventListener('click', startChallenge);
-  btnStudy.addEventListener('click', ()=>{ setMode('study'); renderPeopleList(); });
+  btnStudy.addEventListener('click', startStudy);
+  
+  // Navigation
+  btnBackToSetup.addEventListener('click', showSetup);
+  btnBackFromStudy.addEventListener('click', showSetup);
+  
+  // Game controls
   btnNext.addEventListener('click', nextQuestion);
   btnQuit.addEventListener('click', quitQuiz);
   btnPause.addEventListener('click', togglePause);
+  
+  // Study controls
+  searchPerson.addEventListener('input', e=>renderPeopleList(e.target.value));
+  sortSelect.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  filterMother.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  filterOccupation.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  filterAge.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  btnShuffleList.addEventListener('click', ()=>{ shuffle(state.people); renderPeopleList(searchPerson.value); });
+  btnExpandAll.addEventListener('click', ()=>toggleAllDetails(true));
+  btnCollapseAll.addEventListener('click', ()=>toggleAllDetails(false));
+  
+  // Data management
   btnExport.addEventListener('click', exportJson);
   btnImport.addEventListener('click', ()=>fileInput.click());
   btnResetData.addEventListener('click', resetData);
-  btnShuffleList?.addEventListener('click', ()=>{ shuffle(state.people); renderPeopleList(searchPerson.value); });
   fileInput.addEventListener('change', handleImportFile);
-  searchPerson.addEventListener('input', e=>renderPeopleList(e.target.value));
-
-  // Study controls
-  sortSelect?.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
-  filterMother?.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
-  filterOccupation?.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
-  filterAge?.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
-  btnExpandAll?.addEventListener('click', ()=>toggleAllDetails(true));
-  btnCollapseAll?.addEventListener('click', ()=>toggleAllDetails(false));
-
-  // Keyboard navigation on answers
-  answersEl.addEventListener('keydown', onAnswersKeyDown);
-
-  // Persist settings
+  
+  // Settings persistence
   difficultySel.addEventListener('change', saveSettingsFromUI);
   numQuestionsInput.addEventListener('change', saveSettingsFromUI);
   timeLimitInput.addEventListener('change', saveSettingsFromUI);
-
+  
   // Theme toggle
   btnTheme.addEventListener('click', ()=>{
     const next = state.theme === 'dark' ? 'light' : 'dark';
     applyTheme(next);
     saveSettingsFromUI();
   });
-
+  
   // Modal handlers
   btnSummaryClose.addEventListener('click', hideSummaryModal);
-  btnPlayAgain.addEventListener('click', ()=>{ hideSummaryModal(); startSolo(); });
-
-  // Welcome toast
-  showToast({ title: 'Welcome to Who-Bible', msg: 'Choose a mode to begin. Use Theme to toggle light/dark.', type: 'info', timeout: 4000 });
+  btnPlayAgain.addEventListener('click', ()=>{ hideSummaryModal(); showSetup(); });
+  btnPlayersClose.addEventListener('click', hidePlayersModal);
+  btnPlayersCancel.addEventListener('click', hidePlayersModal);
+  btnPlayersStart.addEventListener('click', startChallengeFromModal);
+  
+  // Keyboard navigation on answers
+  answersEl.addEventListener('keydown', onAnswersKeyDown);
 }
 
-function setMode(mode){
-  state.mode = mode;
-  if(mode==='study'){
-    quizEl.style.display='none';
-    welcomeEl.style.display='block';
-    stopTimer();
-  }else{
-    welcomeEl.style.display='none';
-    quizEl.style.display='block';
-  }
+// =========================
+// Panel Management
+// =========================
+function showSetup(){
+  setupPanel.style.display = 'flex';
+  gameArea.style.display = 'none';
+  studyPanel.style.display = 'none';
+  stopTimer();
+  
+  // Reset quiz display
+  const quizEl = document.getElementById('quiz');
+  const welcomeMsg = document.getElementById('welcome-message');
+  if(quizEl) quizEl.style.display = 'none';
+  if(welcomeMsg) welcomeMsg.style.display = 'block';
+}
+
+function showGame(){
+  setupPanel.style.display = 'none';
+  gameArea.style.display = 'flex';
+  studyPanel.style.display = 'none';
+}
+
+function showStudy(){
+  setupPanel.style.display = 'none';
+  gameArea.style.display = 'none';
+  studyPanel.style.display = 'flex';
+  renderPeopleList();
 }
 
 // =========================
 // Modes
 // =========================
 function startSolo(){
+  showGame();
+  gameTitle.textContent = 'Solo Mode';
   prepareQuiz('solo');
   showToast({ title: 'Solo Mode', msg: 'Answer at your own pace. Good luck!', type: 'info' });
 }
 
 function startTimed(){
+  showGame();
+  gameTitle.textContent = 'Timed Mode';
   prepareQuiz('timed');
   const secs = parseInt(timeLimitInput.value)||60;
   showToast({ title: 'Timed Mode', msg: `You have ${secs}s. You can pause if needed.`, type: 'warn' });
 }
 
 function startChallenge(){
-  openPlayersModal();
+  showPlayersModal();
+}
+
+function startChallengeFromModal(){
+  const name1 = (p1NameInput.value||'P1').trim() || 'P1';
+  const name2 = (p2NameInput.value||'P2').trim() || 'P2';
+  hidePlayersModal();
+  showGame();
+  gameTitle.textContent = 'Challenge Mode';
+  state.players = [ { name: name1, score: 0 }, { name: name2, score: 0 } ];
+  state.currentPlayerIndex = 0;
+  currentPlayerEl.textContent = '1';
+  p1ScoreEl.textContent = '0';
+  p2ScoreEl.textContent = '0';
+  prepareQuiz('challenge');
+  showToast({ title: 'Challenge Mode', msg: `${name1} vs ${name2}. Alternate turns each question.`, type: 'info' });
+}
+
+function startStudy(){
+  showStudy();
+  showToast({ title: 'Study Mode', msg: 'Browse and learn about Bible people. Use filters and search to find specific information.', type: 'info' });
 }
 
 function prepareQuiz(mode){
-  setMode(mode);
+  state.mode = mode;
   afterRef.innerText='';
   state.score = 0; state.streak = 0; state.qnum = 0; state.results = []; state.paused = false;
   const count = parseInt(numQuestionsInput.value) || 10;
@@ -216,9 +281,19 @@ function prepareQuiz(mode){
   scoreEl.innerText = state.score;
   streakEl.innerText = state.streak;
   btnNext.disabled = true;
+  
+  // Show the quiz interface
+  quizEl.style.display = 'block';
+  
+  // Hide welcome message and show quiz content
+  const welcomeMsg = document.getElementById('welcome-message');
+  if(welcomeMsg) welcomeMsg.style.display = 'none';
+  
+  // Configure mode-specific elements
   timerEl.style.display = (mode==='timed') ? 'inline-flex' : 'none';
   btnPause.style.display = (mode==='timed') ? 'inline-block' : 'none';
   challengeStatusEl.style.display = (mode==='challenge') ? 'inline-flex' : 'none';
+  
   if(mode==='timed'){
     const secs = parseInt(timeLimitInput.value) || 60;
     startTimer(secs);
@@ -230,7 +305,7 @@ function prepareQuiz(mode){
 }
 
 function quitQuiz(){
-  setMode('study');
+  showSetup();
 }
 
 // =========================
@@ -372,7 +447,6 @@ function handleAnswer(choice,q, el){
       state.players[state.currentPlayerIndex].score += 10;
       updateChallengeScores();
     }
-    // FX removed
     showToast({ title: 'Correct!', msg: `+10 points${state.mode==='challenge'?` for ${state.players[state.currentPlayerIndex].name}`:''}`, type: 'success', timeout: 1500 });
   }else{
     state.streak = 0;
@@ -418,7 +492,6 @@ function endQuiz(){
 
   // Show summary modal
   showSummaryModal();
-  // FX removed
   showToast({ title: 'Quiz complete', msg: `Your score: ${state.score}${state.mode==='challenge'?`. ${winnerText()}`:''}`, type: 'success', timeout: 5000 });
 }
 
@@ -508,27 +581,6 @@ function renderPeopleList(filter){
 function toggleAllDetails(expand){
   const items = peopleList.querySelectorAll('.person-details');
   items.forEach(el=>{ el.style.display = expand ? 'block' : 'none'; });
-}
-
-function openPlayersModal(){
-  p1NameInput.value = 'P1';
-  p2NameInput.value = 'P2';
-  playersModal.style.display = 'flex';
-  const close = ()=>{ playersModal.style.display = 'none'; };
-  btnPlayersClose.onclick = close;
-  btnPlayersCancel.onclick = close;
-  btnPlayersStart.onclick = ()=>{
-    const name1 = (p1NameInput.value||'P1').trim() || 'P1';
-    const name2 = (p2NameInput.value||'P2').trim() || 'P2';
-    playersModal.style.display = 'none';
-    state.players = [ { name: name1, score: 0 }, { name: name2, score: 0 } ];
-    state.currentPlayerIndex = 0;
-    currentPlayerEl.textContent = '1';
-    p1ScoreEl.textContent = '0';
-    p2ScoreEl.textContent = '0';
-    prepareQuiz('challenge');
-    showToast({ title: 'Challenge Mode', msg: `${name1} vs ${name2}. Alternate turns each question.`, type: 'info' });
-  };
 }
 
 // =========================
@@ -670,6 +722,17 @@ function hideSummaryModal(){
   if(modalEl) modalEl.style.display = 'none';
 }
 
+// Players modal
+function showPlayersModal(){
+  p1NameInput.value = 'P1';
+  p2NameInput.value = 'P2';
+  playersModal.style.display = 'flex';
+}
+
+function hidePlayersModal(){
+  playersModal.style.display = 'none';
+}
+
 // =========================
 // Toasts
 // =========================
@@ -704,6 +767,4 @@ function scheduleTimeWarnings(){
   };
   requestAnimationFrame(check);
 }
-
-// FX removed per request
 
