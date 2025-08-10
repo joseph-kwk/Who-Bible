@@ -124,26 +124,85 @@ const btnTheme = document.getElementById('btn-theme');
 const toastContainer = document.getElementById('toast-container');
 
 // =========================
+// Event Translations
+// =========================
+const EVENT_TRANSLATIONS = {
+  "Built the ark": { fr: "A construit l'arche", es: "Construyó el arca" },
+  "Survived the flood": { fr: "A survécu au déluge", es: "Sobrevivió al diluvio" },
+  "Led Exodus": { fr: "A conduit l'Exode", es: "Lideró el Éxodo" },
+  "Saw burning bush": { fr: "A vu le buisson ardent", es: "Vio la zarza ardiente" },
+  "Built the temple": { fr: "A construit le temple", es: "Construyó el templo" },
+  "Known for wisdom": { fr: "Connu pour sa sagesse", es: "Conocido por su sabiduría" },
+  "Sold into Egypt": { fr: "Vendu en Égypte", es: "Vendido a Egipto" },
+  "Interpreted dreams": { fr: "A interprété des rêves", es: "Interpretó sueños" },
+  "Killed Goliath": { fr: "A tué Goliath", es: "Mató a Goliat" },
+  "Became king": { fr: "Est devenu roi", es: "Se convirtió en rey" },
+  "Became queen and saved her people": { fr: "Devenue reine et a sauvé son peuple", es: "Se convirtió en reina y salvó a su pueblo" },
+  "Mother of Jesus": { fr: "Mère de Jésus", es: "Madre de Jesús" },
+  "Baptized Jesus": { fr: "A baptisé Jésus", es: "Bautizó a Jesús" },
+  "Converted on road to Damascus": { fr: "Converti sur la route de Damas", es: "Convertido en el camino a Damasco" },
+  "Denial of Jesus": { fr: "A renié Jésus", es: "Negó a Jesús" },
+  "Leader of early church": { fr: "Chef de l'église primitive", es: "Líder de la iglesia primitiva" },
+  "Raised from the dead by Jesus": { fr: "Ressuscité par Jésus", es: "Resucitado por Jesús" },
+  "Father of Isaac": { fr: "Père d'Isaac", es: "Padre de Isaac" },
+  "Covenant with God": { fr: "Alliance avec Dieu", es: "Pacto con Dios" },
+  "Son of Abraham and Sarah": { fr: "Fils d'Abraham et de Sarah", es: "Hijo de Abraham y Sara" },
+  "Renamed Israel": { fr: "Renommé Israël", es: "Renombrado Israel" },
+  "Father of the 12 tribes": { fr: "Père des 12 tribus", es: "Padre de las 12 tribus" },
+  "Anointed Saul and David": { fr: "A oint Saül et David", es: "Ungió a Saúl y David" },
+  "Taken up by chariot of fire": { fr: "Enlevé par un char de feu", es: "Llevado por un carro de fuego" },
+  "Swallowed by fish": { fr: "Avalé par un poisson", es: "Tragado por un pez" },
+  "Ancestor of David": { fr: "Ancêtre de David", es: "Ancestro de David" },
+  "Married Boaz": { fr: "Mariée à Booz", es: "Casada con Booz" },
+  "Witnessed resurrection": { fr: "A été témoin de la résurrection", es: "Fue testigo de la resurrección" },
+  "First king of Israel": { fr: "Premier roi d'Israël", es: "Primer rey de Israel" },
+  "Sold by brothers at 17": { fr: "Vendu par ses frères à 17 ans", es: "Vendido por sus hermanos a los 17" },
+  "Died at 120; 80 when confronting Pharaoh": { fr: "Mort à 120 ans ; 80 ans lors de la confrontation avec Pharaon", es: "Murió a los 120; 80 cuando enfrentó al faraón" },
+  "Died at 175": { fr: "Mort à 175 ans", es: "Murió a los 175" },
+  "Died at 180": { fr: "Mort à 180 ans", es: "Murió a los 180" },
+  "Died at 147": { fr: "Mort à 147 ans", es: "Murió a los 147" },
+  "Jewish queen of Persia who saved her people.": { fr: "Reine juive de Perse qui a sauvé son peuple.", es: "Reina judía de Persia que salvó a su pueblo." },
+  // Add more as needed
+};
+
+function translateEvent(event) {
+  if (!event) return event;
+  const lang = (typeof currentLanguage !== 'undefined' ? currentLanguage : (window.currentLanguage || 'en'));
+  if (lang === 'en') return event;
+  return (EVENT_TRANSLATIONS[event] && EVENT_TRANSLATIONS[event][lang]) || event;
+}
+
+// =========================
 // Init
 // =========================
 init();
 
 function init(){
-  state.people = loadPeopleDataFromLocalStorage() || DEFAULT_PEOPLE_DATA.slice();
-  // Load persisted settings/theme
-  const savedSettings = loadSettings();
-  if(savedSettings){
-    difficultySel.value = savedSettings.difficulty ?? difficultySel.value;
-    numQuestionsInput.value = String(savedSettings.numQuestions ?? numQuestionsInput.value);
-    timeLimitInput.value = String(savedSettings.timeLimit ?? timeLimitInput.value);
-    applyTheme(savedSettings.theme || 'dark');
-  } else {
-    applyTheme('dark');
+  // Set default settings if not present
+  const defaultSettings = {
+    difficulty: 'medium',
+    numQuestions: 10,
+    timeLimit: 60,
+    theme: 'dark',
+    language: 'en'
+  };
+  let savedSettings = loadSettings();
+  if(!savedSettings){
+    savedSettings = { ...defaultSettings };
+    localStorage.setItem('settings', JSON.stringify(savedSettings));
   }
-  
-  // Initialize language system
-  initLanguage();
-  
+  // Apply settings to UI and state
+  difficultySel.value = savedSettings.difficulty ?? defaultSettings.difficulty;
+  numQuestionsInput.value = String(savedSettings.numQuestions ?? defaultSettings.numQuestions);
+  timeLimitInput.value = String(savedSettings.timeLimit ?? defaultSettings.timeLimit);
+  applyTheme(savedSettings.theme || defaultSettings.theme);
+  // Set language
+  if(savedSettings.language && TRANSLATIONS[savedSettings.language]) {
+    setLanguage(savedSettings.language);
+  } else {
+    setLanguage(defaultSettings.language);
+  }
+  state.people = loadPeopleDataFromLocalStorage() || DEFAULT_PEOPLE_DATA.slice();
   renderPeopleList();
   attachHandlers();
   // Welcome toast
@@ -222,12 +281,16 @@ function showSetup(){
   gameArea.style.display = 'none';
   studyPanel.style.display = 'none';
   stopTimer();
-  
   // Reset quiz display
   const quizEl = document.getElementById('quiz');
   const welcomeMsg = document.getElementById('welcome-message');
   if(quizEl) quizEl.style.display = 'none';
   if(welcomeMsg) welcomeMsg.style.display = 'block';
+  // Reset question number display
+  if(typeof qnumEl !== 'undefined' && typeof qtotalEl !== 'undefined') {
+    qnumEl.innerText = '-';
+    qtotalEl.innerText = '-';
+  }
 }
 
 function showGame(){
@@ -336,7 +399,8 @@ function pickQuestionSet(count, difficulty){
   for(const person of selected){
     const t = types[Math.floor(Math.random()*types.length)];
     if(t==='whoDid'){
-      const event = person.notable_events?.[0] || getText('fallbackEvent');
+      const rawEvent = person.notable_events?.[0] || getText('fallbackEvent');
+      const event = translateEvent(rawEvent);
       questions.push({type:'whoDid',prompt:getText('questionWhoDid', {event}),answer:person.name,ref:person.verses});
     }else if(t==='whoMother'){
       if(person.mother) questions.push({type:'whoMother',prompt:getText('questionWhoMother', {name: person.name}),answer:person.mother,ref:person.verses});
@@ -345,14 +409,19 @@ function pickQuestionSet(count, difficulty){
     }else if(t==='age'){
       if(person.age_notes) questions.push({type:'age',prompt:getText('questionAge', {name: person.name}),answer:person.age_notes,ref:person.verses});
     }else if(t==='event'){
-      if(person.notable_events && person.notable_events.length>0) questions.push({type:'event',prompt:getText('questionEvent', {event: person.notable_events[0]}),answer:person.name,ref:person.verses});
+      if(person.notable_events && person.notable_events.length>0) {
+        const rawEvent = person.notable_events[0];
+        const event = translateEvent(rawEvent);
+        questions.push({type:'event',prompt:getText('questionEvent', {event}),answer:person.name,ref:person.verses});
+      }
     }
   }
   // ensure we have at least count questions; fill with simple ones
   let i = 0;
   while(questions.length < count && i < state.people.length){
     const p = state.people[i++];
-    const event = p.notable_events?.[0] || getText('fallbackEvent');
+    const rawEvent = p.notable_events?.[0] || getText('fallbackEvent');
+    const event = translateEvent(rawEvent);
     questions.push({type:'whoDid',prompt:getText('questionWhoDid', {event}),answer:p.name,ref:p.verses});
   }
   return questions.slice(0, count);

@@ -242,10 +242,46 @@ main{flex:1;display:flex;flex-direction:column;min-height:0}
 .footer-bottom{border-top:1px solid var(--border);padding-top:16px;text-align:center}
 .footer-bottom p{color:var(--muted);font-size:12px;margin:0}
 
-/* Fix dropdown backgrounds */
-.setting-row select,.filter-group select{background:var(--card) !important}
-.setting-row select:focus,.filter-group select:focus{background:var(--glass) !important}
-.setting-row select:hover,.filter-group select:hover{background:var(--glass) !important}
+/* Dropdowns: soft, non-white backgrounds */
+.language-selector select,
+.setting-row select,
+.filter-group select {
+  background: var(--dropdown-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  transition: background 0.2s, border-color 0.2s;
+}
+body.light .language-selector select,
+body.light .setting-row select,
+body.light .filter-group select {
+  --dropdown-bg: #e3eafc;
+}
+body:not(.light) .language-selector select,
+body:not(.light) .setting-row select,
+body:not(.light) .filter-group select {
+  --dropdown-bg: #1a2233;
+}
+.language-selector select:focus,
+.setting-row select:focus,
+.filter-group select:focus {
+  border-color: var(--accent);
+  background: #dbeafe;
+}
+body:not(.light) .language-selector select:focus,
+body:not(.light) .setting-row select:focus,
+body:not(.light) .filter-group select:focus {
+  background: #22304a;
+}
+.language-selector select:hover,
+.setting-row select:hover,
+.filter-group select:hover {
+  background: #dbeafe;
+}
+body:not(.light) .language-selector select:hover,
+body:not(.light) .setting-row select:hover,
+body:not(.light) .filter-group select:hover {
+  background: #22304a;
+}
 
 /* Responsive */
 @media (max-width: 768px){
