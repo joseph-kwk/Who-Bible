@@ -122,6 +122,9 @@ const p2NameInput = document.getElementById('p2-name');
 // Theme and toasts
 const btnTheme = document.getElementById('btn-theme');
 const toastContainer = document.getElementById('toast-container');
+// Nav
+const btnShare = document.getElementById('btn-share');
+const navCommunity = document.getElementById('nav-community');
 
 // =========================
 // Event Translations
@@ -172,6 +175,33 @@ function translateEvent(event) {
   return (EVENT_TRANSLATIONS[event] && EVENT_TRANSLATIONS[event][lang]) || event;
 }
 
+// Occupation translations (subset covering default dataset)
+const OCC_TRANSLATIONS = {
+  "Righteous man, built the ark": { fr: "Homme juste, a construit l'arche", es: "Hombre justo, construyó el arca" },
+  "Leader, prophet": { fr: "Chef, prophète", es: "Líder, profeta" },
+  "King": { fr: "Roi", es: "Rey" },
+  "Official in Egypt": { fr: "Haut fonctionnaire en Égypte", es: "Funcionario en Egipto" },
+  "Shepherd, King": { fr: "Berger, roi", es: "Pastor, rey" },
+  "Queen": { fr: "Reine", es: "Reina" },
+  "Prophet": { fr: "Prophète", es: "Profeta" },
+  "Apostle": { fr: "Apôtre", es: "Apóstol" },
+  "Disciple, Apostle": { fr: "Disciple, apôtre", es: "Discípulo, apóstol" },
+  "Prophet, Judge": { fr: "Prophète, juge", es: "Profeta, juez" }
+};
+
+function translateOccupation(text){
+  if(!text) return text;
+  const lang = (typeof currentLanguage !== 'undefined' ? currentLanguage : (window.currentLanguage || 'en'));
+  if (lang === 'en') return text;
+  return (OCC_TRANSLATIONS[text] && OCC_TRANSLATIONS[text][lang]) || text;
+}
+
+function translateAnswerForQuestionType(qType, value){
+  if(qType==='occupation') return translateOccupation(value);
+  if(qType==='age') return translateEvent(value);
+  return value; // names and mothers remain as-is
+}
+
 // =========================
 // Init
 // =========================
@@ -197,7 +227,10 @@ function init(){
   timeLimitInput.value = String(savedSettings.timeLimit ?? defaultSettings.timeLimit);
   applyTheme(savedSettings.theme || defaultSettings.theme);
   // Set language
-  if(savedSettings.language && TRANSLATIONS[savedSettings.language]) {
+  const savedLang = localStorage.getItem('who-bible-language');
+  if (savedLang && TRANSLATIONS[savedLang]) {
+    setLanguage(savedLang);
+  } else if(savedSettings.language && TRANSLATIONS[savedSettings.language]) {
     setLanguage(savedSettings.language);
   } else {
     setLanguage(defaultSettings.language);
@@ -205,6 +238,9 @@ function init(){
   state.people = loadPeopleDataFromLocalStorage() || DEFAULT_PEOPLE_DATA.slice();
   renderPeopleList();
   attachHandlers();
+  // Footer year
+  const fy = document.getElementById('footer-year');
+  if (fy) fy.textContent = String(new Date().getFullYear());
   // Welcome toast
   showToast({ title: getText('brandTitle'), msg: getText('welcomeMessage'), type: 'info', timeout: 4000 });
 }
@@ -261,6 +297,33 @@ function attachHandlers(){
     applyTheme(next);
     saveSettingsFromUI();
   });
+  // Share
+  if (btnShare) {
+    btnShare.addEventListener('click', async ()=>{
+      const shareData = {
+        title: 'Who-Bible',
+        text: getText('brandDesc'),
+        url: location.href
+      };
+      if (navigator.share) {
+        try { await navigator.share(shareData); } catch(_){}
+      } else {
+        try {
+          await navigator.clipboard.writeText(`${shareData.title} — ${shareData.url}`);
+          showToast({ title: getText('exportSuccess'), msg: getText('exportMsg'), type: 'success', timeout: 1500 });
+        } catch(_) {
+          showToast({ title: getText('importError'), msg: 'Clipboard unavailable', type: 'error', timeout: 1500 });
+        }
+      }
+    });
+  }
+  // Community placeholder behavior
+  if (navCommunity) {
+    navCommunity.addEventListener('click', (e)=>{
+      e.preventDefault();
+      showToast({ title: 'Community', msg: 'Coming soon…', type: 'info', timeout: 1500 });
+    });
+  }
   
   // Modal handlers
   btnSummaryClose.addEventListener('click', hideSummaryModal);
@@ -288,8 +351,10 @@ function showSetup(){
   if(welcomeMsg) welcomeMsg.style.display = 'block';
   // Reset question number display
   if(typeof qnumEl !== 'undefined' && typeof qtotalEl !== 'undefined') {
-    qnumEl.innerText = '-';
-    qtotalEl.innerText = '-';
+    qnumEl.innerText = '0';
+    // set total to selected number of questions for clarity
+    const selected = parseInt(numQuestionsInput.value)||10;
+    qtotalEl.innerText = String(selected);
   }
 }
 
@@ -311,14 +376,14 @@ function showStudy(){
 // =========================
 function startSolo(){
   showGame();
-  gameTitle.textContent = 'Solo Mode';
+  gameTitle.textContent = getText('soloMode');
   prepareQuiz('solo');
   showToast({ title: getText('soloStart'), msg: getText('soloStartMsg'), type: 'info' });
 }
 
 function startTimed(){
   showGame();
-  gameTitle.textContent = 'Timed Mode';
+  gameTitle.textContent = getText('timedMode');
   prepareQuiz('timed');
   const secs = parseInt(timeLimitInput.value)||60;
   showToast({ title: getText('timedStart'), msg: getText('timedStartMsg'), type: 'warn' });
@@ -333,7 +398,7 @@ function startChallengeFromModal(){
   const name2 = (p2NameInput.value||'P2').trim() || 'P2';
   hidePlayersModal();
   showGame();
-  gameTitle.textContent = 'Challenge Mode';
+  gameTitle.textContent = getText('challengeMode');
   state.players = [ { name: name1, score: 0 }, { name: name2, score: 0 } ];
   state.currentPlayerIndex = 0;
   currentPlayerEl.textContent = '1';
@@ -461,16 +526,18 @@ function renderQuestion(q){
   btnNext.disabled = true;
   answersEl.innerHTML='';
   answersEl.setAttribute('aria-activedescendant','');
+  answersEl.setAttribute('aria-label', getText('answersLabel'));
   const choices = makeChoices(q);
-  choices.forEach((choice, idx)=>{
+  choices.forEach((choiceObj, idx)=>{
     const div = document.createElement('div');
     div.className='ans';
     div.tabIndex=0;
     div.id = `choice-${idx+1}`;
     div.setAttribute('role','option');
     div.setAttribute('aria-selected','false');
-    div.innerText = choice;
-    div.addEventListener('click',()=>handleAnswer(choice,q,div));
+    div.innerText = choiceObj.display;
+    div.dataset.value = choiceObj.original;
+    div.addEventListener('click',()=>handleAnswer(choiceObj.original,q,div));
     answersEl.appendChild(div);
   });
   // Focus first choice for accessibility
@@ -479,19 +546,19 @@ function renderQuestion(q){
 }
 
 function makeChoices(q){
-  const choices = new Set([q.answer]);
+  const set = new Set([q.answer]);
   const distractors = getDistractors(q);
   for(const d of distractors){
-    choices.add(d);
-    if(choices.size>=4) break;
+    set.add(d);
+    if(set.size>=4) break;
   }
   // Fallback to names if not enough
   const names = state.people.map(p=>p.name);
-  while(choices.size<4){
+  while(set.size<4){
     const pick = names[Math.floor(Math.random()*names.length)];
-    choices.add(pick);
+    set.add(pick);
   }
-  const arr = Array.from(choices);
+  const arr = Array.from(set).map(original=>({ original, display: translateAnswerForQuestionType(q.type, original) }));
   shuffle(arr);
   return arr;
 }
@@ -520,7 +587,7 @@ function handleAnswer(choice,q, el){
   const ansNodes = Array.from(answersEl.querySelectorAll('.ans'));
   ansNodes.forEach(node=>{
     node.classList.add('disabled');
-    if(normalize(node.innerText) === normalize(q.answer)) node.classList.add('correct');
+  if(normalize(node.dataset.value) === normalize(q.answer)) node.classList.add('correct');
   });
   if(!correct) el.classList.add('incorrect');
 
@@ -529,7 +596,7 @@ function handleAnswer(choice,q, el){
   if(correct){
     state.score += 10;
     state.streak += 1;
-    afterRef.innerText = 'Correct — ref: ' + (q.ref||[]).join(', ');
+  afterRef.innerText = `${getText('correctAnswer')} — ${getText('references')}: ` + (q.ref||[]).join(', ');
     if(state.mode==='challenge'){
       state.players[state.currentPlayerIndex].score += 10;
       updateChallengeScores();
@@ -537,15 +604,23 @@ function handleAnswer(choice,q, el){
     showToast({ title: getText('correctAnswer'), msg: getText('correctMsg'), type: 'success', timeout: 1500 });
   }else{
     state.streak = 0;
-    afterRef.innerText = `Incorrect. Correct: ${q.answer}. Ref: ${(q.ref||[]).join(', ')}`;
-    showToast({ title: getText('wrongAnswer'), msg: getText('wrongMsg', { answer: q.answer }), type: 'error', timeout: 1800 });
+  afterRef.innerText = `${getText('wrongAnswer')}. ${getText('correctLabel')}: ${translateAnswerForQuestionType(q.type, q.answer)}. ${getText('references')}: ${(q.ref||[]).join(', ')}`;
+  showToast({ title: getText('wrongAnswer'), msg: getText('wrongMsg', { answer: translateAnswerForQuestionType(q.type, q.answer) }), type: 'error', timeout: 1800 });
   }
 
   scoreEl.innerText = state.score;
   streakEl.innerText = state.streak;
 
   // Record result
-  state.results.push({ prompt: q.prompt, chosen: choice, correctAnswer: q.answer, correct, ref: q.ref||[] });
+  state.results.push({ 
+    prompt: q.prompt, 
+    chosen: choice, 
+    correctAnswer: q.answer, 
+    chosenDisplay: translateAnswerForQuestionType(q.type, choice),
+    correctDisplay: translateAnswerForQuestionType(q.type, q.answer),
+    correct, 
+    ref: q.ref||[] 
+  });
 
   // For challenge mode, alternate player each question
   if(state.mode==='challenge'){
@@ -564,11 +639,12 @@ function updateChallengeScores(){
 }
 
 function endQuiz(){
-  let endText = `Quiz complete! Score: ${state.score}`;
+  let endText = `${getText('quizComplete')}! ${getText('yourScore')}: ${state.score}`;
   if(state.mode==='challenge'){
     const [p1,p2] = state.players;
-    const winner = p1.score === p2.score ? 'Tie' : (p1.score > p2.score ? p1.name : p2.name);
-    endText += ` — ${winner === 'Tie' ? 'Tie game' : 'Winner: '+winner}`;
+    const isTie = p1.score === p2.score;
+    const winnerName = p1.score > p2.score ? p1.name : p2.name;
+    endText += ` — ${isTie ? getText('tieGame') : getText('winner') + ': ' + winnerName}`;
   }
   qText.innerText = endText;
   answersEl.innerHTML='';
@@ -579,13 +655,13 @@ function endQuiz(){
 
   // Show summary modal
   showSummaryModal();
-  showToast({ title: 'Quiz complete', msg: `Your score: ${state.score}${state.mode==='challenge'?`. ${winnerText()}`:''}`, type: 'success', timeout: 5000 });
+  showToast({ title: getText('quizComplete'), msg: `${getText('yourScore')}: ${state.score}${state.mode==='challenge'?`. ${winnerText()}`:''}`, type: 'success', timeout: 5000 });
 }
 
 function winnerText(){
   const [p1,p2] = state.players;
-  if(p1.score===p2.score) return 'Tie game';
-  return `Winner: ${p1.score>p2.score?p1.name:p2.name}`;
+  if(p1.score===p2.score) return getText('tieGame');
+  return `${getText('winner')}: ${p1.score>p2.score?p1.name:p2.name}`;
 }
 
 // =========================
@@ -606,6 +682,7 @@ function startTimer(seconds){
     else if(state.timerSecondsRemaining <= 15) timerEl.classList.add('warn');
     if(state.timerSecondsRemaining <= 0){
       stopTimer();
+  showToast({ title: getText('timeUp'), msg: getText('timeUpMsg'), type: 'warn', timeout: 2000 });
       endQuiz();
     }
   },1000);
@@ -621,8 +698,8 @@ function stopTimer(){
 function togglePause(){
   if(state.mode!=='timed') return;
   state.paused = !state.paused;
-  btnPause.textContent = state.paused ? 'Resume' : 'Pause';
-  showToast({ title: state.paused ? 'Paused' : 'Resumed', msg: state.paused ? 'Timer paused.' : 'Timer running.', type: 'info', timeout: 1200 });
+  btnPause.textContent = state.paused ? getText('resume') : getText('pause');
+  showToast({ title: state.paused ? getText('paused') : getText('resumed'), msg: state.paused ? getText('timerPaused') : getText('timerRunning'), type: 'info', timeout: 1200 });
 }
 
 // =========================
@@ -648,13 +725,20 @@ function renderPeopleList(filter){
     const details = document.createElement('div');
     details.className = 'person-details';
     details.style.display = 'none';
+    const aliasLabel = getText('aliases');
+    const motherLabel = getText('filterMother');
+    const occupationLabel = getText('filterOccupation');
+    const ageLabel = getText('filterAge');
+    const eventsLabel = getText('events');
+    const versesLabel = getText('verses');
+    const eventsJoined = (p.notable_events||[]).map(translateEvent).join(', ');
     details.innerHTML = `
-      ${p.aliases?.length?`<div><strong>Aliases:</strong> ${p.aliases.join(', ')}</div>`:''}
-      ${p.mother?`<div><strong>Mother:</strong> ${p.mother}</div>`:''}
-      ${p.occupation?`<div><strong>Occupation:</strong> ${p.occupation}</div>`:''}
-      ${p.age_notes?`<div><strong>Age notes:</strong> ${p.age_notes}</div>`:''}
-      ${p.notable_events?.length?`<div><strong>Events:</strong> ${p.notable_events.join(', ')}</div>`:''}
-      <div class="ref"><strong>Verses:</strong> ${p.verses?.join(', ')||''}</div>
+      ${p.aliases?.length?`<div><strong>${aliasLabel}:</strong> ${p.aliases.join(', ')}</div>`:''}
+      ${p.mother?`<div><strong>${motherLabel}:</strong> ${p.mother}</div>`:''}
+      ${p.occupation?`<div><strong>${occupationLabel}:</strong> ${p.occupation}</div>`:''}
+      ${p.age_notes?`<div><strong>${ageLabel}:</strong> ${p.age_notes}</div>`:''}
+      ${p.notable_events?.length?`<div><strong>${eventsLabel}:</strong> ${eventsJoined}</div>`:''}
+      <div class="ref"><strong>${versesLabel}:</strong> ${p.verses?.join(', ')||''}</div>
     `;
     header.addEventListener('click',()=>{
       details.style.display = details.style.display==='none' ? 'block' : 'none';
@@ -677,6 +761,7 @@ function exportJson(){
   const blob = new Blob([JSON.stringify(state.people,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href=url; a.download='people_data.json'; a.click(); URL.revokeObjectURL(url);
+  showToast({ title: getText('exportSuccess'), msg: getText('exportMsg'), type: 'success', timeout: 1800 });
 }
 
 async function handleImportFile(e){
@@ -700,7 +785,7 @@ async function handleImportFile(e){
 }
 
 function resetData(){
-  if(confirm('Reset to built-in dataset? This will remove your saved data.')){
+  if(confirm(getText('resetConfirm'))){
     localStorage.removeItem('peopleData');
     state.people = DEFAULT_PEOPLE_DATA.slice();
     renderPeopleList();
@@ -795,10 +880,10 @@ function showSummaryModal(){
     const div = document.createElement('div');
     div.className = 'summary-item ' + (r.correct?'correct':'incorrect');
     div.innerHTML = `
-      <div><strong>Q:</strong> ${r.prompt}</div>
-      <div><strong>Your answer:</strong> ${r.chosen}</div>
-      <div><strong>Correct:</strong> ${r.correctAnswer}</div>
-      <div class="ref"><strong>Refs:</strong> ${(r.ref||[]).join(', ')}</div>
+      <div><strong>${getText('questionLabelShort')}:</strong> ${r.prompt}</div>
+  <div><strong>${getText('yourAnswer')}:</strong> ${r.chosenDisplay}</div>
+  <div><strong>${getText('correctLabel')}:</strong> ${r.correctDisplay}</div>
+      <div class="ref"><strong>${getText('references')}:</strong> ${(r.ref||[]).join(', ')}</div>
     `;
     summaryListEl.appendChild(div);
   });
@@ -836,6 +921,7 @@ function showToast({ title, msg, type='info', timeout=3000 }){
   `;
   const closer = el.querySelector('.close');
   closer.addEventListener('click',()=>{ el.remove(); });
+  // Append without affecting layout (container is fixed and centered)
   toastContainer.appendChild(el);
   if(timeout>0){ setTimeout(()=>{ el.remove(); }, timeout); }
 }

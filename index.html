@@ -16,8 +16,8 @@
         <div class="logo-section">
           <img src="assets/images/logo.png" alt="Who-Bible Logo" class="logo" />
           <div class="title-section">
-            <h1>Who-Bible</h1>
-            <div class="muted">Who did this? At what age? Who's mother? Occupations & events — accurate refs included.</div>
+            <h1 class="brand-title">Who-Bible</h1>
+            <div class="muted brand-desc">A beautiful, accurate, and extensible Bible people challenge. Learn who did what, ages, mothers, occupations, and events — with verse references.</div>
           </div>
         </div>
         <div class="controls">
@@ -28,6 +28,17 @@
               <option value="es">Español</option>
             </select>
           </div>
+          <nav class="site-nav" aria-label="Site">
+            <a id="nav-community" href="#community" class="nav-link coming-soon" rel="noopener">Community</a>
+            <button id="btn-share" class="icon-btn" title="Share" aria-label="Share">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <!-- Common share: arrow out of a box -->
+                <path d="M12 3v12"/>
+                <path d="M8 7l4-4 4 4"/>
+                <path d="M5 13v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/>
+              </svg>
+            </button>
+          </nav>
           <button id="btn-theme" title="Toggle theme" class="theme-toggle" data-title-key="toggleTheme">
             <div class="theme-icon">
               <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -208,6 +219,17 @@
         </div>
       </div>
     </main>
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="assets/images/logo.png" alt="Who-Bible Logo" class="footer-logo" />
+          <div class="footer-title">Who-Bible</div>
+        </div>
+        <div class="footer-bottom">
+          <p>© <span id="footer-year"></span> Who-Bible</p>
+        </div>
+      </div>
+    </footer>
   </div>
 
   <noscript>This app requires JavaScript to run.</noscript>
@@ -234,7 +256,7 @@
   <div id="players-modal" class="modal-overlay" style="display:none">
     <div class="modal">
       <div class="modal-header">
-        <h2 id="challenge-modal-title">Challenge Setup</h2>
+  <h2 id="challenge-modal-title">Challenge Setup</h2>
         <button id="btn-players-close" aria-label="Close">✕</button>
       </div>
       <div class="modal-body">

@@ -1,361 +1,137 @@
-const TRANSLATIONS = {
-  en: {
-    // Brand - Keep "Who-Bible" untranslated
-    brandTitle: "Who-Bible",
-    brandDesc: "A beautiful, accurate, and extensible Bible people challenge. Learn who did what, ages, mothers, occupations, and events — with verse references.",
-    
-    // Setup Panel
-    gameSettings: "Game Settings",
-    difficulty: "Difficulty",
-    difficultyEasy: "Beginner",
-    difficultyMedium: "Intermediate", 
-    difficultyHard: "Expert",
-    numQuestions: "Number of Questions",
-    timeLimit: "Time Limit (seconds)",
-    
-    // Game Modes
-    gameModes: "Game Modes",
-    soloMode: "Solo Mode",
-    soloDesc: "Practice at your own pace",
-    timedMode: "Timed Mode", 
-    timedDesc: "Race against the clock",
-    challengeMode: "Challenge Mode",
-    challengeDesc: "Two players compete",
-    studyMode: "Study Mode",
-    studyDesc: "Browse and learn",
-    
-    // Data Management
-    dataManagement: "Data Management",
-    exportJSON: "Export JSON",
-    importJSON: "Import JSON", 
-    resetData: "Reset Data",
-    
-    // Game Area
-    backToSetup: "← Back to Setup",
-    score: "Score",
-    streak: "Streak",
-    question: "Question",
-    time: "Time",
-    player: "Player",
-    next: "Next",
-    pause: "Pause",
-    quit: "Quit",
-    welcomeMessage: "Click a mode button to start your quiz!",
-    
-    // Study Panel
-    backFromStudy: "← Back to Setup",
-    studyTitle: "Study Mode",
-    searchPlaceholder: "Search people (e.g. Moses)",
-    shuffleList: "Shuffle",
-    sortBy: "Sort by:",
-    sortNameAsc: "Name (A–Z)",
-    sortNameDesc: "Name (Z–A)",
-    filters: "Filters:",
-    filterMother: "Mother",
-    filterOccupation: "Occupation", 
-    filterAge: "Age notes",
-    people: "People",
-    expandAll: "Expand all",
-    collapseAll: "Collapse all",
-    
-    // Challenge Modal
-    challengeTitle: "Challenge Mode Setup",
-    player1Name: "Player 1 Name",
-    player2Name: "Player 2 Name",
-    startChallenge: "Start Challenge",
-    cancel: "Cancel",
-    
-    // Notifications
-    soloStart: "Solo Mode",
-    soloStartMsg: "Answer at your own pace. Good luck!",
-    timedStart: "Timed Mode",
-    timedStartMsg: "Race against the clock! Time is ticking...",
-    challengeStart: "Challenge Mode", 
-    challengeStartMsg: "Two players will compete! Good luck to both!",
-    studyStart: "Study Mode",
-    studyStartMsg: "Browse and learn about Bible people at your own pace.",
-    correctAnswer: "Correct!",
-    correctMsg: "Great job! +1 point",
-    wrongAnswer: "Incorrect!",
-    wrongMsg: "The correct answer was: {answer}",
-    timeWarning: "Time Warning",
-    timeWarningMsg: "Only {time} seconds remaining!",
-    timeUp: "Time's Up!",
-    timeUpMsg: "Quiz completed!",
-    challengeTurn: "Player {player}'s Turn",
-    challengeTurnMsg: "It's {player}'s turn to answer!",
-    exportSuccess: "Export Successful",
-    exportMsg: "Data exported to clipboard",
-    importSuccess: "Import Successful", 
-    importMsg: "Data imported successfully",
-    resetSuccess: "Reset Successful",
-    resetMsg: "All data has been reset",
-    importError: "Import Error",
-    importErrorMsg: "Invalid JSON format. Please check your data.",
-    
-    // Summary Modal
-    summaryTitle: "Quiz Summary",
-    summaryStats: "Final Score: {score}/{total} ({percentage}%) | Streak: {streak}",
-    summaryCorrect: "Correct Answers",
-    summaryIncorrect: "Incorrect Answers",
-    
-    // Theme Toggle
-    toggleTheme: "Toggle theme",
-    close: "Close",
-    
-    // Language Selector
-    language: "Language",
-    english: "English",
-    french: "Français", 
-    spanish: "Español",
-    
-    // Question Templates
-    questionWhoDid: "Who is known for: {event}?",
-    questionWhoMother: "Who was the mother of {name}?",
-    questionOccupation: "What was {name}'s occupation or role?",
-    questionAge: "Which age-note is correct for {name}?",
-    questionEvent: "Which person is linked to: {event}?",
-    fallbackEvent: "a notable event"
-  },
-  
-  fr: {
-    // Brand - Keep "Who-Bible" untranslated
-    brandTitle: "Who-Bible",
-    brandDesc: "Un défi biblique beau, précis et extensible. Apprenez qui a fait quoi, les âges, les mères, les occupations et les événements — avec références bibliques.",
-    
-    // Setup Panel
-    gameSettings: "Paramètres du Jeu",
-    difficulty: "Difficulté",
-    difficultyEasy: "Débutant",
-    difficultyMedium: "Intermédiaire",
-    difficultyHard: "Expert", 
-    numQuestions: "Nombre de Questions",
-    timeLimit: "Limite de Temps (secondes)",
-    
-    // Game Modes
-    gameModes: "Modes de Jeu",
-    soloMode: "Mode Solo",
-    soloDesc: "Pratiquez à votre rythme",
-    timedMode: "Mode Chronométré",
-    timedDesc: "Course contre la montre",
-    challengeMode: "Mode Défi",
-    challengeDesc: "Deux joueurs s'affrontent",
-    studyMode: "Mode Étude",
-    studyDesc: "Parcourez et apprenez",
-    
-    // Data Management
-    dataManagement: "Gestion des Données",
-    exportJSON: "Exporter JSON",
-    importJSON: "Importer JSON",
-    resetData: "Réinitialiser les Données",
-    
-    // Game Area
-    backToSetup: "← Retour à la Configuration",
-    score: "Score",
-    streak: "Série",
-    question: "Question",
-    time: "Temps",
-    player: "Joueur",
-    next: "Suivant",
-    pause: "Pause",
-    quit: "Quitter",
-    welcomeMessage: "Cliquez sur un bouton de mode pour commencer votre quiz !",
-    
-    // Study Panel
-    backFromStudy: "← Retour à la Configuration",
-    studyTitle: "Mode Étude",
-    searchPlaceholder: "Rechercher des personnes (ex. Moïse)",
-    shuffleList: "Mélanger",
-    sortBy: "Trier par :",
-    sortNameAsc: "Nom (A–Z)",
-    sortNameDesc: "Nom (Z–A)",
-    filters: "Filtres :",
-    filterMother: "Mère",
-    filterOccupation: "Occupation",
-    filterAge: "Notes d'âge",
-    people: "Personnes",
-    expandAll: "Tout développer",
-    collapseAll: "Tout réduire",
-    
-    // Challenge Modal
-    challengeTitle: "Configuration du Mode Défi",
-    player1Name: "Nom du Joueur 1",
-    player2Name: "Nom du Joueur 2", 
-    startChallenge: "Commencer le Défi",
-    cancel: "Annuler",
-    
-    // Notifications
-    soloStart: "Mode Solo",
-    soloStartMsg: "Répondez à votre rythme. Bonne chance !",
-    timedStart: "Mode Chronométré",
-    timedStartMsg: "Course contre la montre ! Le temps presse...",
-    challengeStart: "Mode Défi",
-    challengeStartMsg: "Deux joueurs vont s'affronter ! Bonne chance à tous les deux !",
-    studyStart: "Mode Étude",
-    studyStartMsg: "Parcourez et apprenez sur les personnages bibliques à votre rythme.",
-    correctAnswer: "Correct !",
-    correctMsg: "Excellent travail ! +1 point",
-    wrongAnswer: "Incorrect !",
-    wrongMsg: "La bonne réponse était : {answer}",
-    timeWarning: "Avertissement de Temps",
-    timeWarningMsg: "Il ne reste que {time} secondes !",
-    timeUp: "Temps Écoulé !",
-    timeUpMsg: "Quiz terminé !",
-    challengeTurn: "Tour du Joueur {player}",
-    challengeTurnMsg: "C'est au tour de {player} de répondre !",
-    exportSuccess: "Export Réussi",
-    exportMsg: "Données exportées dans le presse-papiers",
-    importSuccess: "Import Réussi",
-    importMsg: "Données importées avec succès",
-    resetSuccess: "Réinitialisation Réussie",
-    resetMsg: "Toutes les données ont été réinitialisées",
-    importError: "Erreur d'Import",
-    importErrorMsg: "Format JSON invalide. Veuillez vérifier vos données.",
-    
-    // Summary Modal
-    summaryTitle: "Résumé du Quiz",
-    summaryStats: "Score Final : {score}/{total} ({percentage}%) | Série : {streak}",
-    
-    // Theme Toggle
-    toggleTheme: "Basculer le thème",
-    summaryCorrect: "Réponses Correctes",
-    summaryIncorrect: "Réponses Incorrectes",
-    close: "Fermer",
-    
-    // Language Selector
-    language: "Langue",
-    english: "English",
-    french: "Français",
-    spanish: "Español",
-    
-    // Question Templates
-    questionWhoDid: "Qui est connu pour : {event} ?",
-    questionWhoMother: "Qui était la mère de {name} ?",
-    questionOccupation: "Quelle était l'occupation ou le rôle de {name} ?",
-    questionAge: "Quelle note d'âge est correcte pour {name} ?",
-    questionEvent: "Quelle personne est liée à : {event} ?",
-    fallbackEvent: "un événement notable"
-  },
-  
-  es: {
-    // Brand - Keep "Who-Bible" untranslated
-    brandTitle: "Who-Bible",
-    brandDesc: "Un hermoso, preciso y extensible desafío bíblico. Aprende quién hizo qué, edades, madres, ocupaciones y eventos — con referencias bíblicas.",
-    
-    // Setup Panel
-    gameSettings: "Configuración del Juego",
-    difficulty: "Dificultad",
-    difficultyEasy: "Principiante",
-    difficultyMedium: "Intermedio",
-    difficultyHard: "Experto",
-    numQuestions: "Número de Preguntas",
-    timeLimit: "Límite de Tiempo (segundos)",
-    
-    // Game Modes
-    gameModes: "Modos de Juego",
-    soloMode: "Modo Individual",
-    soloDesc: "Practica a tu propio ritmo",
-    timedMode: "Modo Cronometrado",
-    timedDesc: "Carrera contra el tiempo",
-    challengeMode: "Modo Desafío",
-    challengeDesc: "Dos jugadores compiten",
-    studyMode: "Modo Estudio",
-    studyDesc: "Navega y aprende",
-    
-    // Data Management
-    dataManagement: "Gestión de Datos",
-    exportJSON: "Exportar JSON",
-    importJSON: "Importar JSON",
-    resetData: "Restablecer Datos",
-    
-    // Game Area
-    backToSetup: "← Volver a Configuración",
-    score: "Puntuación",
-    streak: "Racha",
-    question: "Pregunta",
-    time: "Tiempo",
-    player: "Jugador",
-    next: "Siguiente",
-    pause: "Pausa",
-    quit: "Salir",
-    welcomeMessage: "¡Haz clic en un botón de modo para comenzar tu cuestionario!",
-    
-    // Study Panel
-    backFromStudy: "← Volver a Configuración",
-    studyTitle: "Modo Estudio",
-    searchPlaceholder: "Buscar personas (ej. Moisés)",
-    shuffleList: "Mezclar",
-    sortBy: "Ordenar por:",
-    sortNameAsc: "Nombre (A–Z)",
-    sortNameDesc: "Nombre (Z–A)",
-    filters: "Filtros:",
-    filterMother: "Madre",
-    filterOccupation: "Ocupación",
-    filterAge: "Notas de edad",
-    people: "Personas",
-    expandAll: "Expandir todo",
-    collapseAll: "Contraer todo",
-    
-    // Challenge Modal
-    challengeTitle: "Configuración del Modo Desafío",
-    player1Name: "Nombre del Jugador 1",
-    player2Name: "Nombre del Jugador 2",
-    startChallenge: "Comenzar Desafío",
-    cancel: "Cancelar",
-    
-    // Notifications
-    soloStart: "Modo Individual",
-    soloStartMsg: "Responde a tu propio ritmo. ¡Buena suerte!",
-    timedStart: "Modo Cronometrado",
-    timedStartMsg: "¡Carrera contra el tiempo! El tiempo corre...",
-    challengeStart: "Modo Desafío",
-    challengeStartMsg: "¡Dos jugadores competirán! ¡Buena suerte a ambos!",
-    studyStart: "Modo Estudio",
-    studyStartMsg: "Navega y aprende sobre personajes bíblicos a tu propio ritmo.",
-    correctAnswer: "¡Correcto!",
-    correctMsg: "¡Excelente trabajo! +1 punto",
-    wrongAnswer: "¡Incorrecto!",
-    wrongMsg: "La respuesta correcta era: {answer}",
-    timeWarning: "Advertencia de Tiempo",
-    timeWarningMsg: "¡Solo quedan {time} segundos!",
-    timeUp: "¡Se Acabó el Tiempo!",
-    timeUpMsg: "¡Cuestionario completado!",
-    challengeTurn: "Turno del Jugador {player}",
-    challengeTurnMsg: "¡Es el turno de {player} de responder!",
-    exportSuccess: "Exportación Exitosa",
-    exportMsg: "Datos exportados al portapapeles",
-    importSuccess: "Importación Exitosa",
-    importMsg: "Datos importados exitosamente",
-    resetSuccess: "Restablecimiento Exitoso",
-    resetMsg: "Todos los datos han sido restablecidos",
-    importError: "Error de Importación",
-    importErrorMsg: "Formato JSON inválido. Por favor verifica tus datos.",
-    
-    // Summary Modal
-    summaryTitle: "Resumen del Cuestionario",
-    
-    // Theme Toggle
-    toggleTheme: "Cambiar tema",
-    summaryStats: "Puntuación Final: {score}/{total} ({percentage}%) | Racha: {streak}",
-    summaryCorrect: "Respuestas Correctas",
-    summaryIncorrect: "Respuestas Incorrectas",
-    close: "Cerrar",
-    
-    // Language Selector
-    language: "Idioma",
-    english: "English",
-    french: "Français",
-    spanish: "Español",
-    
-    // Question Templates
-    questionWhoDid: "¿Quién es conocido por: {event}?",
-    questionWhoMother: "¿Quién era la madre de {name}?",
-    questionOccupation: "¿Cuál era la ocupación o rol de {name}?",
-    questionAge: "¿Qué nota de edad es correcta para {name}?",
-    questionEvent: "¿Qué persona está relacionada con: {event}?",
-    fallbackEvent: "un evento notable"
-  }
+// Default English fallback so UI works even if JSON fetch fails (e.g., file://)
+const DEFAULT_EN = {
+  brandTitle: "Who-Bible",
+  brandDesc: "Bible people quiz: deeds, ages, mothers, roles, and events — with refs.",
+  gameSettings: "Game Settings",
+  difficulty: "Difficulty",
+  difficultyEasy: "Beginner",
+  difficultyMedium: "Intermediate",
+  difficultyHard: "Expert",
+  numQuestions: "Number of Questions",
+  timeLimit: "Time Limit (seconds)",
+  gameModes: "Game Modes",
+  soloMode: "Solo Mode",
+  soloDesc: "Practice at your own pace",
+  timedMode: "Timed Mode",
+  timedDesc: "Race against the clock",
+  challengeMode: "Challenge Mode",
+  challengeDesc: "Two players compete",
+  studyMode: "Study Mode",
+  studyDesc: "Browse and learn",
+  dataManagement: "Data Management",
+  exportJSON: "Export JSON",
+  importJSON: "Import JSON",
+  resetData: "Reset Data",
+  backToSetup: "← Back to Setup",
+  score: "Score",
+  streak: "Streak",
+  question: "Question",
+  time: "Time",
+  player: "Player",
+  next: "Next",
+  pause: "Pause",
+  quit: "Quit",
+  welcomeMessage: "Click a mode button to start your quiz!",
+  backFromStudy: "← Back to Setup",
+  studyTitle: "Study Mode",
+  searchPlaceholder: "Search people (e.g. Moses)",
+  shuffleList: "Shuffle",
+  sortBy: "Sort by:",
+  sortNameAsc: "Name (A–Z)",
+  sortNameDesc: "Name (Z–A)",
+  filters: "Filters:",
+  filterMother: "Mother",
+  filterOccupation: "Occupation",
+  filterAge: "Age notes",
+  people: "People",
+  expandAll: "Expand all",
+  collapseAll: "Collapse all",
+  challengeTitle: "Challenge Mode Setup",
+  player1Name: "Player 1 Name",
+  player2Name: "Player 2 Name",
+  startChallenge: "Start Challenge",
+  cancel: "Cancel",
+  soloStart: "Solo Mode",
+  soloStartMsg: "Answer at your own pace. Good luck!",
+  timedStart: "Timed Mode",
+  timedStartMsg: "Race against the clock! Time is ticking...",
+  challengeStart: "Challenge Mode",
+  challengeStartMsg: "Two players will compete! Good luck to both!",
+  studyStart: "Study Mode",
+  studyStartMsg: "Browse and learn about Bible people at your own pace.",
+  correctAnswer: "Correct!",
+  correctMsg: "Great job! +1 point",
+  wrongAnswer: "Incorrect!",
+  wrongMsg: "The correct answer was: {answer}",
+  timeWarning: "Time Warning",
+  timeWarningMsg: "Only {time} seconds remaining!",
+  timeUp: "Time's Up!",
+  timeUpMsg: "Quiz completed!",
+  challengeTurn: "Player {player}'s Turn",
+  challengeTurnMsg: "It's {player}'s turn to answer!",
+  exportSuccess: "Export Successful",
+  exportMsg: "Data exported to clipboard",
+  importSuccess: "Import Successful",
+  importMsg: "Data imported successfully",
+  resetSuccess: "Reset Successful",
+  resetMsg: "All data has been reset",
+  importError: "Import Error",
+  importErrorMsg: "Invalid JSON format. Please check your data.",
+  summaryTitle: "Quiz Summary",
+  summaryStats: "Final Score: {score}/{total} ({percentage}%) | Streak: {streak}",
+  summaryCorrect: "Correct Answers",
+  summaryIncorrect: "Incorrect Answers",
+  toggleTheme: "Toggle theme",
+  close: "Close",
+  playAgain: "Play Again",
+  resume: "Resume",
+  paused: "Paused",
+  resumed: "Resumed",
+  timerPaused: "Timer paused.",
+  timerRunning: "Timer running.",
+  references: "References",
+  yourAnswer: "Your answer",
+  correctLabel: "Correct",
+  questionLabelShort: "Q",
+  aliases: "Aliases",
+  events: "Events",
+  verses: "Verses",
+  answersLabel: "Answer choices",
+  language: "Language",
+  english: "English",
+  french: "Français",
+  spanish: "Español",
+  questionWhoDid: "Who is known for: {event}?",
+  questionWhoMother: "Who was the mother of {name}?",
+  questionOccupation: "What was {name}'s occupation or role?",
+  questionAge: "Which age-note is correct for {name}?",
+  questionEvent: "Which person is linked to: {event}?",
+  fallbackEvent: "a notable event",
+  resetConfirm: "Reset to built-in dataset? This will remove your saved data.",
+  quizComplete: "Quiz complete",
+  yourScore: "Your score",
+  winner: "Winner",
+  tieGame: "Tie game",
+  community: "Community",
+  share: "Share"
 };
+
+// Externalized translations loaded at runtime (seed English with fallback)
+const TRANSLATIONS = { en: { ...DEFAULT_EN }, fr: {}, es: {} };
+
+// Load language bundles
+async function loadLanguageBundle(lang) {
+  try {
+    const res = await fetch(`assets/i18n/${lang}.json`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Failed to load ${lang}.json`);
+  const json = await res.json();
+  // Merge over any existing fallback (esp. English)
+  TRANSLATIONS[lang] = { ...(TRANSLATIONS[lang]||{}), ...json };
+  } catch (e) {
+    // If fetch fails, keep existing in-memory or empty; UI will fall back to keys
+    console.warn('i18n load failed for', lang, e);
+  }
+}
 
 // Language management functions
 let currentLanguage = 'en';
@@ -364,7 +140,9 @@ function setLanguage(lang) {
   if (TRANSLATIONS[lang]) {
     currentLanguage = lang;
     localStorage.setItem('who-bible-language', lang);
-    updateAllText();
+  updateAllText();
+  const sel = document.getElementById('language-select');
+  if (sel) sel.value = lang;
   }
 }
 
@@ -380,11 +158,20 @@ function getText(key, params = {}) {
 }
 
 function updateAllText() {
+  // Set document language attribute
+  if (document && document.documentElement) {
+    document.documentElement.lang = currentLanguage;
+  }
   // Update brand
   const brandTitle = document.querySelector('.brand-title');
   const brandDesc = document.querySelector('.brand-desc');
   if (brandTitle) brandTitle.textContent = getText('brandTitle');
   if (brandDesc) brandDesc.textContent = getText('brandDesc');
+  // Header title/desc in header section
+  const headerTitle = document.querySelector('header .title-section h1');
+  const headerDesc = document.querySelector('header .title-section .muted');
+  if (headerTitle) headerTitle.textContent = getText('brandTitle');
+  if (headerDesc) headerDesc.textContent = getText('brandDesc');
   
   // Update setup panel
   const setupSections = document.querySelectorAll('.setup-section h3');
@@ -475,6 +262,9 @@ function updateAllText() {
   if (searchInput) {
     searchInput.placeholder = getText('searchPlaceholder');
   }
+  // Update ARIA labels
+  const answersList = document.getElementById('answers');
+  if (answersList) answersList.setAttribute('aria-label', getText('answersLabel'));
   
   // Update welcome message
   const welcomeMsg = document.getElementById('welcome-message');
@@ -488,6 +278,12 @@ function updateAllText() {
   const studyTitle = document.querySelector('.study-title');
   if (gameTitle && gameTitle.textContent.includes('Game Mode')) {
     gameTitle.textContent = getText('gameModes');
+  }
+  if (gameTitle) {
+    const t = gameTitle.textContent.toLowerCase();
+    if (t.includes('solo') || t.includes('solo')) gameTitle.textContent = getText('soloMode');
+    else if (t.includes('timed') || t.includes('chronom')) gameTitle.textContent = getText('timedMode');
+    else if (t.includes('challenge') || t.includes('défi') || t.includes('desafío')) gameTitle.textContent = getText('challengeMode');
   }
   if (studyTitle) {
     studyTitle.textContent = getText('studyTitle');
@@ -503,22 +299,27 @@ function updateAllText() {
     }
   });
   
-  // Update status text
-  const statusElements = document.querySelectorAll('.status .small');
-  statusElements.forEach(el => {
-    const text = el.textContent.toLowerCase();
-    if (text.includes('score')) {
-      el.innerHTML = el.innerHTML.replace('Score:', getText('score') + ':');
-    } else if (text.includes('streak')) {
-      el.innerHTML = el.innerHTML.replace('Streak:', getText('streak') + ':');
-    } else if (text.includes('question')) {
-      el.innerHTML = el.innerHTML.replace('Question:', getText('question') + ':');
-    } else if (text.includes('time')) {
-      el.innerHTML = el.innerHTML.replace('Time:', getText('time') + ':');
-    } else if (text.includes('player')) {
-      el.innerHTML = el.innerHTML.replace('Player:', getText('player') + ':');
-    }
-  });
+  // Update status text (explicit elements)
+  const scoreLabelEl = document.querySelector('.status .small:nth-child(1)');
+  if (scoreLabelEl) scoreLabelEl.innerHTML = `${getText('score')}: <span id="score">${document.getElementById('score')?.textContent||'0'}</span>`;
+  const streakLabelEl = document.querySelector('.status .small:nth-child(2)');
+  if (streakLabelEl) streakLabelEl.innerHTML = `${getText('streak')}: <span id="streak">${document.getElementById('streak')?.textContent||'0'}</span>`;
+  const qLabelEl = document.querySelector('.status .small:nth-child(3)');
+  if (qLabelEl) {
+    const qnum = document.getElementById('qnum')?.textContent || '0';
+    const qtotal = document.getElementById('qtotal')?.textContent || document.getElementById('num-questions')?.value || '0';
+    qLabelEl.innerHTML = `${getText('question')}: <span id="qnum">${qnum}</span>/<span id="qtotal">${qtotal}</span>`;
+  }
+  const timerLabelEl = document.getElementById('timer');
+  if (timerLabelEl) {
+    const t = document.getElementById('time-remaining')?.textContent || '0';
+    timerLabelEl.innerHTML = `${getText('time')}: <span id="time-remaining">${t}</span>s`;
+  }
+  const challengePlayerLabel = document.querySelector('#challenge-status .small:nth-child(1)');
+  if (challengePlayerLabel) {
+    const cp = document.getElementById('current-player')?.textContent || '1';
+    challengePlayerLabel.innerHTML = `${getText('player')}: <span id="current-player">${cp}</span>`;
+  }
   
   // Update people count
   const peopleCount = document.getElementById('people-count');
@@ -569,26 +370,75 @@ function updateAllText() {
   
   const p2NameLabel = document.getElementById('p2-name-label');
   if (p2NameLabel) p2NameLabel.textContent = getText('player2Name');
+
+  const btnPlayersCancel = document.getElementById('btn-players-cancel');
+  if (btnPlayersCancel) btnPlayersCancel.textContent = getText('cancel');
+  const btnPlayersStart = document.getElementById('btn-players-start');
+  if (btnPlayersStart) btnPlayersStart.textContent = getText('startChallenge');
+  const btnSummaryClose = document.getElementById('btn-summary-close');
+  if (btnSummaryClose) btnSummaryClose.setAttribute('aria-label', getText('close'));
+  const btnPlayAgain = document.getElementById('btn-play-again');
+  if (btnPlayAgain) btnPlayAgain.textContent = getText('playAgain');
   
   // Update theme toggle title
   const themeToggle = document.getElementById('btn-theme');
   if (themeToggle && themeToggle.getAttribute('data-title-key')) {
     themeToggle.title = getText('toggleTheme');
   }
+  const shuffleBtn = document.getElementById('btn-shuffle-list');
+  if (shuffleBtn) shuffleBtn.title = getText('shuffleList');
+
+  // Nav items (use English fallback keys if missing)
+  const navCommunity = document.getElementById('nav-community');
+  if (navCommunity) {
+    navCommunity.textContent = getText('community') || 'Community';
+    if (!navCommunity.classList.contains('coming-soon')) navCommunity.classList.add('coming-soon');
+  }
+  const btnShare = document.getElementById('btn-share');
+  if (btnShare) {
+    btnShare.title = getText('share') || 'Share';
+    btnShare.setAttribute('aria-label', getText('share') || 'Share');
+  }
+
+  // Update language selector option text
+  const languageSelect = document.getElementById('language-select');
+  if (languageSelect) {
+    const opts = languageSelect.querySelectorAll('option');
+    opts.forEach(opt => {
+      if (opt.value === 'en') opt.textContent = getText('english');
+      if (opt.value === 'fr') opt.textContent = getText('french');
+      if (opt.value === 'es') opt.textContent = getText('spanish');
+    });
+  }
+
+  // Modal close aria-labels
+  const playersClose = document.getElementById('btn-players-close');
+  if (playersClose) playersClose.setAttribute('aria-label', getText('close'));
 }
 
 // Initialize language on page load
-function initLanguage() {
+async function initLanguage() {
   const savedLang = localStorage.getItem('who-bible-language');
-  if (savedLang && TRANSLATIONS[savedLang]) {
+  if (savedLang && TRANSLATIONS[savedLang] !== undefined) {
     currentLanguage = savedLang;
   }
-  
-  // Set the language selector to the current language
-  const languageSelect = document.getElementById('language-select');
-  if (languageSelect) {
-    languageSelect.value = currentLanguage;
+  // load bundles, then update text
+  try {
+    await Promise.all([
+      loadLanguageBundle('en'),
+      loadLanguageBundle('fr'),
+      loadLanguageBundle('es')
+    ]);
+  } finally {
+    const languageSelect = document.getElementById('language-select');
+    if (languageSelect) languageSelect.value = currentLanguage;
+    updateAllText();
   }
-  
-  updateAllText();
+}
+
+// Ensure translations apply after DOM content is loaded in case init() in app.js hasn't set language yet
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initLanguage);
+} else {
+  initLanguage();
 }
