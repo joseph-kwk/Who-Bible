@@ -394,6 +394,11 @@ function updateAllText() {
     navCommunity.textContent = getText('community') || 'Community';
     if (!navCommunity.classList.contains('coming-soon')) navCommunity.classList.add('coming-soon');
   }
+  const footerCommunity = document.getElementById('footer-community');
+  if (footerCommunity) {
+    footerCommunity.textContent = getText('community') || 'Community';
+    if (!footerCommunity.classList.contains('coming-soon')) footerCommunity.classList.add('coming-soon');
+  }
   const btnShare = document.getElementById('btn-share');
   if (btnShare) {
     btnShare.title = getText('share') || 'Share';

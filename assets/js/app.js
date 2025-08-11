@@ -228,9 +228,9 @@ function init(){
   applyTheme(savedSettings.theme || defaultSettings.theme);
   // Set language
   const savedLang = localStorage.getItem('who-bible-language');
-  if (savedLang && TRANSLATIONS[savedLang]) {
+  if (savedLang && TRANSLATIONS[savedLang] !== undefined) {
     setLanguage(savedLang);
-  } else if(savedSettings.language && TRANSLATIONS[savedSettings.language]) {
+  } else if(savedSettings.language && TRANSLATIONS[savedSettings.language] !== undefined) {
     setLanguage(savedSettings.language);
   } else {
     setLanguage(defaultSettings.language);
@@ -288,7 +288,26 @@ function attachHandlers(){
   
   // Language selector
   languageSelect.addEventListener('change', (e) => {
-    setLanguage(e.target.value);
+    const lang = e.target.value;
+    // Persist preferred language as part of settings as well
+    const settings = loadSettings() || {};
+    settings.language = lang;
+    try{ localStorage.setItem('settings', JSON.stringify(settings)); }catch(_){/* ignore */}
+    setLanguage(lang);
+    // Re-render visible question if any
+    if(state.current){
+      // Rebuild prompt with translated pieces when possible
+      const q = state.current;
+      // We cannot perfectly rebuild dynamic tokens here without source data; keep prompt as-is,
+      // but refresh choices labels and status/headers via updateAllText called by setLanguage.
+      // Future: store raw tokens to fully re-localize prompt.
+      // Refresh answers display text
+      const nodes = Array.from(document.querySelectorAll('#answers .ans'));
+      nodes.forEach(node=>{
+        const orig = node.dataset.value;
+        node.innerText = (typeof translateAnswerForQuestionType==='function') ? translateAnswerForQuestionType(q.type, orig) : orig;
+      });
+    }
   });
   
   // Theme toggle

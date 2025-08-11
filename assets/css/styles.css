@@ -241,6 +241,10 @@ main{flex:1;display:flex;flex-direction:column;min-height:0}
 /* Footer */
 .footer{background:var(--glass);border-top:1px solid var(--border);margin-top:36px;backdrop-filter: blur(8px);width:100%;border-radius:16px}
 .footer-content{padding:16px 16px;max-width:1100px;margin:0 auto}
+.footer-top{display:flex;align-items:center;justify-content:space-between}
+.footer-link{display:inline-flex;align-items:center;height:32px;padding:0 10px;border-radius:10px;background:var(--glass);border:1px solid var(--border);color:var(--text);text-decoration:none;transition:all 200ms ease}
+.footer-link:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,0.2);border-color:var(--accent)}
+.footer-link.coming-soon{border-color:var(--accent-2);color:var(--accent-2);background:linear-gradient(135deg,var(--glass),rgba(34,211,238,0.08))}
 .footer-brand{display:flex;align-items:center;gap:6px;margin-bottom:6px}
 .footer-logo{width:24px;height:24px;border-radius:6px;object-fit:cover}
 .footer-title{font-size:15px;font-weight:700;color:var(--text)}
