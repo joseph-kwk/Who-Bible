@@ -13,14 +13,14 @@
   <div class="app">
     <header>
       <div class="header-content">
-        <div class="logo-section">
-          <img src="assets/images/logo.png" alt="Who-Bible Logo" class="logo" />
-          <div class="title-section">
-            <h1 class="brand-title">Who-Bible</h1>
-            <div class="muted brand-desc">A beautiful, accurate, and extensible Bible people challenge. Learn who did what, ages, mothers, occupations, and events — with verse references.</div>
-          </div>
-        </div>
-        <div class="controls">
+  <a href="#" id="home-link" class="logo-section" aria-label="Home">
+            <img src="assets/images/logo.png" alt="Who-Bible Logo" class="logo" />
+            <div class="title-section">
+              <h1 class="brand-title">Who-Bible</h1>
+              <div class="muted brand-desc">A beautiful, accurate, and extensible Bible people challenge. Learn who did what, ages, mothers, occupations, and events — with verse references.</div>
+            </div>
+          </a>
+          <div class="controls">
           <div class="language-selector">
             <select id="language-select">
               <option value="en">English</option>
@@ -29,7 +29,7 @@
             </select>
           </div>
           <nav class="site-nav" aria-label="Site">
-            <a id="nav-community" href="#community" class="nav-link coming-soon" rel="noopener">Community</a>
+            <a id="nav-community" href="community.html" target="_blank" class="nav-link" rel="noopener">Community</a>
             <button id="btn-share" class="icon-btn" title="Share" aria-label="Share">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <!-- Common share: arrow out of a box -->
@@ -61,7 +61,7 @@
       </div>
     </header>
 
-    <main>
+  <main>
       <!-- Setup Panel -->
       <div id="setup-panel" class="setup-panel">
         <div class="brand">
@@ -218,6 +218,7 @@
           </div>
         </div>
       </div>
+
     </main>
     <footer class="footer">
       <div class="footer-content">
@@ -275,6 +276,22 @@
       <div class="modal-footer">
         <button id="btn-players-cancel">Cancel</button>
         <button id="btn-players-start" class="primary">Start Challenge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Community Modal (for room details etc.) -->
+  <div id="community-modal" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="community-modal-title">Details</h2>
+        <button id="btn-community-close" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body" id="community-modal-body">
+        <!-- populated dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button id="btn-community-ok" class="primary">Close</button>
       </div>
     </div>
   </div>

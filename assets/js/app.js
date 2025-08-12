@@ -125,6 +125,10 @@ const toastContainer = document.getElementById('toast-container');
 // Nav
 const btnShare = document.getElementById('btn-share');
 const navCommunity = document.getElementById('nav-community');
+const footerCommunity = document.getElementById('footer-community');
+
+// Community elements
+// Community elements removed on main page (moved to community.html)
 
 // =========================
 // Event Translations
@@ -246,9 +250,11 @@ function init(){
 }
 
 function attachHandlers(){
-  // Logo click handler
-  const logoSection = document.querySelector('.logo-section');
-  logoSection.addEventListener('click', showSetup);
+  // Home link handler
+  const homeLink = document.getElementById('home-link');
+  if (homeLink) {
+    homeLink.addEventListener('click', (e)=>{ e.preventDefault(); showSetup(); });
+  }
   
   // Mode buttons
   btnSolo.addEventListener('click', startSolo);
@@ -259,6 +265,7 @@ function attachHandlers(){
   // Navigation
   btnBackToSetup.addEventListener('click', showSetup);
   btnBackFromStudy.addEventListener('click', showSetup);
+  // Community moved to separate page
   
   // Game controls
   btnNext.addEventListener('click', nextQuestion);
@@ -337,12 +344,7 @@ function attachHandlers(){
     });
   }
   // Community placeholder behavior
-  if (navCommunity) {
-    navCommunity.addEventListener('click', (e)=>{
-      e.preventDefault();
-      showToast({ title: 'Community', msg: 'Coming soon…', type: 'info', timeout: 1500 });
-    });
-  }
+  // Community opens in a new tab via anchor href
   
   // Modal handlers
   btnSummaryClose.addEventListener('click', hideSummaryModal);
@@ -353,6 +355,7 @@ function attachHandlers(){
   
   // Keyboard navigation on answers
   answersEl.addEventListener('keydown', onAnswersKeyDown);
+
 }
 
 // =========================
@@ -389,6 +392,31 @@ function showStudy(){
   studyPanel.style.display = 'flex';
   renderPeopleList();
 }
+
+// Community removed from main SPA; use community.html
+
+// Community helpers
+// Community modal lives on community.html
+
+function initialsFromName(name){
+  const parts = (name||'').trim().split(/[\s-]+/).filter(Boolean);
+  if(parts.length===0) return 'WB';
+  const first = parts[0][0] || '';
+  const second = parts.length>1 ? parts[1][0] : '';
+  return (first+second).toUpperCase();
+}
+function generateAvatarText(name){
+  const txt = initialsFromName(name);
+  return txt || 'WB';
+}
+// Avatar helpers moved to community.js
+// Profile helpers moved to community.js
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"]+/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[ch]));
+}
+
+// setActiveCommunityTab moved to community.js
 
 // =========================
 // Modes

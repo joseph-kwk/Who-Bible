@@ -113,7 +113,34 @@ const DEFAULT_EN = {
   winner: "Winner",
   tieGame: "Tie game",
   community: "Community",
-  share: "Share"
+  share: "Share",
+  communityIntro: "Explore rooms, join live quizzes, and manage your profile.",
+  communityTabExplore: "Explore",
+  communityTabLive: "Live",
+  communityTabProfile: "Profile",
+  communityTabGuidelines: "Guidelines",
+  featuredRooms: "Featured Rooms",
+  liveRooms: "Live Rooms",
+  liveRoomsDesc: "Join a live room to play and chat in real time. Coming soon.",
+  profileTitle: "Your Profile",
+  profileDesc: "Create an avatar and set your display name. Coming soon.",
+  guidelines: "Guidelines",
+  guideline1: "Be respectful and kind.",
+  guideline2: "Stay on topic and avoid spoilers without warning.",
+  guideline3: "Report inappropriate content.",
+  profileNameLabel: "Display name",
+  profileNamePlaceholder: "Your name",
+  generateAvatar: "Generate Avatar",
+  saveProfile: "Save Profile",
+  profileSaved: "Profile saved",
+  details: "Details",
+  hostRoomTitle: "Host a Room",
+  roomNamePlaceholder: "Room name",
+  createRoom: "Create Room",
+  myRoomsTitle: "My Rooms",
+  noRoomsYet: "No rooms yet",
+  hostLabel: "Host",
+  roomCreatedBy: "Room created by {host}."
 };
 
 // Externalized translations loaded at runtime (seed English with fallback)
@@ -391,13 +418,11 @@ function updateAllText() {
   // Nav items (use English fallback keys if missing)
   const navCommunity = document.getElementById('nav-community');
   if (navCommunity) {
-    navCommunity.textContent = getText('community') || 'Community';
-    if (!navCommunity.classList.contains('coming-soon')) navCommunity.classList.add('coming-soon');
+  navCommunity.textContent = getText('community') || 'Community';
   }
   const footerCommunity = document.getElementById('footer-community');
   if (footerCommunity) {
-    footerCommunity.textContent = getText('community') || 'Community';
-    if (!footerCommunity.classList.contains('coming-soon')) footerCommunity.classList.add('coming-soon');
+  footerCommunity.textContent = getText('community') || 'Community';
   }
   const btnShare = document.getElementById('btn-share');
   if (btnShare) {
@@ -419,31 +444,57 @@ function updateAllText() {
   // Modal close aria-labels
   const playersClose = document.getElementById('btn-players-close');
   if (playersClose) playersClose.setAttribute('aria-label', getText('close'));
-}
 
-// Initialize language on page load
-async function initLanguage() {
-  const savedLang = localStorage.getItem('who-bible-language');
-  if (savedLang && TRANSLATIONS[savedLang] !== undefined) {
-    currentLanguage = savedLang;
+  // Community panel
+  const communityTitle = document.getElementById('community-title');
+  if (communityTitle) communityTitle.textContent = getText('community');
+  const btnBackFromCommunity = document.getElementById('btn-back-from-community');
+  if (btnBackFromCommunity) btnBackFromCommunity.textContent = getText('backToSetup');
+  const communityIntro = document.getElementById('community-intro');
+  if (communityIntro) communityIntro.textContent = getText('communityIntro');
+  const tabExplore = document.getElementById('tab-explore');
+  if (tabExplore) tabExplore.textContent = getText('communityTabExplore');
+  const tabLive = document.getElementById('tab-live');
+  if (tabLive) tabLive.textContent = getText('communityTabLive');
+  const tabProfile = document.getElementById('tab-profile');
+  if (tabProfile) tabProfile.textContent = getText('communityTabProfile');
+  const tabGuidelines = document.getElementById('tab-guidelines');
+  if (tabGuidelines) tabGuidelines.textContent = getText('communityTabGuidelines');
+  const featuredRoomsTitle = document.getElementById('featured-rooms-title');
+  if (featuredRoomsTitle) featuredRoomsTitle.textContent = getText('featuredRooms');
+  const liveRoomsTitle = document.getElementById('live-rooms-title');
+  if (liveRoomsTitle) liveRoomsTitle.textContent = getText('liveRooms');
+  const liveRoomsDesc = document.getElementById('live-rooms-desc');
+  if (liveRoomsDesc) liveRoomsDesc.textContent = getText('liveRoomsDesc');
+  const hostRoomTitle = document.getElementById('host-room-title');
+  if (hostRoomTitle) hostRoomTitle.textContent = getText('hostRoomTitle') || 'Host a Room';
+  const roomNameInput = document.getElementById('room-name');
+  if (roomNameInput) roomNameInput.placeholder = getText('roomNamePlaceholder') || 'Room name';
+  const btnCreateRoom = document.getElementById('btn-create-room');
+  if (btnCreateRoom) btnCreateRoom.textContent = getText('createRoom') || 'Create Room';
+  const myRoomsTitle = document.getElementById('my-rooms-title');
+  if (myRoomsTitle) myRoomsTitle.textContent = getText('myRoomsTitle') || 'My Rooms';
+  // Card action buttons get updated dynamically on render; text is set via getText in app.js
+  const profileTitle = document.getElementById('profile-title');
+  if (profileTitle) profileTitle.textContent = getText('profileTitle');
+  const profileNameLabel = document.getElementById('profile-name-label');
+  if (profileNameLabel) profileNameLabel.textContent = getText('profileNameLabel');
+  const displayNameInput = document.getElementById('display-name');
+  if (displayNameInput) displayNameInput.placeholder = getText('profileNamePlaceholder');
+  const btnGenAvatar = document.getElementById('btn-generate-avatar');
+  if (btnGenAvatar) btnGenAvatar.textContent = getText('generateAvatar');
+  const btnSaveProfile = document.getElementById('btn-save-profile');
+  if (btnSaveProfile) btnSaveProfile.textContent = getText('saveProfile');
+  const guidelinesTitle = document.getElementById('guidelines-title');
+  if (guidelinesTitle) guidelinesTitle.textContent = getText('guidelines');
+  const guidelinesList = document.getElementById('guidelines-list');
+  if (guidelinesList) {
+    // Simple localized items if available
+    const items = [getText('guideline1'), getText('guideline2'), getText('guideline3')];
+    guidelinesList.innerHTML = items.map(t=>`<li>${t}</li>`).join('');
   }
-  // load bundles, then update text
-  try {
-    await Promise.all([
-      loadLanguageBundle('en'),
-      loadLanguageBundle('fr'),
-      loadLanguageBundle('es')
-    ]);
-  } finally {
-    const languageSelect = document.getElementById('language-select');
-    if (languageSelect) languageSelect.value = currentLanguage;
-    updateAllText();
-  }
-}
 
-// Ensure translations apply after DOM content is loaded in case init() in app.js hasn't set language yet
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initLanguage);
-} else {
-  initLanguage();
-}
+    // Community panel is now on community.html; localization for that page will run there too
+  
+  } // <-- Close updateAllText function
+
