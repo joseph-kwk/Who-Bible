@@ -167,9 +167,18 @@ function setLanguage(lang) {
   if (TRANSLATIONS[lang]) {
     currentLanguage = lang;
     localStorage.setItem('who-bible-language', lang);
+  // Immediate refresh using whatever we have (falls back to English)
   updateAllText();
   const sel = document.getElementById('language-select');
   if (sel) sel.value = lang;
+  // Lazy-load the bundle and refresh again when it arrives
+  // (covers community.html which doesn't have app.js handlers)
+  loadLanguageBundle(lang).then(() => {
+    // Only re-render if the user hasn't switched again meanwhile
+    if (localStorage.getItem('who-bible-language') === lang) {
+      updateAllText();
+    }
+  });
   }
 }
 
@@ -497,4 +506,28 @@ function updateAllText() {
     // Community panel is now on community.html; localization for that page will run there too
   
   } // <-- Close updateAllText function
+
+// Attach a generic language selector handler (helps pages without app.js wiring)
+(() => {
+  function wireLanguageSelector(){
+    const sel = document.getElementById('language-select');
+    if (!sel || sel.dataset.wbLangWired === '1') return;
+    // Set current value from storage
+    const saved = localStorage.getItem('who-bible-language') || 'en';
+    try { sel.value = saved; } catch(_) {}
+    sel.addEventListener('change', (e)=>{
+      const lang = e.target.value;
+      setLanguage(lang);
+    });
+    sel.dataset.wbLangWired = '1';
+  }
+  // Run on DOM ready and also attempt once immediately (defer script usually runs after DOM anyway)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireLanguageSelector, { once: true });
+  } else {
+    wireLanguageSelector();
+  }
+  // Opportunistically prefetch other bundles so switches feel instant
+  ['fr','es'].forEach((lng)=>{ if (lng !== 'en') loadLanguageBundle(lng); });
+})();
 
