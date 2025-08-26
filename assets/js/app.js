@@ -176,6 +176,11 @@ function translateEvent(event) {
   if (!event) return event;
   const lang = (typeof currentLanguage !== 'undefined' ? currentLanguage : (window.currentLanguage || 'en'));
   if (lang === 'en') return event;
+  // Prefer centralized translations from TRANSLATIONS bundles when available
+  try{
+    const mapping = (window.TRANSLATIONS && window.TRANSLATIONS[lang] && window.TRANSLATIONS[lang].eventTranslations) || null;
+    if(mapping && mapping[event]) return mapping[event];
+  }catch(_){ }
   return (EVENT_TRANSLATIONS[event] && EVENT_TRANSLATIONS[event][lang]) || event;
 }
 
@@ -197,6 +202,10 @@ function translateOccupation(text){
   if(!text) return text;
   const lang = (typeof currentLanguage !== 'undefined' ? currentLanguage : (window.currentLanguage || 'en'));
   if (lang === 'en') return text;
+  try{
+    const mapping = (window.TRANSLATIONS && window.TRANSLATIONS[lang] && window.TRANSLATIONS[lang].occupationTranslations) || null;
+    if(mapping && mapping[text]) return mapping[text];
+  }catch(_){ }
   return (OCC_TRANSLATIONS[text] && OCC_TRANSLATIONS[text][lang]) || text;
 }
 
@@ -512,19 +521,20 @@ function pickQuestionSet(count, difficulty){
     const t = types[Math.floor(Math.random()*types.length)];
     if(t==='whoDid'){
       const rawEvent = person.notable_events?.[0] || getText('fallbackEvent');
+      // Store raw token to allow re-localization on language change
       const event = translateEvent(rawEvent);
-      questions.push({type:'whoDid',prompt:getText('questionWhoDid', {event}),answer:person.name,ref:person.verses});
+      questions.push({type:'whoDid',prompt:getText('questionWhoDid', {event}),answer:person.name,ref:person.verses, raw:{ event: rawEvent }});
     }else if(t==='whoMother'){
-      if(person.mother) questions.push({type:'whoMother',prompt:getText('questionWhoMother', {name: person.name}),answer:person.mother,ref:person.verses});
+      if(person.mother) questions.push({type:'whoMother',prompt:getText('questionWhoMother', {name: person.name}),answer:person.mother,ref:person.verses, raw:{ name: person.name }});
     }else if(t==='occupation'){
-      if(person.occupation) questions.push({type:'occupation',prompt:getText('questionOccupation', {name: person.name}),answer:person.occupation,ref:person.verses});
+      if(person.occupation) questions.push({type:'occupation',prompt:getText('questionOccupation', {name: person.name}),answer:person.occupation,ref:person.verses, raw:{ occupation: person.occupation, name: person.name }});
     }else if(t==='age'){
-      if(person.age_notes) questions.push({type:'age',prompt:getText('questionAge', {name: person.name}),answer:person.age_notes,ref:person.verses});
+      if(person.age_notes) questions.push({type:'age',prompt:getText('questionAge', {name: person.name}),answer:person.age_notes,ref:person.verses, raw:{ name: person.name, age: person.age_notes }});
     }else if(t==='event'){
       if(person.notable_events && person.notable_events.length>0) {
         const rawEvent = person.notable_events[0];
         const event = translateEvent(rawEvent);
-        questions.push({type:'event',prompt:getText('questionEvent', {event}),answer:person.name,ref:person.verses});
+        questions.push({type:'event',prompt:getText('questionEvent', {event}),answer:person.name,ref:person.verses, raw:{ event: rawEvent }});
       }
     }
   }
@@ -568,7 +578,23 @@ function nextQuestion(){
 }
 
 function renderQuestion(q){
-  qText.innerText = q.prompt;
+  // If the question has raw tokens, regenerate localized prompt to respect current language
+  if(q && q.raw){
+    if(q.type==='whoDid' || q.type==='event'){
+      const ev = translateEvent(q.raw.event);
+      qText.innerText = getText(q.type==='whoDid' ? 'questionWhoDid' : 'questionEvent', { event: ev });
+    } else if(q.type==='occupation'){
+      qText.innerText = getText('questionOccupation', { name: q.raw.name });
+    } else if(q.type==='whoMother'){
+      qText.innerText = getText('questionWhoMother', { name: q.raw.name });
+    } else if(q.type==='age'){
+      qText.innerText = getText('questionAge', { name: q.raw.name });
+    } else {
+      qText.innerText = q.prompt;
+    }
+  } else {
+    qText.innerText = q.prompt;
+  }
   afterRef.innerText='';
   btnNext.disabled = true;
   answersEl.innerHTML='';
@@ -805,10 +831,22 @@ function toggleAllDetails(expand){
 // Import/Export & Persistence
 // =========================
 function exportJson(){
-  const blob = new Blob([JSON.stringify(state.people,null,2)],{type:'application/json'});
+  const json = JSON.stringify(state.people,null,2);
+  // Download as file
+  const blob = new Blob([json],{type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href=url; a.download='people_data.json'; a.click(); URL.revokeObjectURL(url);
-  showToast({ title: getText('exportSuccess'), msg: getText('exportMsg'), type: 'success', timeout: 1800 });
+  // Also try to copy to clipboard for convenience
+  if(navigator && navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(json).then(()=>{
+      showToast({ title: getText('exportSuccess'), msg: getText('exportMsg'), type: 'success', timeout: 1800 });
+    }).catch(()=>{
+      // Clipboard failed; still show download success
+      showToast({ title: getText('exportSuccess'), msg: getText('exportMsg'), type: 'success', timeout: 1800 });
+    });
+  } else {
+    showToast({ title: getText('exportSuccess'), msg: getText('exportMsg'), type: 'success', timeout: 1800 });
+  }
 }
 
 async function handleImportFile(e){
@@ -816,19 +854,48 @@ async function handleImportFile(e){
   const txt = await f.text();
   try{
     const parsed = JSON.parse(txt);
-    if(Array.isArray(parsed)){
-      state.people = parsed;
-      savePeopleDataToLocalStorage(parsed);
-      renderPeopleList();
-      showToast({ title: getText('importSuccess'), msg: getText('importMsg'), type: 'success' });
-    } else {
+    if(!Array.isArray(parsed)){
       showToast({ title: getText('importError'), msg: getText('importErrorMsg'), type: 'error' });
+    } else {
+      // Validate each item and collect errors
+      const errors = [];
+      const valid = [];
+      parsed.forEach((item, idx)=>{
+        const res = validatePerson(item);
+        if(res.valid) valid.push(item);
+        else errors.push(`Item ${idx+1}: ${res.reason}`);
+      });
+      if(errors.length){
+        const msg = `${getText('importError')}: ${errors.slice(0,5).join('; ')}${errors.length>5?` (+${errors.length-5} more)`:''}`;
+        showToast({ title: getText('importError'), msg, type: 'error', timeout: 5000 });
+      }
+      if(valid.length>0){
+        state.people = valid;
+        savePeopleDataToLocalStorage(valid);
+        renderPeopleList();
+        showToast({ title: getText('importSuccess'), msg: getText('importMsg'), type: 'success' });
+      }
     }
   }catch(err){
     showToast({ title: getText('importError'), msg: (err?.message||String(err)), type: 'error' });
   } finally {
     e.target.value = '';
   }
+}
+
+// Simple runtime validation for imported person objects
+function validatePerson(p){
+  if(!p || typeof p !== 'object') return { valid:false, reason: 'Not an object' };
+  if(!p.name || typeof p.name !== 'string' || !p.name.trim()) return { valid:false, reason: 'Missing or invalid "name"' };
+  if(p.aliases && !Array.isArray(p.aliases)) return { valid:false, reason: '"aliases" must be an array if present' };
+  if(p.mother && typeof p.mother !== 'string') return { valid:false, reason: '"mother" must be a string if present' };
+  if(p.occupation && typeof p.occupation !== 'string') return { valid:false, reason: '"occupation" must be a string if present' };
+  if(p.age_notes && typeof p.age_notes !== 'string') return { valid:false, reason: '"age_notes" must be a string if present' };
+  if(p.notable_events && !Array.isArray(p.notable_events)) return { valid:false, reason: '"notable_events" must be an array if present' };
+  if(p.verses && !Array.isArray(p.verses)) return { valid:false, reason: '"verses" must be an array if present' };
+  // short_bio optional but should be string if present
+  if(p.short_bio && typeof p.short_bio !== 'string') return { valid:false, reason: '"short_bio" must be a string if present' };
+  return { valid:true };
 }
 
 function resetData(){
@@ -987,4 +1054,25 @@ function scheduleTimeWarnings(){
   };
   requestAnimationFrame(check);
 }
+
+// Re-localize dynamic pieces when language changes
+window.onWhoBibleLanguageChange = function(lang){
+  try{
+    // Re-render study list (people) to reflect translated events/occupations
+    if(document.getElementById('study-panel') && state.people.length>0){
+      renderPeopleList(searchPerson.value || '');
+    }
+    // Rebuild current question prompt and answer labels if a quiz is active
+    if(state.current){
+      renderQuestion(state.current);
+      // Update answers display text for current choices
+      const nodes = Array.from(document.querySelectorAll('#answers .ans'));
+      nodes.forEach(node=>{
+        const orig = node.dataset.value;
+        const q = state.current;
+        node.innerText = (typeof translateAnswerForQuestionType==='function') ? translateAnswerForQuestionType(q.type, orig) : orig;
+      });
+    }
+  }catch(_){ /* non-fatal */ }
+};
 

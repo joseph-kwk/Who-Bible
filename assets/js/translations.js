@@ -169,6 +169,8 @@ function setLanguage(lang) {
     localStorage.setItem('who-bible-language', lang);
   // Immediate refresh using whatever we have (falls back to English)
   updateAllText();
+  // Notify any page-level handler that cares about raw-token re-localization
+  try{ if (window && typeof window.onWhoBibleLanguageChange === 'function') window.onWhoBibleLanguageChange(lang); }catch(_){ }
   const sel = document.getElementById('language-select');
   if (sel) sel.value = lang;
   // Lazy-load the bundle and refresh again when it arrives

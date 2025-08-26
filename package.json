@@ -1,0 +1,11 @@
+{
+  "name": "who-bible",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "validate-sample": "node tools/validate_import_sample.js"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}

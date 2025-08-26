@@ -79,3 +79,16 @@ You can export, edit, and import a JSON array of these objects.
 
 The original prototype remains at `bible_people_challenge_prd_prototype_single_file_html.html`.
 
+
+### Testing import validation (quick)
+
+A small Node script is included to exercise the same import validation used by the app. From the project root:
+
+```powershell
+cd \path\to\Who-Bible
+npm install
+npm run validate-sample
+```
+
+The script will print validation results for a few sample objects.
+
