@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Modal Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        .status { margin: 20px 0; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Modal Functionality Test</h1>
+    
+    <button onclick="testChallenge()">Test Challenge Mode Modal</button>
+    <button onclick="checkElements()">Check Elements</button>
+    <button onclick="testFunctions()">Test Functions</button>
+    
+    <div class="status" id="status">Ready to test...</div>
+    
+    <script>
+        function testChallenge() {
+            const status = document.getElementById('status');
+            
+            // Open main page in iframe to test
+            const iframe = document.createElement('iframe');
+            iframe.src = 'http://localhost:5500/index.html';
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            iframe.style.border = '1px solid #ccc';
+            iframe.style.marginTop = '20px';
+            
+            iframe.onload = function() {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                const challengeBtn = doc.getElementById('btn-challenge');
+                const modal = doc.getElementById('players-modal');
+                
+                status.innerHTML = `
+                    <strong>Test Results:</strong><br>
+                    Challenge Button: ${challengeBtn ? '✅ Found' : '❌ Missing'}<br>
+                    Players Modal: ${modal ? '✅ Found' : '❌ Missing'}<br>
+                `;
+                
+                if (challengeBtn && modal) {
+                    // Test clicking the button
+                    challengeBtn.click();
+                    
+                    setTimeout(() => {
+                        const modalDisplay = modal.style.display;
+                        const computedDisplay = iframe.contentWindow.getComputedStyle(modal).display;
+                        
+                        status.innerHTML += `
+                            Modal style.display: ${modalDisplay}<br>
+                            Modal computed display: ${computedDisplay}<br>
+                            Modal working: ${(modalDisplay === 'flex' || computedDisplay === 'flex') ? '✅ Yes' : '❌ No'}
+                        `;
+                    }, 500);
+                }
+            };
+            
+            // Remove any existing iframe
+            const existingIframe = document.querySelector('iframe');
+            if (existingIframe) existingIframe.remove();
+            
+            document.body.appendChild(iframe);
+        }
+        
+        function checkElements() {
+            window.open('http://localhost:5500/index.html', '_blank');
+        }
+        
+        function testFunctions() {
+            const status = document.getElementById('status');
+            status.innerHTML = 'Open browser console and click Challenge Mode button to see debug logs...';
+        }
+    </script>
+</body>
+</html>
