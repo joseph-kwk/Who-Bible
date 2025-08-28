@@ -131,72 +131,18 @@ const footerCommunity = document.getElementById('footer-community');
 // Community elements removed on main page (moved to community.html)
 
 // =========================
-// Event Translations
+// Translation functions (using centralized JSON translations)
 // =========================
-const EVENT_TRANSLATIONS = {
-  "Built the ark": { fr: "A construit l'arche", es: "Construyó el arca" },
-  "Survived the flood": { fr: "A survécu au déluge", es: "Sobrevivió al diluvio" },
-  "Led Exodus": { fr: "A conduit l'Exode", es: "Lideró el Éxodo" },
-  "Saw burning bush": { fr: "A vu le buisson ardent", es: "Vio la zarza ardiente" },
-  "Built the temple": { fr: "A construit le temple", es: "Construyó el templo" },
-  "Known for wisdom": { fr: "Connu pour sa sagesse", es: "Conocido por su sabiduría" },
-  "Sold into Egypt": { fr: "Vendu en Égypte", es: "Vendido a Egipto" },
-  "Interpreted dreams": { fr: "A interprété des rêves", es: "Interpretó sueños" },
-  "Killed Goliath": { fr: "A tué Goliath", es: "Mató a Goliat" },
-  "Became king": { fr: "Est devenu roi", es: "Se convirtió en rey" },
-  "Became queen and saved her people": { fr: "Devenue reine et a sauvé son peuple", es: "Se convirtió en reina y salvó a su pueblo" },
-  "Mother of Jesus": { fr: "Mère de Jésus", es: "Madre de Jesús" },
-  "Baptized Jesus": { fr: "A baptisé Jésus", es: "Bautizó a Jesús" },
-  "Converted on road to Damascus": { fr: "Converti sur la route de Damas", es: "Convertido en el camino a Damasco" },
-  "Denial of Jesus": { fr: "A renié Jésus", es: "Negó a Jesús" },
-  "Leader of early church": { fr: "Chef de l'église primitive", es: "Líder de la iglesia primitiva" },
-  "Raised from the dead by Jesus": { fr: "Ressuscité par Jésus", es: "Resucitado por Jesús" },
-  "Father of Isaac": { fr: "Père d'Isaac", es: "Padre de Isaac" },
-  "Covenant with God": { fr: "Alliance avec Dieu", es: "Pacto con Dios" },
-  "Son of Abraham and Sarah": { fr: "Fils d'Abraham et de Sarah", es: "Hijo de Abraham y Sara" },
-  "Renamed Israel": { fr: "Renommé Israël", es: "Renombrado Israel" },
-  "Father of the 12 tribes": { fr: "Père des 12 tribus", es: "Padre de las 12 tribus" },
-  "Anointed Saul and David": { fr: "A oint Saül et David", es: "Ungió a Saúl y David" },
-  "Taken up by chariot of fire": { fr: "Enlevé par un char de feu", es: "Llevado por un carro de fuego" },
-  "Swallowed by fish": { fr: "Avalé par un poisson", es: "Tragado por un pez" },
-  "Ancestor of David": { fr: "Ancêtre de David", es: "Ancestro de David" },
-  "Married Boaz": { fr: "Mariée à Booz", es: "Casada con Booz" },
-  "Witnessed resurrection": { fr: "A été témoin de la résurrection", es: "Fue testigo de la resurrección" },
-  "First king of Israel": { fr: "Premier roi d'Israël", es: "Primer rey de Israel" },
-  "Sold by brothers at 17": { fr: "Vendu par ses frères à 17 ans", es: "Vendido por sus hermanos a los 17" },
-  "Died at 120; 80 when confronting Pharaoh": { fr: "Mort à 120 ans ; 80 ans lors de la confrontation avec Pharaon", es: "Murió a los 120; 80 cuando enfrentó al faraón" },
-  "Died at 175": { fr: "Mort à 175 ans", es: "Murió a los 175" },
-  "Died at 180": { fr: "Mort à 180 ans", es: "Murió a los 180" },
-  "Died at 147": { fr: "Mort à 147 ans", es: "Murió a los 147" },
-  "Jewish queen of Persia who saved her people.": { fr: "Reine juive de Perse qui a sauvé son peuple.", es: "Reina judía de Persia que salvó a su pueblo." },
-  // Add more as needed
-};
-
 function translateEvent(event) {
   if (!event) return event;
   const lang = (typeof currentLanguage !== 'undefined' ? currentLanguage : (window.currentLanguage || 'en'));
   if (lang === 'en') return event;
-  // Prefer centralized translations from TRANSLATIONS bundles when available
   try{
     const mapping = (window.TRANSLATIONS && window.TRANSLATIONS[lang] && window.TRANSLATIONS[lang].eventTranslations) || null;
     if(mapping && mapping[event]) return mapping[event];
   }catch(_){ }
-  return (EVENT_TRANSLATIONS[event] && EVENT_TRANSLATIONS[event][lang]) || event;
+  return event; // fallback to original text
 }
-
-// Occupation translations (subset covering default dataset)
-const OCC_TRANSLATIONS = {
-  "Righteous man, built the ark": { fr: "Homme juste, a construit l'arche", es: "Hombre justo, construyó el arca" },
-  "Leader, prophet": { fr: "Chef, prophète", es: "Líder, profeta" },
-  "King": { fr: "Roi", es: "Rey" },
-  "Official in Egypt": { fr: "Haut fonctionnaire en Égypte", es: "Funcionario en Egipto" },
-  "Shepherd, King": { fr: "Berger, roi", es: "Pastor, rey" },
-  "Queen": { fr: "Reine", es: "Reina" },
-  "Prophet": { fr: "Prophète", es: "Profeta" },
-  "Apostle": { fr: "Apôtre", es: "Apóstol" },
-  "Disciple, Apostle": { fr: "Disciple, apôtre", es: "Discípulo, apóstol" },
-  "Prophet, Judge": { fr: "Prophète, juge", es: "Profeta, juez" }
-};
 
 function translateOccupation(text){
   if(!text) return text;
@@ -206,7 +152,7 @@ function translateOccupation(text){
     const mapping = (window.TRANSLATIONS && window.TRANSLATIONS[lang] && window.TRANSLATIONS[lang].occupationTranslations) || null;
     if(mapping && mapping[text]) return mapping[text];
   }catch(_){ }
-  return (OCC_TRANSLATIONS[text] && OCC_TRANSLATIONS[text][lang]) || text;
+  return text; // fallback to original text
 }
 
 function translateAnswerForQuestionType(qType, value){

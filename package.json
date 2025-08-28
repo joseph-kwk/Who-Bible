@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "validate-sample": "node tools/validate_import_sample.js"
+    "validate-sample": "node tools/validate_import_sample.js",
+    "test": "node tools/test-quiz-logic.js"
   },
   "engines": {
     "node": ">=14"

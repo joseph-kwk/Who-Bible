@@ -1,26 +1,109 @@
-:root{
-  /* Dark theme (default) - Night Sky inspired */
-  --bg:#0a0f1a;
-  --bg-2:#070c14;
-  --card:rgba(255,255,255,0.08);
-  --muted:#a1b3cc;
-  --accent:#8b5cf6;
-  --accent-2:#22d3ee;
-  --good:#34d399;
-  --bad:#f87171;
-  --text:#f1f5f9;
-  --glass:rgba(255,255,255,0.08);
-  --border:rgba(255,255,255,0.15);
+/* ===== ROOT VARIABLES & RESETS ===== */
+:root {
+  /* Colors */
+  --primary-color: #2c3e50;
+  --secondary-color: #34495e;
+  --accent-color: #3498db;
+  --success-color: #27ae60;
+  --error-color: #e74c3c;
+  --warning-color: #f39c12;
   
-  /* Natural element colors */
-  --sun-gold:#fbbf24;
-  --sun-orange:#f97316;
-  --wind-blue:#60a5fa;
-  --wind-light:#93c5fd;
-  --water-blue:#0ea5e9;
-  --water-deep:#0369a1;
-  --sky-blue:#3b82f6;
-  --sky-light:#dbeafe;
+  /* Dark theme colors */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3a3a3a;
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --text-muted: #808080;
+  --border-color: #444;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  
+  /* Light theme colors */
+  --light-bg-primary: #ffffff;
+  --light-bg-secondary: #f8f9fa;
+  --light-bg-tertiary: #e9ecef;
+  --light-text-primary: #212529;
+  --light-text-secondary: #495057;
+  --light-text-muted: #6c757d;
+  --light-border-color: #dee2e6;
+  --light-shadow-color: rgba(0, 0, 0, 0.1);
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-xxl: 3rem;
+  
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-xxl: 1.5rem;
+  --font-size-xxxl: 2rem;
+  
+  /* Border radius */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Focus visible for better keyboard navigation */
+.sr-only:focus {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: var(--spacing-sm) !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+  background: var(--accent-color) !important;
+  color: white !important;
+  border-radius: var(--border-radius-sm) !important;
+}
+
+/* Base reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 body.light{
   /* Light theme - Sun and Sky inspired with more sky blue to reduce brightness */
@@ -113,9 +196,14 @@ body.light .moon-icon{opacity:1;transform:rotate(0deg) scale(1)}
 
 button{background:var(--glass);border:1px solid var(--border);color:inherit;padding:8px 12px;border-radius:10px;cursor:pointer;backdrop-filter: blur(10px);transition:all 200ms ease}
 button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.1);border-color:var(--accent);background:rgba(255,255,255,0.1)}
+button:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(52, 152, 219, 0.3);background:rgba(255,255,255,0.1)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 button:active{transform:translateY(0)}
 button.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#06121f;font-weight:700;border:0}
 button.primary:hover{box-shadow:0 4px 16px rgba(139,92,246,0.4)}
+button.primary:focus{box-shadow:0 0 0 3px rgba(52, 152, 219, 0.3), 0 4px 16px rgba(139,92,246,0.4)}
+button:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+button:disabled:hover{transform:none;box-shadow:none}
 main{flex:1;display:flex;flex-direction:column;min-height:0}
 
 /* Setup Panel */
@@ -348,5 +436,87 @@ body:not(.light) .filter-group select:hover {
   .language-selector select { width: 100%; }
   .mode-title{font-size:18px}
   .mode-desc{font-size:13px}
+}
+
+/* ===== ACCESSIBILITY & HELPER TEXT ===== */
+.data-help, .control-help, .modal-help {
+  margin-top: var(--spacing-sm);
+}
+
+.data-help small, .control-help small, .modal-help small {
+  display: block;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+}
+
+/* Enhanced modal accessibility */
+.modal-overlay[aria-hidden="true"] {
+  display: none;
+}
+
+.modal[role="document"] {
+  position: relative;
+}
+
+.modal-close:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Improved form accessibility */
+input[aria-describedby], select[aria-describedby] {
+  border-color: var(--border-color);
+}
+
+input[aria-describedby]:focus, select[aria-describedby]:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Skip link for keyboard navigation */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--accent-color);
+  color: white;
+  padding: 8px;
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  z-index: 100;
+  transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  button {
+    border-width: 2px;
+  }
+  
+  .choice-btn {
+    border-width: 2px;
+  }
+  
+  .modal {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
 }
 
