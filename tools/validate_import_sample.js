@@ -4,9 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const app = fs.readFileSync(path.join(__dirname,'..','assets','js','app.js'),'utf8');
 // Extract validatePerson function text by simple regex (for demo only)
-const m = app.match(/function validatePerson\([\s\S]*?\n}\n/);
+const m = app.match(/function validatePerson\([^)]*\)\{[\s\S]*?^}/m);
 if(!m){
-  console.error('validatePerson not found in app.js'); process.exit(2);
+  console.error('validatePerson not found in app.js'); process.exit(1);
 }
 const funcText = m[0];
 // Create a sandbox and evaluate the function
@@ -15,7 +15,7 @@ const sandbox = {};
 vm.createContext(sandbox);
 vm.runInContext(funcText, sandbox);
 const validatePerson = sandbox.validatePerson;
-if(typeof validatePerson !== 'function'){ console.error('validatePerson not loaded'); process.exit(2); }
+if(typeof validatePerson !== 'function'){ console.error('validatePerson not loaded'); process.exit(1); }
 
 const samples = [
   { name: 'Valid Person', aliases: ['X'], mother: 'Y', occupation: 'Z', age_notes: 'Died at 100', notable_events: ['Event'], verses: ['Gen 1'] },

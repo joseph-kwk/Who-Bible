@@ -177,6 +177,7 @@
             
             <div class="game-controls">
               <button id="btn-hint" class="control-btn" aria-describedby="hint-help">Get Hint</button>
+              <button id="btn-pause" class="control-btn" style="display:none" aria-describedby="pause-help">Pause</button>
               <button id="btn-next" class="control-btn primary" style="display:none" aria-describedby="next-help">Next Question</button>
               <button id="btn-finish" class="control-btn primary" style="display:none" aria-describedby="finish-help">Finish Quiz</button>
               <button id="btn-quit" class="control-btn secondary" aria-describedby="quit-help">Quit Game</button>
@@ -184,6 +185,7 @@
             
             <div class="control-help">
               <small id="hint-help" class="sr-only">Reveal a helpful clue for this question</small>
+              <small id="pause-help" class="sr-only">Pause or resume the timer</small>
               <small id="next-help" class="sr-only">Proceed to the next question</small>
               <small id="finish-help" class="sr-only">Complete the quiz and see results</small>
               <small id="quit-help" class="sr-only">Exit the quiz and return to setup</small>
@@ -193,43 +195,54 @@
       </section>
 
       <!-- Study Panel -->
-            <!-- Study Panel -->
       <section id="study-panel" style="display:none" role="main" aria-labelledby="study-heading">
         <header class="study-header">
           <h2 id="study-heading">Study Mode - Bible People Explorer</h2>
-          <div class="study-controls">
-            <button id="btn-random-person" class="control-btn" aria-describedby="random-help">Random Person</button>
-            <button id="btn-back-to-setup" class="control-btn secondary" aria-describedby="back-help">Back to Setup</button>
+          
+          <div class="study-tools">
+            <div class="search-bar">
+              <label for="search-person" class="sr-only">Search Bible people</label>
+              <input id="search-person" type="text" placeholder="Search people..." aria-label="Search Bible people" />
+            </div>
+            
+            <div class="filter-group">
+              <label for="sort-select" class="sr-only">Sort by</label>
+              <select id="sort-select" aria-label="Sort order">
+                <option value="name-asc">Name A-Z</option>
+                <option value="name-desc">Name Z-A</option>
+              </select>
+            </div>
+            
+            <div class="filter-checkboxes">
+              <label class="checkbox-label">
+                <input id="filter-mother" type="checkbox" />
+                <span>Has Mother</span>
+              </label>
+              <label class="checkbox-label">
+                <input id="filter-occupation" type="checkbox" />
+                <span>Has Occupation</span>
+              </label>
+              <label class="checkbox-label">
+                <input id="filter-age" type="checkbox" />
+                <span>Has Age Info</span>
+              </label>
+            </div>
           </div>
-          <div class="study-help">
-            <small id="random-help" class="sr-only">Display information about a randomly selected Bible person</small>
-            <small id="back-help" class="sr-only">Return to game mode selection</small>
+          
+          <div class="study-controls">
+            <button id="btn-expand-all" class="control-btn" aria-label="Expand all person details">Expand All</button>
+            <button id="btn-collapse-all" class="control-btn" aria-label="Collapse all person details">Collapse All</button>
+            <button id="btn-shuffle-list" class="control-btn" aria-label="Shuffle the list">Shuffle</button>
+            <button id="btn-back-from-study" class="control-btn secondary" aria-label="Return to game mode selection">Back to Setup</button>
+          </div>
+          
+          <div class="people-count-display">
+            <span>Showing <strong id="people-count">0</strong> people</span>
           </div>
         </header>
         
         <main class="study-content" role="main">
-          <article id="person-card" class="person-card" aria-live="polite">
-            <div class="person-image-container">
-              <img id="person-image" src="" alt="" class="person-image" />
-            </div>
-            <div class="person-info">
-              <h3 id="person-name" class="person-name"></h3>
-              <div class="person-details">
-                <div class="detail-item">
-                  <span class="detail-label">Gender:</span>
-                  <span id="person-gender" class="detail-value"></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Notable Events:</span>
-                  <div id="person-events" class="detail-value events-list"></div>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Occupations:</span>
-                  <div id="person-occupations" class="detail-value occupations-list"></div>
-                </div>
-              </div>
-            </div>
-          </article>
+          <div id="people-list" class="people-list" aria-live="polite"></div>
         </main>
       </section>
 
