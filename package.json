@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "validate-sample": "node tools/validate_import_sample.js",
-    "test": "node tools/test-quiz-logic.js"
+    "test": "node tools/test-quiz-logic.js",
+    "contrast-check": "node tools/contrast_check.js"
   },
   "engines": {
     "node": ">=14"

@@ -112,6 +112,11 @@ body {
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
+/* Animate transitions for theme switch for smooth visual effect */
+html * {
+  transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease, box-shadow 350ms ease;
+}
+
 /* Global anchor colors always use accent for discoverability and ensure contrast is good */
 a, a:link, a:visited {
   color: var(--accent);
@@ -269,6 +274,10 @@ body.sepia header{
 .language-selector select{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:inherit;font-size:13px;font-weight:500;transition:all 200ms ease;cursor:pointer;min-width:100px}
 .language-selector select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(139,92,246,0.2);background:var(--glass)}
 .language-selector select:hover{background:var(--glass);border-color:var(--accent)}
+/* Theme selector in header */
+.theme-picker{display:flex;align-items:center;margin-left:8px}
+.theme-picker select{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:inherit;font-size:13px;font-weight:500;cursor:pointer}
+.theme-picker select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,0,0,0.08)}
 /* resolved */
 /* App container */
 .app {

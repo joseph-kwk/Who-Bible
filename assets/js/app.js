@@ -280,6 +280,19 @@ function attachHandlers(){
     applyTheme(next);
     saveSettingsFromUI();
   });
+  // Theme selector (dropdown)
+  const themeSelect = document.getElementById('theme-select');
+  if(themeSelect){
+    themeSelect.value = state.theme || 'dark';
+    themeSelect.addEventListener('change', (e)=>{
+      const chosen = e.target.value || 'dark';
+      applyTheme(chosen);
+      saveSettingsFromUI();
+    });
+    // reflect theme when user chooses with button
+    const updateThemeSelect = (t)=>{ if(themeSelect) themeSelect.value = t||'dark'; };
+    window.updateThemeSelect = updateThemeSelect;
+  }
   // Share
   if (btnShare) {
     btnShare.addEventListener('click', async ()=>{
@@ -923,6 +936,7 @@ function applyTheme(theme){
   const themeKey = theme==='dark' ? 'themeDark' : (theme==='light' ? 'themeLight' : (theme==='sepia' ? 'themeSepia' : (theme==='high-contrast' ? 'themeHighContrast' : 'themeDark')));
   const keyText = getText(themeKey) || theme;
   if(btnTheme) btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${keyText}`);
+  if(window.updateThemeSelect) window.updateThemeSelect(theme);
 }
 
 function saveSettingsFromUI(){

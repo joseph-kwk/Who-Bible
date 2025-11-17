@@ -56,6 +56,11 @@
         btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${label}`);
       }catch(_){ }
     });
+    const themeSelect = document.getElementById('theme-select');
+    if(themeSelect){
+      try{ themeSelect.value = (document.body.classList.contains('light')?'light':(document.body.classList.contains('sepia')?'sepia':(document.body.classList.contains('high-contrast')?'high-contrast':'dark'))); }catch(_){ }
+      themeSelect.addEventListener('change', (e)=>{ applyTheme(e.target.value); });
+    }
   }
 
   // Wire community behaviors similar to app.js
