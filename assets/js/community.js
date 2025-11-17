@@ -30,25 +30,58 @@
   // Theme toggle re-use
   const btnTheme = document.getElementById('btn-theme');
   function applyTheme(theme){
-    document.body.classList.remove('light','sepia','high-contrast');
-    if(theme && theme!=='dark') document.body.classList.add(theme);
-    try{ const s = JSON.parse(localStorage.getItem('settings')||'{}'); s.theme = theme; localStorage.setItem('settings', JSON.stringify(s)); }catch(_){ }
+    // Remove all theme classes first
+    document.body.classList.remove('day', 'night');
+    
+    // Apply the new theme
+    if(theme === 'day') {
+      document.body.classList.add('day');
+    } else {
+      // Default to night theme
+      document.body.classList.add('night');
+      theme = 'night'; // Normalize to night if invalid theme
+    }
+    
+    try{ 
+      const s = JSON.parse(localStorage.getItem('settings')||'{}'); 
+      s.theme = theme; 
+      localStorage.setItem('settings', JSON.stringify(s)); 
+    }catch(_){ }
   }
+  
   try{
     const s = JSON.parse(localStorage.getItem('settings')||'{}');
-    applyTheme(s.theme||'dark');
-    const keyMap = { 'dark':'themeDark','light':'themeLight','sepia':'themeSepia','high-contrast':'themeHighContrast' };
-    const label = getText(keyMap[s.theme]||'themeDark');
+    applyTheme(s.theme||'night');
+    const keyMap = { 'night':'themeNight','day':'themeDay' };
+    const label = getText(keyMap[s.theme]||'themeNight');
     if(btnTheme) btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${label}`);
-  }catch(_){ applyTheme('dark'); }
+  }catch(_){ applyTheme('night'); }
+  
   if (btnTheme){
     btnTheme.addEventListener('click', ()=>{
-      const THEMES = ['dark','light','sepia','high-contrast'];
-      const current = THEMES.find(t=>document.body.classList.contains(t)) || 'dark';
+      const THEMES = ['night','day'];
+      const current = document.body.classList.contains('day') ? 'day' : 'night';
       const next = THEMES[(THEMES.indexOf(current)+1)%THEMES.length];
       applyTheme(next);
       // Set a helpful tooltip with the current theme
       try{
+        const keyMap = { 'night':'themeNight','day':'themeDay' };
+        const label = getText(keyMap[next]||'themeNight');
+        btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${label}`);
+      }catch(_){}
+    });
+  }
+  
+  // Theme selector (dropdown)
+  const themeSelect = document.getElementById('theme-select');
+  if(themeSelect){
+    const current = document.body.classList.contains('day') ? 'day' : 'night';
+    themeSelect.value = current;
+    themeSelect.addEventListener('change', (e)=>{
+      const chosen = e.target.value || 'night';
+      applyTheme(chosen);
+    });
+  }
         const keyMap = {
           'dark':'themeDark','light':'themeLight','sepia':'themeSepia','high-contrast':'themeHighContrast'
         };

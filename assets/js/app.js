@@ -44,7 +44,7 @@ const state = {
   people: [],
   results: [],
   paused: false,
-  theme: 'dark'
+  theme: 'night'
 };
 
 // =========================
@@ -172,7 +172,7 @@ function init(){
     difficulty: 'medium',
     numQuestions: 10,
     timeLimit: 60,
-    theme: 'dark',
+    theme: 'night',
     language: 'en'
   };
   let savedSettings = loadSettings();
@@ -272,10 +272,10 @@ function attachHandlers(){
     }
   });
   
-  // Theme toggle: cycle through themes for richer choices
+  // Theme toggle: cycle through Day and Night themes
   btnTheme.addEventListener('click', ()=>{
-    const THEMES = ['dark','light','sepia','high-contrast'];
-    const idx = THEMES.indexOf(state.theme||'dark');
+    const THEMES = ['night','day'];
+    const idx = THEMES.indexOf(state.theme||'night');
     const next = THEMES[(idx+1) % THEMES.length];
     applyTheme(next);
     saveSettingsFromUI();
@@ -283,14 +283,14 @@ function attachHandlers(){
   // Theme selector (dropdown)
   const themeSelect = document.getElementById('theme-select');
   if(themeSelect){
-    themeSelect.value = state.theme || 'dark';
+    themeSelect.value = state.theme || 'night';
     themeSelect.addEventListener('change', (e)=>{
-      const chosen = e.target.value || 'dark';
+      const chosen = e.target.value || 'night';
       applyTheme(chosen);
       saveSettingsFromUI();
     });
     // reflect theme when user chooses with button
-    const updateThemeSelect = (t)=>{ if(themeSelect) themeSelect.value = t||'dark'; };
+    const updateThemeSelect = (t)=>{ if(themeSelect) themeSelect.value = t||'night'; };
     window.updateThemeSelect = updateThemeSelect;
   }
   // Share
@@ -921,19 +921,20 @@ function updateProgress(){
 // Theme
 function applyTheme(theme){
   state.theme = theme;
-  document.body.classList.remove('light','sepia','high-contrast');
-  if(theme && theme!=='dark') document.body.classList.add(theme);
-  // for a11y: set --accent-color to a high-contrast accent for contrast theme
-  if(theme==='high-contrast'){
-    document.documentElement.style.setProperty('--accent-color','#ffd166');
-    document.documentElement.style.setProperty('--success-color','#00ff99');
+  // Remove all theme classes first
+  document.body.classList.remove('day', 'night');
+  
+  // Apply the new theme
+  if(theme === 'day') {
+    document.body.classList.add('day');
   } else {
-    // reset accent to default defined in CSS
-    document.documentElement.style.removeProperty('--accent-color');
-    document.documentElement.style.removeProperty('--success-color');
+    // Default to night theme
+    document.body.classList.add('night');
+    theme = 'night'; // Normalize to night if invalid theme
   }
-  // Show active theme label for screen readers and tooltip
-  const themeKey = theme==='dark' ? 'themeDark' : (theme==='light' ? 'themeLight' : (theme==='sepia' ? 'themeSepia' : (theme==='high-contrast' ? 'themeHighContrast' : 'themeDark')));
+  
+  // Update theme toggle button tooltip
+  const themeKey = theme === 'day' ? 'themeDay' : 'themeNight';
   const keyText = getText(themeKey) || theme;
   if(btnTheme) btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${keyText}`);
   if(window.updateThemeSelect) window.updateThemeSelect(theme);
