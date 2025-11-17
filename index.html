@@ -149,54 +149,58 @@
       </section>
 
       <!-- Game Area -->
-            <!-- Game Area -->
       <section id="game-area" style="display:none" role="main" aria-label="Quiz Game">
         <div class="game-container">
           <header class="game-header" role="banner">
-            <div class="timer-container" aria-live="polite">
-              <div id="timer" class="timer" aria-label="Time remaining">Time: 00:00</div>
-            </div>
-            <div class="score-container" aria-live="polite">
-              <div id="score" class="score" aria-label="Current score">Score: 0/0</div>
-            </div>
-            <div class="question-counter" aria-live="polite">
-              <div id="question-counter" aria-label="Question progress">Question 0/0</div>
+            <button id="btn-back-to-setup" class="back-btn" aria-label="Back to Setup">← Back</button>
+            <div id="game-title" class="game-title">Quiz Mode</div>
+            <div id="timer" class="timer" style="display:none" aria-live="polite">
+              <span>⏱️</span>
+              <span id="time-remaining">60</span>s
             </div>
           </header>
           
-          <main class="question-content" role="main">
+          <div class="game-stats">
+            <div class="stat-item">
+              <span class="stat-label">Score:</span>
+              <span id="score" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Streak:</span>
+              <span id="streak" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Question:</span>
+              <span id="qnum" class="stat-value">1</span>/<span id="qtotal" class="stat-value">10</span>
+            </div>
+            <div id="challenge-status" class="challenge-status" style="display:none">
+              <div>Player <span id="current-player">1</span>'s Turn</div>
+              <div>P1: <span id="p1-score">0</span> | P2: <span id="p2-score">0</span></div>
+            </div>
+          </div>
+          
+          <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+          
+          <main id="quiz" class="quiz-content">
             <div id="question-text" class="question-text" aria-live="assertive"></div>
-            <div id="question-clue" class="question-clue" aria-live="polite"></div>
-            
-            <div class="choices-container" role="group" aria-labelledby="question-text">
-              <button id="choice-a" class="choice-btn" data-choice="a" aria-describedby="choice-a-desc"></button>
-              <button id="choice-b" class="choice-btn" data-choice="b" aria-describedby="choice-b-desc"></button>
-              <button id="choice-c" class="choice-btn" data-choice="c" aria-describedby="choice-c-desc"></button>
-              <button id="choice-d" class="choice-btn" data-choice="d" aria-describedby="choice-d-desc"></button>
-            </div>
-            
-            <div class="game-controls">
-              <button id="btn-hint" class="control-btn" aria-describedby="hint-help">Get Hint</button>
-              <button id="btn-pause" class="control-btn" style="display:none" aria-describedby="pause-help">Pause</button>
-              <button id="btn-next" class="control-btn primary" style="display:none" aria-describedby="next-help">Next Question</button>
-              <button id="btn-finish" class="control-btn primary" style="display:none" aria-describedby="finish-help">Finish Quiz</button>
-              <button id="btn-quit" class="control-btn secondary" aria-describedby="quit-help">Quit Game</button>
-            </div>
-            
-            <div class="control-help">
-              <small id="hint-help" class="sr-only">Reveal a helpful clue for this question</small>
-              <small id="pause-help" class="sr-only">Pause or resume the timer</small>
-              <small id="next-help" class="sr-only">Proceed to the next question</small>
-              <small id="finish-help" class="sr-only">Complete the quiz and see results</small>
-              <small id="quit-help" class="sr-only">Exit the quiz and return to setup</small>
-            </div>
+            <div id="answers" class="answers-container" role="group" aria-label="Answer choices"></div>
+            <div id="after-ref" class="after-ref" aria-live="polite"></div>
           </main>
+          
+          <div class="game-controls">
+            <button id="btn-pause" class="control-btn" style="display:none" aria-label="Pause/Resume Timer">Pause</button>
+            <button id="btn-next" class="control-btn primary" disabled aria-label="Next Question">Next</button>
+            <button id="btn-quit" class="control-btn secondary" aria-label="Quit Game">Quit</button>
+          </div>
         </div>
       </section>
 
       <!-- Study Panel -->
       <section id="study-panel" style="display:none" role="main" aria-labelledby="study-heading">
         <header class="study-header">
+          <button id="btn-back-from-study" class="back-btn" aria-label="Back to Setup">← Back</button>
           <h2 id="study-heading">Study Mode - Bible People Explorer</h2>
           
           <div class="study-tools">
@@ -233,7 +237,6 @@
             <button id="btn-expand-all" class="control-btn" aria-label="Expand all person details">Expand All</button>
             <button id="btn-collapse-all" class="control-btn" aria-label="Collapse all person details">Collapse All</button>
             <button id="btn-shuffle-list" class="control-btn" aria-label="Shuffle the list">Shuffle</button>
-            <button id="btn-back-from-study" class="control-btn secondary" aria-label="Return to game mode selection">Back to Setup</button>
           </div>
           
           <div class="people-count-display">
@@ -241,7 +244,7 @@
           </div>
         </header>
         
-        <main class="study-content" role="main">
+        <main class="study-content">
           <div id="people-list" class="people-list" aria-live="polite"></div>
         </main>
       </section>
