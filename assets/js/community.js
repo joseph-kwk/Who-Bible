@@ -65,26 +65,13 @@
       applyTheme(next);
       // Set a helpful tooltip with the current theme
       try{
-        const keyMap = { 'night':'themeNight','day':'themeDay' };
-        const label = getText(keyMap[next]||'themeNight');
-        btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${label}`);
+        const label = next === 'day' ? 'Day' : 'Night';
+        btnTheme.setAttribute('title', `Toggle theme — ${label}`);
       }catch(_){}
     });
   }
-  
-  // Theme selector (dropdown)
-  const themeSelect = document.getElementById('theme-select');
-  if(themeSelect){
-    const current = document.body.classList.contains('day') ? 'day' : 'night';
-    themeSelect.value = current;
-    themeSelect.addEventListener('change', (e)=>{
-      const chosen = e.target.value || 'night';
-      applyTheme(chosen);
-    });
-  }
-        const keyMap = {
-          'dark':'themeDark','light':'themeLight','sepia':'themeSepia','high-contrast':'themeHighContrast'
-        };
+
+  // Share functionality
         const label = getText(keyMap[next]) || next;
         btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${label}`);
       }catch(_){ }

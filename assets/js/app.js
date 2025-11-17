@@ -184,7 +184,11 @@ function init(){
   difficultySel.value = savedSettings.difficulty ?? defaultSettings.difficulty;
   numQuestionsInput.value = String(savedSettings.numQuestions ?? defaultSettings.numQuestions);
   timeLimitInput.value = String(savedSettings.timeLimit ?? defaultSettings.timeLimit);
-  applyTheme(savedSettings.theme || defaultSettings.theme);
+  
+  // Ensure theme is applied - force initial application
+  const themeToApply = savedSettings.theme || defaultSettings.theme;
+  console.log('Initial theme to apply:', themeToApply); // Debug
+  applyTheme(themeToApply);
   // Set language
   const savedLang = localStorage.getItem('who-bible-language');
   if (savedLang && TRANSLATIONS[savedLang] !== undefined) {
@@ -272,26 +276,23 @@ function attachHandlers(){
     }
   });
   
-  // Theme toggle: cycle through Day and Night themes
-  btnTheme.addEventListener('click', ()=>{
-    const THEMES = ['night','day'];
-    const idx = THEMES.indexOf(state.theme||'night');
-    const next = THEMES[(idx+1) % THEMES.length];
-    applyTheme(next);
-    saveSettingsFromUI();
-  });
-  // Theme selector (dropdown)
-  const themeSelect = document.getElementById('theme-select');
-  if(themeSelect){
-    themeSelect.value = state.theme || 'night';
-    themeSelect.addEventListener('change', (e)=>{
-      const chosen = e.target.value || 'night';
-      applyTheme(chosen);
+  // Theme toggle: cycle between day and night
+  if (btnTheme) {
+    btnTheme.addEventListener('click', ()=>{
+      console.log('Theme button clicked!'); // Debug
+      console.log('Current state.theme:', state.theme); // Debug
+      console.log('Body classes:', document.body.className); // Debug
+      
+      // Use state.theme as the source of truth
+      const current = state.theme || 'night';
+      const next = current === 'night' ? 'day' : 'night';
+      
+      console.log('Switching from', current, 'to', next); // Debug
+      applyTheme(next);
       saveSettingsFromUI();
     });
-    // reflect theme when user chooses with button
-    const updateThemeSelect = (t)=>{ if(themeSelect) themeSelect.value = t||'night'; };
-    window.updateThemeSelect = updateThemeSelect;
+  } else {
+    console.log('btnTheme not found!'); // Debug
   }
   // Share
   if (btnShare) {
@@ -920,6 +921,7 @@ function updateProgress(){
 
 // Theme
 function applyTheme(theme){
+  console.log('applyTheme called with:', theme); // Debug
   state.theme = theme;
   // Remove all theme classes first
   document.body.classList.remove('day', 'night');
@@ -927,17 +929,18 @@ function applyTheme(theme){
   // Apply the new theme
   if(theme === 'day') {
     document.body.classList.add('day');
+    console.log('Applied day theme'); // Debug
   } else {
     // Default to night theme
     document.body.classList.add('night');
     theme = 'night'; // Normalize to night if invalid theme
+    console.log('Applied night theme'); // Debug
   }
   
   // Update theme toggle button tooltip
   const themeKey = theme === 'day' ? 'themeDay' : 'themeNight';
-  const keyText = getText(themeKey) || theme;
-  if(btnTheme) btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${keyText}`);
-  if(window.updateThemeSelect) window.updateThemeSelect(theme);
+  const keyText = getText(themeKey) || (theme === 'day' ? 'Day' : 'Night');
+  if(btnTheme) btnTheme.setAttribute('title', `Toggle theme — ${keyText}`);
 }
 
 function saveSettingsFromUI(){

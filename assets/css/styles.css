@@ -134,6 +134,11 @@ body {
   background-attachment: local, local, local, local, local, fixed, fixed, fixed, fixed;
 }
 
+/* Ensure body starts with night theme by default */
+body:not(.day) {
+  /* Apply night theme variables */
+}
+
 /* ===== GLOBAL TRANSITION EFFECTS ===== */
 * {
   transition: 
@@ -195,9 +200,9 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 24px;
 }
 
 /* ===== HEADER STYLES ===== */
@@ -239,7 +244,7 @@ header::before {
   background: var(--glass);
   backdrop-filter: blur(20px);
   border-radius: var(--border-radius);
-  padding: 16px 24px;
+  padding: 20px 32px;
   border: 1px solid var(--border);
   box-shadow: 0 8px 32px var(--shadow);
 }
@@ -300,13 +305,11 @@ body.day .title-section h1 {
 }
 
 /* ===== THEME SELECTOR & LANGUAGE SELECTOR ===== */
-.language-selector,
-.theme-picker {
+.language-selector {
   position: relative;
 }
 
-.language-selector select,
-.theme-picker select {
+.language-selector select {
   padding: 12px 16px;
   border-radius: var(--border-radius-sm);
   border: 1px solid var(--border);
@@ -320,16 +323,14 @@ body.day .title-section h1 {
   min-width: 120px;
 }
 
-.language-selector select:hover,
-.theme-picker select:hover {
+.language-selector select:hover {
   border-color: var(--accent);
   background: var(--glass);
   transform: translateY(-1px);
   box-shadow: 0 4px 16px var(--shadow);
 }
 
-.language-selector select:focus,
-.theme-picker select:focus {
+.language-selector select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(255, 138, 101, 0.2);
@@ -1098,8 +1099,11 @@ button:disabled:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 .footer-brand {
@@ -1161,7 +1165,7 @@ button:disabled:hover {
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .app {
-    padding: 0 12px;
+    padding: 0 16px;
   }
   
   header {
@@ -1172,7 +1176,11 @@ button:disabled:hover {
   .header-content {
     flex-direction: column;
     gap: 16px;
-    padding: 16px 20px;
+    padding: 16px 24px;
+  }
+  
+  .footer-content {
+    padding: 0 16px;
   }
   
   .logo-section {
