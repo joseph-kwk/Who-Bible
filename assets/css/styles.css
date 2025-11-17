@@ -57,6 +57,12 @@
   --transition-slow: 0.5s ease;
 }
 
+/* Layout helpers for full-screen app */
+:root{
+  --header-height: 72px;
+  --footer-height: 64px;
+}
+
 /* Screen reader only content */
 .sr-only {
   position: absolute !important;
@@ -113,13 +119,13 @@ a, a:link, a:visited {
 }
 a:hover, a:focus { color: var(--accent-2); text-decoration: underline; }
 body.light{
-  /* Light theme - Sun and Sky inspired with more sky blue to reduce brightness */
-  --bg:#e0f2fe;
-  --bg-2:#b3e5fc;
-  --card:#ffffff;
-  --muted:#64748b;
-  --accent:#f97316;
-  --accent-2:#0ea5e9;
+  /* Light theme - Sun and Sky inspired colors */
+  --bg:#f0f9ff; /* soft sky background */
+  --bg-2:#e0f2fe; /* lighter sky gradient */
+  --card:#ffffff; /* surface */
+  --muted:#475569; /* muted text */
+  --accent:#ffb020; /* sun-gold */
+  --accent-2:#3b82f6; /* sky-blue */
   --good:#16a34a;
   --bad:#dc2626;
   --text:#334155;
@@ -127,7 +133,7 @@ body.light{
   --border:rgba(51,65,85,0.1);
   
   /* Natural element colors */
-  --sun-gold:#fbbf24;
+  --sun-gold:#ffb020;
   --sun-orange:#f97316;
   --wind-blue:#60a5fa;
   --wind-light:#93c5fd;
@@ -135,6 +141,10 @@ body.light{
   --water-deep:#0369a1;
   --sky-blue:#3b82f6;
   --sky-light:#dbeafe;
+  /* Light theme helpers for sky gradients */
+  --light-sky-primary: var(--sky-blue);
+  --light-sky-secondary: #60a5fa; /* lighter sky accent */
+  --light-sky-muted: #93c5fd;
 }
 
 /* Sepia theme - soft ivory, warm browns for pleasant reading */
@@ -195,12 +205,60 @@ body{
   padding:24px;
   transition:background 250ms ease,color 250ms ease;
 }
-<<<<<<< HEAD
-.app{width:100%;max-width:1100px;min-height:calc(100vh - 48px);display:flex;flex-direction:column}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-shrink:0;gap:20px}
-.header-content{display:flex;align-items:center;justify-content:space-between;width:100%;gap:20px}
-.logo-section{display:flex;align-items:center;gap:16px;cursor:pointer;transition:transform 200ms ease}
-.logo-section{ text-decoration:none; color:inherit; }
+/* App container */
+.app {
+  width: 100%;
+  max-width: 1100px;
+  min-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Use header/footer variables to size content area to viewport height */
+.app { min-height: calc(100vh - var(--header-height) - var(--footer-height)); }
+
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+  gap: 20px;
+}
+
+/* Sunny header when light theme is active */
+body.light header{
+  background: linear-gradient(90deg, var(--bg-2), rgba(255,255,255,0.6));
+  box-shadow: 0 4px 20px rgba(14,165,233,0.08);
+  border-radius: 12px;
+  padding: 12px 18px;
+}
+/* Slight sepia header for reading mode */
+body.sepia header{
+  background: linear-gradient(90deg, var(--bg), rgba(255,255,255,0.85));
+  color: var(--text);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 20px;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: transform 200ms ease;
+}
+
+.logo-section{
+  text-decoration:none; color:inherit; }
+  
 .logo-section:hover, .logo-section:focus{ text-decoration:none; color:inherit; }
 .logo-section:hover{transform:scale(1.02)}
 .logo{width:48px;height:48px;border-radius:8px;object-fit:cover;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
@@ -211,7 +269,7 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .language-selector select{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:inherit;font-size:13px;font-weight:500;transition:all 200ms ease;cursor:pointer;min-width:100px}
 .language-selector select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(139,92,246,0.2);background:var(--glass)}
 .language-selector select:hover{background:var(--glass);border-color:var(--accent)}
-=======
+/* resolved */
 /* App container */
 .app {
   width: 100%;
@@ -314,7 +372,7 @@ header {
   background: var(--glass);
   border-color: var(--accent);
 }
->>>>>>> e200779 (style: Clean up CSS formatting and improve code readability)
+/* resolved */
 
 /* Nav styles */
 .site-nav {
@@ -400,7 +458,11 @@ header {
 body.light .sun-icon{opacity:0;transform:rotate(90deg) scale(0.5)}
 body.light .moon-icon{opacity:1;transform:rotate(0deg) scale(1)}
 
-<<<<<<< HEAD
+.mode-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
 button{background:var(--glass);border:1px solid var(--border);color:inherit;padding:8px 12px;border-radius:10px;cursor:pointer;backdrop-filter: blur(10px);transition:all 200ms ease}
 button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.1);border-color:var(--accent);background:rgba(255,255,255,0.1)}
 button:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(52, 152, 219, 0.3);background:rgba(255,255,255,0.1)}
@@ -421,7 +483,7 @@ main{flex:1;display:flex;flex-direction:column;min-height:0}
 .setup-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;flex:1}
 .setup-section{background:var(--glass);padding:20px;border-radius:14px;border:1px solid var(--border);backdrop-filter: blur(8px);position:relative;overflow:hidden}
 .setup-section::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--sun-gold),var(--wind-blue),var(--water-blue),var(--sky-blue));opacity:0.7}
-=======
+/* resolved */
 button {
   background: var(--glass);
   border: 1px solid var(--border);
@@ -510,6 +572,8 @@ main {
   flex-direction: column;
   min-height: 0;
 }
+/* Ensure main content uses leftover viewport height */
+main{ min-height: calc(100vh - var(--header-height) - var(--footer-height)); }
 
 /* Setup Panel */
 .setup-panel {
@@ -579,7 +643,7 @@ body.light .setup-section::before{
     var(--light-sky-muted)
   );
 }
->>>>>>> e200779 (style: Clean up CSS formatting and improve code readability)
+/* resolved */
 .setup-section h3{margin:0 0 16px 0;font-size:16px;font-weight:600}
 .setting-row{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
 .setting-row:last-child{margin-bottom:0}
@@ -588,21 +652,32 @@ body.light .setup-section::before{
 .setting-row input:focus,.setting-row select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(139,92,246,0.2);background:rgba(255,255,255,0.1)}
 
 /* Mode Buttons */
-<<<<<<< HEAD
 .mode-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.mode-btn{display:flex;align-items:center;gap:12px;padding:16px;text-align:left;border-radius:12px;transition:all 200ms ease;min-height:80px;background:var(--glass);border:1px solid var(--border)}
-.mode-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);border-color:var(--accent)}
+.mode-btn{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:16px;
+  text-align:left;
+  border-radius:12px;
+  transition:all 200ms ease;
+  min-height:80px;
+  background:var(--glass);
+  border:1px solid var(--border);
+}
 
-/* Mode-specific colors using natural elements */
-.mode-btn[data-mode="solo"]:hover{border-color:var(--sun-gold);background:rgba(251,191,36,0.1)}
-.mode-btn[data-mode="timed"]:hover{border-color:var(--wind-blue);background:rgba(96,165,250,0.1)}
-.mode-btn[data-mode="challenge"]:hover{border-color:var(--water-blue);background:rgba(14,165,233,0.1)}
-.mode-btn[data-mode="study"]:hover{border-color:var(--sky-blue);background:rgba(59,130,246,0.1)}
-.mode-icon{font-size:24px;flex-shrink:0}
-.mode-text{flex:1}
-.mode-title{font-weight:600;margin-bottom:4px}
-.mode-desc{font-size:13px;color:var(--muted)}
-=======
+.mode-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px var(--shadow-color);
+  border-color:var(--accent);
+}
+
+/* Sky blue theme mode button colors */
+body.light .mode-btn[data-mode="solo"]:hover {
+  border-color: var(--light-sky-primary);
+  background: rgba(14, 165, 233, 0.08);
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.15);
+}
 .mode-buttons {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -692,14 +767,14 @@ body.light .mode-btn[data-mode="study"]:hover {
   font-size: 13px;
   color: var(--muted);
 }
->>>>>>> e200779 (style: Clean up CSS formatting and improve code readability)
+/* Merge resolved */
 
 /* Data Buttons */
 .data-buttons{display:flex;gap:8px;flex-wrap:wrap}
 .data-buttons button{flex:1;min-width:120px}
 
 /* Game Area */
-.game-area{display:flex;flex-direction:column;height:100%}
+.game-area{display:flex;flex-direction:column;height:100%;flex:1;min-height:0}
 .game-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-shrink:0}
 .back-btn{background:rgba(255,255,255,0.08);border:1px solid var(--border);padding:8px 12px;border-radius:8px;font-size:14px}
 .back-btn:hover{background:rgba(255,255,255,0.12)}
@@ -732,6 +807,8 @@ body.light .mode-btn[data-mode="study"]:hover {
 .study-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-shrink:0}
 .study-title{font-size:20px;font-weight:600}
 .study-content{flex:1;display:flex;flex-direction:column;min-height:0}
+/* Ensure main content takes the available vh space and scrolls when necessary */
+.study-content, .game-area, .setup-panel{overflow:auto}
 .study-controls{background:var(--glass);padding:16px;border-radius:12px;border:1px solid var(--border);margin-bottom:16px;flex-shrink:0;position:relative;overflow:hidden}
 .study-controls::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--sky-blue),var(--wind-light));opacity:0.6}
 .search-row{display:flex;gap:8px;margin-bottom:12px}
