@@ -30,17 +30,31 @@
   // Theme toggle re-use
   const btnTheme = document.getElementById('btn-theme');
   function applyTheme(theme){
-    document.body.classList.toggle('light', theme==='light');
+    document.body.classList.remove('light','sepia','high-contrast');
+    if(theme && theme!=='dark') document.body.classList.add(theme);
     try{ const s = JSON.parse(localStorage.getItem('settings')||'{}'); s.theme = theme; localStorage.setItem('settings', JSON.stringify(s)); }catch(_){ }
   }
   try{
     const s = JSON.parse(localStorage.getItem('settings')||'{}');
     applyTheme(s.theme||'dark');
+    const keyMap = { 'dark':'themeDark','light':'themeLight','sepia':'themeSepia','high-contrast':'themeHighContrast' };
+    const label = getText(keyMap[s.theme]||'themeDark');
+    if(btnTheme) btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${label}`);
   }catch(_){ applyTheme('dark'); }
   if (btnTheme){
     btnTheme.addEventListener('click', ()=>{
-      const light = !document.body.classList.contains('light');
-      applyTheme(light ? 'light':'dark');
+      const THEMES = ['dark','light','sepia','high-contrast'];
+      const current = THEMES.find(t=>document.body.classList.contains(t)) || 'dark';
+      const next = THEMES[(THEMES.indexOf(current)+1)%THEMES.length];
+      applyTheme(next);
+      // Set a helpful tooltip with the current theme
+      try{
+        const keyMap = {
+          'dark':'themeDark','light':'themeLight','sepia':'themeSepia','high-contrast':'themeHighContrast'
+        };
+        const label = getText(keyMap[next]) || next;
+        btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${label}`);
+      }catch(_){ }
     });
   }
 

@@ -272,9 +272,11 @@ function attachHandlers(){
     }
   });
   
-  // Theme toggle
+  // Theme toggle: cycle through themes for richer choices
   btnTheme.addEventListener('click', ()=>{
-    const next = state.theme === 'dark' ? 'light' : 'dark';
+    const THEMES = ['dark','light','sepia','high-contrast'];
+    const idx = THEMES.indexOf(state.theme||'dark');
+    const next = THEMES[(idx+1) % THEMES.length];
     applyTheme(next);
     saveSettingsFromUI();
   });
@@ -906,8 +908,21 @@ function updateProgress(){
 // Theme
 function applyTheme(theme){
   state.theme = theme;
-  if(theme==='light') document.body.classList.add('light');
-  else document.body.classList.remove('light');
+  document.body.classList.remove('light','sepia','high-contrast');
+  if(theme && theme!=='dark') document.body.classList.add(theme);
+  // for a11y: set --accent-color to a high-contrast accent for contrast theme
+  if(theme==='high-contrast'){
+    document.documentElement.style.setProperty('--accent-color','#ffd166');
+    document.documentElement.style.setProperty('--success-color','#00ff99');
+  } else {
+    // reset accent to default defined in CSS
+    document.documentElement.style.removeProperty('--accent-color');
+    document.documentElement.style.removeProperty('--success-color');
+  }
+  // Show active theme label for screen readers and tooltip
+  const themeKey = theme==='dark' ? 'themeDark' : (theme==='light' ? 'themeLight' : (theme==='sepia' ? 'themeSepia' : (theme==='high-contrast' ? 'themeHighContrast' : 'themeDark')));
+  const keyText = getText(themeKey) || theme;
+  if(btnTheme) btnTheme.setAttribute('title', `${getText('toggleTheme')} — ${keyText}`);
 }
 
 function saveSettingsFromUI(){

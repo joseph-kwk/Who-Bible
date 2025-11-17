@@ -105,6 +105,13 @@ body {
   min-height: 100vh;
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
+
+/* Global anchor colors always use accent for discoverability and ensure contrast is good */
+a, a:link, a:visited {
+  color: var(--accent);
+  text-decoration: underline dotted;
+}
+a:hover, a:focus { color: var(--accent-2); text-decoration: underline; }
 body.light{
   /* Light theme - Sun and Sky inspired with more sky blue to reduce brightness */
   --bg:#e0f2fe;
@@ -128,6 +135,36 @@ body.light{
   --water-deep:#0369a1;
   --sky-blue:#3b82f6;
   --sky-light:#dbeafe;
+}
+
+/* Sepia theme - soft ivory, warm browns for pleasant reading */
+body.sepia{
+  --bg: #f6efe5;
+  --bg-2: #efe4d0;
+  --card: #fff8ee;
+  --muted: #7b6f63;
+  --accent: #a86b2f;
+  --accent-2:#c5893c;
+  --good:#1f7a3a;
+  --bad:#b04035;
+  --text:#2e2a26;
+  --glass:rgba(255,255,255,0.92);
+  --border:rgba(46,42,38,0.08);
+}
+
+/* High-contrast theme for visual accessibility */
+body.high-contrast{
+  --bg: #000000;
+  --bg-2: #111111;
+  --card: #000000;
+  --muted: #bfbfbf;
+  --accent: #ffd166;
+  --accent-2:#ffea8a;
+  --good:#00ff99;
+  --bad:#ff5555;
+  --text:#ffffff;
+  --glass:rgba(0,0,0,0.6);
+  --border:rgba(255,255,255,0.9);
 }
 *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
 body{
@@ -431,6 +468,20 @@ button.primary {
 body.light button.primary {
   background: linear-gradient(135deg, var(--light-sky-primary), var(--light-sky-secondary));
   box-shadow: 0 2px 12px rgba(14, 165, 233, 0.3);
+}
+
+/* Ensure buttons are visible in sepia and high-contrast */
+body.sepia button.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+body.high-contrast button.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #000;
+  border: 2px solid var(--border);
+  box-shadow: none;
 }
 
 button.primary:hover {
