@@ -393,9 +393,7 @@ function translateAnswerForQuestionType(qType, value){
 // =========================
 // Init
 // =========================
-init();
-
-function init(){
+async function init(){
   // Set default settings if not present
   const defaultSettings = {
     difficulty: 'medium',
@@ -427,6 +425,19 @@ function init(){
   } else {
     setLanguage(defaultSettings.language);
   }
+  // Load people data from external JSON file
+  try {
+    const response = await fetch('assets/data/people.json');
+    if (response.ok) {
+      const externalData = await response.json();
+      DEFAULT_PEOPLE_DATA.length = 0; // Clear hardcoded data
+      DEFAULT_PEOPLE_DATA.push(...externalData); // Replace with external data
+      console.log('✓ Loaded', externalData.length, 'people from external JSON');
+    }
+  } catch (error) {
+    console.warn('Could not load external people data, using defaults:', error);
+  }
+  
   state.people = loadPeopleDataFromLocalStorage() || DEFAULT_PEOPLE_DATA.slice();
   
   // Initialize relationship graph
@@ -1472,3 +1483,9 @@ window.onWhoBibleLanguageChange = function(lang){
   }catch(_){ /* non-fatal */ }
 };
 
+// Initialize app when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}

@@ -527,13 +527,13 @@ button:disabled:hover {
 .setup-panel {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 20px;
   flex: 1;
 }
 
 .brand {
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .brand-title {
@@ -770,11 +770,108 @@ button:disabled:hover {
   line-height: 1.4;
 }
 
-/* ===== DATA MANAGEMENT ===== */
-.data-buttons {
+/* ===== REMOTE CHALLENGE CARD ===== */
+.remote-challenge-card {
+  background: linear-gradient(135deg, var(--accent-soft), var(--sky-soft));
+  border: 2px solid var(--accent);
+  position: relative;
+  overflow: hidden;
+}
+
+.remote-challenge-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.remote-challenge-hero {
   display: flex;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.remote-challenge-icon {
+  font-size: 64px;
+  flex-shrink: 0;
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.8)); }
+}
+
+.remote-challenge-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  flex-wrap: wrap;
+}
+
+.remote-challenge-content h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: var(--font-weight-bold);
+  color: var(--text);
+}
+
+.remote-challenge-desc {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.remote-challenge-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--border-radius);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 12px var(--shadow-1);
+}
+
+.remote-challenge-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--shadow-2);
+}
+
+.remote-btn-icon {
+  font-size: 20px;
+}
+
+.remote-challenge-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 4px 0 0 0;
+}
+
+.remote-status-icon {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* ===== DATA MANAGEMENT (HIDDEN) ===== */
+.data-buttons {
+  display: none;
 }
 
 .data-buttons button {

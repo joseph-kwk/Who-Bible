@@ -19,6 +19,7 @@
   <script src="assets/js/remote-challenge-ui.js"></script>
   <script src="assets/js/relationships.js" defer></script>
   <script src="assets/js/translations.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
 </head>
 <body>
   <!-- Skip to main content link for keyboard navigation -->
@@ -160,13 +161,6 @@
                   <div class="mode-desc" id="challenge-desc">Two players, same device</div>
                 </div>
               </button>
-              <button id="btn-remote-challenge" class="mode-btn" data-mode="remote" aria-describedby="remote-desc" style="display:none;">
-                <div class="mode-icon" aria-hidden="true">🌐</div>
-                <div class="mode-text">
-                  <div class="mode-title">Remote Challenge</div>
-                  <div class="mode-desc" id="remote-desc">Play with anyone, anywhere</div>
-                </div>
-              </button>
               <button id="btn-study" class="mode-btn" data-mode="study" aria-describedby="study-desc">
                 <div class="mode-icon" aria-hidden="true">🔍</div>
                 <div class="mode-text">
@@ -177,18 +171,20 @@
             </div>
           </section>
           
-          <section class="setup-section" aria-labelledby="data-heading">
-            <h3 id="data-heading">Data Management</h3>
-            <div class="data-buttons" role="group" aria-labelledby="data-heading">
-              <button id="btn-export" aria-describedby="export-help">Export JSON</button>
-              <button id="btn-import" aria-describedby="import-help">Import JSON</button>
-              <button id="btn-reset-data" aria-describedby="reset-help">Reset Data</button>
-              <input id="file-input" type="file" accept="application/json,.json" style="display:none" aria-label="Choose JSON file to import" />
-            </div>
-            <div class="data-help">
-              <small id="export-help" class="sr-only">Export your current people data as JSON</small>
-              <small id="import-help" class="sr-only">Import custom people data from JSON file</small>
-              <small id="reset-help" class="sr-only">Reset to default Bible people dataset</small>
+          <section class="setup-section remote-challenge-card" aria-labelledby="remote-heading">
+            <div class="remote-challenge-hero">
+              <div class="remote-challenge-icon">🌐</div>
+              <div class="remote-challenge-content">
+                <h3 id="remote-heading">Play Online with Friends</h3>
+                <p class="remote-challenge-desc">Challenge anyone, anywhere! Create a room, share the link, and compete in real-time.</p>
+                <button id="btn-remote-challenge" class="remote-challenge-btn" data-mode="remote" aria-describedby="remote-desc">
+                  <span class="remote-btn-icon">🎮</span>
+                  <span>Start Remote Challenge</span>
+                </button>
+                <p class="remote-challenge-note" id="remote-desc">
+                  <span class="remote-status-icon">✓</span> No sign-up required • Instant matchmaking • Live scoring
+                </p>
+              </div>
             </div>
           </section>
         </div>

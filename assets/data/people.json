@@ -1177,7 +1177,7 @@
     "notable_events": [],
     "verses": [],
     "short_bio": "given name",
-    "testament": null,
+    "testament": "ot",
     "gender": null,
     "_qid": "Q1690679",
     "_source": "wikidata:Q1690679",
@@ -1199,7 +1199,7 @@
     "notable_events": [],
     "verses": [],
     "short_bio": "given name",
-    "testament": null,
+    "testament": "ot",
     "gender": null,
     "_qid": "Q2821587",
     "_source": "wikidata:Q2821587",
@@ -1224,7 +1224,7 @@
     "notable_events": [],
     "verses": [],
     "short_bio": "unisex given name",
-    "testament": null,
+    "testament": "ot",
     "gender": null,
     "_qid": "Q3849764",
     "_source": "wikidata:Q3849764",
@@ -1250,7 +1250,7 @@
     "notable_events": [],
     "verses": [],
     "short_bio": "male given name (Արամ)",
-    "testament": null,
+    "testament": "ot",
     "gender": null,
     "_qid": "Q4068496",
     "_source": "wikidata:Q4068496",
@@ -1259,5 +1259,360 @@
     "_inferred_gender": true,
     "_verified": true,
     "_accepted_date": "2025-12-01T03:31:49.595Z"
+  },
+  {
+    "name": "Seth",
+    "aliases": [],
+    "mother": "Eve",
+    "father": "Adam",
+    "spouse": null,
+    "children": [
+      "Enosh"
+    ],
+    "siblings": [
+      "Cain",
+      "Abel"
+    ],
+    "occupation": null,
+    "age_notes": "Lived 912 years",
+    "notable_events": [
+      "Born to replace Abel",
+      "His line called upon the name of the Lord"
+    ],
+    "verses": [
+      "Genesis 4:25 - 5:8"
+    ],
+    "testament": "ot",
+    "gender": "male"
+  },
+  {
+    "name": "Enosh",
+    "aliases": [],
+    "mother": null,
+    "father": "Seth",
+    "spouse": null,
+    "children": [
+      "Kenan"
+    ],
+    "siblings": [],
+    "occupation": null,
+    "age_notes": "Lived 905 years",
+    "notable_events": [
+      "During his time"
+    ],
+    "verses": [
+      "people began to call upon the name of the Lord"
+    ],
+    "testament": "genesis 5:9-11",
+    "gender": "OT"
+  },
+  {
+    "name": "Kenan",
+    "aliases": [],
+    "mother": null,
+    "father": "Enosh",
+    "spouse": null,
+    "children": [
+      "Mahalalel"
+    ],
+    "siblings": [],
+    "occupation": null,
+    "age_notes": "Lived 910 years",
+    "notable_events": [],
+    "verses": [
+      "Genesis 5:12-14"
+    ],
+    "testament": "ot",
+    "gender": "male"
+  },
+  {
+    "name": "Mahalalel",
+    "aliases": [],
+    "mother": null,
+    "father": "Kenan",
+    "spouse": null,
+    "children": [
+      "Jared"
+    ],
+    "siblings": [],
+    "occupation": null,
+    "age_notes": "Lived 895 years",
+    "notable_events": [],
+    "verses": [
+      "Genesis 5:15-17"
+    ],
+    "testament": "ot",
+    "gender": "male"
+  },
+  {
+    "name": "Jared",
+    "aliases": [],
+    "mother": null,
+    "father": "Mahalalel",
+    "spouse": null,
+    "children": [
+      "Enoch"
+    ],
+    "siblings": [],
+    "occupation": null,
+    "age_notes": "Lived 962 years",
+    "notable_events": [],
+    "verses": [
+      "Genesis 5:18-20"
+    ],
+    "testament": "ot",
+    "gender": "male"
+  },
+  {
+    "name": "Enoch (Jared's Son)",
+    "aliases": [],
+    "mother": null,
+    "father": "Jared",
+    "spouse": null,
+    "children": [
+      "Methuselah"
+    ],
+    "siblings": [],
+    "occupation": "Prophet",
+    "age_notes": "Lived 365 years",
+    "notable_events": [
+      "'Walked with God' and was taken away without seeing death"
+    ],
+    "verses": [
+      "Genesis 5:21-24",
+      "Hebrews 11:5"
+    ],
+    "testament": "ot",
+    "gender": "male"
+  },
+  {
+    "name": "Methuselah",
+    "aliases": [],
+    "mother": null,
+    "father": "Enoch (Jared's Son)",
+    "spouse": null,
+    "children": [
+      "Lamech"
+    ],
+    "siblings": [],
+    "occupation": null,
+    "age_notes": "Lived 969 years (Oldest man in the Bible)",
+    "notable_events": [],
+    "verses": [
+      "Genesis 5:25-27"
+    ],
+    "testament": "ot",
+    "gender": "male"
+  },
+  {
+    "name": "Lamech (Methuselah's Son)",
+    "aliases": [],
+    "mother": null,
+    "father": "Methuselah",
+    "spouse": null,
+    "children": [
+      "Noah"
+    ],
+    "siblings": [],
+    "occupation": null,
+    "age_notes": "Lived 777 years",
+    "notable_events": [
+      "Named his son Noah"
+    ],
+    "verses": [
+      "believing he would bring comfort"
+    ],
+    "testament": "genesis 5:28-31",
+    "gender": "OT"
+  },
+  {
+    "name": "Shem",
+    "aliases": [],
+    "mother": "Noah's wife",
+    "father": "Noah",
+    "spouse": null,
+    "children": [
+      "Elam",
+      "Asshur",
+      "Arpachshad",
+      "Lud",
+      "Aram"
+    ],
+    "siblings": [
+      "Ham",
+      "Japheth"
+    ],
+    "occupation": "Patriarch",
+    "age_notes": "Lived 600 years",
+    "notable_events": [
+      "Ancestor of Abraham and the Israelites"
+    ],
+    "verses": [
+      "Genesis 10-11"
+    ],
+    "testament": "ot",
+    "gender": "male"
+  },
+  {
+    "name": "Ham",
+    "aliases": [],
+    "mother": "Noah's wife",
+    "father": "Noah",
+    "spouse": null,
+    "children": [
+      "Cush",
+      "Mizraim",
+      "Put",
+      "Canaan"
+    ],
+    "siblings": [
+      "Shem",
+      "Japheth"
+    ],
+    "occupation": "Patriarch",
+    "age_notes": null,
+    "notable_events": [
+      "Saw his father Noah naked and was cursed (via his son Canaan)"
+    ],
+    "verses": [
+      "Genesis 9-10"
+    ],
+    "testament": "ot",
+    "gender": "male"
+  },
+  {
+    "name": "Japheth",
+    "aliases": [],
+    "mother": "Noah's wife",
+    "father": "Noah",
+    "spouse": null,
+    "children": [
+      "Gomer",
+      "Magog",
+      "Madai",
+      "Javan",
+      "Tubal",
+      "Meshech",
+      "Tiras"
+    ],
+    "siblings": [
+      "Shem",
+      "Ham"
+    ],
+    "occupation": "Patriarch",
+    "age_notes": null,
+    "notable_events": [],
+    "verses": [
+      "Genesis 10:2-5"
+    ],
+    "testament": "ot",
+    "gender": "male"
+  },
+  {
+    "name": "Nimrod",
+    "aliases": [
+      "Mighty Hunter"
+    ],
+    "mother": null,
+    "father": "Cush",
+    "spouse": null,
+    "children": [],
+    "siblings": [
+      "Seba",
+      "Havilah",
+      "Sabtah",
+      "Raamah",
+      "Sabteca"
+    ],
+    "occupation": "Mighty Hunter",
+    "age_notes": " King",
+    "notable_events": [],
+    "verses": [
+      "First mighty warrior on earth",
+      "Established the kingdom of Babel and cities like Nineveh"
+    ],
+    "testament": "genesis 10:8-12",
+    "gender": "OT"
+  },
+  {
+    "name": "Terah",
+    "aliases": [],
+    "mother": null,
+    "father": "Nahor (Shem's descendant)",
+    "spouse": null,
+    "children": [
+      "Abram (Abraham)",
+      "Nahor",
+      "Haran"
+    ],
+    "siblings": [],
+    "occupation": null,
+    "age_notes": "Lived 205 years",
+    "notable_events": [
+      "Father of Abraham",
+      "Traveled from Ur to Haran"
+    ],
+    "verses": [
+      "Genesis 11:24-32"
+    ],
+    "testament": "ot",
+    "gender": "male"
+  },
+  {
+    "name": "Hagar",
+    "aliases": [],
+    "mother": null,
+    "father": null,
+    "spouse": "Abraham (concubine)",
+    "children": [
+      "Ishmael"
+    ],
+    "siblings": [],
+    "occupation": "Egyptian Servant of Sarah",
+    "age_notes": null,
+    "notable_events": [
+      "Mother of Ishmael",
+      "Sent away into the wilderness twice"
+    ],
+    "verses": [
+      "Genesis 16",
+      "21"
+    ],
+    "testament": "ot",
+    "gender": "female"
+  },
+  {
+    "name": "Ishmael",
+    "aliases": [],
+    "mother": "Hagar",
+    "father": "Abraham",
+    "spouse": null,
+    "children": [
+      "Nebaioth",
+      "Kedar",
+      "Adbeel",
+      "Mibsam",
+      "Mishma",
+      "Dumah",
+      "Massa",
+      "Hadad",
+      "Tema",
+      "Jetur",
+      "Naphish",
+      "Kedemah"
+    ],
+    "siblings": [
+      "Isaac (half-brother)"
+    ],
+    "occupation": "Archer",
+    "age_notes": " Patriarch of Ishmaelites",
+    "notable_events": [
+      "Lived 137 years"
+    ],
+    "verses": [
+      "Prophesied to be a 'wild donkey of a man'"
+    ],
+    "testament": "genesis 16|21|25",
+    "gender": "OT"
   }
 ]
