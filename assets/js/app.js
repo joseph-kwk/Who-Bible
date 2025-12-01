@@ -4,83 +4,83 @@
 // Default dataset
 // =========================
 const DEFAULT_PEOPLE_DATA = [
-  {name: 'Noah', aliases: [], mother: null, occupation: 'Righteous man, built the ark', age_notes: 'Lived 950 years', notable_events: ['Built the ark','Survived the flood','Sent out dove and raven'], verses: ['Genesis 6-9','Genesis 9:29'], short_bio: 'Noah built the ark to survive the flood.'},
-  {name: 'Moses', aliases: [], mother: 'Jochebed', occupation: 'Leader, prophet', age_notes: 'Died at 120; 80 when confronting Pharaoh', notable_events: ['Led Exodus','Saw burning bush','Parted Red Sea','Received Ten Commandments'], verses: ['Exodus 3','Exodus 14','Exodus 20','Deuteronomy 34:7'], short_bio: 'Moses led the Israelites out of Egypt.'},
-  {name: 'Solomon', aliases: [], mother: 'Bathsheba', occupation: 'King', age_notes: 'Reigned 40 years', notable_events: ['Built the temple','Known for wisdom','Judged between two mothers'], verses: ['1 Kings 3','1 Kings 6','2 Samuel 12:24'], short_bio: 'Son of David and Bathsheba; famed for wisdom.'},
-  {name: 'Joseph (son of Jacob)', aliases: ['Joseph of Egypt'], mother: 'Rachel', occupation: 'Official in Egypt', age_notes: 'Sold by brothers at 17; died at 110', notable_events: ['Sold into Egypt','Interpreted dreams','Saved Egypt from famine','Reunited with family'], verses: ['Genesis 37:2','Genesis 41','Genesis 45','Genesis 50:26'], short_bio: 'Joseph was sold into Egypt and rose to power.'},
-  {name: 'David', aliases: [], mother: null, occupation: 'Shepherd, King', age_notes: 'Became king at 30; reigned 40 years', notable_events: ['Killed Goliath','Became king','Danced before the ark','Committed adultery with Bathsheba'], verses: ['1 Samuel 17','2 Samuel 5:4','2 Samuel 6','2 Samuel 11'], short_bio: 'Shepherd who became king of Israel; famous for defeating Goliath.'},
-  {name: 'Esther', aliases: ['Hadassah'], mother: null, occupation: 'Queen', age_notes: null, notable_events: ['Became queen and saved her people','Revealed Haman\'s plot'], verses: ['Esther 2','Esther 7'], short_bio: 'Jewish queen of Persia who saved her people.'},
-  {name: 'Mary (mother of Jesus)', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Mother of Jesus','Visited by angel Gabriel','Present at crucifixion'], verses: ['Luke 1:26-38','John 19:25'], short_bio: 'Mother of Jesus.'},
-  {name: 'John the Baptist', aliases: [], mother: 'Elizabeth', occupation: 'Prophet', age_notes: null, notable_events: ['Baptized Jesus','Beheaded by Herod','Wore camel hair'], verses: ['Luke 1','Matthew 3','Matthew 14'], short_bio: 'Prophet who baptized Jesus.'},
-  {name: 'Paul', aliases: ['Saul'], mother: null, occupation: 'Apostle, tent maker', age_notes: null, notable_events: ['Converted on road to Damascus','Missionary journeys','Wrote epistles','Shipwrecked'], verses: ['Acts 9','Acts 13-28','2 Corinthians 11:25'], short_bio: 'Originally named Saul; became Apostle Paul after conversion.'},
-  {name: 'Peter', aliases: ['Simon Peter','Simon'], mother: null, occupation: 'Fisherman, Apostle', age_notes: null, notable_events: ['Walked on water','Denial of Jesus','Leader of early church','Vision of unclean animals'], verses: ['Matthew 14:29','Matthew 26:69-75','Acts 10'], short_bio: 'One of Jesus\'s closest disciples; called Peter.'},
-  {name: 'Lazarus', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Raised from the dead by Jesus','Brother of Mary and Martha'], verses: ['John 11','John 12'], short_bio: 'Brother of Mary and Martha; raised from the dead.'},
-  {name: 'Abraham', aliases: ['Abram'], mother: null, occupation: 'Patriarch', age_notes: 'Died at 175; fathered Isaac at 100', notable_events: ['Father of Isaac','Covenant with God','Nearly sacrificed Isaac','Left Ur'], verses: ['Genesis 12','Genesis 17','Genesis 22','Genesis 25:7'], short_bio: 'Father of the Israelite nation.'},
-  {name: 'Isaac', aliases: [], mother: 'Sarah', occupation: 'Patriarch', age_notes: 'Died at 180; born when Abraham was 100', notable_events: ['Son of Abraham and Sarah','Nearly sacrificed by Abraham','Married Rebekah'], verses: ['Genesis 22','Genesis 24','Genesis 35:28'], short_bio: 'Son of Abraham and Sarah; father of Jacob.'},
-  {name: 'Jacob', aliases: ['Israel'], mother: 'Rebekah', occupation: 'Patriarch', age_notes: 'Died at 147', notable_events: ['Renamed Israel','Father of the 12 tribes','Wrestled with angel','Deceived Isaac'], verses: ['Genesis 27','Genesis 32:28','Genesis 47:28'], short_bio: 'Father of the 12 tribes of Israel.'},
-  {name: 'Samuel', aliases: [], mother: 'Hannah', occupation: 'Prophet, Judge', age_notes: 'Dedicated to temple as child', notable_events: ['Anointed Saul and David','Heard God\'s voice as child','Judge of Israel'], verses: ['1 Samuel 3','1 Samuel 10','1 Samuel 16'], short_bio: 'Prophet and judge who anointed Israel\'s first kings.'},
-  {name: 'Elijah', aliases: [], mother: null, occupation: 'Prophet', age_notes: null, notable_events: ['Taken up by chariot of fire','Defeated prophets of Baal','Fed by ravens','Raised widow\'s son'], verses: ['1 Kings 17','1 Kings 18','2 Kings 2'], short_bio: 'Great prophet who was taken to heaven in a chariot.'},
-  {name: 'Jonah', aliases: [], mother: null, occupation: 'Prophet', age_notes: null, notable_events: ['Swallowed by fish','Preached to Nineveh','Fled from God'], verses: ['Jonah 1-4'], short_bio: 'Prophet who fled God and was swallowed by a great fish.'},
-  {name: 'Ruth', aliases: [], mother: null, occupation: 'Gleaner', age_notes: null, notable_events: ['Ancestor of David','Married Boaz','Loyal to Naomi'], verses: ['Ruth 1-4'], short_bio: 'Moabite woman who became ancestor to King David.'},
-  {name: 'Mary Magdalene', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Witnessed resurrection','Seven demons cast out','Followed Jesus'], verses: ['Luke 8:2','Matthew 28','John 20'], short_bio: 'Witness of Jesus\'s resurrection.'},
-  {name: 'Saul (first king)', aliases: [], mother: null, occupation: 'King', age_notes: 'Reigned 40 years', notable_events: ['First king of Israel','Consulted witch of Endor','Fell on sword'], verses: ['1 Samuel 9-10','1 Samuel 28','1 Samuel 31'], short_bio: 'Israel\'s first king anointed by Samuel.'},
-  {name: 'Daniel', aliases: [], mother: null, occupation: 'Prophet, official', age_notes: 'Taken to Babylon as youth', notable_events: ['In the lion\'s den','Interpreted dreams','Three friends in furnace'], verses: ['Daniel 1','Daniel 3','Daniel 6'], short_bio: 'Prophet in Babylon; survived lion\'s den.'},
-  {name: 'Joshua', aliases: [], mother: null, occupation: 'Military leader', age_notes: 'Died at 110', notable_events: ['Led conquest of Canaan','Walls of Jericho fell','Stopped sun and moon'], verses: ['Joshua 1','Joshua 6','Joshua 10:12-13','Joshua 24:29'], short_bio: 'Successor to Moses who led Israel into Promised Land.'},
-  {name: 'Deborah', aliases: [], mother: null, occupation: 'Prophet, Judge', age_notes: null, notable_events: ['Judge of Israel','Led victory over Canaanites','Sang victory song'], verses: ['Judges 4-5'], short_bio: 'Prophet and judge who led Israel to victory.'},
-  {name: 'Gideon', aliases: [], mother: null, occupation: 'Judge', age_notes: null, notable_events: ['Defeated Midianites with 300 men','Asked for fleece sign','Tore down Baal altar'], verses: ['Judges 6-7'], short_bio: 'Judge who defeated the Midianites with 300 men.'},
-  {name: 'Samson', aliases: [], mother: null, occupation: 'Judge', age_notes: 'Nazirite from birth', notable_events: ['Super strength from long hair','Betrayed by Delilah','Killed Philistines'], verses: ['Judges 13-16'], short_bio: 'Judge with supernatural strength; betrayed by Delilah.'},
-  {name: 'Jeremiah', aliases: [], mother: null, occupation: 'Prophet', age_notes: 'Called as youth', notable_events: ['Wept for Jerusalem','Put in cistern','Prophesied exile'], verses: ['Jeremiah 1','Jeremiah 38','Jeremiah 52'], short_bio: 'Weeping prophet who warned of Babylon\'s destruction.'},
-  {name: 'Ezekiel', aliases: [], mother: null, occupation: 'Prophet, priest', age_notes: 'Exiled to Babylon', notable_events: ['Vision of dry bones','Vision of wheels','Temple vision'], verses: ['Ezekiel 1','Ezekiel 37','Ezekiel 40-48'], short_bio: 'Prophet of the exile with dramatic visions.'},
-  {name: 'Isaiah', aliases: [], mother: null, occupation: 'Prophet', age_notes: null, notable_events: ['Vision of God\'s throne','Prophesied Messiah','Walked naked three years'], verses: ['Isaiah 6','Isaiah 53','Isaiah 20'], short_bio: 'Major prophet who prophesied about the Messiah.'},
-  {name: 'Job', aliases: [], mother: null, occupation: 'Wealthy landowner', age_notes: 'Lived 140 years after trials', notable_events: ['Tested by Satan','Lost everything','Remained faithful','Restored double'], verses: ['Job 1-2','Job 42'], short_bio: 'Righteous man who suffered but remained faithful.'},
-  {name: 'Nehemiah', aliases: [], mother: null, occupation: 'Cupbearer, governor', age_notes: null, notable_events: ['Rebuilt Jerusalem walls','Cupbearer to king','Led reforms'], verses: ['Nehemiah 1-2','Nehemiah 6'], short_bio: 'Led rebuilding of Jerusalem\'s walls.'},
-  {name: 'Ezra', aliases: [], mother: null, occupation: 'Priest, scribe', age_notes: null, notable_events: ['Led return from exile','Read law to people','Reformed worship'], verses: ['Ezra 7','Nehemiah 8'], short_bio: 'Priest and scribe who restored the Law.'},
-  {name: 'Adam', aliases: [], mother: null, occupation: 'First man', age_notes: 'Lived 930 years', notable_events: ['First human created','Ate forbidden fruit','Named the animals'], verses: ['Genesis 1-3','Genesis 5:5'], short_bio: 'First human created by God.'},
-  {name: 'Eve', aliases: [], mother: null, occupation: 'First woman', age_notes: null, notable_events: ['First woman created','Ate forbidden fruit','Mother of all living'], verses: ['Genesis 2-3'], short_bio: 'First woman; mother of all humanity.'},
-  {name: 'Cain', aliases: [], mother: 'Eve', occupation: 'Farmer', age_notes: null, notable_events: ['Killed Abel','First murderer','Mark of Cain'], verses: ['Genesis 4'], short_bio: 'First son of Adam and Eve; killed his brother.'},
-  {name: 'Abel', aliases: [], mother: 'Eve', occupation: 'Shepherd', age_notes: null, notable_events: ['Killed by Cain','Offered acceptable sacrifice'], verses: ['Genesis 4','Hebrews 11:4'], short_bio: 'Second son of Adam and Eve; murdered by Cain.'},
-  {name: 'Lot', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Escaped Sodom','Wife turned to salt','Saved by Abraham'], verses: ['Genesis 13','Genesis 19'], short_bio: 'Abraham\'s nephew who escaped Sodom\'s destruction.'},
-  {name: 'Sarah', aliases: ['Sarai'], mother: null, occupation: null, age_notes: 'Died at 127; gave birth at 90', notable_events: ['Wife of Abraham','Mother of Isaac','Laughed at promise'], verses: ['Genesis 17','Genesis 18','Genesis 23:1'], short_bio: 'Wife of Abraham and mother of Isaac.'},
-  {name: 'Rebekah', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Wife of Isaac','Mother of Jacob and Esau','Helped Jacob deceive Isaac'], verses: ['Genesis 24','Genesis 27'], short_bio: 'Wife of Isaac; mother of Jacob and Esau.'},
-  {name: 'Rachel', aliases: [], mother: null, occupation: 'Shepherdess', age_notes: 'Died giving birth to Benjamin', notable_events: ['Jacob worked 14 years for her','Mother of Joseph and Benjamin'], verses: ['Genesis 29','Genesis 35:16-19'], short_bio: 'Beloved wife of Jacob; mother of Joseph.'},
-  {name: 'Leah', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['First wife of Jacob','Mother of six sons','Weak eyes'], verses: ['Genesis 29-30'], short_bio: 'First wife of Jacob; mother of six of his sons.'},
-  {name: 'Miriam', aliases: [], mother: 'Jochebed', occupation: 'Prophet', age_notes: null, notable_events: ['Watched baby Moses','Led women in song','Struck with leprosy'], verses: ['Exodus 2','Exodus 15','Numbers 12'], short_bio: 'Sister of Moses and Aaron; prophetess.'},
-  {name: 'Aaron', aliases: [], mother: 'Jochebed', occupation: 'High priest', age_notes: 'Died at 123', notable_events: ['First high priest','Made golden calf','Rod that budded'], verses: ['Exodus 28','Exodus 32','Numbers 17','Numbers 33:39'], short_bio: 'Brother of Moses; first high priest of Israel.'},
-  {name: 'Caleb', aliases: [], mother: null, occupation: 'Spy, warrior', age_notes: 'Still strong at 85', notable_events: ['One of faithful spies','Conquered Hebron'], verses: ['Numbers 13-14','Joshua 14'], short_bio: 'Faithful spy who trusted God\'s promise.'},
-  {name: 'Elisha', aliases: [], mother: null, occupation: 'Prophet', age_notes: null, notable_events: ['Succeeded Elijah','Parted Jordan','Multiplied oil','Raised dead boy'], verses: ['1 Kings 19','2 Kings 2','2 Kings 4'], short_bio: 'Prophet who succeeded Elijah; performed many miracles.'},
-  {name: 'Naomi', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Mother-in-law of Ruth','Lost husband and sons','Returned to Bethlehem'], verses: ['Ruth 1-4'], short_bio: 'Mother-in-law of Ruth; returned from Moab.'},
-  {name: 'Boaz', aliases: [], mother: null, occupation: 'Wealthy landowner', age_notes: null, notable_events: ['Married Ruth','Kinsman redeemer','Ancestor of David'], verses: ['Ruth 2-4'], short_bio: 'Wealthy man who married Ruth.'},
-  {name: 'Hannah', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Prayed for son','Mother of Samuel','Sang praise song'], verses: ['1 Samuel 1-2'], short_bio: 'Mother of Samuel; prayed faithfully for a son.'},
-  {name: 'Eli', aliases: [], mother: null, occupation: 'High priest, judge', age_notes: 'Died at 98', notable_events: ['Mentored Samuel','Sons were wicked','Died hearing of ark capture'], verses: ['1 Samuel 1-4'], short_bio: 'High priest who mentored young Samuel.'},
-  {name: 'Goliath', aliases: [], mother: null, occupation: 'Philistine warrior', age_notes: 'Over 9 feet tall', notable_events: ['Defeated by David','Champion of Philistines'], verses: ['1 Samuel 17'], short_bio: 'Giant Philistine warrior defeated by David.'},
-  {name: 'Jonathan', aliases: [], mother: null, occupation: 'Prince, warrior', age_notes: null, notable_events: ['Best friend of David','Gave David his armor','Died with Saul'], verses: ['1 Samuel 18','1 Samuel 20','1 Samuel 31'], short_bio: 'Son of Saul and loyal friend of David.'},
-  {name: 'Bathsheba', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Committed adultery with David','Mother of Solomon','Husband Uriah killed'], verses: ['2 Samuel 11-12','1 Kings 1'], short_bio: 'Wife of Uriah then David; mother of Solomon.'},
-  {name: 'Absalom', aliases: [], mother: null, occupation: 'Prince', age_notes: null, notable_events: ['Rebelled against David','Known for beautiful hair','Hair caught in tree'], verses: ['2 Samuel 13-18'], short_bio: 'Son of David who rebelled against him.'},
-  {name: 'Elkanah', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Father of Samuel','Husband of Hannah'], verses: ['1 Samuel 1'], short_bio: 'Father of Samuel; husband of Hannah and Peninnah.'},
-  {name: 'Mordecai', aliases: [], mother: null, occupation: 'Official', age_notes: null, notable_events: ['Cousin of Esther','Exposed assassination plot','Honored by king'], verses: ['Esther 2-10'], short_bio: 'Cousin of Esther who helped save the Jews.'},
-  {name: 'Haman', aliases: [], mother: null, occupation: 'Official', age_notes: null, notable_events: ['Plotted against Jews','Hanged on own gallows'], verses: ['Esther 3-7'], short_bio: 'Evil official who plotted against the Jews.'},
-  {name: 'John (apostle)', aliases: ['John the Beloved'], mother: null, occupation: 'Fisherman, apostle', age_notes: null, notable_events: ['Beloved disciple','Wrote gospel and Revelation','Exiled to Patmos'], verses: ['John 13:23','John 19:26','Revelation 1:9'], short_bio: 'Beloved disciple who wrote the Gospel of John.'},
-  {name: 'Matthew', aliases: ['Levi'], mother: null, occupation: 'Tax collector, apostle', age_notes: null, notable_events: ['Called by Jesus','Wrote gospel','Tax collector'], verses: ['Matthew 9:9','Mark 2:14'], short_bio: 'Tax collector who became apostle; wrote gospel.'},
-  {name: 'Thomas', aliases: ['Didymus'], mother: null, occupation: 'Apostle', age_notes: null, notable_events: ['Doubted resurrection','Touched Jesus\' wounds'], verses: ['John 20:24-29'], short_bio: 'Apostle who doubted resurrection until he saw Jesus.'},
-  {name: 'Judas Iscariot', aliases: [], mother: null, occupation: 'Apostle, treasurer', age_notes: null, notable_events: ['Betrayed Jesus','Hanged himself','Sold Jesus for 30 silver'], verses: ['Matthew 26:14-16','Matthew 27:3-5'], short_bio: 'Apostle who betrayed Jesus for thirty pieces of silver.'},
-  {name: 'Zacchaeus', aliases: [], mother: null, occupation: 'Tax collector', age_notes: 'Short in stature', notable_events: ['Climbed sycamore tree','Restored fourfold','Hosted Jesus'], verses: ['Luke 19:1-10'], short_bio: 'Short tax collector who climbed tree to see Jesus.'},
-  {name: 'Martha', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Sister of Mary and Lazarus','Served Jesus','Believed in resurrection'], verses: ['Luke 10:38-42','John 11'], short_bio: 'Sister of Lazarus and Mary who served Jesus.'},
-  {name: 'Mary (sister of Lazarus)', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Anointed Jesus\' feet','Sat at Jesus\' feet','Sister of Lazarus'], verses: ['Luke 10:39','John 11','John 12:3'], short_bio: 'Sister of Lazarus who anointed Jesus\' feet.'},
-  {name: 'Nicodemus', aliases: [], mother: null, occupation: 'Pharisee, ruler', age_notes: null, notable_events: ['Visited Jesus at night','Helped bury Jesus','Asked about being born again'], verses: ['John 3','John 19:39'], short_bio: 'Pharisee who visited Jesus by night.'},
-  {name: 'Joseph of Arimathea', aliases: [], mother: null, occupation: 'Rich man, council member', age_notes: null, notable_events: ['Buried Jesus','Provided tomb','Secret disciple'], verses: ['Matthew 27:57-60','John 19:38'], short_bio: 'Rich man who provided tomb for Jesus.'},
-  {name: 'Stephen', aliases: [], mother: null, occupation: 'Deacon', age_notes: null, notable_events: ['First Christian martyr','Full of Holy Spirit','Stoned to death'], verses: ['Acts 6-7'], short_bio: 'First Christian martyr; stoned for his faith.'},
-  {name: 'Philip (evangelist)', aliases: [], mother: null, occupation: 'Deacon, evangelist', age_notes: null, notable_events: ['Baptized Ethiopian eunuch','Preached in Samaria'], verses: ['Acts 8'], short_bio: 'Deacon who evangelized and baptized the Ethiopian.'},
-  {name: 'Barnabas', aliases: ['Joseph'], mother: null, occupation: 'Apostle', age_notes: null, notable_events: ['Traveled with Paul','Sold field for church','Encouraged believers'], verses: ['Acts 4:36-37','Acts 11:22-26','Acts 13-15'], short_bio: 'Companion of Paul; known as "son of encouragement".'},
-  {name: 'Timothy', aliases: [], mother: 'Eunice', occupation: 'Pastor, missionary', age_notes: 'Young when called', notable_events: ['Companion of Paul','Pastor at Ephesus','Received letters from Paul'], verses: ['Acts 16:1','1 Timothy','2 Timothy'], short_bio: 'Young pastor mentored by Paul.'},
-  {name: 'Silas', aliases: ['Silvanus'], mother: null, occupation: 'Prophet, missionary', age_notes: null, notable_events: ['Traveled with Paul','Imprisoned with Paul','Sang in prison'], verses: ['Acts 15:22','Acts 16:25'], short_bio: 'Companion of Paul who sang in prison.'},
-  {name: 'Luke', aliases: [], mother: null, occupation: 'Physician, historian', age_notes: null, notable_events: ['Wrote gospel and Acts','Traveled with Paul','Beloved physician'], verses: ['Colossians 4:14','2 Timothy 4:11'], short_bio: 'Physician who wrote gospel and book of Acts.'},
-  {name: 'Mark', aliases: ['John Mark'], mother: 'Mary', occupation: 'Missionary, writer', age_notes: null, notable_events: ['Wrote gospel','Deserted Paul','Restored to ministry'], verses: ['Acts 12:12','Acts 15:37-39','2 Timothy 4:11'], short_bio: 'Writer of the Gospel of Mark.'},
-  {name: 'Pontius Pilate', aliases: [], mother: null, occupation: 'Roman governor', age_notes: null, notable_events: ['Sentenced Jesus to death','Washed hands','Released Barabbas'], verses: ['Matthew 27','John 18-19'], short_bio: 'Roman governor who sentenced Jesus to crucifixion.'},
-  {name: 'Herod the Great', aliases: [], mother: null, occupation: 'King', age_notes: null, notable_events: ['Killed babies in Bethlehem','Built temple','Tried to kill Jesus'], verses: ['Matthew 2'], short_bio: 'King who tried to kill baby Jesus.'},
-  {name: 'Elizabeth', aliases: [], mother: null, occupation: null, age_notes: 'Old when pregnant', notable_events: ['Mother of John the Baptist','Wife of Zechariah','Relative of Mary'], verses: ['Luke 1'], short_bio: 'Mother of John the Baptist.'},
-  {name: 'Zechariah', aliases: [], mother: null, occupation: 'Priest', age_notes: null, notable_events: ['Father of John the Baptist','Made mute by angel','Prophesied at birth'], verses: ['Luke 1'], short_bio: 'Priest who became mute; father of John the Baptist.'},
-  {name: 'Anna', aliases: [], mother: null, occupation: 'Prophet', age_notes: '84 years old', notable_events: ['Recognized baby Jesus','Widow who served in temple','Fasted and prayed'], verses: ['Luke 2:36-38'], short_bio: 'Elderly prophetess who recognized baby Jesus.'},
-  {name: 'Simeon', aliases: [], mother: null, occupation: null, age_notes: 'Elderly', notable_events: ['Held baby Jesus','Blessed Jesus','Prophesied sword for Mary'], verses: ['Luke 2:25-35'], short_bio: 'Righteous man who blessed baby Jesus in temple.'}
+  {'name':'Noah','aliases':[],'mother':null,'father':'Lamech','spouse':null,'children':['Shem','Ham','Japheth'],'siblings':[],'occupation':'Righteous man, built the ark','age_notes':'Lived 950 years','notable_events':['Built the ark','Survived the flood','Sent out dove and raven'],'verses':['Genesis 6-9','Genesis 9:29'],'short_bio':'Noah built the ark to survive the flood.','testament':'ot','gender':'male'},
+  {'name':'Moses','aliases':[],'mother':'Jochebed','father':'Amram','spouse':'Zipporah','children':['Gershom','Eliezer'],'siblings':['Aaron','Miriam'],'occupation':'Leader, prophet','age_notes':'Died at 120; 80 when confronting Pharaoh','notable_events':['Led Exodus','Saw burning bush','Parted Red Sea','Received Ten Commandments'],'verses':['Exodus 3','Exodus 14','Exodus 20','Deuteronomy 34:7'],'short_bio':'Moses led the Israelites out of Egypt.','testament':'ot','gender':'male'},
+  {'name':'Solomon','aliases':[],'mother':'Bathsheba','father':'David','spouse':null,'children':['Rehoboam'],'siblings':['Absalom'],'occupation':'King','age_notes':'Reigned 40 years','notable_events':['Built the temple','Known for wisdom','Judged between two mothers'],'verses':['1 Kings 3','1 Kings 6','2 Samuel 12:24'],'short_bio':'Son of David and Bathsheba; famed for wisdom.','testament':'ot','gender':'male'},
+  {'name':'Joseph (son of Jacob)','aliases':['Joseph of Egypt'],'mother':'Rachel','father':'Jacob','spouse':'Asenath','children':['Manasseh','Ephraim'],'siblings':['Reuben','Simeon','Levi','Judah','Benjamin'],'occupation':'Official in Egypt','age_notes':'Sold by brothers at 17; died at 110','notable_events':['Sold into Egypt','Interpreted dreams','Saved Egypt from famine','Reunited with family'],'verses':['Genesis 37:2','Genesis 41','Genesis 45','Genesis 50:26'],'short_bio':'Joseph was sold into Egypt and rose to power.','testament':'ot','gender':'male'},
+  {'name':'David','aliases':[],'mother':null,'father':'Jesse','spouse':['Michal','Bathsheba'],'children':['Solomon','Absalom'],'siblings':[],'occupation':'Shepherd, King','age_notes':'Became king at 30; reigned 40 years','notable_events':['Killed Goliath','Became king','Danced before the ark','Committed adultery with Bathsheba'],'verses':['1 Samuel 17','2 Samuel 5:4','2 Samuel 6','2 Samuel 11'],'short_bio':'Shepherd who became king of Israel; famous for defeating Goliath.','testament':'ot','gender':'male'},
+  {'name':'Esther','aliases':['Hadassah'],'mother':null,'father':null,'spouse':'Xerxes','children':[],'siblings':[],'occupation':'Queen','age_notes':null,'notable_events':['Became queen and saved her people','Revealed Haman's plot'],'verses':['Esther 2','Esther 7'],'short_bio':'Jewish queen of Persia who saved her people.','testament':'ot','gender':'female'},
+  {'name':'Mary (mother of Jesus)','aliases':[],'mother':null,'father':null,'spouse':'Joseph','children':['Jesus'],'siblings':[],'occupation':null,'age_notes':null,'notable_events':['Mother of Jesus','Visited by angel Gabriel','Present at crucifixion'],'verses':['Luke 1:26-38','John 19:25'],'short_bio':'Mother of Jesus.','testament':'nt','gender':'female'},
+  {'name':'John the Baptist','aliases':[],'mother':'Elizabeth','father':'Zechariah','spouse':null,'children':[],'siblings':[],'occupation':'Prophet','age_notes':null,'notable_events':['Baptized Jesus','Beheaded by Herod','Wore camel hair'],'verses':['Luke 1','Matthew 3','Matthew 14'],'short_bio':'Prophet who baptized Jesus.','testament':'nt','gender':'male'},
+  {'name':'Paul','aliases':['Saul'],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Apostle, tent maker','age_notes':null,'notable_events':['Converted on road to Damascus','Missionary journeys','Wrote epistles','Shipwrecked'],'verses':['Acts 9','Acts 13-28','2 Corinthians 11:25'],'short_bio':'Originally named Saul; became Apostle Paul after conversion.','testament':'nt','gender':'male'},
+  {'name':'Peter','aliases':['Simon Peter','Simon'],'mother':null,'father':'John','spouse':null,'children':[],'siblings':['Andrew'],'occupation':'Fisherman, Apostle','age_notes':null,'notable_events':['Walked on water','Denial of Jesus','Leader of early church','Vision of unclean animals'],'verses':['Matthew 14:29','Matthew 26:69-75','Acts 10'],'short_bio':'One of Jesus's closest disciples; called Peter.','testament':'nt','gender':'male'},
+  {'name':'Lazarus','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':['Martha','Mary (sister of Lazarus)'],'occupation':null,'age_notes':null,'notable_events':['Raised from the dead by Jesus','Brother of Mary and Martha'],'verses':['John 11','John 12'],'short_bio':'Brother of Mary and Martha; raised from the dead.','testament':'nt','gender':'male'},
+  {'name':'Abraham','aliases':['Abram'],'mother':null,'father':'Terah','spouse':'Sarah','children':['Isaac','Ishmael'],'siblings':[],'occupation':'Patriarch','age_notes':'Died at 175; fathered Isaac at 100','notable_events':['Father of Isaac','Covenant with God','Nearly sacrificed Isaac','Left Ur'],'verses':['Genesis 12','Genesis 17','Genesis 22','Genesis 25:7'],'short_bio':'Father of the Israelite nation.','testament':'ot','gender':'male'},
+  {'name':'Isaac','aliases':[],'mother':'Sarah','father':'Abraham','spouse':'Rebekah','children':['Jacob','Esau'],'siblings':['Ishmael'],'occupation':'Patriarch','age_notes':'Died at 180; born when Abraham was 100','notable_events':['Son of Abraham and Sarah','Nearly sacrificed by Abraham','Married Rebekah'],'verses':['Genesis 22','Genesis 24','Genesis 35:28'],'short_bio':'Son of Abraham and Sarah; father of Jacob.','testament':'ot','gender':'male'},
+  {'name':'Jacob','aliases':['Israel'],'mother':'Rebekah','father':'Isaac','spouse':['Leah','Rachel'],'children':['Reuben','Simeon','Levi','Judah','Joseph (son of Jacob)','Benjamin'],'siblings':['Esau'],'occupation':'Patriarch','age_notes':'Died at 147','notable_events':['Renamed Israel','Father of the 12 tribes','Wrestled with angel','Deceived Isaac'],'verses':['Genesis 27','Genesis 32:28','Genesis 47:28'],'short_bio':'Father of the 12 tribes of Israel.','testament':'ot','gender':'male'},
+  {'name':'Samuel','aliases':[],'mother':'Hannah','father':'Elkanah','spouse':null,'children':[],'siblings':[],'occupation':'Prophet, Judge','age_notes':'Dedicated to temple as child','notable_events':['Anointed Saul and David','Heard God's voice as child','Judge of Israel'],'verses':['1 Samuel 3','1 Samuel 10','1 Samuel 16'],'short_bio':'Prophet and judge who anointed Israel's first kings.','testament':'ot','gender':'male'},
+  {'name':'Elijah','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Prophet','age_notes':null,'notable_events':['Taken up by chariot of fire','Defeated prophets of Baal','Fed by ravens','Raised widow's son'],'verses':['1 Kings 17','1 Kings 18','2 Kings 2'],'short_bio':'Great prophet who was taken to heaven in a chariot.','testament':'ot','gender':'male'},
+  {'name':'Jonah','aliases':[],'mother':null,'father':'Amittai','spouse':null,'children':[],'siblings':[],'occupation':'Prophet','age_notes':null,'notable_events':['Swallowed by fish','Preached to Nineveh','Fled from God'],'verses':['Jonah 1-4'],'short_bio':'Prophet who fled God and was swallowed by a great fish.','testament':'ot','gender':'male'},
+  {'name':'Ruth','aliases':[],'mother':null,'father':null,'spouse':'Boaz','children':['Obed'],'siblings':[],'occupation':'Gleaner','age_notes':null,'notable_events':['Ancestor of David','Married Boaz','Loyal to Naomi'],'verses':['Ruth 1-4'],'short_bio':'Moabite woman who became ancestor to King David.','testament':'ot','gender':'female'},
+  {'name':'Mary Magdalene','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':null,'age_notes':null,'notable_events':['Witnessed resurrection','Seven demons cast out','Followed Jesus'],'verses':['Luke 8:2','Matthew 28','John 20'],'short_bio':'Witness of Jesus's resurrection.','testament':'nt','gender':'female'},
+  {'name':'Saul (first king)','aliases':[],'mother':null,'father':'Kish','spouse':'Ahinoam','children':['Jonathan'],'siblings':[],'occupation':'King','age_notes':'Reigned 40 years','notable_events':['First king of Israel','Consulted witch of Endor','Fell on sword'],'verses':['1 Samuel 9-10','1 Samuel 28','1 Samuel 31'],'short_bio':'Israel's first king anointed by Samuel.','testament':'ot','gender':'male'},
+  {'name':'Daniel','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Prophet, official','age_notes':'Taken to Babylon as youth','notable_events':['In the lion's den','Interpreted dreams','Three friends in furnace'],'verses':['Daniel 1','Daniel 3','Daniel 6'],'short_bio':'Prophet in Babylon; survived lion's den.','testament':'ot','gender':'male'},
+  {'name':'Joshua','aliases':[],'mother':null,'father':'Nun','spouse':null,'children':[],'siblings':[],'occupation':'Military leader','age_notes':'Died at 110','notable_events':['Led conquest of Canaan','Walls of Jericho fell','Stopped sun and moon'],'verses':['Joshua 1','Joshua 6','Joshua 10:12-13','Joshua 24:29'],'short_bio':'Successor to Moses who led Israel into Promised Land.','testament':'ot','gender':'male'},
+  {'name':'Deborah','aliases':[],'mother':null,'father':null,'spouse':'Lappidoth','children':[],'siblings':[],'occupation':'Prophet, Judge','age_notes':null,'notable_events':['Judge of Israel','Led victory over Canaanites','Sang victory song'],'verses':['Judges 4-5'],'short_bio':'Prophet and judge who led Israel to victory.','testament':'ot','gender':'female'},
+  {'name':'Gideon','aliases':[],'mother':null,'father':'Joash','spouse':null,'children':[],'siblings':[],'occupation':'Judge','age_notes':null,'notable_events':['Defeated Midianites with 300 men','Asked for fleece sign','Tore down Baal altar'],'verses':['Judges 6-7'],'short_bio':'Judge who defeated the Midianites with 300 men.','testament':'ot','gender':'male'},
+  {'name':'Samson','aliases':[],'mother':null,'father':'Manoah','spouse':null,'children':[],'siblings':[],'occupation':'Judge','age_notes':'Nazirite from birth','notable_events':['Super strength from long hair','Betrayed by Delilah','Killed Philistines'],'verses':['Judges 13-16'],'short_bio':'Judge with supernatural strength; betrayed by Delilah.','testament':'ot','gender':'male'},
+  {'name':'Jeremiah','aliases':[],'mother':null,'father':'Hilkiah','spouse':null,'children':[],'siblings':[],'occupation':'Prophet','age_notes':'Called as youth','notable_events':['Wept for Jerusalem','Put in cistern','Prophesied exile'],'verses':['Jeremiah 1','Jeremiah 38','Jeremiah 52'],'short_bio':'Weeping prophet who warned of Babylon's destruction.','testament':'ot','gender':'male'},
+  {'name':'Ezekiel','aliases':[],'mother':null,'father':'Buzi','spouse':null,'children':[],'siblings':[],'occupation':'Prophet, priest','age_notes':'Exiled to Babylon','notable_events':['Vision of dry bones','Vision of wheels','Temple vision'],'verses':['Ezekiel 1','Ezekiel 37','Ezekiel 40-48'],'short_bio':'Prophet of the exile with dramatic visions.','testament':'ot','gender':'male'},
+  {'name':'Isaiah','aliases':[],'mother':null,'father':'Amoz','spouse':null,'children':[],'siblings':[],'occupation':'Prophet','age_notes':null,'notable_events':['Vision of God's throne','Prophesied Messiah','Walked naked three years'],'verses':['Isaiah 6','Isaiah 53','Isaiah 20'],'short_bio':'Major prophet who prophesied about the Messiah.','testament':'ot','gender':'male'},
+  {'name':'Job','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Wealthy landowner','age_notes':'Lived 140 years after trials','notable_events':['Tested by Satan','Lost everything','Remained faithful','Restored double'],'verses':['Job 1-2','Job 42'],'short_bio':'Righteous man who suffered but remained faithful.','testament':'ot','gender':'male'},
+  {'name':'Nehemiah','aliases':[],'mother':null,'father':'Hacaliah','spouse':null,'children':[],'siblings':[],'occupation':'Cupbearer, governor','age_notes':null,'notable_events':['Rebuilt Jerusalem walls','Cupbearer to king','Led reforms'],'verses':['Nehemiah 1-2','Nehemiah 6'],'short_bio':'Led rebuilding of Jerusalem's walls.','testament':'ot','gender':'male'},
+  {'name':'Ezra','aliases':[],'mother':null,'father':'Seraiah','spouse':null,'children':[],'siblings':[],'occupation':'Priest, scribe','age_notes':null,'notable_events':['Led return from exile','Read law to people','Reformed worship'],'verses':['Ezra 7','Nehemiah 8'],'short_bio':'Priest and scribe who restored the Law.','testament':'ot','gender':'male'},
+  {'name':'Adam','aliases':[],'mother':null,'father':null,'spouse':'Eve','children':['Cain','Abel','Seth'],'siblings':[],'occupation':'First man','age_notes':'Lived 930 years','notable_events':['First human created','Ate forbidden fruit','Named the animals'],'verses':['Genesis 1-3','Genesis 5:5'],'short_bio':'First human created by God.','testament':'ot','gender':'male'},
+  {'name':'Eve','aliases':[],'mother':null,'father':null,'spouse':'Adam','children':['Cain','Abel','Seth'],'siblings':[],'occupation':'First woman','age_notes':null,'notable_events':['First woman created','Ate forbidden fruit','Mother of all living'],'verses':['Genesis 2-3'],'short_bio':'First woman; mother of all humanity.','testament':'ot','gender':'female'},
+  {'name':'Cain','aliases':[],'mother':'Eve','father':'Adam','spouse':null,'children':[],'siblings':['Abel','Seth'],'occupation':'Farmer','age_notes':null,'notable_events':['Killed Abel','First murderer','Mark of Cain'],'verses':['Genesis 4'],'short_bio':'First son of Adam and Eve; killed his brother.','testament':'ot','gender':'male'},
+  {'name':'Abel','aliases':[],'mother':'Eve','father':'Adam','spouse':null,'children':[],'siblings':['Cain','Seth'],'occupation':'Shepherd','age_notes':null,'notable_events':['Killed by Cain','Offered acceptable sacrifice'],'verses':['Genesis 4','Hebrews 11:4'],'short_bio':'Second son of Adam and Eve; murdered by Cain.','testament':'ot','gender':'male'},
+  {'name':'Lot','aliases':[],'mother':null,'father':'Haran','spouse':null,'children':[],'siblings':[],'occupation':null,'age_notes':null,'notable_events':['Escaped Sodom','Wife turned to salt','Saved by Abraham'],'verses':['Genesis 13','Genesis 19'],'short_bio':'Abraham's nephew who escaped Sodom's destruction.','testament':'ot','gender':'male'},
+  {'name':'Sarah','aliases':['Sarai'],'mother':null,'father':'Terah','spouse':'Abraham','children':['Isaac'],'siblings':[],'occupation':null,'age_notes':'Died at 127; gave birth at 90','notable_events':['Wife of Abraham','Mother of Isaac','Laughed at promise'],'verses':['Genesis 17','Genesis 18','Genesis 23:1'],'short_bio':'Wife of Abraham and mother of Isaac.','testament':'ot','gender':'female'},
+  {'name':'Rebekah','aliases':[],'mother':null,'father':'Bethuel','spouse':'Isaac','children':['Jacob','Esau'],'siblings':[],'occupation':null,'age_notes':null,'notable_events':['Wife of Isaac','Mother of Jacob and Esau','Helped Jacob deceive Isaac'],'verses':['Genesis 24','Genesis 27'],'short_bio':'Wife of Isaac; mother of Jacob and Esau.','testament':'ot','gender':'female'},
+  {'name':'Rachel','aliases':[],'mother':null,'father':'Laban','spouse':'Jacob','children':['Joseph (son of Jacob)','Benjamin'],'siblings':['Leah'],'occupation':'Shepherdess','age_notes':'Died giving birth to Benjamin','notable_events':['Jacob worked 14 years for her','Mother of Joseph and Benjamin'],'verses':['Genesis 29','Genesis 35:16-19'],'short_bio':'Beloved wife of Jacob; mother of Joseph.','testament':'ot','gender':'female'},
+  {'name':'Leah','aliases':[],'mother':null,'father':'Laban','spouse':'Jacob','children':['Reuben','Simeon','Levi','Judah'],'siblings':['Rachel'],'occupation':null,'age_notes':null,'notable_events':['First wife of Jacob','Mother of six sons','Weak eyes'],'verses':['Genesis 29-30'],'short_bio':'First wife of Jacob; mother of six of his sons.','testament':'ot','gender':'female'},
+  {'name':'Miriam','aliases':[],'mother':'Jochebed','father':'Amram','spouse':null,'children':[],'siblings':['Moses','Aaron'],'occupation':'Prophet','age_notes':null,'notable_events':['Watched baby Moses','Led women in song','Struck with leprosy'],'verses':['Exodus 2','Exodus 15','Numbers 12'],'short_bio':'Sister of Moses and Aaron; prophetess.','testament':'ot','gender':'female'},
+  {'name':'Aaron','aliases':[],'mother':'Jochebed','father':'Amram','spouse':'Elisheba','children':[],'siblings':['Moses','Miriam'],'occupation':'High priest','age_notes':'Died at 123','notable_events':['First high priest','Made golden calf','Rod that budded'],'verses':['Exodus 28','Exodus 32','Numbers 17','Numbers 33:39'],'short_bio':'Brother of Moses; first high priest of Israel.','testament':'ot','gender':'male'},
+  {'name':'Caleb','aliases':[],'mother':null,'father':'Jephunneh','spouse':null,'children':[],'siblings':[],'occupation':'Spy, warrior','age_notes':'Still strong at 85','notable_events':['One of faithful spies','Conquered Hebron'],'verses':['Numbers 13-14','Joshua 14'],'short_bio':'Faithful spy who trusted God's promise.','testament':'ot','gender':'male'},
+  {'name':'Elisha','aliases':[],'mother':null,'father':'Shaphat','spouse':null,'children':[],'siblings':[],'occupation':'Prophet','age_notes':null,'notable_events':['Succeeded Elijah','Parted Jordan','Multiplied oil','Raised dead boy'],'verses':['1 Kings 19','2 Kings 2','2 Kings 4'],'short_bio':'Prophet who succeeded Elijah; performed many miracles.','testament':'ot','gender':'male'},
+  {'name':'Naomi','aliases':[],'mother':null,'father':null,'spouse':'Elimelech','children':[],'siblings':[],'occupation':null,'age_notes':null,'notable_events':['Mother-in-law of Ruth','Lost husband and sons','Returned to Bethlehem'],'verses':['Ruth 1-4'],'short_bio':'Mother-in-law of Ruth; returned from Moab.','testament':'ot','gender':'female'},
+  {'name':'Boaz','aliases':[],'mother':null,'father':null,'spouse':'Ruth','children':['Obed'],'siblings':[],'occupation':'Wealthy landowner','age_notes':null,'notable_events':['Married Ruth','Kinsman redeemer','Ancestor of David'],'verses':['Ruth 2-4'],'short_bio':'Wealthy man who married Ruth.','testament':'ot','gender':'male'},
+  {'name':'Hannah','aliases':[],'mother':null,'father':null,'spouse':'Elkanah','children':['Samuel'],'siblings':[],'occupation':null,'age_notes':null,'notable_events':['Prayed for son','Mother of Samuel','Sang praise song'],'verses':['1 Samuel 1-2'],'short_bio':'Mother of Samuel; prayed faithfully for a son.','testament':'ot','gender':'female'},
+  {'name':'Eli','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'High priest, judge','age_notes':'Died at 98','notable_events':['Mentored Samuel','Sons were wicked','Died hearing of ark capture'],'verses':['1 Samuel 1-4'],'short_bio':'High priest who mentored young Samuel.','testament':'ot','gender':'male'},
+  {'name':'Goliath','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Philistine warrior','age_notes':'Over 9 feet tall','notable_events':['Defeated by David','Champion of Philistines'],'verses':['1 Samuel 17'],'short_bio':'Giant Philistine warrior defeated by David.','testament':'ot','gender':'male'},
+  {'name':'Jonathan','aliases':[],'mother':null,'father':'Saul (first king)','spouse':null,'children':[],'siblings':[],'occupation':'Prince, warrior','age_notes':null,'notable_events':['Best friend of David','Gave David his armor','Died with Saul'],'verses':['1 Samuel 18','1 Samuel 20','1 Samuel 31'],'short_bio':'Son of Saul and loyal friend of David.','testament':'ot','gender':'male'},
+  {'name':'Bathsheba','aliases':[],'mother':null,'father':'Eliam','spouse':['Uriah','David'],'children':['Solomon'],'siblings':[],'occupation':null,'age_notes':null,'notable_events':['Committed adultery with David','Mother of Solomon','Husband Uriah killed'],'verses':['2 Samuel 11-12','1 Kings 1'],'short_bio':'Wife of Uriah then David; mother of Solomon.','testament':'ot','gender':'female'},
+  {'name':'Absalom','aliases':[],'mother':null,'father':'David','spouse':null,'children':[],'siblings':['Solomon'],'occupation':'Prince','age_notes':null,'notable_events':['Rebelled against David','Known for beautiful hair','Hair caught in tree'],'verses':['2 Samuel 13-18'],'short_bio':'Son of David who rebelled against him.','testament':'ot','gender':'male'},
+  {'name':'Elkanah','aliases':[],'mother':null,'father':null,'spouse':['Hannah','Peninnah'],'children':['Samuel'],'siblings':[],'occupation':null,'age_notes':null,'notable_events':['Father of Samuel','Husband of Hannah'],'verses':['1 Samuel 1'],'short_bio':'Father of Samuel; husband of Hannah and Peninnah.','testament':'ot','gender':'male'},
+  {'name':'Mordecai','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Official','age_notes':null,'notable_events':['Cousin of Esther','Exposed assassination plot','Honored by king'],'verses':['Esther 2-10'],'short_bio':'Cousin of Esther who helped save the Jews.','testament':'ot','gender':'male'},
+  {'name':'Haman','aliases':[],'mother':null,'father':'Hammedatha','spouse':null,'children':[],'siblings':[],'occupation':'Official','age_notes':null,'notable_events':['Plotted against Jews','Hanged on own gallows'],'verses':['Esther 3-7'],'short_bio':'Evil official who plotted against the Jews.','testament':'ot','gender':'male'},
+  {'name':'John (apostle)','aliases':['John the Beloved'],'mother':null,'father':'Zebedee','spouse':null,'children':[],'siblings':['James'],'occupation':'Fisherman, apostle','age_notes':null,'notable_events':['Beloved disciple','Wrote gospel and Revelation','Exiled to Patmos'],'verses':['John 13:23','John 19:26','Revelation 1:9'],'short_bio':'Beloved disciple who wrote the Gospel of John.','testament':'nt','gender':'male'},
+  {'name':'Matthew','aliases':['Levi'],'mother':null,'father':'Alphaeus','spouse':null,'children':[],'siblings':[],'occupation':'Tax collector, apostle','age_notes':null,'notable_events':['Called by Jesus','Wrote gospel','Tax collector'],'verses':['Matthew 9:9','Mark 2:14'],'short_bio':'Tax collector who became apostle; wrote gospel.','testament':'nt','gender':'male'},
+  {'name':'Thomas','aliases':['Didymus'],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Apostle','age_notes':null,'notable_events':['Doubted resurrection','Touched Jesus' wounds'],'verses':['John 20:24-29'],'short_bio':'Apostle who doubted resurrection until he saw Jesus.','testament':'nt','gender':'male'},
+  {'name':'Judas Iscariot','aliases':[],'mother':null,'father':'Simon Iscariot','spouse':null,'children':[],'siblings':[],'occupation':'Apostle, treasurer','age_notes':null,'notable_events':['Betrayed Jesus','Hanged himself','Sold Jesus for 30 silver'],'verses':['Matthew 26:14-16','Matthew 27:3-5'],'short_bio':'Apostle who betrayed Jesus for thirty pieces of silver.','testament':'nt','gender':'male'},
+  {'name':'Zacchaeus','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Tax collector','age_notes':'Short in stature','notable_events':['Climbed sycamore tree','Restored fourfold','Hosted Jesus'],'verses':['Luke 19:1-10'],'short_bio':'Short tax collector who climbed tree to see Jesus.','testament':'nt','gender':'male'},
+  {'name':'Martha','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':['Lazarus','Mary (sister of Lazarus)'],'occupation':null,'age_notes':null,'notable_events':['Sister of Mary and Lazarus','Served Jesus','Believed in resurrection'],'verses':['Luke 10:38-42','John 11'],'short_bio':'Sister of Lazarus and Mary who served Jesus.','testament':'nt','gender':'female'},
+  {'name':'Mary (sister of Lazarus)','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':['Lazarus','Martha'],'occupation':null,'age_notes':null,'notable_events':['Anointed Jesus' feet','Sat at Jesus' feet','Sister of Lazarus'],'verses':['Luke 10:39','John 11','John 12:3'],'short_bio':'Sister of Lazarus who anointed Jesus' feet.','testament':'nt','gender':'female'},
+  {'name':'Nicodemus','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Pharisee, ruler','age_notes':null,'notable_events':['Visited Jesus at night','Helped bury Jesus','Asked about being born again'],'verses':['John 3','John 19:39'],'short_bio':'Pharisee who visited Jesus by night.','testament':'nt','gender':'male'},
+  {'name':'Joseph of Arimathea','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Rich man, council member','age_notes':null,'notable_events':['Buried Jesus','Provided tomb','Secret disciple'],'verses':['Matthew 27:57-60','John 19:38'],'short_bio':'Rich man who provided tomb for Jesus.','testament':'nt','gender':'male'},
+  {'name':'Stephen','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Deacon','age_notes':null,'notable_events':['First Christian martyr','Full of Holy Spirit','Stoned to death'],'verses':['Acts 6-7'],'short_bio':'First Christian martyr; stoned for his faith.','testament':'nt','gender':'male'},
+  {'name':'Philip (evangelist)','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Deacon, evangelist','age_notes':null,'notable_events':['Baptized Ethiopian eunuch','Preached in Samaria'],'verses':['Acts 8'],'short_bio':'Deacon who evangelized and baptized the Ethiopian.','testament':'nt','gender':'male'},
+  {'name':'Barnabas','aliases':['Joseph'],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Apostle','age_notes':null,'notable_events':['Traveled with Paul','Sold field for church','Encouraged believers'],'verses':['Acts 4:36-37','Acts 11:22-26','Acts 13-15'],'short_bio':'Companion of Paul; known as \'son of encouragement\'.','testament':'nt','gender':'male'},
+  {'name':'Timothy','aliases':[],'mother':'Eunice','father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Pastor, missionary','age_notes':'Young when called','notable_events':['Companion of Paul','Pastor at Ephesus','Received letters from Paul'],'verses':['Acts 16:1','1 Timothy','2 Timothy'],'short_bio':'Young pastor mentored by Paul.','testament':'nt','gender':'male'},
+  {'name':'Silas','aliases':['Silvanus'],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Prophet, missionary','age_notes':null,'notable_events':['Traveled with Paul','Imprisoned with Paul','Sang in prison'],'verses':['Acts 15:22','Acts 16:25'],'short_bio':'Companion of Paul who sang in prison.','testament':'nt','gender':'male'},
+  {'name':'Luke','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Physician, historian','age_notes':null,'notable_events':['Wrote gospel and Acts','Traveled with Paul','Beloved physician'],'verses':['Colossians 4:14','2 Timothy 4:11'],'short_bio':'Physician who wrote gospel and book of Acts.','testament':'nt','gender':'male'},
+  {'name':'Mark','aliases':['John Mark'],'mother':'Mary','father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Missionary, writer','age_notes':null,'notable_events':['Wrote gospel','Deserted Paul','Restored to ministry'],'verses':['Acts 12:12','Acts 15:37-39','2 Timothy 4:11'],'short_bio':'Writer of the Gospel of Mark.','testament':'nt','gender':'male'},
+  {'name':'Pontius Pilate','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Roman governor','age_notes':null,'notable_events':['Sentenced Jesus to death','Washed hands','Released Barabbas'],'verses':['Matthew 27','John 18-19'],'short_bio':'Roman governor who sentenced Jesus to crucifixion.','testament':'nt','gender':'male'},
+  {'name':'Herod the Great','aliases':[],'mother':null,'father':'Antipater','spouse':null,'children':[],'siblings':[],'occupation':'King','age_notes':null,'notable_events':['Killed babies in Bethlehem','Built temple','Tried to kill Jesus'],'verses':['Matthew 2'],'short_bio':'King who tried to kill baby Jesus.','testament':'ot','gender':'male'},
+  {'name':'Elizabeth','aliases':[],'mother':null,'father':null,'spouse':'Zechariah','children':['John the Baptist'],'siblings':[],'occupation':null,'age_notes':'Old when pregnant','notable_events':['Mother of John the Baptist','Wife of Zechariah','Relative of Mary'],'verses':['Luke 1'],'short_bio':'Mother of John the Baptist.','testament':'nt','gender':'female'},
+  {'name':'Zechariah','aliases':[],'mother':null,'father':null,'spouse':'Elizabeth','children':['John the Baptist'],'siblings':[],'occupation':'Priest','age_notes':null,'notable_events':['Father of John the Baptist','Made mute by angel','Prophesied at birth'],'verses':['Luke 1'],'short_bio':'Priest who became mute; father of John the Baptist.','testament':'nt','gender':'male'},
+  {'name':'Anna','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':'Prophet','age_notes':'84 years old','notable_events':['Recognized baby Jesus','Widow who served in temple','Fasted and prayed'],'verses':['Luke 2:36-38'],'short_bio':'Elderly prophetess who recognized baby Jesus.','testament':'nt','gender':'female'},
+  {'name':'Simeon','aliases':[],'mother':null,'father':null,'spouse':null,'children':[],'siblings':[],'occupation':null,'age_notes':'Elderly','notable_events':['Held baby Jesus','Blessed Jesus','Prophesied sword for Mary'],'verses':['Luke 2:25-35'],'short_bio':'Righteous man who blessed baby Jesus in temple.','testament':'nt','gender':'male'}
 ];
 
 // =========================
@@ -196,16 +196,30 @@ function updatePlayerStats(score, streak, correct, total, mode) {
 }
 
 function promptForPlayerName() {
-  const name = prompt(getText('enterPlayerName') || 'Enter your name (or leave blank for Guest):');
-  if (name === null) return null; // User cancelled
+  const currentName = state.currentPlayer ? state.currentPlayer.name : 'Guest';
+  const message = getText('enterPlayerName') || `Enter your name (current: ${currentName}):`;
+  const name = prompt(message);
+  
+  if (name === null) {
+    // User cancelled - keep current player
+    return state.currentPlayer;
+  }
   
   if (name && name.trim()) {
+    // User entered a name
     const player = createGuestPlayer(name.trim());
+    // Preserve stats from previous guest session if transitioning from Guest
+    if (state.currentPlayer && state.currentPlayer.name === 'Guest') {
+      player.stats = state.currentPlayer.stats;
+    }
+    state.currentPlayer = player;
     savePlayer(player);
     showToast({ title: getText('welcome') || 'Welcome', msg: `${getText('welcomePlayer') || 'Welcome'}, ${player.name}!`, type: 'success', timeout: 2000 });
     return player;
   } else {
+    // User left blank - use Guest
     const player = createGuestPlayer('Guest');
+    state.currentPlayer = player;
     savePlayer(player);
     return player;
   }
@@ -397,19 +411,24 @@ function init(){
   }
   state.people = loadPeopleDataFromLocalStorage() || DEFAULT_PEOPLE_DATA.slice();
   
+  // Initialize relationship graph
+  if (window.RelationshipSystem) {
+    RelationshipSystem.buildRelationshipGraph(state.people);
+    console.log('✓ Relationship graph built for', state.people.length, 'people');
+  }
+  
   // Load or create player
   const player = loadPlayer();
   if (player) {
     state.currentPlayer = player;
     displayPlayerInfo();
   } else {
-    // Prompt for player name on first visit
-    setTimeout(() => {
-      const newPlayer = promptForPlayerName();
-      if (newPlayer) {
-        displayPlayerInfo();
-      }
-    }, 1000);
+    // Create a guest player by default (no prompt)
+    // User can change name later via "Change Player" button
+    const guestPlayer = createGuestPlayer('Guest');
+    state.currentPlayer = guestPlayer;
+    savePlayer(guestPlayer);
+    displayPlayerInfo();
   }
   
   renderPeopleList();
@@ -465,6 +484,16 @@ function attachHandlers(){
   btnShuffleList.addEventListener('click', ()=>{ shuffle(state.people); renderPeopleList(searchPerson.value); });
   btnExpandAll.addEventListener('click', ()=>toggleAllDetails(true));
   btnCollapseAll.addEventListener('click', ()=>toggleAllDetails(false));
+  
+  // Testament and gender filters
+  const testamentFilter = document.getElementById('testament-filter');
+  const genderFilter = document.getElementById('gender-filter');
+  if (testamentFilter) {
+    testamentFilter.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  }
+  if (genderFilter) {
+    genderFilter.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  }
   
   // Data management
   btnExport.addEventListener('click', exportJson);
@@ -637,18 +666,28 @@ function startChallenge(){
 }
 
 function startChallengeFromModal(){
-  const name1 = (p1NameInput.value||'P1').trim() || 'P1';
-  const name2 = (p2NameInput.value||'P2').trim() || 'P2';
+  const name1 = (p1NameInput.value||'Player 1').trim() || 'Player 1';
+  const name2 = (p2NameInput.value||'Player 2').trim() || 'Player 2';
   hidePlayersModal();
   showGame();
   gameTitle.textContent = getText('challengeMode');
-  state.players = [ { name: name1, score: 0 }, { name: name2, score: 0 } ];
+  
+  // Challenge mode uses temporary players for this session only
+  // Does not affect the main player profile/stats
+  state.players = [ 
+    { name: name1, score: 0 }, 
+    { name: name2, score: 0 } 
+  ];
   state.currentPlayerIndex = 0;
   currentPlayerEl.textContent = '1';
   p1ScoreEl.textContent = '0';
   p2ScoreEl.textContent = '0';
   prepareQuiz('challenge');
-  showToast({ title: getText('challengeStart'), msg: getText('challengeStartMsg'), type: 'info' });
+  showToast({ 
+    title: getText('challengeStart'), 
+    msg: `${name1} vs ${name2}! ${getText('challengeStartMsg')}`, 
+    type: 'info' 
+  });
 }
 
 function startStudy(){
@@ -662,7 +701,21 @@ function prepareQuiz(mode){
   state.score = 0; state.streak = 0; state.qnum = 0; state.results = []; state.paused = false;
   const count = parseInt(numQuestionsInput.value) || 10;
   const difficulty = difficultySel.value;
-  state.questions = pickQuestionSet(count, difficulty);
+  
+  // Apply testament and gender filters to the people pool
+  let peoplePool = state.people.slice();
+  const testamentFilter = document.getElementById('testament-filter');
+  const genderFilter = document.getElementById('gender-filter');
+  
+  if (testamentFilter && testamentFilter.value !== 'all') {
+    peoplePool = peoplePool.filter(p => p.testament === testamentFilter.value);
+  }
+  
+  if (genderFilter && genderFilter.value !== 'all') {
+    peoplePool = peoplePool.filter(p => p.gender === genderFilter.value);
+  }
+  
+  state.questions = pickQuestionSet(count, difficulty, peoplePool);
   state.qtotal = state.questions.length;
   qtotalEl.innerText = state.qtotal;
   scoreEl.innerText = state.score;
@@ -698,9 +751,9 @@ function quitQuiz(){
 // =========================
 // Questions
 // =========================
-function pickQuestionSet(count, difficulty){
+function pickQuestionSet(count, difficulty, peoplePool = null){
   const types = ['whoDid','whoMother','occupation','age','event'];
-  const pool = filterPeopleByDifficulty(state.people, difficulty);
+  const pool = filterPeopleByDifficulty(peoplePool || state.people, difficulty);
   shuffle(pool);
   const selected = pool.slice(0, Math.min(count, pool.length));
   const questions = [];
@@ -974,9 +1027,23 @@ function togglePause(){
 function renderPeopleList(filter){
   peopleList.innerHTML='';
   let arr = state.people.filter(p=>!filter || p.name.toLowerCase().includes(filter.toLowerCase()));
+  
+  // Apply existing filters
   if(filterMother?.checked) arr = arr.filter(p=>!!p.mother);
   if(filterOccupation?.checked) arr = arr.filter(p=>!!p.occupation);
   if(filterAge?.checked) arr = arr.filter(p=>!!p.age_notes);
+  
+  // Apply testament filter (from setup panel if available)
+  const testamentFilter = document.getElementById('testament-filter');
+  if (testamentFilter && testamentFilter.value !== 'all') {
+    arr = arr.filter(p => p.testament === testamentFilter.value);
+  }
+  
+  // Apply gender filter (from setup panel if available)
+  const genderFilter = document.getElementById('gender-filter');
+  if (genderFilter && genderFilter.value !== 'all') {
+    arr = arr.filter(p => p.gender === genderFilter.value);
+  }
   if(sortSelect){
     if(sortSelect.value==='name-asc') arr.sort((a,b)=>a.name.localeCompare(b.name));
     if(sortSelect.value==='name-desc') arr.sort((a,b)=>b.name.localeCompare(a.name));
@@ -998,9 +1065,40 @@ function renderPeopleList(filter){
     const eventsLabel = getText('events');
     const versesLabel = getText('verses');
     const eventsJoined = (p.notable_events||[]).map(translateEvent).join(', ');
+    
+    // Build relationship badges
+    let relationshipBadges = '';
+    if (window.RelationshipSystem) {
+      const suggestions = RelationshipSystem.getSuggestions(p.name, state.people, 3);
+      
+      // Family badge
+      if (suggestions.family && suggestions.family.length > 0) {
+        const familyNames = suggestions.family.map(rel => `${rel.name} (${rel.relationship})`).join(', ');
+        relationshipBadges += `<div class="person-badge">👨‍👩‍👦 ${familyNames}</div>`;
+      }
+      
+      // Testament badge
+      if (p.testament) {
+        const testamentText = p.testament === 'ot' ? '📜 Old Testament' : '✝️ New Testament';
+        relationshipBadges += `<div class="person-badge">${testamentText}</div>`;
+      }
+      
+      // Occupation group badge
+      if (suggestions.sameOccupation && suggestions.sameOccupation.length > 0) {
+        const occGroup = RelationshipSystem.categorizeOccupation(p.occupation);
+        const occIcon = occGroup === 'prophet' ? '🔮' : occGroup === 'ruler' ? '👑' : occGroup === 'priest' ? '⛪' : occGroup === 'apostle' ? '✝️' : '👔';
+        const occNames = suggestions.sameOccupation.slice(0, 2).map(o => o.name).join(', ');
+        relationshipBadges += `<div class="person-badge">${occIcon} ${occNames}</div>`;
+      }
+    }
+    
     details.innerHTML = `
+      ${relationshipBadges}
       ${p.aliases?.length?`<div><strong>${aliasLabel}:</strong> ${p.aliases.join(', ')}</div>`:''}
       ${p.mother?`<div><strong>${motherLabel}:</strong> ${p.mother}</div>`:''}
+      ${p.father?`<div><strong>Father:</strong> ${p.father}</div>`:''}
+      ${p.spouse?`<div><strong>Spouse:</strong> ${Array.isArray(p.spouse) ? p.spouse.join(', ') : p.spouse}</div>`:''}
+      ${p.children?.length?`<div><strong>Children:</strong> ${p.children.join(', ')}</div>`:''}
       ${p.occupation?`<div><strong>${occupationLabel}:</strong> ${p.occupation}</div>`:''}
       ${p.age_notes?`<div><strong>${ageLabel}:</strong> ${p.age_notes}</div>`:''}
       ${p.notable_events?.length?`<div><strong>${eventsLabel}:</strong> ${eventsJoined}</div>`:''}

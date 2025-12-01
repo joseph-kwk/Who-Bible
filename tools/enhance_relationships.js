@@ -1,0 +1,98 @@
+// Script to enhance people data with relationships, testament, and gender
+// Run this to generate enhanced dataset
+
+const fs = require('fs');
+const path = require('path');
+
+// Enhanced data with relationships
+const enhancedPeople = [
+  {name: 'Noah', testament: 'ot', gender: 'male', father: 'Lamech', spouse: null, children: ['Shem', 'Ham', 'Japheth'], siblings: []},
+  {name: 'Moses', testament: 'ot', gender: 'male', father: 'Amram', spouse: 'Zipporah', children: ['Gershom', 'Eliezer'], siblings: ['Aaron', 'Miriam']},
+  {name: 'Solomon', testament: 'ot', gender: 'male', father: 'David', spouse: null, children: ['Rehoboam'], siblings: ['Absalom']},
+  {name: 'Joseph (son of Jacob)', testament: 'ot', gender: 'male', father: 'Jacob', spouse: 'Asenath', children: ['Manasseh', 'Ephraim'], siblings: ['Reuben', 'Simeon', 'Levi', 'Judah', 'Benjamin']},
+  {name: 'David', testament: 'ot', gender: 'male', father: 'Jesse', spouse: ['Michal', 'Bathsheba'], children: ['Solomon', 'Absalom'], siblings: []},
+  {name: 'Esther', testament: 'ot', gender: 'female', father: null, spouse: 'Xerxes', children: [], siblings: []},
+  {name: 'Mary (mother of Jesus)', testament: 'nt', gender: 'female', father: null, spouse: 'Joseph', children: ['Jesus'], siblings: []},
+  {name: 'John the Baptist', testament: 'nt', gender: 'male', father: 'Zechariah', spouse: null, children: [], siblings: []},
+  {name: 'Paul', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Peter', testament: 'nt', gender: 'male', father: 'John', spouse: null, children: [], siblings: ['Andrew']},
+  {name: 'Lazarus', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: ['Martha', 'Mary (sister of Lazarus)']},
+  {name: 'Abraham', testament: 'ot', gender: 'male', father: 'Terah', spouse: 'Sarah', children: ['Isaac', 'Ishmael'], siblings: []},
+  {name: 'Isaac', testament: 'ot', gender: 'male', father: 'Abraham', spouse: 'Rebekah', children: ['Jacob', 'Esau'], siblings: ['Ishmael']},
+  {name: 'Jacob', testament: 'ot', gender: 'male', father: 'Isaac', spouse: ['Leah', 'Rachel'], children: ['Reuben', 'Simeon', 'Levi', 'Judah', 'Joseph (son of Jacob)', 'Benjamin'], siblings: ['Esau']},
+  {name: 'Samuel', testament: 'ot', gender: 'male', father: 'Elkanah', spouse: null, children: [], siblings: []},
+  {name: 'Elijah', testament: 'ot', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Jonah', testament: 'ot', gender: 'male', father: 'Amittai', spouse: null, children: [], siblings: []},
+  {name: 'Ruth', testament: 'ot', gender: 'female', father: null, spouse: 'Boaz', children: ['Obed'], siblings: []},
+  {name: 'Mary Magdalene', testament: 'nt', gender: 'female', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Saul (first king)', testament: 'ot', gender: 'male', father: 'Kish', spouse: 'Ahinoam', children: ['Jonathan'], siblings: []},
+  {name: 'Daniel', testament: 'ot', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Joshua', testament: 'ot', gender: 'male', father: 'Nun', spouse: null, children: [], siblings: []},
+  {name: 'Deborah', testament: 'ot', gender: 'female', father: null, spouse: 'Lappidoth', children: [], siblings: []},
+  {name: 'Gideon', testament: 'ot', gender: 'male', father: 'Joash', spouse: null, children: [], siblings: []},
+  {name: 'Samson', testament: 'ot', gender: 'male', father: 'Manoah', spouse: null, children: [], siblings: []},
+  {name: 'Jeremiah', testament: 'ot', gender: 'male', father: 'Hilkiah', spouse: null, children: [], siblings: []},
+  {name: 'Ezekiel', testament: 'ot', gender: 'male', father: 'Buzi', spouse: null, children: [], siblings: []},
+  {name: 'Isaiah', testament: 'ot', gender: 'male', father: 'Amoz', spouse: null, children: [], siblings: []},
+  {name: 'Job', testament: 'ot', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Nehemiah', testament: 'ot', gender: 'male', father: 'Hacaliah', spouse: null, children: [], siblings: []},
+  {name: 'Ezra', testament: 'ot', gender: 'male', father: 'Seraiah', spouse: null, children: [], siblings: []},
+  {name: 'Adam', testament: 'ot', gender: 'male', father: null, spouse: 'Eve', children: ['Cain', 'Abel', 'Seth'], siblings: []},
+  {name: 'Eve', testament: 'ot', gender: 'female', father: null, spouse: 'Adam', children: ['Cain', 'Abel', 'Seth'], siblings: []},
+  {name: 'Cain', testament: 'ot', gender: 'male', father: 'Adam', spouse: null, children: [], siblings: ['Abel', 'Seth']},
+  {name: 'Abel', testament: 'ot', gender: 'male', father: 'Adam', spouse: null, children: [], siblings: ['Cain', 'Seth']},
+  {name: 'Lot', testament: 'ot', gender: 'male', father: 'Haran', spouse: null, children: [], siblings: []},
+  {name: 'Sarah', testament: 'ot', gender: 'female', father: 'Terah', spouse: 'Abraham', children: ['Isaac'], siblings: []},
+  {name: 'Rebekah', testament: 'ot', gender: 'female', father: 'Bethuel', spouse: 'Isaac', children: ['Jacob', 'Esau'], siblings: []},
+  {name: 'Rachel', testament: 'ot', gender: 'female', father: 'Laban', spouse: 'Jacob', children: ['Joseph (son of Jacob)', 'Benjamin'], siblings: ['Leah']},
+  {name: 'Leah', testament: 'ot', gender: 'female', father: 'Laban', spouse: 'Jacob', children: ['Reuben', 'Simeon', 'Levi', 'Judah'], siblings: ['Rachel']},
+  {name: 'Miriam', testament: 'ot', gender: 'female', father: 'Amram', spouse: null, children: [], siblings: ['Moses', 'Aaron']},
+  {name: 'Aaron', testament: 'ot', gender: 'male', father: 'Amram', spouse: 'Elisheba', children: [], siblings: ['Moses', 'Miriam']},
+  {name: 'Caleb', testament: 'ot', gender: 'male', father: 'Jephunneh', spouse: null, children: [], siblings: []},
+  {name: 'Elisha', testament: 'ot', gender: 'male', father: 'Shaphat', spouse: null, children: [], siblings: []},
+  {name: 'Naomi', testament: 'ot', gender: 'female', father: null, spouse: 'Elimelech', children: [], siblings: []},
+  {name: 'Boaz', testament: 'ot', gender: 'male', father: null, spouse: 'Ruth', children: ['Obed'], siblings: []},
+  {name: 'Hannah', testament: 'ot', gender: 'female', father: null, spouse: 'Elkanah', children: ['Samuel'], siblings: []},
+  {name: 'Eli', testament: 'ot', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Goliath', testament: 'ot', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Jonathan', testament: 'ot', gender: 'male', father: 'Saul (first king)', spouse: null, children: [], siblings: []},
+  {name: 'Bathsheba', testament: 'ot', gender: 'female', father: 'Eliam', spouse: ['Uriah', 'David'], children: ['Solomon'], siblings: []},
+  {name: 'Absalom', testament: 'ot', gender: 'male', father: 'David', spouse: null, children: [], siblings: ['Solomon']},
+  {name: 'Elkanah', testament: 'ot', gender: 'male', father: null, spouse: ['Hannah', 'Peninnah'], children: ['Samuel'], siblings: []},
+  {name: 'Mordecai', testament: 'ot', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Haman', testament: 'ot', gender: 'male', father: 'Hammedatha', spouse: null, children: [], siblings: []},
+  {name: 'John (apostle)', testament: 'nt', gender: 'male', father: 'Zebedee', spouse: null, children: [], siblings: ['James']},
+  {name: 'Matthew', testament: 'nt', gender: 'male', father: 'Alphaeus', spouse: null, children: [], siblings: []},
+  {name: 'Thomas', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Judas Iscariot', testament: 'nt', gender: 'male', father: 'Simon Iscariot', spouse: null, children: [], siblings: []},
+  {name: 'Zacchaeus', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Martha', testament: 'nt', gender: 'female', father: null, spouse: null, children: [], siblings: ['Lazarus', 'Mary (sister of Lazarus)']},
+  {name: 'Mary (sister of Lazarus)', testament: 'nt', gender: 'female', father: null, spouse: null, children: [], siblings: ['Lazarus', 'Martha']},
+  {name: 'Nicodemus', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Joseph of Arimathea', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Stephen', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Philip (evangelist)', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Barnabas', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Timothy', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Silas', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Luke', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Mark', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Pontius Pilate', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Herod the Great', testament: 'ot', gender: 'male', father: 'Antipater', spouse: null, children: [], siblings: []},
+  {name: 'Elizabeth', testament: 'nt', gender: 'female', father: null, spouse: 'Zechariah', children: ['John the Baptist'], siblings: []},
+  {name: 'Zechariah', testament: 'nt', gender: 'male', father: null, spouse: 'Elizabeth', children: ['John the Baptist'], siblings: []},
+  {name: 'Anna', testament: 'nt', gender: 'female', father: null, spouse: null, children: [], siblings: []},
+  {name: 'Simeon', testament: 'nt', gender: 'male', father: null, spouse: null, children: [], siblings: []}
+];
+
+console.log('Enhanced people data with relationships:');
+console.log(`Total: ${enhancedPeople.length} people`);
+console.log(`OT: ${enhancedPeople.filter(p => p.testament === 'ot').length}`);
+console.log(`NT: ${enhancedPeople.filter(p => p.testament === 'nt').length}`);
+console.log(`Male: ${enhancedPeople.filter(p => p.gender === 'male').length}`);
+console.log(`Female: ${enhancedPeople.filter(p => p.gender === 'female').length}`);
+
+// Write to file
+const outputPath = path.join(__dirname, 'enhanced_relationships.json');
+fs.writeFileSync(outputPath, JSON.stringify(enhancedPeople, null, 2));
+console.log(`\nWritten to: ${outputPath}`);

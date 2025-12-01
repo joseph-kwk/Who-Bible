@@ -8,6 +8,7 @@
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <script src="assets/js/relationships.js" defer></script>
   <script src="assets/js/translations.js" defer></script>
 </head>
 <body>
@@ -107,6 +108,22 @@
               <label for="time-limit">Time Limit (seconds)</label>
               <input id="time-limit" type="number" value="60" min="10" max="300" aria-describedby="time-help" />
               <small id="time-help" class="sr-only">For timed mode only, between 10 and 300 seconds</small>
+            </div>
+            <div class="setting-row">
+              <label for="testament-filter">Testament</label>
+              <select id="testament-filter" aria-label="Filter by testament">
+                <option value="all">All (OT + NT)</option>
+                <option value="ot">Old Testament</option>
+                <option value="nt">New Testament</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label for="gender-filter">Gender</label>
+              <select id="gender-filter" aria-label="Filter by gender">
+                <option value="all">All</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
             </div>
           </section>
           
@@ -212,66 +229,110 @@
 
       <!-- Study Panel -->
       <section id="study-panel" style="display:none" role="main" aria-labelledby="study-heading">
-        <header class="study-header">
-          <button id="btn-back-from-study" class="back-btn" aria-label="Back to Setup">← Back</button>
-          <h2 id="study-heading">Study Mode - Bible People Explorer</h2>
-          
-          <div class="study-tools">
-            <div class="search-bar">
-              <label for="search-person" class="sr-only">Search Bible people</label>
-              <input id="search-person" type="text" placeholder="Search people..." aria-label="Search Bible people" />
+        <div class="study-container">
+          <header class="study-header">
+            <div class="study-header-top">
+              <button id="btn-back-from-study" class="back-btn" aria-label="Back to Setup">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back
+              </button>
+              <div class="study-title-section">
+                <h2 id="study-heading">Bible People Explorer</h2>
+                <p class="study-subtitle">Discover and learn about biblical characters</p>
+              </div>
             </div>
             
-            <div class="filter-group">
-              <label for="sort-select" class="sr-only">Sort by</label>
-              <select id="sort-select" aria-label="Sort order">
-                <option value="name-asc">Name A-Z</option>
-                <option value="name-desc">Name Z-A</option>
-              </select>
+            <div class="study-search-section">
+              <div class="search-bar-wrapper">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.35-4.35"/>
+                </svg>
+                <label for="search-person" class="sr-only">Search Bible people</label>
+                <input id="search-person" type="text" placeholder="Search by name, occupation, or event..." aria-label="Search Bible people" />
+              </div>
+              
+              <div class="study-filter-row">
+                <div class="filter-group">
+                  <label for="sort-select" class="filter-label">Sort by:</label>
+                  <select id="sort-select" aria-label="Sort order">
+                    <option value="name-asc">Name (A-Z)</option>
+                    <option value="name-desc">Name (Z-A)</option>
+                  </select>
+                </div>
+                
+                <div class="filter-chips">
+                  <label class="filter-chip">
+                    <input id="filter-mother" type="checkbox" />
+                    <span class="chip-text">Has Mother</span>
+                  </label>
+                  <label class="filter-chip">
+                    <input id="filter-occupation" type="checkbox" />
+                    <span class="chip-text">Has Occupation</span>
+                  </label>
+                  <label class="filter-chip">
+                    <input id="filter-age" type="checkbox" />
+                    <span class="chip-text">Has Age Info</span>
+                  </label>
+                </div>
+              </div>
             </div>
             
-            <div class="filter-checkboxes">
-              <label class="checkbox-label">
-                <input id="filter-mother" type="checkbox" />
-                <span>Has Mother</span>
-              </label>
-              <label class="checkbox-label">
-                <input id="filter-occupation" type="checkbox" />
-                <span>Has Occupation</span>
-              </label>
-              <label class="checkbox-label">
-                <input id="filter-age" type="checkbox" />
-                <span>Has Age Info</span>
-              </label>
+            <div class="study-actions-bar">
+              <div class="people-count-display">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <span><strong id="people-count">0</strong> people</span>
+              </div>
+              <div class="study-controls">
+                <button id="btn-expand-all" class="control-btn-icon" aria-label="Expand all person details" title="Expand All">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <polyline points="7 13 12 18 17 13"/>
+                    <polyline points="7 6 12 11 17 6"/>
+                  </svg>
+                </button>
+                <button id="btn-collapse-all" class="control-btn-icon" aria-label="Collapse all person details" title="Collapse All">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <polyline points="17 11 12 6 7 11"/>
+                    <polyline points="17 18 12 13 7 18"/>
+                  </svg>
+                </button>
+                <button id="btn-shuffle-list" class="control-btn-icon" aria-label="Shuffle the list" title="Shuffle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <polyline points="16 3 21 3 21 8"/>
+                    <line x1="4" y1="20" x2="21" y2="3"/>
+                    <polyline points="21 16 21 21 16 21"/>
+                    <line x1="15" y1="15" x2="21" y2="21"/>
+                    <line x1="4" y1="4" x2="9" y2="9"/>
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
+          </header>
           
-          <div class="study-controls">
-            <button id="btn-expand-all" class="control-btn" aria-label="Expand all person details">Expand All</button>
-            <button id="btn-collapse-all" class="control-btn" aria-label="Collapse all person details">Collapse All</button>
-            <button id="btn-shuffle-list" class="control-btn" aria-label="Shuffle the list">Shuffle</button>
-          </div>
-          
-          <div class="people-count-display">
-            <span>Showing <strong id="people-count">0</strong> people</span>
-          </div>
-        </header>
-        
-        <main class="study-content">
-          <div id="people-list" class="people-list" aria-live="polite"></div>
-        </main>
+          <main class="study-content">
+            <div id="people-list" class="people-list" aria-live="polite"></div>
+          </main>
+        </div>
       </section>
 
     </main>
     <footer class="footer">
       <div class="footer-content">
-        <div class="footer-top">
-          <div class="footer-brand">
-            <img src="assets/images/logo.png" alt="Who-Bible Logo" class="footer-logo" />
-            <div class="footer-title">Who-Bible</div>
-          </div>
-          <a id="footer-community" href="#community" class="footer-link coming-soon" rel="noopener">Community</a>
+        <div class="footer-brand">
+          <img src="assets/images/logo.png" alt="Who-Bible Logo" class="footer-logo" />
+          <div class="footer-title">Who-Bible</div>
         </div>
+        
+        <div class="footer-nav">
+          <a id="footer-community" href="community.html" class="footer-link coming-soon" rel="noopener">Community</a>
+        </div>
+        
         <div class="footer-bottom">
           <p>© <span id="footer-year"></span> Who-Bible</p>
         </div>
