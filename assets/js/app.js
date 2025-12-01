@@ -4,83 +4,1175 @@
 // Default dataset
 // =========================
 const DEFAULT_PEOPLE_DATA = [
-  {name: 'Noah', aliases: [], mother: null, occupation: 'Righteous man, built the ark', age_notes: 'Lived 950 years', notable_events: ['Built the ark','Survived the flood','Sent out dove and raven'], verses: ['Genesis 6-9','Genesis 9:29'], short_bio: 'Noah built the ark to survive the flood.'},
-  {name: 'Moses', aliases: [], mother: 'Jochebed', occupation: 'Leader, prophet', age_notes: 'Died at 120; 80 when confronting Pharaoh', notable_events: ['Led Exodus','Saw burning bush','Parted Red Sea','Received Ten Commandments'], verses: ['Exodus 3','Exodus 14','Exodus 20','Deuteronomy 34:7'], short_bio: 'Moses led the Israelites out of Egypt.'},
-  {name: 'Solomon', aliases: [], mother: 'Bathsheba', occupation: 'King', age_notes: 'Reigned 40 years', notable_events: ['Built the temple','Known for wisdom','Judged between two mothers'], verses: ['1 Kings 3','1 Kings 6','2 Samuel 12:24'], short_bio: 'Son of David and Bathsheba; famed for wisdom.'},
-  {name: 'Joseph (son of Jacob)', aliases: ['Joseph of Egypt'], mother: 'Rachel', occupation: 'Official in Egypt', age_notes: 'Sold by brothers at 17; died at 110', notable_events: ['Sold into Egypt','Interpreted dreams','Saved Egypt from famine','Reunited with family'], verses: ['Genesis 37:2','Genesis 41','Genesis 45','Genesis 50:26'], short_bio: 'Joseph was sold into Egypt and rose to power.'},
-  {name: 'David', aliases: [], mother: null, occupation: 'Shepherd, King', age_notes: 'Became king at 30; reigned 40 years', notable_events: ['Killed Goliath','Became king','Danced before the ark','Committed adultery with Bathsheba'], verses: ['1 Samuel 17','2 Samuel 5:4','2 Samuel 6','2 Samuel 11'], short_bio: 'Shepherd who became king of Israel; famous for defeating Goliath.'},
-  {name: 'Esther', aliases: ['Hadassah'], mother: null, occupation: 'Queen', age_notes: null, notable_events: ['Became queen and saved her people','Revealed Haman\'s plot'], verses: ['Esther 2','Esther 7'], short_bio: 'Jewish queen of Persia who saved her people.'},
-  {name: 'Mary (mother of Jesus)', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Mother of Jesus','Visited by angel Gabriel','Present at crucifixion'], verses: ['Luke 1:26-38','John 19:25'], short_bio: 'Mother of Jesus.'},
-  {name: 'John the Baptist', aliases: [], mother: 'Elizabeth', occupation: 'Prophet', age_notes: null, notable_events: ['Baptized Jesus','Beheaded by Herod','Wore camel hair'], verses: ['Luke 1','Matthew 3','Matthew 14'], short_bio: 'Prophet who baptized Jesus.'},
-  {name: 'Paul', aliases: ['Saul'], mother: null, occupation: 'Apostle, tent maker', age_notes: null, notable_events: ['Converted on road to Damascus','Missionary journeys','Wrote epistles','Shipwrecked'], verses: ['Acts 9','Acts 13-28','2 Corinthians 11:25'], short_bio: 'Originally named Saul; became Apostle Paul after conversion.'},
-  {name: 'Peter', aliases: ['Simon Peter','Simon'], mother: null, occupation: 'Fisherman, Apostle', age_notes: null, notable_events: ['Walked on water','Denial of Jesus','Leader of early church','Vision of unclean animals'], verses: ['Matthew 14:29','Matthew 26:69-75','Acts 10'], short_bio: 'One of Jesus\'s closest disciples; called Peter.'},
-  {name: 'Lazarus', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Raised from the dead by Jesus','Brother of Mary and Martha'], verses: ['John 11','John 12'], short_bio: 'Brother of Mary and Martha; raised from the dead.'},
-  {name: 'Abraham', aliases: ['Abram'], mother: null, occupation: 'Patriarch', age_notes: 'Died at 175; fathered Isaac at 100', notable_events: ['Father of Isaac','Covenant with God','Nearly sacrificed Isaac','Left Ur'], verses: ['Genesis 12','Genesis 17','Genesis 22','Genesis 25:7'], short_bio: 'Father of the Israelite nation.'},
-  {name: 'Isaac', aliases: [], mother: 'Sarah', occupation: 'Patriarch', age_notes: 'Died at 180; born when Abraham was 100', notable_events: ['Son of Abraham and Sarah','Nearly sacrificed by Abraham','Married Rebekah'], verses: ['Genesis 22','Genesis 24','Genesis 35:28'], short_bio: 'Son of Abraham and Sarah; father of Jacob.'},
-  {name: 'Jacob', aliases: ['Israel'], mother: 'Rebekah', occupation: 'Patriarch', age_notes: 'Died at 147', notable_events: ['Renamed Israel','Father of the 12 tribes','Wrestled with angel','Deceived Isaac'], verses: ['Genesis 27','Genesis 32:28','Genesis 47:28'], short_bio: 'Father of the 12 tribes of Israel.'},
-  {name: 'Samuel', aliases: [], mother: 'Hannah', occupation: 'Prophet, Judge', age_notes: 'Dedicated to temple as child', notable_events: ['Anointed Saul and David','Heard God\'s voice as child','Judge of Israel'], verses: ['1 Samuel 3','1 Samuel 10','1 Samuel 16'], short_bio: 'Prophet and judge who anointed Israel\'s first kings.'},
-  {name: 'Elijah', aliases: [], mother: null, occupation: 'Prophet', age_notes: null, notable_events: ['Taken up by chariot of fire','Defeated prophets of Baal','Fed by ravens','Raised widow\'s son'], verses: ['1 Kings 17','1 Kings 18','2 Kings 2'], short_bio: 'Great prophet who was taken to heaven in a chariot.'},
-  {name: 'Jonah', aliases: [], mother: null, occupation: 'Prophet', age_notes: null, notable_events: ['Swallowed by fish','Preached to Nineveh','Fled from God'], verses: ['Jonah 1-4'], short_bio: 'Prophet who fled God and was swallowed by a great fish.'},
-  {name: 'Ruth', aliases: [], mother: null, occupation: 'Gleaner', age_notes: null, notable_events: ['Ancestor of David','Married Boaz','Loyal to Naomi'], verses: ['Ruth 1-4'], short_bio: 'Moabite woman who became ancestor to King David.'},
-  {name: 'Mary Magdalene', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Witnessed resurrection','Seven demons cast out','Followed Jesus'], verses: ['Luke 8:2','Matthew 28','John 20'], short_bio: 'Witness of Jesus\'s resurrection.'},
-  {name: 'Saul (first king)', aliases: [], mother: null, occupation: 'King', age_notes: 'Reigned 40 years', notable_events: ['First king of Israel','Consulted witch of Endor','Fell on sword'], verses: ['1 Samuel 9-10','1 Samuel 28','1 Samuel 31'], short_bio: 'Israel\'s first king anointed by Samuel.'},
-  {name: 'Daniel', aliases: [], mother: null, occupation: 'Prophet, official', age_notes: 'Taken to Babylon as youth', notable_events: ['In the lion\'s den','Interpreted dreams','Three friends in furnace'], verses: ['Daniel 1','Daniel 3','Daniel 6'], short_bio: 'Prophet in Babylon; survived lion\'s den.'},
-  {name: 'Joshua', aliases: [], mother: null, occupation: 'Military leader', age_notes: 'Died at 110', notable_events: ['Led conquest of Canaan','Walls of Jericho fell','Stopped sun and moon'], verses: ['Joshua 1','Joshua 6','Joshua 10:12-13','Joshua 24:29'], short_bio: 'Successor to Moses who led Israel into Promised Land.'},
-  {name: 'Deborah', aliases: [], mother: null, occupation: 'Prophet, Judge', age_notes: null, notable_events: ['Judge of Israel','Led victory over Canaanites','Sang victory song'], verses: ['Judges 4-5'], short_bio: 'Prophet and judge who led Israel to victory.'},
-  {name: 'Gideon', aliases: [], mother: null, occupation: 'Judge', age_notes: null, notable_events: ['Defeated Midianites with 300 men','Asked for fleece sign','Tore down Baal altar'], verses: ['Judges 6-7'], short_bio: 'Judge who defeated the Midianites with 300 men.'},
-  {name: 'Samson', aliases: [], mother: null, occupation: 'Judge', age_notes: 'Nazirite from birth', notable_events: ['Super strength from long hair','Betrayed by Delilah','Killed Philistines'], verses: ['Judges 13-16'], short_bio: 'Judge with supernatural strength; betrayed by Delilah.'},
-  {name: 'Jeremiah', aliases: [], mother: null, occupation: 'Prophet', age_notes: 'Called as youth', notable_events: ['Wept for Jerusalem','Put in cistern','Prophesied exile'], verses: ['Jeremiah 1','Jeremiah 38','Jeremiah 52'], short_bio: 'Weeping prophet who warned of Babylon\'s destruction.'},
-  {name: 'Ezekiel', aliases: [], mother: null, occupation: 'Prophet, priest', age_notes: 'Exiled to Babylon', notable_events: ['Vision of dry bones','Vision of wheels','Temple vision'], verses: ['Ezekiel 1','Ezekiel 37','Ezekiel 40-48'], short_bio: 'Prophet of the exile with dramatic visions.'},
-  {name: 'Isaiah', aliases: [], mother: null, occupation: 'Prophet', age_notes: null, notable_events: ['Vision of God\'s throne','Prophesied Messiah','Walked naked three years'], verses: ['Isaiah 6','Isaiah 53','Isaiah 20'], short_bio: 'Major prophet who prophesied about the Messiah.'},
-  {name: 'Job', aliases: [], mother: null, occupation: 'Wealthy landowner', age_notes: 'Lived 140 years after trials', notable_events: ['Tested by Satan','Lost everything','Remained faithful','Restored double'], verses: ['Job 1-2','Job 42'], short_bio: 'Righteous man who suffered but remained faithful.'},
-  {name: 'Nehemiah', aliases: [], mother: null, occupation: 'Cupbearer, governor', age_notes: null, notable_events: ['Rebuilt Jerusalem walls','Cupbearer to king','Led reforms'], verses: ['Nehemiah 1-2','Nehemiah 6'], short_bio: 'Led rebuilding of Jerusalem\'s walls.'},
-  {name: 'Ezra', aliases: [], mother: null, occupation: 'Priest, scribe', age_notes: null, notable_events: ['Led return from exile','Read law to people','Reformed worship'], verses: ['Ezra 7','Nehemiah 8'], short_bio: 'Priest and scribe who restored the Law.'},
-  {name: 'Adam', aliases: [], mother: null, occupation: 'First man', age_notes: 'Lived 930 years', notable_events: ['First human created','Ate forbidden fruit','Named the animals'], verses: ['Genesis 1-3','Genesis 5:5'], short_bio: 'First human created by God.'},
-  {name: 'Eve', aliases: [], mother: null, occupation: 'First woman', age_notes: null, notable_events: ['First woman created','Ate forbidden fruit','Mother of all living'], verses: ['Genesis 2-3'], short_bio: 'First woman; mother of all humanity.'},
-  {name: 'Cain', aliases: [], mother: 'Eve', occupation: 'Farmer', age_notes: null, notable_events: ['Killed Abel','First murderer','Mark of Cain'], verses: ['Genesis 4'], short_bio: 'First son of Adam and Eve; killed his brother.'},
-  {name: 'Abel', aliases: [], mother: 'Eve', occupation: 'Shepherd', age_notes: null, notable_events: ['Killed by Cain','Offered acceptable sacrifice'], verses: ['Genesis 4','Hebrews 11:4'], short_bio: 'Second son of Adam and Eve; murdered by Cain.'},
-  {name: 'Lot', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Escaped Sodom','Wife turned to salt','Saved by Abraham'], verses: ['Genesis 13','Genesis 19'], short_bio: 'Abraham\'s nephew who escaped Sodom\'s destruction.'},
-  {name: 'Sarah', aliases: ['Sarai'], mother: null, occupation: null, age_notes: 'Died at 127; gave birth at 90', notable_events: ['Wife of Abraham','Mother of Isaac','Laughed at promise'], verses: ['Genesis 17','Genesis 18','Genesis 23:1'], short_bio: 'Wife of Abraham and mother of Isaac.'},
-  {name: 'Rebekah', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Wife of Isaac','Mother of Jacob and Esau','Helped Jacob deceive Isaac'], verses: ['Genesis 24','Genesis 27'], short_bio: 'Wife of Isaac; mother of Jacob and Esau.'},
-  {name: 'Rachel', aliases: [], mother: null, occupation: 'Shepherdess', age_notes: 'Died giving birth to Benjamin', notable_events: ['Jacob worked 14 years for her','Mother of Joseph and Benjamin'], verses: ['Genesis 29','Genesis 35:16-19'], short_bio: 'Beloved wife of Jacob; mother of Joseph.'},
-  {name: 'Leah', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['First wife of Jacob','Mother of six sons','Weak eyes'], verses: ['Genesis 29-30'], short_bio: 'First wife of Jacob; mother of six of his sons.'},
-  {name: 'Miriam', aliases: [], mother: 'Jochebed', occupation: 'Prophet', age_notes: null, notable_events: ['Watched baby Moses','Led women in song','Struck with leprosy'], verses: ['Exodus 2','Exodus 15','Numbers 12'], short_bio: 'Sister of Moses and Aaron; prophetess.'},
-  {name: 'Aaron', aliases: [], mother: 'Jochebed', occupation: 'High priest', age_notes: 'Died at 123', notable_events: ['First high priest','Made golden calf','Rod that budded'], verses: ['Exodus 28','Exodus 32','Numbers 17','Numbers 33:39'], short_bio: 'Brother of Moses; first high priest of Israel.'},
-  {name: 'Caleb', aliases: [], mother: null, occupation: 'Spy, warrior', age_notes: 'Still strong at 85', notable_events: ['One of faithful spies','Conquered Hebron'], verses: ['Numbers 13-14','Joshua 14'], short_bio: 'Faithful spy who trusted God\'s promise.'},
-  {name: 'Elisha', aliases: [], mother: null, occupation: 'Prophet', age_notes: null, notable_events: ['Succeeded Elijah','Parted Jordan','Multiplied oil','Raised dead boy'], verses: ['1 Kings 19','2 Kings 2','2 Kings 4'], short_bio: 'Prophet who succeeded Elijah; performed many miracles.'},
-  {name: 'Naomi', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Mother-in-law of Ruth','Lost husband and sons','Returned to Bethlehem'], verses: ['Ruth 1-4'], short_bio: 'Mother-in-law of Ruth; returned from Moab.'},
-  {name: 'Boaz', aliases: [], mother: null, occupation: 'Wealthy landowner', age_notes: null, notable_events: ['Married Ruth','Kinsman redeemer','Ancestor of David'], verses: ['Ruth 2-4'], short_bio: 'Wealthy man who married Ruth.'},
-  {name: 'Hannah', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Prayed for son','Mother of Samuel','Sang praise song'], verses: ['1 Samuel 1-2'], short_bio: 'Mother of Samuel; prayed faithfully for a son.'},
-  {name: 'Eli', aliases: [], mother: null, occupation: 'High priest, judge', age_notes: 'Died at 98', notable_events: ['Mentored Samuel','Sons were wicked','Died hearing of ark capture'], verses: ['1 Samuel 1-4'], short_bio: 'High priest who mentored young Samuel.'},
-  {name: 'Goliath', aliases: [], mother: null, occupation: 'Philistine warrior', age_notes: 'Over 9 feet tall', notable_events: ['Defeated by David','Champion of Philistines'], verses: ['1 Samuel 17'], short_bio: 'Giant Philistine warrior defeated by David.'},
-  {name: 'Jonathan', aliases: [], mother: null, occupation: 'Prince, warrior', age_notes: null, notable_events: ['Best friend of David','Gave David his armor','Died with Saul'], verses: ['1 Samuel 18','1 Samuel 20','1 Samuel 31'], short_bio: 'Son of Saul and loyal friend of David.'},
-  {name: 'Bathsheba', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Committed adultery with David','Mother of Solomon','Husband Uriah killed'], verses: ['2 Samuel 11-12','1 Kings 1'], short_bio: 'Wife of Uriah then David; mother of Solomon.'},
-  {name: 'Absalom', aliases: [], mother: null, occupation: 'Prince', age_notes: null, notable_events: ['Rebelled against David','Known for beautiful hair','Hair caught in tree'], verses: ['2 Samuel 13-18'], short_bio: 'Son of David who rebelled against him.'},
-  {name: 'Elkanah', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Father of Samuel','Husband of Hannah'], verses: ['1 Samuel 1'], short_bio: 'Father of Samuel; husband of Hannah and Peninnah.'},
-  {name: 'Mordecai', aliases: [], mother: null, occupation: 'Official', age_notes: null, notable_events: ['Cousin of Esther','Exposed assassination plot','Honored by king'], verses: ['Esther 2-10'], short_bio: 'Cousin of Esther who helped save the Jews.'},
-  {name: 'Haman', aliases: [], mother: null, occupation: 'Official', age_notes: null, notable_events: ['Plotted against Jews','Hanged on own gallows'], verses: ['Esther 3-7'], short_bio: 'Evil official who plotted against the Jews.'},
-  {name: 'John (apostle)', aliases: ['John the Beloved'], mother: null, occupation: 'Fisherman, apostle', age_notes: null, notable_events: ['Beloved disciple','Wrote gospel and Revelation','Exiled to Patmos'], verses: ['John 13:23','John 19:26','Revelation 1:9'], short_bio: 'Beloved disciple who wrote the Gospel of John.'},
-  {name: 'Matthew', aliases: ['Levi'], mother: null, occupation: 'Tax collector, apostle', age_notes: null, notable_events: ['Called by Jesus','Wrote gospel','Tax collector'], verses: ['Matthew 9:9','Mark 2:14'], short_bio: 'Tax collector who became apostle; wrote gospel.'},
-  {name: 'Thomas', aliases: ['Didymus'], mother: null, occupation: 'Apostle', age_notes: null, notable_events: ['Doubted resurrection','Touched Jesus\' wounds'], verses: ['John 20:24-29'], short_bio: 'Apostle who doubted resurrection until he saw Jesus.'},
-  {name: 'Judas Iscariot', aliases: [], mother: null, occupation: 'Apostle, treasurer', age_notes: null, notable_events: ['Betrayed Jesus','Hanged himself','Sold Jesus for 30 silver'], verses: ['Matthew 26:14-16','Matthew 27:3-5'], short_bio: 'Apostle who betrayed Jesus for thirty pieces of silver.'},
-  {name: 'Zacchaeus', aliases: [], mother: null, occupation: 'Tax collector', age_notes: 'Short in stature', notable_events: ['Climbed sycamore tree','Restored fourfold','Hosted Jesus'], verses: ['Luke 19:1-10'], short_bio: 'Short tax collector who climbed tree to see Jesus.'},
-  {name: 'Martha', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Sister of Mary and Lazarus','Served Jesus','Believed in resurrection'], verses: ['Luke 10:38-42','John 11'], short_bio: 'Sister of Lazarus and Mary who served Jesus.'},
-  {name: 'Mary (sister of Lazarus)', aliases: [], mother: null, occupation: null, age_notes: null, notable_events: ['Anointed Jesus\' feet','Sat at Jesus\' feet','Sister of Lazarus'], verses: ['Luke 10:39','John 11','John 12:3'], short_bio: 'Sister of Lazarus who anointed Jesus\' feet.'},
-  {name: 'Nicodemus', aliases: [], mother: null, occupation: 'Pharisee, ruler', age_notes: null, notable_events: ['Visited Jesus at night','Helped bury Jesus','Asked about being born again'], verses: ['John 3','John 19:39'], short_bio: 'Pharisee who visited Jesus by night.'},
-  {name: 'Joseph of Arimathea', aliases: [], mother: null, occupation: 'Rich man, council member', age_notes: null, notable_events: ['Buried Jesus','Provided tomb','Secret disciple'], verses: ['Matthew 27:57-60','John 19:38'], short_bio: 'Rich man who provided tomb for Jesus.'},
-  {name: 'Stephen', aliases: [], mother: null, occupation: 'Deacon', age_notes: null, notable_events: ['First Christian martyr','Full of Holy Spirit','Stoned to death'], verses: ['Acts 6-7'], short_bio: 'First Christian martyr; stoned for his faith.'},
-  {name: 'Philip (evangelist)', aliases: [], mother: null, occupation: 'Deacon, evangelist', age_notes: null, notable_events: ['Baptized Ethiopian eunuch','Preached in Samaria'], verses: ['Acts 8'], short_bio: 'Deacon who evangelized and baptized the Ethiopian.'},
-  {name: 'Barnabas', aliases: ['Joseph'], mother: null, occupation: 'Apostle', age_notes: null, notable_events: ['Traveled with Paul','Sold field for church','Encouraged believers'], verses: ['Acts 4:36-37','Acts 11:22-26','Acts 13-15'], short_bio: 'Companion of Paul; known as "son of encouragement".'},
-  {name: 'Timothy', aliases: [], mother: 'Eunice', occupation: 'Pastor, missionary', age_notes: 'Young when called', notable_events: ['Companion of Paul','Pastor at Ephesus','Received letters from Paul'], verses: ['Acts 16:1','1 Timothy','2 Timothy'], short_bio: 'Young pastor mentored by Paul.'},
-  {name: 'Silas', aliases: ['Silvanus'], mother: null, occupation: 'Prophet, missionary', age_notes: null, notable_events: ['Traveled with Paul','Imprisoned with Paul','Sang in prison'], verses: ['Acts 15:22','Acts 16:25'], short_bio: 'Companion of Paul who sang in prison.'},
-  {name: 'Luke', aliases: [], mother: null, occupation: 'Physician, historian', age_notes: null, notable_events: ['Wrote gospel and Acts','Traveled with Paul','Beloved physician'], verses: ['Colossians 4:14','2 Timothy 4:11'], short_bio: 'Physician who wrote gospel and book of Acts.'},
-  {name: 'Mark', aliases: ['John Mark'], mother: 'Mary', occupation: 'Missionary, writer', age_notes: null, notable_events: ['Wrote gospel','Deserted Paul','Restored to ministry'], verses: ['Acts 12:12','Acts 15:37-39','2 Timothy 4:11'], short_bio: 'Writer of the Gospel of Mark.'},
-  {name: 'Pontius Pilate', aliases: [], mother: null, occupation: 'Roman governor', age_notes: null, notable_events: ['Sentenced Jesus to death','Washed hands','Released Barabbas'], verses: ['Matthew 27','John 18-19'], short_bio: 'Roman governor who sentenced Jesus to crucifixion.'},
-  {name: 'Herod the Great', aliases: [], mother: null, occupation: 'King', age_notes: null, notable_events: ['Killed babies in Bethlehem','Built temple','Tried to kill Jesus'], verses: ['Matthew 2'], short_bio: 'King who tried to kill baby Jesus.'},
-  {name: 'Elizabeth', aliases: [], mother: null, occupation: null, age_notes: 'Old when pregnant', notable_events: ['Mother of John the Baptist','Wife of Zechariah','Relative of Mary'], verses: ['Luke 1'], short_bio: 'Mother of John the Baptist.'},
-  {name: 'Zechariah', aliases: [], mother: null, occupation: 'Priest', age_notes: null, notable_events: ['Father of John the Baptist','Made mute by angel','Prophesied at birth'], verses: ['Luke 1'], short_bio: 'Priest who became mute; father of John the Baptist.'},
-  {name: 'Anna', aliases: [], mother: null, occupation: 'Prophet', age_notes: '84 years old', notable_events: ['Recognized baby Jesus','Widow who served in temple','Fasted and prayed'], verses: ['Luke 2:36-38'], short_bio: 'Elderly prophetess who recognized baby Jesus.'},
-  {name: 'Simeon', aliases: [], mother: null, occupation: null, age_notes: 'Elderly', notable_events: ['Held baby Jesus','Blessed Jesus','Prophesied sword for Mary'], verses: ['Luke 2:25-35'], short_bio: 'Righteous man who blessed baby Jesus in temple.'}
+  
+  // Replaced with the auto-annotated dataset (generated by tools/auto_annotate.js)
+
+  {
+    "name": "Noah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Righteous man, built the ark",
+    "age_notes": "Lived 950 years",
+    "notable_events": [
+      "Built the ark",
+      "Survived the flood",
+      "Sent out dove and raven"
+    ],
+    "verses": [
+      "Genesis 6-9",
+      "Genesis 9:29"
+    ],
+    "short_bio": "Noah built the ark to survive the flood.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Moses",
+    "aliases": [],
+    "mother": "Jochebed",
+    "occupation": "Leader, prophet",
+    "age_notes": "Died at 120; 80 when confronting Pharaoh",
+    "notable_events": [
+      "Led Exodus",
+      "Saw burning bush",
+      "Parted Red Sea",
+      "Received Ten Commandments"
+    ],
+    "verses": [
+      "Exodus 3",
+      "Exodus 14",
+      "Exodus 20",
+      "Deuteronomy 34:7"
+    ],
+    "short_bio": "Moses led the Israelites out of Egypt.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Solomon",
+    "aliases": [],
+    "mother": "Bathsheba",
+    "occupation": "King",
+    "age_notes": "Reigned 40 years",
+    "notable_events": [
+      "Built the temple",
+      "Known for wisdom",
+      "Judged between two mothers"
+    ],
+    "verses": [
+      "1 Kings 3",
+      "1 Kings 6",
+      "2 Samuel 12:24"
+    ],
+    "short_bio": "Son of David and Bathsheba; famed for wisdom.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Joseph (son of Jacob)",
+    "aliases": [
+      "Joseph of Egypt"
+    ],
+    "mother": "Rachel",
+    "occupation": "Official in Egypt",
+    "age_notes": "Sold by brothers at 17; died at 110",
+    "notable_events": [
+      "Sold into Egypt",
+      "Interpreted dreams",
+      "Saved Egypt from famine",
+      "Reunited with family"
+    ],
+    "verses": [
+      "Genesis 37:2",
+      "Genesis 41",
+      "Genesis 45",
+      "Genesis 50:26"
+    ],
+    "short_bio": "Joseph was sold into Egypt and rose to power.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "David",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Shepherd, King",
+    "age_notes": "Became king at 30; reigned 40 years",
+    "notable_events": [
+      "Killed Goliath",
+      "Became king",
+      "Danced before the ark",
+      "Committed adultery with Bathsheba"
+    ],
+    "verses": [
+      "1 Samuel 17",
+      "2 Samuel 5:4",
+      "2 Samuel 6",
+      "2 Samuel 11"
+    ],
+    "short_bio": "Shepherd who became king of Israel; famous for defeating Goliath.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Esther",
+    "aliases": [
+      "Hadassah"
+    ],
+    "mother": null,
+    "occupation": "Queen",
+    "age_notes": null,
+    "notable_events": [
+      "Became queen and saved her people",
+      "Revealed Haman's plot"
+    ],
+    "verses": [
+      "Esther 2",
+      "Esther 7"
+    ],
+    "short_bio": "Jewish queen of Persia who saved her people.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Mary (mother of Jesus)",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Mother of Jesus",
+      "Visited by angel Gabriel",
+      "Present at crucifixion"
+    ],
+    "verses": [
+      "Luke 1:26-38",
+      "John 19:25"
+    ],
+    "short_bio": "Mother of Jesus.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "John the Baptist",
+    "aliases": [],
+    "mother": "Elizabeth",
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Baptized Jesus",
+      "Beheaded by Herod",
+      "Wore camel hair"
+    ],
+    "verses": [
+      "Luke 1",
+      "Matthew 3",
+      "Matthew 14"
+    ],
+    "short_bio": "Prophet who baptized Jesus.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Paul",
+    "aliases": [
+      "Saul"
+    ],
+    "mother": null,
+    "occupation": "Apostle, tent maker",
+    "age_notes": null,
+    "notable_events": [
+      "Converted on road to Damascus",
+      "Missionary journeys",
+      "Wrote epistles",
+      "Shipwrecked"
+    ],
+    "verses": [
+      "Acts 9",
+      "Acts 13-28",
+      "2 Corinthians 11:25"
+    ],
+    "short_bio": "Originally named Saul; became Apostle Paul after conversion.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Peter",
+    "aliases": [
+      "Simon Peter",
+      "Simon"
+    ],
+    "mother": null,
+    "occupation": "Fisherman, Apostle",
+    "age_notes": null,
+    "notable_events": [
+      "Walked on water",
+      "Denial of Jesus",
+      "Leader of early church",
+      "Vision of unclean animals"
+    ],
+    "verses": [
+      "Matthew 14:29",
+      "Matthew 26:69-75",
+      "Acts 10"
+    ],
+    "short_bio": "One of Jesus's closest disciples; called Peter.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Lazarus",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Raised from the dead by Jesus",
+      "Brother of Mary and Martha"
+    ],
+    "verses": [
+      "John 11",
+      "John 12"
+    ],
+    "short_bio": "Brother of Mary and Martha; raised from the dead.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Abraham",
+    "aliases": [
+      "Abram"
+    ],
+    "mother": null,
+    "occupation": "Patriarch",
+    "age_notes": "Died at 175; fathered Isaac at 100",
+    "notable_events": [
+      "Father of Isaac",
+      "Covenant with God",
+      "Nearly sacrificed Isaac",
+      "Left Ur"
+    ],
+    "verses": [
+      "Genesis 12",
+      "Genesis 17",
+      "Genesis 22",
+      "Genesis 25:7"
+    ],
+    "short_bio": "Father of the Israelite nation.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Isaac",
+    "aliases": [],
+    "mother": "Sarah",
+    "occupation": "Patriarch",
+    "age_notes": "Died at 180; born when Abraham was 100",
+    "notable_events": [
+      "Son of Abraham and Sarah",
+      "Nearly sacrificed by Abraham",
+      "Married Rebekah"
+    ],
+    "verses": [
+      "Genesis 22",
+      "Genesis 24",
+      "Genesis 35:28"
+    ],
+    "short_bio": "Son of Abraham and Sarah; father of Jacob.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Jacob",
+    "aliases": [
+      "Israel"
+    ],
+    "mother": "Rebekah",
+    "occupation": "Patriarch",
+    "age_notes": "Died at 147",
+    "notable_events": [
+      "Renamed Israel",
+      "Father of the 12 tribes",
+      "Wrestled with angel",
+      "Deceived Isaac"
+    ],
+    "verses": [
+      "Genesis 27",
+      "Genesis 32:28",
+      "Genesis 47:28"
+    ],
+    "short_bio": "Father of the 12 tribes of Israel.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Samuel",
+    "aliases": [],
+    "mother": "Hannah",
+    "occupation": "Prophet, Judge",
+    "age_notes": "Dedicated to temple as child",
+    "notable_events": [
+      "Anointed Saul and David",
+      "Heard God's voice as child",
+      "Judge of Israel"
+    ],
+    "verses": [
+      "1 Samuel 3",
+      "1 Samuel 10",
+      "1 Samuel 16"
+    ],
+    "short_bio": "Prophet and judge who anointed Israel's first kings.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Elijah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Taken up by chariot of fire",
+      "Defeated prophets of Baal",
+      "Fed by ravens",
+      "Raised widow's son"
+    ],
+    "verses": [
+      "1 Kings 17",
+      "1 Kings 18",
+      "2 Kings 2"
+    ],
+    "short_bio": "Great prophet who was taken to heaven in a chariot.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Jonah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Swallowed by fish",
+      "Preached to Nineveh",
+      "Fled from God"
+    ],
+    "verses": [
+      "Jonah 1-4"
+    ],
+    "short_bio": "Prophet who fled God and was swallowed by a great fish.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Ruth",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Gleaner",
+    "age_notes": null,
+    "notable_events": [
+      "Ancestor of David",
+      "Married Boaz",
+      "Loyal to Naomi"
+    ],
+    "verses": [
+      "Ruth 1-4"
+    ],
+    "short_bio": "Moabite woman who became ancestor to King David.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Mary Magdalene",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Witnessed resurrection",
+      "Seven demons cast out",
+      "Followed Jesus"
+    ],
+    "verses": [
+      "Luke 8:2",
+      "Matthew 28",
+      "John 20"
+    ],
+    "short_bio": "Witness of Jesus's resurrection.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Saul (first king)",
+    "aliases": [],
+    "mother": null,
+    "occupation": "King",
+    "age_notes": "Reigned 40 years",
+    "notable_events": [
+      "First king of Israel",
+      "Consulted witch of Endor",
+      "Fell on sword"
+    ],
+    "verses": [
+      "1 Samuel 9-10",
+      "1 Samuel 28",
+      "1 Samuel 31"
+    ],
+    "short_bio": "Israel's first king anointed by Samuel.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Daniel",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet, official",
+    "age_notes": "Taken to Babylon as youth",
+    "notable_events": [
+      "In the lion's den",
+      "Interpreted dreams",
+      "Three friends in furnace"
+    ],
+    "verses": [
+      "Daniel 1",
+      "Daniel 3",
+      "Daniel 6"
+    ],
+    "short_bio": "Prophet in Babylon; survived lion's den.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Joshua",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Military leader",
+    "age_notes": "Died at 110",
+    "notable_events": [
+      "Led conquest of Canaan",
+      "Walls of Jericho fell",
+      "Stopped sun and moon"
+    ],
+    "verses": [
+      "Joshua 1",
+      "Joshua 6",
+      "Joshua 10:12-13",
+      "Joshua 24:29"
+    ],
+    "short_bio": "Successor to Moses who led Israel into Promised Land.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Deborah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet, Judge",
+    "age_notes": null,
+    "notable_events": [
+      "Judge of Israel",
+      "Led victory over Canaanites",
+      "Sang victory song"
+    ],
+    "verses": [
+      "Judges 4-5"
+    ],
+    "short_bio": "Prophet and judge who led Israel to victory.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Gideon",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Judge",
+    "age_notes": null,
+    "notable_events": [
+      "Defeated Midianites with 300 men",
+      "Asked for fleece sign",
+      "Tore down Baal altar"
+    ],
+    "verses": [
+      "Judges 6-7"
+    ],
+    "short_bio": "Judge who defeated the Midianites with 300 men.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Samson",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Judge",
+    "age_notes": "Nazirite from birth",
+    "notable_events": [
+      "Super strength from long hair",
+      "Betrayed by Delilah",
+      "Killed Philistines"
+    ],
+    "verses": [
+      "Judges 13-16"
+    ],
+    "short_bio": "Judge with supernatural strength; betrayed by Delilah.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Jeremiah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": "Called as youth",
+    "notable_events": [
+      "Wept for Jerusalem",
+      "Put in cistern",
+      "Prophesied exile"
+    ],
+    "verses": [
+      "Jeremiah 1",
+      "Jeremiah 38",
+      "Jeremiah 52"
+    ],
+    "short_bio": "Weeping prophet who warned of Babylon's destruction.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Ezekiel",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet, priest",
+    "age_notes": "Exiled to Babylon",
+    "notable_events": [
+      "Vision of dry bones",
+      "Vision of wheels",
+      "Temple vision"
+    ],
+    "verses": [
+      "Ezekiel 1",
+      "Ezekiel 37",
+      "Ezekiel 40-48"
+    ],
+    "short_bio": "Prophet of the exile with dramatic visions.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Isaiah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Vision of God's throne",
+      "Prophesied Messiah",
+      "Walked naked three years"
+    ],
+    "verses": [
+      "Isaiah 6",
+      "Isaiah 53",
+      "Isaiah 20"
+    ],
+    "short_bio": "Major prophet who prophesied about the Messiah.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Job",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Wealthy landowner",
+    "age_notes": "Lived 140 years after trials",
+    "notable_events": [
+      "Tested by Satan",
+      "Lost everything",
+      "Remained faithful",
+      "Restored double"
+    ],
+    "verses": [
+      "Job 1-2",
+      "Job 42"
+    ],
+    "short_bio": "Righteous man who suffered but remained faithful.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Nehemiah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Cupbearer, governor",
+    "age_notes": null,
+    "notable_events": [
+      "Rebuilt Jerusalem walls",
+      "Cupbearer to king",
+      "Led reforms"
+    ],
+    "verses": [
+      "Nehemiah 1-2",
+      "Nehemiah 6"
+    ],
+    "short_bio": "Led rebuilding of Jerusalem's walls.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Ezra",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Priest, scribe",
+    "age_notes": null,
+    "notable_events": [
+      "Led return from exile",
+      "Read law to people",
+      "Reformed worship"
+    ],
+    "verses": [
+      "Ezra 7",
+      "Nehemiah 8"
+    ],
+    "short_bio": "Priest and scribe who restored the Law.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Adam",
+    "aliases": [],
+    "mother": null,
+    "occupation": "First man",
+    "age_notes": "Lived 930 years",
+    "notable_events": [
+      "First human created",
+      "Ate forbidden fruit",
+      "Named the animals"
+    ],
+    "verses": [
+      "Genesis 1-3",
+      "Genesis 5:5"
+    ],
+    "short_bio": "First human created by God.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Eve",
+    "aliases": [],
+    "mother": null,
+    "occupation": "First woman",
+    "age_notes": null,
+    "notable_events": [
+      "First woman created",
+      "Ate forbidden fruit",
+      "Mother of all living"
+    ],
+    "verses": [
+      "Genesis 2-3"
+    ],
+    "short_bio": "First woman; mother of all humanity.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Cain",
+    "aliases": [],
+    "mother": "Eve",
+    "occupation": "Farmer",
+    "age_notes": null,
+    "notable_events": [
+      "Killed Abel",
+      "First murderer",
+      "Mark of Cain"
+    ],
+    "verses": [
+      "Genesis 4"
+    ],
+    "short_bio": "First son of Adam and Eve; killed his brother.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Abel",
+    "aliases": [],
+    "mother": "Eve",
+    "occupation": "Shepherd",
+    "age_notes": null,
+    "notable_events": [
+      "Killed by Cain",
+      "Offered acceptable sacrifice"
+    ],
+    "verses": [
+      "Genesis 4",
+      "Hebrews 11:4"
+    ],
+    "short_bio": "Second son of Adam and Eve; murdered by Cain.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Lot",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Escaped Sodom",
+      "Wife turned to salt",
+      "Saved by Abraham"
+    ],
+    "verses": [
+      "Genesis 13",
+      "Genesis 19"
+    ],
+    "short_bio": "Abraham's nephew who escaped Sodom's destruction.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Sarah",
+    "aliases": [
+      "Sarai"
+    ],
+    "mother": null,
+    "occupation": null,
+    "age_notes": "Died at 127; gave birth at 90",
+    "notable_events": [
+      "Wife of Abraham",
+      "Mother of Isaac",
+      "Laughed at promise"
+    ],
+    "verses": [
+      "Genesis 17",
+      "Genesis 18",
+      "Genesis 23:1"
+    ],
+    "short_bio": "Wife of Abraham and mother of Isaac.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Rebekah",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Wife of Isaac",
+      "Mother of Jacob and Esau",
+      "Helped Jacob deceive Isaac"
+    ],
+    "verses": [
+      "Genesis 24",
+      "Genesis 27"
+    ],
+    "short_bio": "Wife of Isaac; mother of Jacob and Esau.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Rachel",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Shepherdess",
+    "age_notes": "Died giving birth to Benjamin",
+    "notable_events": [
+      "Jacob worked 14 years for her",
+      "Mother of Joseph and Benjamin"
+    ],
+    "verses": [
+      "Genesis 29",
+      "Genesis 35:16-19"
+    ],
+    "short_bio": "Beloved wife of Jacob; mother of Joseph.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Leah",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "First wife of Jacob",
+      "Mother of six sons",
+      "Weak eyes"
+    ],
+    "verses": [
+      "Genesis 29-30"
+    ],
+    "short_bio": "First wife of Jacob; mother of six of his sons.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Miriam",
+    "aliases": [],
+    "mother": "Jochebed",
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Watched baby Moses",
+      "Led women in song",
+      "Struck with leprosy"
+    ],
+    "verses": [
+      "Exodus 2",
+      "Exodus 15",
+      "Numbers 12"
+    ],
+    "short_bio": "Sister of Moses and Aaron; prophetess.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Aaron",
+    "aliases": [],
+    "mother": "Jochebed",
+    "occupation": "High priest",
+    "age_notes": "Died at 123",
+    "notable_events": [
+      "First high priest",
+      "Made golden calf",
+      "Rod that budded"
+    ],
+    "verses": [
+      "Exodus 28",
+      "Exodus 32",
+      "Numbers 17",
+      "Numbers 33:39"
+    ],
+    "short_bio": "Brother of Moses; first high priest of Israel.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Caleb",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Spy, warrior",
+    "age_notes": "Still strong at 85",
+    "notable_events": [
+      "One of faithful spies",
+      "Conquered Hebron"
+    ],
+    "verses": [
+      "Numbers 13-14",
+      "Joshua 14"
+    ],
+    "short_bio": "Faithful spy who trusted God's promise.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Elisha",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Succeeded Elijah",
+      "Parted Jordan",
+      "Multiplied oil",
+      "Raised dead boy"
+    ],
+    "verses": [
+      "1 Kings 19",
+      "2 Kings 2",
+      "2 Kings 4"
+    ],
+    "short_bio": "Prophet who succeeded Elijah; performed many miracles.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Naomi",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Mother-in-law of Ruth",
+      "Lost husband and sons",
+      "Returned to Bethlehem"
+    ],
+    "verses": [
+      "Ruth 1-4"
+    ],
+    "short_bio": "Mother-in-law of Ruth; returned from Moab.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Boaz",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Wealthy landowner",
+    "age_notes": null,
+    "notable_events": [
+      "Married Ruth",
+      "Kinsman redeemer",
+      "Ancestor of David"
+    ],
+    "verses": [
+      "Ruth 2-4"
+    ],
+    "short_bio": "Wealthy man who married Ruth.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Hannah",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Prayed for son",
+      "Mother of Samuel",
+      "Sang praise song"
+    ],
+    "verses": [
+      "1 Samuel 1-2"
+    ],
+    "short_bio": "Mother of Samuel; prayed faithfully for a son.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Eli",
+    "aliases": [],
+    "mother": null,
+    "occupation": "High priest, judge",
+    "age_notes": "Died at 98",
+    "notable_events": [
+      "Mentored Samuel",
+      "Sons were wicked",
+      "Died hearing of ark capture"
+    ],
+    "verses": [
+      "1 Samuel 1-4"
+    ],
+    "short_bio": "High priest who mentored young Samuel.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Goliath",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Philistine warrior",
+    "age_notes": "Over 9 feet tall",
+    "notable_events": [
+      "Defeated by David",
+      "Champion of Philistines"
+    ],
+    "verses": [
+      "1 Samuel 17"
+    ],
+    "short_bio": "Giant Philistine warrior defeated by David.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Jonathan",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prince, warrior",
+    "age_notes": null,
+    "notable_events": [
+      "Best friend of David",
+      "Gave David his armor",
+      "Died with Saul"
+    ],
+    "verses": [
+      "1 Samuel 18",
+      "1 Samuel 20",
+      "1 Samuel 31"
+    ],
+    "short_bio": "Son of Saul and loyal friend of David.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Bathsheba",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Committed adultery with David",
+      "Mother of Solomon",
+      "Husband Uriah killed"
+    ],
+    "verses": [
+      "2 Samuel 11-12",
+      "1 Kings 1"
+    ],
+    "short_bio": "Wife of Uriah then David; mother of Solomon.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Absalom",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prince",
+    "age_notes": null,
+    "notable_events": [
+      "Rebelled against David",
+      "Known for beautiful hair",
+      "Hair caught in tree"
+    ],
+    "verses": [
+      "2 Samuel 13-18"
+    ],
+    "short_bio": "Son of David who rebelled against him.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Elkanah",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Father of Samuel",
+      "Husband of Hannah"
+    ],
+    "verses": [
+      "1 Samuel 1"
+    ],
+    "short_bio": "Father of Samuel; husband of Hannah and Peninnah.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Mordecai",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Official",
+    "age_notes": null,
+    "notable_events": [
+      "Cousin of Esther",
+      "Exposed assassination plot",
+      "Honored by king"
+    ],
+    "verses": [
+      "Esther 2-10"
+    ],
+    "short_bio": "Cousin of Esther who helped save the Jews.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  }
 ];
 
 // =========================
@@ -99,11 +1191,49 @@ const state = {
   timerSecondsRemaining: 0,
   timerId: null,
   people: [],
+  candidates: [],
+  acceptedCandidates: [],
   results: [],
   paused: false,
   theme: 'night',
   currentPlayer: null  // Stores logged-in player info
 };
+
+
+// Normalize and validate people data at startup to avoid incorrect fields
+function normalizePeopleData(peopleArray) {
+  const norm = peopleArray.map(p => {
+    // ensure name exists
+    if (!p.name) return null;
+
+    // normalize mother/father/spouse: convert null to empty string
+    if (p.mother === null) p.mother = '';
+    if (p.father === null) p.father = '';
+    if (p.spouse === null) p.spouse = '';
+
+    // standardize gender values
+    if (p.gender) {
+      const g = String(p.gender).toLowerCase();
+      if (g.startsWith('f')) p.gender = 'female';
+      else if (g.startsWith('m')) p.gender = 'male';
+      else p.gender = 'unknown';
+    } else {
+      p.gender = 'unknown';
+    }
+
+    // specific known-data fix: Deborah was incorrectly labeled male in source
+    if (p.name && p.name.toLowerCase().includes('deborah')) {
+      p.gender = 'female';
+    }
+
+    return p;
+  }).filter(Boolean);
+  return norm;
+}
+
+// Initialize in-memory people from the canonical DEFAULT_PEOPLE_DATA
+// Use a shallow copy to avoid mutating the original constant directly
+state.people = normalizePeopleData(Array.isArray(DEFAULT_PEOPLE_DATA) ? DEFAULT_PEOPLE_DATA.slice() : []);
 
 // =========================
 // Player Authentication & Stats
@@ -294,6 +1424,12 @@ const sortSelect = document.getElementById('sort-select');
 const filterMother = document.getElementById('filter-mother');
 const filterOccupation = document.getElementById('filter-occupation');
 const filterAge = document.getElementById('filter-age');
+const showDetailsToggle = document.getElementById('show-details-toggle');
+const motherSelect = document.getElementById('mother-select');
+const showRelativesToggle = document.getElementById('show-relatives-toggle');
+const showMothersOnly = document.getElementById('show-mothers-only');
+const testamentSelect = document.getElementById('testament-select');
+const genderSelect = document.getElementById('gender-select');
 const peopleCountEl = document.getElementById('people-count');
 
 // Language selector
@@ -381,6 +1517,9 @@ function init(){
   difficultySel.value = savedSettings.difficulty ?? defaultSettings.difficulty;
   numQuestionsInput.value = String(savedSettings.numQuestions ?? defaultSettings.numQuestions);
   timeLimitInput.value = String(savedSettings.timeLimit ?? defaultSettings.timeLimit);
+  // Apply testament/gender to UI if present
+  if(testamentSelect) testamentSelect.value = savedSettings.testament || defaultSettings.testament;
+  if(genderSelect) genderSelect.value = savedSettings.gender || 'all';
   
   // Ensure theme is applied - force initial application
   const themeToApply = savedSettings.theme || defaultSettings.theme;
@@ -398,6 +1537,8 @@ function init(){
   state.people = loadPeopleDataFromLocalStorage() || DEFAULT_PEOPLE_DATA.slice();
   
   // Load or create player
+  // Render dataset stats audit in Study panel
+  try{ renderDatasetStats(); }catch(_){ /* ignore if function not yet defined during early load */ }
   const player = loadPlayer();
   if (player) {
     state.currentPlayer = player;
@@ -465,12 +1606,47 @@ function attachHandlers(){
   btnShuffleList.addEventListener('click', ()=>{ shuffle(state.people); renderPeopleList(searchPerson.value); });
   btnExpandAll.addEventListener('click', ()=>toggleAllDetails(true));
   btnCollapseAll.addEventListener('click', ()=>toggleAllDetails(false));
+  if(showDetailsToggle){ showDetailsToggle.addEventListener('change', ()=>renderPeopleList(searchPerson.value)); }
+  if(showRelativesToggle){ showRelativesToggle.addEventListener('change', ()=>renderPeopleList(searchPerson.value)); }
+  if(motherSelect){ motherSelect.addEventListener('change', ()=>renderPeopleList(searchPerson.value)); }
+  if(showMothersOnly){ showMothersOnly.addEventListener('change', ()=>renderPeopleList(searchPerson.value)); }
+  if(testamentSelect){ testamentSelect.addEventListener('change', ()=>{ saveSettingsFromUI(); renderPeopleList(searchPerson.value); }); }
+  if(genderSelect){ genderSelect.addEventListener('change', ()=>{ saveSettingsFromUI(); renderPeopleList(searchPerson.value); }); }
   
   // Data management
   btnExport.addEventListener('click', exportJson);
   btnImport.addEventListener('click', ()=>fileInput.click());
   btnResetData.addEventListener('click', resetData);
   fileInput.addEventListener('change', handleImportFile);
+
+  // Data Quality / Person Editor wiring
+  const btnDQ = document.getElementById('btn-data-quality');
+  if (btnDQ) btnDQ.addEventListener('click', showDataQualityModal);
+  const dqClose = document.getElementById('btn-data-quality-close');
+  if (dqClose) dqClose.addEventListener('click', hideDataQualityModal);
+  const dqClose2 = document.getElementById('btn-dq-close');
+  if (dqClose2) dqClose2.addEventListener('click', hideDataQualityModal);
+  const dqExport = document.getElementById('btn-dq-export');
+  if (dqExport) dqExport.addEventListener('click', exportDataQualityReport);
+  const dqAcceptAll = document.getElementById('btn-dq-accept-all');
+  if (dqAcceptAll) dqAcceptAll.addEventListener('click', ()=>{
+    if(confirm('This will accept all inferred testament/gender values and remove their inferred flags. A backup of flagged records will be downloaded first. Proceed?')){
+      acceptAllInferred();
+    }
+  });
+
+  // Candidate load/export controls (Wikidata review)
+  const btnLoadCandidates = document.getElementById('btn-load-candidates');
+  if(btnLoadCandidates) btnLoadCandidates.addEventListener('click', ()=>{ loadCandidatesForReview(); });
+  const btnExportAccepted = document.getElementById('btn-export-accepted');
+  if(btnExportAccepted) btnExportAccepted.addEventListener('click', ()=>{ exportAcceptedCandidates(); });
+
+  const peClose = document.getElementById('btn-person-editor-close');
+  if (peClose) peClose.addEventListener('click', hidePersonEditor);
+  const peCancel = document.getElementById('btn-person-cancel');
+  if (peCancel) peCancel.addEventListener('click', (e)=>{ e.preventDefault(); hidePersonEditor(); });
+  const peSave = document.getElementById('btn-person-save');
+  if (peSave) peSave.addEventListener('click', (e)=>{ e.preventDefault(); savePersonFromEditor(); });
   
   // Settings persistence
   difficultySel.addEventListener('change', saveSettingsFromUI);
@@ -496,6 +1672,7 @@ function attachHandlers(){
       const nodes = Array.from(document.querySelectorAll('#answers .ans'));
       nodes.forEach(node=>{
         const orig = node.dataset.value;
+        const q = state.current;
         node.innerText = (typeof translateAnswerForQuestionType==='function') ? translateAnswerForQuestionType(q.type, orig) : orig;
       });
     }
@@ -587,6 +1764,8 @@ function showStudy(){
   gameArea.style.display = 'none';
   studyPanel.style.display = 'flex';
   renderPeopleList();
+  // Refresh dataset audit when Study panel is opened
+  try{ renderDatasetStats(); }catch(_){/* ignore if not available */}
 }
 
 // Community removed from main SPA; use community.html
@@ -700,7 +1879,18 @@ function quitQuiz(){
 // =========================
 function pickQuestionSet(count, difficulty){
   const types = ['whoDid','whoMother','occupation','age','event'];
-  const pool = filterPeopleByDifficulty(state.people, difficulty);
+  let pool = filterPeopleByDifficulty(state.people, difficulty);
+  // Apply testament/gender filters from UI/settings
+  try{
+    const testament = (testamentSelect && testamentSelect.value) ? testamentSelect.value : (loadSettings()?.testament || 'all');
+    const gender = (genderSelect && genderSelect.value) ? genderSelect.value : (loadSettings()?.gender || 'all');
+    if(testament && testament!=='all'){
+      pool = pool.filter(p=> (p.testament ? p.testament===testament : inferTestament(p)===testament));
+    }
+    if(gender && gender!=='all'){
+      pool = pool.filter(p=> (p.gender ? p.gender===gender : inferGender(p)===gender));
+    }
+  }catch(_){ }
   shuffle(pool);
   const selected = pool.slice(0, Math.min(count, pool.length));
   const questions = [];
@@ -751,6 +1941,29 @@ function filterPeopleByDifficulty(people, difficulty){
     return scored.map(s=>s.p);
   }
   return people.slice();
+}
+
+// Heuristics: determine testament and gender from available data if explicit fields missing
+function inferTestament(p){
+  if(!p) return null;
+  if(p.testament) return p.testament; // 'ot' or 'nt'
+  // Look at verse keys to guess NT vs OT
+  try{
+    const ntKeys = ['Matthew','Mark','Luke','John','Acts','Romans','Corinthians','Galatians','Ephesians','Philippians','Colossians','Thessalonians','Timothy','Titus','Philemon','Hebrews','James','Peter','Jude','Revelation'];
+    const verses = (p.verses||[]).join(' ');
+    for(const k of ntKeys){ if(verses.includes(k)) return 'nt'; }
+  }catch(_){ }
+  return 'ot';
+}
+
+function inferGender(p){
+  if(!p) return null;
+  if(p.gender) return p.gender; // 'male' or 'female'
+  const femaleNames = new Set(['mary','martha','esther','ruth','rebekah','leah','rachel','hannah','naomi','abigail','joanna','salome','sarah']);
+  const nm = (p.name||'').toLowerCase();
+  for(const fn of femaleNames){ if(nm.includes(fn)) return 'female'; }
+  // fallback: if has mother field, likely male or female, but default to male
+  return 'male';
 }
 
 function nextQuestion(){
@@ -974,6 +2187,26 @@ function togglePause(){
 function renderPeopleList(filter){
   peopleList.innerHTML='';
   let arr = state.people.filter(p=>!filter || p.name.toLowerCase().includes(filter.toLowerCase()));
+  // Populate mother-select options dynamically (unique mother names)
+  try{
+    if(motherSelect){
+      const mothers = Array.from(new Set(state.people.map(pp=>pp.mother).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+      motherSelect.innerHTML = '<option value="">All mothers</option>' + mothers.map(m=>`<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join('');
+    }
+  }catch(_){ /* ignore */ }
+  // Filter by selected mother if one chosen
+  try{
+    if(motherSelect && motherSelect.value){
+      arr = arr.filter(p=>p.mother === motherSelect.value);
+    }
+  }catch(_){ }
+  // Apply testament/gender filters to study list as well
+  try{
+    const testament = (testamentSelect && testamentSelect.value) ? testamentSelect.value : 'all';
+    const gender = (genderSelect && genderSelect.value) ? genderSelect.value : 'all';
+    if(testament && testament!=='all') arr = arr.filter(p=> (p.testament? p.testament===testament : inferTestament(p)===testament));
+    if(gender && gender!=='all') arr = arr.filter(p=> (p.gender? p.gender===gender : inferGender(p)===gender));
+  }catch(_){ }
   if(filterMother?.checked) arr = arr.filter(p=>!!p.mother);
   if(filterOccupation?.checked) arr = arr.filter(p=>!!p.occupation);
   if(filterAge?.checked) arr = arr.filter(p=>!!p.age_notes);
@@ -987,10 +2220,13 @@ function renderPeopleList(filter){
     item.className = 'person-item';
     const header = document.createElement('div');
     header.className = 'person-header';
-    header.innerHTML = `<strong>${p.name}</strong> <span class="muted">${(p.short_bio||'').slice(0,80)}</span>`;
+    header.innerHTML = `<div style="display:flex;align-items:center;gap:12px"><div class=\"person-title\"><strong>${escapeHtml(p.name)}</strong></div><div class=\"muted\">${escapeHtml((p.short_bio||'').slice(0,80))}</div></div>`;
     const details = document.createElement('div');
     details.className = 'person-details';
-    details.style.display = 'none';
+    // Default visibility respects the global "show details" toggle
+    try{
+      details.style.display = (showDetailsToggle && showDetailsToggle.checked) ? 'block' : 'none';
+    }catch(_){ details.style.display = 'none'; }
     const aliasLabel = getText('aliases');
     const motherLabel = getText('filterMother');
     const occupationLabel = getText('filterOccupation');
@@ -998,26 +2234,384 @@ function renderPeopleList(filter){
     const eventsLabel = getText('events');
     const versesLabel = getText('verses');
     const eventsJoined = (p.notable_events||[]).map(translateEvent).join(', ');
-    details.innerHTML = `
-      ${p.aliases?.length?`<div><strong>${aliasLabel}:</strong> ${p.aliases.join(', ')}</div>`:''}
-      ${p.mother?`<div><strong>${motherLabel}:</strong> ${p.mother}</div>`:''}
-      ${p.occupation?`<div><strong>${occupationLabel}:</strong> ${p.occupation}</div>`:''}
-      ${p.age_notes?`<div><strong>${ageLabel}:</strong> ${p.age_notes}</div>`:''}
-      ${p.notable_events?.length?`<div><strong>${eventsLabel}:</strong> ${eventsJoined}</div>`:''}
-      <div class="ref"><strong>${versesLabel}:</strong> ${p.verses?.join(', ')||''}</div>
-    `;
+    // Build details content; include relatives if requested
+    const parts = [];
+    if(p.aliases?.length) parts.push(`<div><strong>${aliasLabel}:</strong> ${escapeHtml(p.aliases.join(', '))}</div>`);
+    if(p.mother) parts.push(`<div class=\"mother-line\"><strong>${motherLabel}:</strong> ${escapeHtml(p.mother)}</div>`);
+    if(p.occupation) parts.push(`<div><strong>${occupationLabel}:</strong> ${escapeHtml(p.occupation)}</div>`);
+    if(p.age_notes) parts.push(`<div><strong>${ageLabel}:</strong> ${escapeHtml(p.age_notes)}</div>`);
+    if(p.notable_events?.length) parts.push(`<div><strong>${eventsLabel}:</strong> ${escapeHtml(eventsJoined)}</div>`);
+    parts.push(`<div class=\"ref\"><strong>${versesLabel}:</strong> ${escapeHtml(p.verses?.join(', ')||'')}</div>`);
+
+    // Relatives: siblings (same mother) and children (people who list this person as mother)
+    let relativesHtml = '';
+    try{
+      if(showRelativesToggle && showRelativesToggle.checked){
+        const siblings = state.people.filter(pp=>pp.mother && p.mother && pp.mother===p.mother && pp.name!==p.name).map(s=>s.name);
+        const children = state.people.filter(pp=>pp.mother && pp.mother===p.name).map(c=>c.name);
+        relativesHtml += '<div class="relatives-block">';
+        if(siblings.length) relativesHtml += `<div><strong>Siblings:</strong> ${escapeHtml(siblings.join(', '))}</div>`;
+        if(children.length) relativesHtml += `<div><strong>Children:</strong> ${escapeHtml(children.join(', '))}</div>`;
+        if(!siblings.length && !children.length) relativesHtml += `<div class=\"muted\">No direct relatives listed</div>`;
+        relativesHtml += '</div>';
+      }
+    }catch(_){ }
+
+    details.innerHTML = parts.join('') + relativesHtml;
     header.addEventListener('click',()=>{
       details.style.display = details.style.display==='none' ? 'block' : 'none';
     });
+    // Add an explicit details toggle button for accessibility and a family crest
+    const detailsBtn = document.createElement('button');
+    detailsBtn.className = 'details-btn';
+    detailsBtn.type = 'button';
+    detailsBtn.setAttribute('aria-expanded', details.style.display==='block');
+    detailsBtn.textContent = details.style.display==='block' ? 'Hide' : 'Show';
+    detailsBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); const isShown = details.style.display==='block'; details.style.display = isShown ? 'none' : 'block'; detailsBtn.textContent = isShown ? 'Show' : 'Hide'; detailsBtn.setAttribute('aria-expanded', !isShown); });
+
+    const crest = document.createElement('div');
+    crest.className = 'family-crest';
+    try{
+      const motherName = p.mother || '';
+      const motherInitials = motherName ? initialsFromName(motherName) : '—';
+      const siblingCount = state.people.filter(pp=>pp.mother && pp.mother===p.mother).length - 1;
+      const childrenCount = state.people.filter(pp=>pp.mother && pp.mother===p.name).length;
+      crest.innerHTML = `<div class=\"crest-initials\">${escapeHtml(motherInitials)}</div><div class=\"crest-meta\"><div class=\"crest-line\">${motherName?escapeHtml(motherName):'<span class="muted">No mother</span>'}</div><div class=\"crest-line muted\">Siblings: ${siblingCount>0?siblingCount:0} • Children: ${childrenCount}</div></div>`;
+    }catch(_){ crest.textContent = ''; }
+
+    item.appendChild(crest);
     item.appendChild(header);
     item.appendChild(details);
+    // Place details toggle in header for compact layout
+    header.appendChild(detailsBtn);
     peopleList.appendChild(item);
   }
+  // Ensure the dataset audit reflects the latest people data (full dataset)
+  try{ renderDatasetStats(); }catch(_){/* ignore if not present */}
 }
 
 function toggleAllDetails(expand){
   const items = peopleList.querySelectorAll('.person-details');
   items.forEach(el=>{ el.style.display = expand ? 'block' : 'none'; });
+}
+
+// =========================
+// Dataset Audit (Study panel)
+// =========================
+function computeDatasetStats(people){
+  const stats = {
+    total: 0,
+    withEvents: 0,
+    withOccupation: 0,
+    withMother: 0,
+    withAliases: 0,
+    withAge: 0,
+    withVerses: 0
+  };
+  if(!Array.isArray(people)) return stats;
+  stats.total = people.length;
+  for(const p of people){
+    if(p.notable_events && Array.isArray(p.notable_events) && p.notable_events.length>0) stats.withEvents++;
+    if(p.occupation) stats.withOccupation++;
+    if(p.mother) stats.withMother++;
+    if(p.aliases && Array.isArray(p.aliases) && p.aliases.length>0) stats.withAliases++;
+    if(p.age_notes) stats.withAge++;
+    if(p.verses && Array.isArray(p.verses) && p.verses.length>0) stats.withVerses++;
+  }
+  return stats;
+}
+
+function renderDatasetStats(){
+  try{
+    const elTotal = document.getElementById('audit-total');
+    const elEvents = document.getElementById('audit-events');
+    const elOcc = document.getElementById('audit-occupation');
+    const elMother = document.getElementById('audit-mother');
+    const elAliases = document.getElementById('audit-aliases');
+    const elAge = document.getElementById('audit-age');
+    if(!elTotal) return; // not on page
+    const stats = computeDatasetStats(state.people || []);
+    elTotal.textContent = String(stats.total);
+    elEvents.textContent = String(stats.withEvents);
+    elOcc.textContent = String(stats.withOccupation);
+    elMother.textContent = String(stats.withMother);
+    elAliases.textContent = String(stats.withAliases);
+    elAge.textContent = String(stats.withAge);
+  }catch(_){ /* non-fatal */ }
+}
+
+// =========================
+// Data Quality & Person Editor
+// =========================
+function showDataQualityModal(){
+  const modal = document.getElementById('data-quality-modal');
+  if(!modal) return;
+  renderDataQualityReport();
+  modal.style.display = 'flex';
+}
+
+function hideDataQualityModal(){
+  const modal = document.getElementById('data-quality-modal');
+  if(!modal) return;
+  modal.style.display = 'none';
+}
+
+function renderDataQualityReport() {
+    const total = state.people.length;
+    const inferredTestament = state.people.filter(p => p._inferred_testament && !p._verified).length;
+    const inferredGender = state.people.filter(p => p._inferred_gender && !p._verified).length;
+    const forReview = state.people.filter(p => p._for_review && !p._verified).length;
+
+    const summaryEl = document.getElementById('data-quality-summary');
+    summaryEl.innerHTML = `
+        <p><strong>Total People:</strong> ${total}</p>
+        <p><strong class="inferred">Unverified Inferred Testaments:</strong> ${inferredTestament}</p>
+        <p><strong class="inferred">Unverified Inferred Genders:</strong> ${inferredGender}</p>
+        <p><strong class="review">New from Wikidata for Review:</strong> ${forReview}</p>
+    `;
+
+    const listEl = document.getElementById('data-quality-list');
+    listEl.innerHTML = '';
+
+    state.people.forEach((person, index) => {
+        let flags = '';
+        if (person._inferred_testament && !person._verified) flags += '<span class="flag inferred">Inferred Testament</span>';
+        if (person._inferred_gender && !person._verified) flags += '<span class="flag inferred">Inferred Gender</span>';
+        if (person._for_review && !person._verified) flags += '<span class="flag review">For Review</span>';
+
+
+        if (flags) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div class="person-info">
+                    <span class="person-name">${person.name}</span>
+                    <div class="flags">${flags}</div>
+                </div>
+                <button class="btn-edit-person" data-index="${index}">Review/Edit</button>
+            `;
+            listEl.appendChild(li);
+        }
+    });
+}
+
+// -------------------------
+// Candidate review (Wikidata) helpers
+// -------------------------
+async function loadCandidatesForReview(){
+  // Try to fetch a prepared candidate file from tools/ (served by static server)
+  try{
+    const resp = await fetch('tools/people_from_wikidata.candidates.relaxed.json');
+    if(!resp.ok) throw new Error('Fetch failed');
+    const data = await resp.json();
+    // annotate and store
+    state.candidates = (Array.isArray(data) ? data : []).map((c, i)=>({ _local_index: i, _for_review: true, _rejected: false, ...c }));
+    state.acceptedCandidates = [];
+    renderCandidatesList();
+    renderDataQualityReport();
+    showToast({ title: 'Candidates loaded', msg: `${state.candidates.length} candidate(s) loaded.`, type: 'success', timeout: 2200 });
+  }catch(err){
+    console.error('Could not load candidates:', err);
+    showToast({ title: 'Load failed', msg: 'Could not load candidate file. Ensure you are running a local server and the file exists at tools/people_from_wikidata.candidates.relaxed.json', type: 'error', timeout: 5000 });
+  }
+}
+
+function renderCandidatesList(){
+  const listEl = document.getElementById('data-quality-list');
+  if(!listEl) return;
+  listEl.innerHTML = '';
+  if(!state.candidates || state.candidates.length===0){
+    listEl.innerHTML = '<p class="muted">No candidates loaded. Use "Load Candidates" to fetch proposals.</p>';
+    return;
+  }
+
+  const ul = document.createElement('ul'); ul.className = 'dq-candidates';
+  state.candidates.forEach((c, idx)=>{
+    if(c._rejected) return; // skip rejected ones
+    const li = document.createElement('li');
+    const wikilink = c._qid ? `https://www.wikidata.org/wiki/${c._qid}` : (c._source||'');
+    li.innerHTML = `
+      <div class="candidate-head">
+        <strong>${escapeHtml(c.name||'Unnamed')}</strong>
+        <span class="muted">${c._qid?escapeHtml(c._qid):''}</span>
+      </div>
+      <div class="candidate-body">
+        <div>${escapeHtml(c.short_bio||c.note||'')}</div>
+        <div class="meta muted">Source: ${escapeHtml(wikilink)}</div>
+      </div>
+      <div class="candidate-actions" style="margin-top:6px">
+        <button class="btn-accept" data-idx="${idx}">Accept</button>
+        <button class="btn-reject" data-idx="${idx}">Reject</button>
+      </div>
+    `;
+    ul.appendChild(li);
+  });
+  listEl.appendChild(ul);
+
+  // Wire accept/reject buttons
+  Array.from(listEl.querySelectorAll('.btn-accept')).forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const idx = parseInt(e.target.dataset.idx,10);
+      acceptCandidate(idx);
+    });
+  });
+  Array.from(listEl.querySelectorAll('.btn-reject')).forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const idx = parseInt(e.target.dataset.idx,10);
+      rejectCandidate(idx);
+    });
+  });
+}
+
+function acceptCandidate(idx){
+  const cand = state.candidates?.[idx];
+  if(!cand) return;
+  // Prepare object to merge into people; preserve provenance
+  const obj = { ...cand };
+  delete obj._local_index; delete obj._for_review; delete obj._rejected;
+  obj._qid = cand._qid || cand._source || null;
+  obj._verified = true; obj._accepted_date = (new Date()).toISOString();
+  // Validate before pushing
+  const v = validatePerson(obj);
+  if(!v.valid){
+    // still allow accept but warn
+    if(!confirm('Candidate failed validation: '+v.reason+"\nAccept anyway?")) return;
+  }
+  state.people.push(obj);
+  state.acceptedCandidates.push(obj);
+  // mark candidate as processed
+  state.candidates[idx]._rejected = true;
+  savePeopleDataToLocalStorage(state.people);
+  renderPeopleList(); renderDatasetStats(); renderDataQualityReport(); renderCandidatesList();
+  showToast({ title: 'Accepted', msg: `${obj.name} added to dataset`, type: 'success', timeout: 2000 });
+}
+
+function rejectCandidate(idx){
+  const cand = state.candidates?.[idx];
+  if(!cand) return;
+  if(!confirm('Reject candidate '+(cand.name||'Unnamed')+'? This cannot be undone in this session.')) return;
+  state.candidates[idx]._rejected = true;
+  renderCandidatesList(); renderDataQualityReport();
+}
+
+function exportAcceptedCandidates(){
+  const arr = state.acceptedCandidates || [];
+  if(arr.length===0){ showToast({ title: 'No accepted', msg: 'No accepted candidates to export', type: 'info' }); return; }
+  const json = JSON.stringify(arr, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'accepted_candidates.json'; a.click(); URL.revokeObjectURL(url);
+  showToast({ title: 'Exported', msg: `Downloaded ${arr.length} accepted candidate(s)`, type: 'success', timeout: 2200 });
+}
+
+function exportDataQualityReport() {
+  // Export subset with inferred or missing fields
+  const people = state.people || [];
+  const flagged = people.filter(p=>(!p.testament || p._inferred_testament) || (!p.gender || p._inferred_gender));
+  const json = JSON.stringify(flagged, null, 2);
+  const blob = new Blob([json],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'data_quality_report.json'; a.click(); URL.revokeObjectURL(url);
+}
+
+let __who_edit_index = -1;
+function showPersonEditor(idx){
+  const modal = document.getElementById('person-editor-modal');
+  if(!modal) return;
+  const person = state.people?.[idx];
+  __who_edit_index = idx;
+  if(person){
+    document.getElementById('edit-name').value = person.name || '';
+    document.getElementById('edit-aliases').value = (person.aliases||[]).join(', ');
+    document.getElementById('edit-mother').value = person.mother || '';
+    document.getElementById('edit-occupation').value = person.occupation || '';
+    document.getElementById('edit-age').value = person.age_notes || '';
+    document.getElementById('edit-events').value = (person.notable_events||[]).join('\n');
+    document.getElementById('edit-verses').value = (person.verses||[]).join(', ');
+    document.getElementById('edit-testament').value = person.testament || 'ot';
+    document.getElementById('edit-gender').value = person.gender || 'male';
+  } else {
+    document.getElementById('person-editor-form').reset();
+    __who_edit_index = -1;
+  }
+  modal.style.display = 'flex';
+}
+
+function hidePersonEditor(){
+  const modal = document.getElementById('person-editor-modal');
+  if(!modal) return; modal.style.display = 'none';
+}
+
+function savePersonFromEditor(){
+  const idx = __who_edit_index;
+  const name = document.getElementById('edit-name').value.trim();
+  if(!name){ alert('Name required'); return; }
+  const aliases = document.getElementById('edit-aliases').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const mother = document.getElementById('edit-mother').value.trim() || null;
+  const occupation = document.getElementById('edit-occupation').value.trim() || null;
+  const age_notes = document.getElementById('edit-age').value.trim() || null;
+  const notable_events = document.getElementById('edit-events').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const verses = document.getElementById('edit-verses').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const testament = document.getElementById('edit-testament').value || 'ot';
+  const gender = document.getElementById('edit-gender').value || 'male';
+
+  const obj = { name, aliases, mother, occupation, age_notes, notable_events, verses, testament, gender };
+  const v = validatePerson(obj);
+  if(!v.valid){ alert('Validation failed: ' + v.reason); return; }
+  if(idx>=0 && state.people && state.people[idx]){
+    // preserve any other fields like short_bio
+    const orig = state.people[idx];
+    state.people[idx] = { ...orig, ...obj };
+    // clear inference flags if user explicitly set values
+    delete state.people[idx]._inferred_testament; delete state.people[idx]._inferred_gender;
+    state.people[idx]._verified = true;
+  } else {
+    state.people.push(obj);
+  }
+  savePeopleDataToLocalStorage(state.people);
+  renderPeopleList(); renderDatasetStats(); renderDataQualityReport();
+  hidePersonEditor();
+}
+
+/** Bulk accept inferred fields across the dataset
+ * - Backs up flagged records as a JSON download
+ * - Removes `_inferred_testament` and `_inferred_gender` from those records and marks `_verified`
+ * - Saves to localStorage and refreshes UI
+ */
+function acceptAllInferred(){
+  const people = state.people || [];
+  const flagged = people.filter(p=>(!p.testament || p._inferred_testament) || (!p.gender || p._inferred_gender));
+  if(flagged.length===0){ showToast({ title: 'No changes', msg: 'No inferred/missing fields found.', type: 'info' }); return; }
+
+  // Backup flagged items
+  try{
+    const json = JSON.stringify(flagged, null, 2);
+    const blob = new Blob([json],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const ts = new Date().toISOString().replace(/[:.]/g,'-');
+    a.download = `who-bible-flagged-backup-${ts}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }catch(_){ /* continue even if download fails */ }
+
+  // Apply accept (clear inference flags and mark verified)
+  let applied = 0;
+  for(const p of people){
+    const should = (!p.testament || p._inferred_testament) || (!p.gender || p._inferred_gender);
+    if(should){
+      if(p._inferred_testament) delete p._inferred_testament;
+      if(p._inferred_gender) delete p._inferred_gender;
+      p._verified = true;
+      applied++;
+    }
+  }
+
+  savePeopleDataToLocalStorage(people);
+  renderDataQualityReport();
+  renderPeopleList();
+  renderDatasetStats();
+  showToast({ title: 'Bulk accept complete', msg: `Accepted ${applied} records. Backup downloaded.`, type: 'success', timeout: 3000 });
 }
 
 // =========================
@@ -1066,6 +2660,7 @@ async function handleImportFile(e){
         state.people = valid;
         savePeopleDataToLocalStorage(valid);
         renderPeopleList();
+        renderDatasetStats();
         showToast({ title: getText('importSuccess'), msg: getText('importMsg'), type: 'success' });
       }
     }
@@ -1096,6 +2691,7 @@ function resetData(){
     localStorage.removeItem('peopleData');
     state.people = DEFAULT_PEOPLE_DATA.slice();
     renderPeopleList();
+    renderDatasetStats();
     showToast({ title: getText('resetSuccess'), msg: getText('resetMsg'), type: 'success' });
   }
 }
@@ -1181,6 +2777,10 @@ function saveSettingsFromUI(){
     timeLimit: parseInt(timeLimitInput.value)||60,
     theme: state.theme
   };
+  try{
+    if(testamentSelect) settings.testament = testamentSelect.value || 'all';
+    if(genderSelect) settings.gender = genderSelect.value || 'all';
+  }catch(_){ }
   try{ localStorage.setItem('settings', JSON.stringify(settings)); }catch(_){/* ignore */}
 }
 
@@ -1285,4 +2885,194 @@ window.onWhoBibleLanguageChange = function(lang){
     }
   }catch(_){ /* non-fatal */ }
 };
+
+async function loadWikidataForReview() {
+    try {
+        const response = await fetch('tools/people_from_wikidata.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const wikidataPeople = await response.json();
+        
+        // Get existing names to prevent duplicates
+        const existingNames = new Set(state.people.map(p => p.name.toLowerCase()));
+        
+        const newPeople = wikidataPeople.filter(p => !existingNames.has(p.name.toLowerCase()));
+
+        if (newPeople.length === 0) {
+            alert('No new people to import from the Wikidata file. All names already exist in the current dataset.');
+            return;
+        }
+
+        // Add a flag to distinguish these as needing review
+        newPeople.forEach(p => {
+            p._for_review = true;
+        });
+
+        // Add to the main people array and re-render the quality report
+        state.people.push(...newPeople);
+        renderDataQualityReport();
+        
+        alert(`Loaded ${newPeople.length} new people from Wikidata for review.`);
+
+    } catch (error) {
+        console.error('Error loading Wikidata for review:', error);
+        alert('Failed to load Wikidata file. Make sure it exists in the `tools` directory and the server is running.');
+    }
+}
+
+function attachEventHandlers() {
+  document.getElementById('btn-data-quality').addEventListener('click', showDataQualityModal);
+  document.getElementById('close-data-quality-modal').addEventListener('click', hideDataQualityModal);
+  document.getElementById('btn-export-data-quality').addEventListener('click', exportDataQualityReport);
+  document.getElementById('btn-accept-all-inferred').addEventListener('click', acceptAllInferred);
+  document.getElementById('btn-load-wikidata').addEventListener('click', loadWikidataForReview);
+
+
+  document.getElementById('btn-save-person').addEventListener('click', savePersonFromEditor);
+  document.getElementById('close-person-editor-modal').addEventListener('click', hidePersonEditor);
+
+  // Mode buttons
+  btnSolo.addEventListener('click', startSolo);
+  btnTimed.addEventListener('click', startTimed);
+  btnChallenge.addEventListener('click', startChallenge);
+  btnStudy.addEventListener('click', startStudy);
+  
+  // Navigation
+  btnBackToSetup.addEventListener('click', showSetup);
+  btnBackFromStudy.addEventListener('click', showSetup);
+  // Community moved to separate page
+  
+  // Game controls
+  btnNext.addEventListener('click', nextQuestion);
+  btnQuit.addEventListener('click', quitQuiz);
+  btnPause.addEventListener('click', togglePause);
+  
+  // Study controls
+  searchPerson.addEventListener('input', e=>renderPeopleList(e.target.value));
+  sortSelect.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  filterMother.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  filterOccupation.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  filterAge.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+  btnShuffleList.addEventListener('click', ()=>{ shuffle(state.people); renderPeopleList(searchPerson.value); });
+  btnExpandAll.addEventListener('click', ()=>toggleAllDetails(true));
+  btnCollapseAll.addEventListener('click', ()=>toggleAllDetails(false));
+  if(showDetailsToggle){ showDetailsToggle.addEventListener('change', ()=>renderPeopleList(searchPerson.value)); }
+  if(showRelativesToggle){ showRelativesToggle.addEventListener('change', ()=>renderPeopleList(searchPerson.value)); }
+  if(motherSelect){ motherSelect.addEventListener('change', ()=>renderPeopleList(searchPerson.value)); }
+  if(showMothersOnly){ showMothersOnly.addEventListener('change', ()=>renderPeopleList(searchPerson.value)); }
+  if(testamentSelect){ testamentSelect.addEventListener('change', ()=>{ saveSettingsFromUI(); renderPeopleList(searchPerson.value); }); }
+  if(genderSelect){ genderSelect.addEventListener('change', ()=>{ saveSettingsFromUI(); renderPeopleList(searchPerson.value); }); }
+  
+  // Data management
+  btnExport.addEventListener('click', exportJson);
+  btnImport.addEventListener('click', ()=>fileInput.click());
+  btnResetData.addEventListener('click', resetData);
+  fileInput.addEventListener('change', handleImportFile);
+
+  // Data Quality / Person Editor wiring
+  const btnDQ = document.getElementById('btn-data-quality');
+  if (btnDQ) btnDQ.addEventListener('click', showDataQualityModal);
+  const dqClose = document.getElementById('btn-data-quality-close');
+  if (dqClose) dqClose.addEventListener('click', hideDataQualityModal);
+  const dqClose2 = document.getElementById('btn-dq-close');
+  if (dqClose2) dqClose2.addEventListener('click', hideDataQualityModal);
+  const dqExport = document.getElementById('btn-dq-export');
+  if (dqExport) dqExport.addEventListener('click', exportDataQualityReport);
+  const dqAcceptAll = document.getElementById('btn-dq-accept-all');
+  if (dqAcceptAll) dqAcceptAll.addEventListener('click', ()=>{
+    if(confirm('This will accept all inferred testament/gender values and remove their inferred flags. A backup of flagged records will be downloaded first. Proceed?')){
+      acceptAllInferred();
+    }
+  });
+
+  const peClose = document.getElementById('btn-person-editor-close');
+  if (peClose) peClose.addEventListener('click', hidePersonEditor);
+  const peCancel = document.getElementById('btn-person-cancel');
+  if (peCancel) peCancel.addEventListener('click', (e)=>{ e.preventDefault(); hidePersonEditor(); });
+  const peSave = document.getElementById('btn-person-save');
+  if (peSave) peSave.addEventListener('click', (e)=>{ e.preventDefault(); savePersonFromEditor(); });
+  
+  // Settings persistence
+  difficultySel.addEventListener('change', saveSettingsFromUI);
+  numQuestionsInput.addEventListener('change', saveSettingsFromUI);
+  timeLimitInput.addEventListener('change', saveSettingsFromUI);
+  
+  // Language selector
+  languageSelect.addEventListener('change', (e) => {
+    const lang = e.target.value;
+    // Persist preferred language as part of settings as well
+    const settings = loadSettings() || {};
+    settings.language = lang;
+    try{ localStorage.setItem('settings', JSON.stringify(settings)); }catch(_){/* ignore */}
+    setLanguage(lang);
+    // Re-render visible question if any
+    if(state.current){
+      // Rebuild prompt with translated pieces when possible
+      const q = state.current;
+      // We cannot perfectly rebuild dynamic tokens here without source data; keep prompt as-is,
+      // but refresh choices labels and status/headers via updateAllText called by setLanguage.
+      // Future: store raw tokens to fully re-localize prompt.
+      // Refresh answers display text
+      const nodes = Array.from(document.querySelectorAll('#answers .ans'));
+      nodes.forEach(node=>{
+        const orig = node.dataset.value;
+        const q = state.current;
+        node.innerText = (typeof translateAnswerForQuestionType==='function') ? translateAnswerForQuestionType(q.type, orig) : orig;
+      });
+    }
+  });
+  
+  // Theme toggle: cycle between day and night
+  if (btnTheme) {
+    btnTheme.addEventListener('click', ()=>{
+      console.log('Theme button clicked!'); // Debug
+      console.log('Current state.theme:', state.theme); // Debug
+      console.log('Body classes:', document.body.className); // Debug
+      
+      // Use state.theme as the source of truth
+      const current = state.theme || 'night';
+      const next = current === 'night' ? 'day' : 'night';
+      
+      console.log('Switching from', current, 'to', next); // Debug
+      applyTheme(next);
+      saveSettingsFromUI();
+    });
+  } else {
+    console.log('btnTheme not found!'); // Debug
+  }
+  // Share
+  if (btnShare) {
+    btnShare.addEventListener('click', async ()=>{
+      const shareData = {
+        title: 'Who-Bible',
+        text: getText('brandDesc'),
+        url: location.href
+      };
+      if (navigator.share) {
+        try { await navigator.share(shareData); } catch(_){}
+      } else {
+        try {
+          await navigator.clipboard.writeText(`${shareData.title} — ${shareData.url}`);
+          showToast({ title: getText('exportSuccess'), msg: getText('exportMsg'), type: 'success', timeout: 1500 });
+        } catch(_) {
+          showToast({ title: getText('importError'), msg: 'Clipboard unavailable', type: 'error', timeout: 1500 });
+        }
+      }
+    });
+  }
+  // Community placeholder behavior
+  // Community opens in a new tab via anchor href
+  
+  // Modal handlers
+  btnSummaryClose.addEventListener('click', hideSummaryModal);
+  btnPlayAgain.addEventListener('click', ()=>{ hideSummaryModal(); showSetup(); });
+  btnPlayersClose.addEventListener('click', hidePlayersModal);
+  btnPlayersCancel.addEventListener('click', hidePlayersModal);
+  btnPlayersStart.addEventListener('click', startChallengeFromModal);
+  
+  // Keyboard navigation on answers
+  answersEl.addEventListener('keydown', onAnswersKeyDown);
+
+}
 

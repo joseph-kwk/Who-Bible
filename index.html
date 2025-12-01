@@ -108,6 +108,22 @@
               <input id="time-limit" type="number" value="60" min="10" max="300" aria-describedby="time-help" />
               <small id="time-help" class="sr-only">For timed mode only, between 10 and 300 seconds</small>
             </div>
+            <div class="setting-row">
+              <label for="testament-select">Testament</label>
+              <select id="testament-select">
+                <option value="all">All</option>
+                <option value="ot">Old Testament</option>
+                <option value="nt">New Testament</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label for="gender-select">Gender</label>
+              <select id="gender-select">
+                <option value="all">All</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
           </section>
           
           <section class="setup-section" aria-labelledby="modes-heading">
@@ -228,6 +244,10 @@
                 <option value="name-asc">Name A-Z</option>
                 <option value="name-desc">Name Z-A</option>
               </select>
+              <label for="mother-select" class="sr-only">Filter by mother</label>
+              <select id="mother-select" aria-label="Filter by mother" style="margin-left:8px;min-width:160px">
+                <option value="">All mothers</option>
+              </select>
             </div>
             
             <div class="filter-checkboxes">
@@ -243,6 +263,18 @@
                 <input id="filter-age" type="checkbox" />
                 <span>Has Age Info</span>
               </label>
+              <label class="checkbox-label" style="margin-left:8px;">
+                <input id="show-details-toggle" type="checkbox" />
+                <span>Show details inline</span>
+              </label>
+              <label class="checkbox-label" style="margin-left:8px;">
+                <input id="show-relatives-toggle" type="checkbox" />
+                <span>Show relatives inline</span>
+              </label>
+                <label class="checkbox-label" style="margin-left:8px;">
+                  <input id="show-mothers-only" type="checkbox" />
+                  <span>Show mothers only</span>
+                </label>
             </div>
           </div>
           
@@ -254,6 +286,16 @@
           
           <div class="people-count-display">
             <span>Showing <strong id="people-count">0</strong> people</span>
+          </div>
+          <!-- Data audit: quick dataset coverage stats -->
+          <div id="data-audit" class="data-audit" aria-live="polite" style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+            <div class="audit-item"><strong>Total:</strong> <span id="audit-total">0</span></div>
+            <div class="audit-item"><strong>With events:</strong> <span id="audit-events">0</span></div>
+            <div class="audit-item"><strong>With occupation:</strong> <span id="audit-occupation">0</span></div>
+            <div class="audit-item"><strong>With mother:</strong> <span id="audit-mother">0</span></div>
+            <div class="audit-item"><strong>With aliases:</strong> <span id="audit-aliases">0</span></div>
+            <div class="audit-item"><strong>With age:</strong> <span id="audit-age">0</span></div>
+            <button id="btn-data-quality" class="control-btn" style="margin-left:8px">Data Quality</button>
           </div>
         </header>
         
@@ -342,6 +384,60 @@
       </main>
       <footer class="modal-footer">
         <button id="btn-community-ok" class="primary">Close</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Data Quality Modal -->
+  <div id="data-quality-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="data-quality-title" aria-modal="true">
+    <div class="modal" role="document">
+      <header class="modal-header">
+        <h2 id="data-quality-title">Data Quality Report</h2>
+        <button id="btn-data-quality-close" aria-label="Close data quality">✕</button>
+      </header>
+      <main class="modal-body" id="data-quality-body">
+        <div id="data-quality-summary"></div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button id="btn-load-candidates" class="control-btn">Load Candidates</button>
+          <button id="btn-export-accepted" class="control-btn">Export Accepted</button>
+        </div>
+        <div id="data-quality-list"></div>
+      </main>
+      <footer class="modal-footer">
+        <button id="btn-dq-accept-all" class="control-btn primary">Accept All Inferred</button>
+        <button id="btn-dq-export" class="control-btn">Export Report</button>
+        <button id="btn-dq-close" class="control-btn">Close</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Person Editor Modal -->
+  <div id="person-editor-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="person-editor-title" aria-modal="true">
+    <div class="modal" role="document">
+      <header class="modal-header">
+        <h2 id="person-editor-title">Edit Person</h2>
+        <button id="btn-person-editor-close" aria-label="Close editor">✕</button>
+      </header>
+      <main class="modal-body">
+        <form id="person-editor-form">
+          <div class="row"><label for="edit-name">Name</label><input id="edit-name" type="text" /></div>
+          <div class="row"><label for="edit-aliases">Aliases (comma-separated)</label><input id="edit-aliases" type="text" /></div>
+          <div class="row"><label for="edit-mother">Mother</label><input id="edit-mother" type="text" /></div>
+          <div class="row"><label for="edit-occupation">Occupation</label><input id="edit-occupation" type="text" /></div>
+          <div class="row"><label for="edit-age">Age notes</label><input id="edit-age" type="text" /></div>
+          <div class="row"><label for="edit-events">Notable events (one per line)</label><textarea id="edit-events" rows="4"></textarea></div>
+          <div class="row"><label for="edit-verses">Verses (comma-separated)</label><input id="edit-verses" type="text" /></div>
+          <div class="row"><label for="edit-testament">Testament</label>
+            <select id="edit-testament"><option value="ot">Old Testament</option><option value="nt">New Testament</option></select>
+          </div>
+          <div class="row"><label for="edit-gender">Gender</label>
+            <select id="edit-gender"><option value="male">Male</option><option value="female">Female</option></select>
+          </div>
+        </form>
+      </main>
+      <footer class="modal-footer">
+        <button id="btn-person-save" class="control-btn primary">Save</button>
+        <button id="btn-person-cancel" class="control-btn">Cancel</button>
       </footer>
     </div>
   </div>
