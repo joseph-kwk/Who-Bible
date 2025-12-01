@@ -8,6 +8,7 @@
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <script src="assets/js/relationships.js" defer></script>
   <script src="assets/js/translations.js" defer></script>
 </head>
 <body>
@@ -109,16 +110,16 @@
               <small id="time-help" class="sr-only">For timed mode only, between 10 and 300 seconds</small>
             </div>
             <div class="setting-row">
-              <label for="testament-select">Testament</label>
-              <select id="testament-select">
-                <option value="all">All</option>
+              <label for="testament-filter">Testament</label>
+              <select id="testament-filter" aria-label="Filter by testament">
+                <option value="all">All (OT + NT)</option>
                 <option value="ot">Old Testament</option>
                 <option value="nt">New Testament</option>
               </select>
             </div>
             <div class="setting-row">
-              <label for="gender-select">Gender</label>
-              <select id="gender-select">
+              <label for="gender-filter">Gender</label>
+              <select id="gender-filter" aria-label="Filter by gender">
                 <option value="all">All</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -228,92 +229,110 @@
 
       <!-- Study Panel -->
       <section id="study-panel" style="display:none" role="main" aria-labelledby="study-heading">
-        <header class="study-header">
-          <button id="btn-back-from-study" class="back-btn" aria-label="Back to Setup">← Back</button>
-          <h2 id="study-heading">Study Mode - Bible People Explorer</h2>
-          
-          <div class="study-tools">
-            <div class="search-bar">
-              <label for="search-person" class="sr-only">Search Bible people</label>
-              <input id="search-person" type="text" placeholder="Search people..." aria-label="Search Bible people" />
+        <div class="study-container">
+          <header class="study-header">
+            <div class="study-header-top">
+              <button id="btn-back-from-study" class="back-btn" aria-label="Back to Setup">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back
+              </button>
+              <div class="study-title-section">
+                <h2 id="study-heading">Bible People Explorer</h2>
+                <p class="study-subtitle">Discover and learn about biblical characters</p>
+              </div>
             </div>
             
-            <div class="filter-group">
-              <label for="sort-select" class="sr-only">Sort by</label>
-              <select id="sort-select" aria-label="Sort order">
-                <option value="name-asc">Name A-Z</option>
-                <option value="name-desc">Name Z-A</option>
-              </select>
-              <label for="mother-select" class="sr-only">Filter by mother</label>
-              <select id="mother-select" aria-label="Filter by mother" style="margin-left:8px;min-width:160px">
-                <option value="">All mothers</option>
-              </select>
+            <div class="study-search-section">
+              <div class="search-bar-wrapper">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.35-4.35"/>
+                </svg>
+                <label for="search-person" class="sr-only">Search Bible people</label>
+                <input id="search-person" type="text" placeholder="Search by name, occupation, or event..." aria-label="Search Bible people" />
+              </div>
+              
+              <div class="study-filter-row">
+                <div class="filter-group">
+                  <label for="sort-select" class="filter-label">Sort by:</label>
+                  <select id="sort-select" aria-label="Sort order">
+                    <option value="name-asc">Name (A-Z)</option>
+                    <option value="name-desc">Name (Z-A)</option>
+                  </select>
+                </div>
+                
+                <div class="filter-chips">
+                  <label class="filter-chip">
+                    <input id="filter-mother" type="checkbox" />
+                    <span class="chip-text">Has Mother</span>
+                  </label>
+                  <label class="filter-chip">
+                    <input id="filter-occupation" type="checkbox" />
+                    <span class="chip-text">Has Occupation</span>
+                  </label>
+                  <label class="filter-chip">
+                    <input id="filter-age" type="checkbox" />
+                    <span class="chip-text">Has Age Info</span>
+                  </label>
+                </div>
+              </div>
             </div>
             
-            <div class="filter-checkboxes">
-              <label class="checkbox-label">
-                <input id="filter-mother" type="checkbox" />
-                <span>Has Mother</span>
-              </label>
-              <label class="checkbox-label">
-                <input id="filter-occupation" type="checkbox" />
-                <span>Has Occupation</span>
-              </label>
-              <label class="checkbox-label">
-                <input id="filter-age" type="checkbox" />
-                <span>Has Age Info</span>
-              </label>
-              <label class="checkbox-label" style="margin-left:8px;">
-                <input id="show-details-toggle" type="checkbox" />
-                <span>Show details inline</span>
-              </label>
-              <label class="checkbox-label" style="margin-left:8px;">
-                <input id="show-relatives-toggle" type="checkbox" />
-                <span>Show relatives inline</span>
-              </label>
-                <label class="checkbox-label" style="margin-left:8px;">
-                  <input id="show-mothers-only" type="checkbox" />
-                  <span>Show mothers only</span>
-                </label>
+            <div class="study-actions-bar">
+              <div class="people-count-display">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <span><strong id="people-count">0</strong> people</span>
+              </div>
+              <div class="study-controls">
+                <button id="btn-expand-all" class="control-btn-icon" aria-label="Expand all person details" title="Expand All">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <polyline points="7 13 12 18 17 13"/>
+                    <polyline points="7 6 12 11 17 6"/>
+                  </svg>
+                </button>
+                <button id="btn-collapse-all" class="control-btn-icon" aria-label="Collapse all person details" title="Collapse All">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <polyline points="17 11 12 6 7 11"/>
+                    <polyline points="17 18 12 13 7 18"/>
+                  </svg>
+                </button>
+                <button id="btn-shuffle-list" class="control-btn-icon" aria-label="Shuffle the list" title="Shuffle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <polyline points="16 3 21 3 21 8"/>
+                    <line x1="4" y1="20" x2="21" y2="3"/>
+                    <polyline points="21 16 21 21 16 21"/>
+                    <line x1="15" y1="15" x2="21" y2="21"/>
+                    <line x1="4" y1="4" x2="9" y2="9"/>
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
+          </header>
           
-          <div class="study-controls">
-            <button id="btn-expand-all" class="control-btn" aria-label="Expand all person details">Expand All</button>
-            <button id="btn-collapse-all" class="control-btn" aria-label="Collapse all person details">Collapse All</button>
-            <button id="btn-shuffle-list" class="control-btn" aria-label="Shuffle the list">Shuffle</button>
-          </div>
-          
-          <div class="people-count-display">
-            <span>Showing <strong id="people-count">0</strong> people</span>
-          </div>
-          <!-- Data audit: quick dataset coverage stats -->
-          <div id="data-audit" class="data-audit" aria-live="polite" style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
-            <div class="audit-item"><strong>Total:</strong> <span id="audit-total">0</span></div>
-            <div class="audit-item"><strong>With events:</strong> <span id="audit-events">0</span></div>
-            <div class="audit-item"><strong>With occupation:</strong> <span id="audit-occupation">0</span></div>
-            <div class="audit-item"><strong>With mother:</strong> <span id="audit-mother">0</span></div>
-            <div class="audit-item"><strong>With aliases:</strong> <span id="audit-aliases">0</span></div>
-            <div class="audit-item"><strong>With age:</strong> <span id="audit-age">0</span></div>
-            <button id="btn-data-quality" class="control-btn" style="margin-left:8px">Data Quality</button>
-          </div>
-        </header>
-        
-        <main class="study-content">
-          <div id="people-list" class="people-list" aria-live="polite"></div>
-        </main>
+          <main class="study-content">
+            <div id="people-list" class="people-list" aria-live="polite"></div>
+          </main>
+        </div>
       </section>
 
     </main>
     <footer class="footer">
       <div class="footer-content">
-        <div class="footer-top">
-          <div class="footer-brand">
-            <img src="assets/images/logo.png" alt="Who-Bible Logo" class="footer-logo" />
-            <div class="footer-title">Who-Bible</div>
-          </div>
-          <a id="footer-community" href="#community" class="footer-link coming-soon" rel="noopener">Community</a>
+        <div class="footer-brand">
+          <img src="assets/images/logo.png" alt="Who-Bible Logo" class="footer-logo" />
+          <div class="footer-title">Who-Bible</div>
         </div>
+        
+        <div class="footer-nav">
+          <a id="footer-community" href="community.html" class="footer-link coming-soon" rel="noopener">Community</a>
+        </div>
+        
         <div class="footer-bottom">
           <p>© <span id="footer-year"></span> Who-Bible</p>
         </div>
@@ -384,60 +403,6 @@
       </main>
       <footer class="modal-footer">
         <button id="btn-community-ok" class="primary">Close</button>
-      </footer>
-    </div>
-  </div>
-
-  <!-- Data Quality Modal -->
-  <div id="data-quality-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="data-quality-title" aria-modal="true">
-    <div class="modal" role="document">
-      <header class="modal-header">
-        <h2 id="data-quality-title">Data Quality Report</h2>
-        <button id="btn-data-quality-close" aria-label="Close data quality">✕</button>
-      </header>
-      <main class="modal-body" id="data-quality-body">
-        <div id="data-quality-summary"></div>
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <button id="btn-load-candidates" class="control-btn">Load Candidates</button>
-          <button id="btn-export-accepted" class="control-btn">Export Accepted</button>
-        </div>
-        <div id="data-quality-list"></div>
-      </main>
-      <footer class="modal-footer">
-        <button id="btn-dq-accept-all" class="control-btn primary">Accept All Inferred</button>
-        <button id="btn-dq-export" class="control-btn">Export Report</button>
-        <button id="btn-dq-close" class="control-btn">Close</button>
-      </footer>
-    </div>
-  </div>
-
-  <!-- Person Editor Modal -->
-  <div id="person-editor-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="person-editor-title" aria-modal="true">
-    <div class="modal" role="document">
-      <header class="modal-header">
-        <h2 id="person-editor-title">Edit Person</h2>
-        <button id="btn-person-editor-close" aria-label="Close editor">✕</button>
-      </header>
-      <main class="modal-body">
-        <form id="person-editor-form">
-          <div class="row"><label for="edit-name">Name</label><input id="edit-name" type="text" /></div>
-          <div class="row"><label for="edit-aliases">Aliases (comma-separated)</label><input id="edit-aliases" type="text" /></div>
-          <div class="row"><label for="edit-mother">Mother</label><input id="edit-mother" type="text" /></div>
-          <div class="row"><label for="edit-occupation">Occupation</label><input id="edit-occupation" type="text" /></div>
-          <div class="row"><label for="edit-age">Age notes</label><input id="edit-age" type="text" /></div>
-          <div class="row"><label for="edit-events">Notable events (one per line)</label><textarea id="edit-events" rows="4"></textarea></div>
-          <div class="row"><label for="edit-verses">Verses (comma-separated)</label><input id="edit-verses" type="text" /></div>
-          <div class="row"><label for="edit-testament">Testament</label>
-            <select id="edit-testament"><option value="ot">Old Testament</option><option value="nt">New Testament</option></select>
-          </div>
-          <div class="row"><label for="edit-gender">Gender</label>
-            <select id="edit-gender"><option value="male">Male</option><option value="female">Female</option></select>
-          </div>
-        </form>
-      </main>
-      <footer class="modal-footer">
-        <button id="btn-person-save" class="control-btn primary">Save</button>
-        <button id="btn-person-cancel" class="control-btn">Cancel</button>
       </footer>
     </div>
   </div>
