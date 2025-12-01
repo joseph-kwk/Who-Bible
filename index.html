@@ -8,6 +8,15 @@
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  
+  <!-- App Scripts -->
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/remote-challenge.js"></script>
+  <script src="assets/js/remote-challenge-ui.js"></script>
   <script src="assets/js/relationships.js" defer></script>
   <script src="assets/js/translations.js" defer></script>
 </head>
@@ -148,7 +157,14 @@
                 <div class="mode-icon" aria-hidden="true">⚔️</div>
                 <div class="mode-text">
                   <div class="mode-title">Challenge Mode</div>
-                  <div class="mode-desc" id="challenge-desc">Two players compete</div>
+                  <div class="mode-desc" id="challenge-desc">Two players, same device</div>
+                </div>
+              </button>
+              <button id="btn-remote-challenge" class="mode-btn" data-mode="remote" aria-describedby="remote-desc" style="display:none;">
+                <div class="mode-icon" aria-hidden="true">🌐</div>
+                <div class="mode-text">
+                  <div class="mode-title">Remote Challenge</div>
+                  <div class="mode-desc" id="remote-desc">Play with anyone, anywhere</div>
                 </div>
               </button>
               <button id="btn-study" class="mode-btn" data-mode="study" aria-describedby="study-desc">
@@ -391,7 +407,109 @@
         </div>
       </footer>
     </div>
-  </div>  <!-- Community Modal (for room details etc.) -->
+  </div>
+
+  <!-- Remote Challenge Modal -->
+  <div id="remote-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="remote-modal-title" aria-modal="true">
+    <div class="modal" role="document">
+      <header class="modal-header">
+        <h2 id="remote-modal-title">Remote Challenge</h2>
+        <button id="btn-remote-close" aria-label="Close remote challenge">✕</button>
+      </header>
+      <main class="modal-body">
+        <!-- Step 1: Choose Create or Join -->
+        <div id="remote-step-1">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <p>Play with anyone, anywhere! No sign-in required.</p>
+          </div>
+          <div style="display: flex; gap: 16px; flex-direction: column;">
+            <button id="btn-create-room" class="primary" style="padding: 16px;">
+              <div style="font-size: 24px; margin-bottom: 8px;">🎮</div>
+              <div><strong>Create Room</strong></div>
+              <div style="font-size: 14px; opacity: 0.8;">Start a new challenge and share with a friend</div>
+            </button>
+            <button id="btn-join-room" style="padding: 16px;">
+              <div style="font-size: 24px; margin-bottom: 8px;">🚪</div>
+              <div><strong>Join Room</strong></div>
+              <div style="font-size: 14px; opacity: 0.8;">Enter a room code to join an existing challenge</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Create Room -->
+        <div id="remote-step-create" style="display:none;">
+          <div class="row">
+            <label for="remote-host-name">Your Name</label>
+            <input id="remote-host-name" type="text" placeholder="Enter your name" maxlength="20" />
+          </div>
+          <div style="text-align: center; margin-top: 16px;">
+            <button id="btn-create-room-confirm" class="primary">Create Room & Get Link</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Room Created - Share Link -->
+        <div id="remote-step-share" style="display:none;">
+          <div style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+            <h3>Room Created!</h3>
+            <p>Share this link with your friend:</p>
+            <div style="background: var(--card); border: 2px solid var(--accent); border-radius: 8px; padding: 16px; margin: 16px 0;">
+              <div style="font-family: monospace; font-size: 18px; font-weight: bold; color: var(--accent); margin-bottom: 8px;" id="remote-room-code">CODE-123</div>
+              <div style="font-size: 14px; word-break: break-all; color: var(--muted);" id="remote-share-url">URL</div>
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+              <button id="btn-copy-link" class="secondary">📋 Copy Link</button>
+              <button id="btn-share-link" class="secondary">📤 Share</button>
+            </div>
+            <div style="margin-top: 24px; padding: 16px; background: var(--glass); border-radius: 8px;">
+              <div style="font-size: 14px; margin-bottom: 8px;"><strong>Waiting for opponent...</strong></div>
+              <div id="remote-opponent-status" style="color: var(--muted); font-size: 13px;">Room created. Waiting for player 2 to join.</div>
+            </div>
+            <div style="margin-top: 16px;">
+              <button id="btn-ready-host" class="primary" style="display:none;">Ready to Start!</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Join Room -->
+        <div id="remote-step-join" style="display:none;">
+          <div class="row">
+            <label for="remote-room-code-input">Room Code</label>
+            <input id="remote-room-code-input" type="text" placeholder="e.g. FAITH-247" style="text-transform: uppercase;" maxlength="20" />
+          </div>
+          <div class="row">
+            <label for="remote-join-name">Your Name</label>
+            <input id="remote-join-name" type="text" placeholder="Enter your name" maxlength="20" />
+          </div>
+          <div style="text-align: center; margin-top: 16px;">
+            <button id="btn-join-room-confirm" class="primary">Join Room</button>
+          </div>
+        </div>
+
+        <!-- Step 5: Joined - Waiting for Host -->
+        <div id="remote-step-joined" style="display:none;">
+          <div style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+            <h3>Joined Room!</h3>
+            <div style="margin: 24px 0; padding: 16px; background: var(--glass); border-radius: 8px;">
+              <div style="font-size: 14px; margin-bottom: 8px;"><strong>Room:</strong> <span id="remote-joined-code">CODE-123</span></div>
+              <div style="font-size: 14px; margin-bottom: 8px;"><strong>Host:</strong> <span id="remote-host-name-display">Player 1</span></div>
+              <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+                <div id="remote-joined-status" style="color: var(--muted); font-size: 13px;">Waiting for both players to be ready...</div>
+              </div>
+            </div>
+            <button id="btn-ready-guest" class="primary">Ready to Start!</button>
+          </div>
+        </div>
+      </main>
+      <footer class="modal-footer">
+        <button id="btn-remote-back" style="display:none;">← Back</button>
+        <button id="btn-remote-cancel">Cancel</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Community Modal (for room details etc.) -->
   <div id="community-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="community-modal-title" aria-modal="true">
     <div class="modal" role="document">
       <header class="modal-header">

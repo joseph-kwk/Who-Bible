@@ -270,6 +270,7 @@ const studyPanel = document.getElementById('study-panel');
 const btnSolo = document.getElementById('btn-solo');
 const btnTimed = document.getElementById('btn-timed');
 const btnChallenge = document.getElementById('btn-challenge');
+const btnRemoteChallenge = document.getElementById('btn-remote-challenge');
 const btnStudy = document.getElementById('btn-study');
 const difficultySel = document.getElementById('difficulty');
 const numQuestionsInput = document.getElementById('num-questions');
@@ -329,6 +330,23 @@ const btnPlayersCancel = document.getElementById('btn-players-cancel');
 const btnPlayersStart = document.getElementById('btn-players-start');
 const p1NameInput = document.getElementById('p1-name');
 const p2NameInput = document.getElementById('p2-name');
+
+// Remote Challenge Modal elements
+const remoteModal = document.getElementById('remote-modal');
+const btnRemoteClose = document.getElementById('btn-remote-close');
+const btnRemoteCancel = document.getElementById('btn-remote-cancel');
+const btnRemoteBack = document.getElementById('btn-remote-back');
+const btnCreateRoom = document.getElementById('btn-create-room');
+const btnJoinRoom = document.getElementById('btn-join-room');
+const btnCreateRoomConfirm = document.getElementById('btn-create-room-confirm');
+const btnJoinRoomConfirm = document.getElementById('btn-join-room-confirm');
+const btnCopyLink = document.getElementById('btn-copy-link');
+const btnShareLink = document.getElementById('btn-share-link');
+const btnReadyHost = document.getElementById('btn-ready-host');
+const btnReadyGuest = document.getElementById('btn-ready-guest');
+const remoteHostNameInput = document.getElementById('remote-host-name');
+const remoteJoinNameInput = document.getElementById('remote-join-name');
+const remoteRoomCodeInput = document.getElementById('remote-room-code-input');
 
 // Theme and toasts
 const btnTheme = document.getElementById('btn-theme');
@@ -415,6 +433,28 @@ function init(){
   if (window.RelationshipSystem) {
     RelationshipSystem.buildRelationshipGraph(state.people);
     console.log('✓ Relationship graph built for', state.people.length, 'people');
+  }
+  
+  // Initialize Firebase and show Remote Challenge if available
+  if (window.FirebaseConfig) {
+    const firebaseReady = window.FirebaseConfig.initialize();
+    if (firebaseReady && btnRemoteChallenge) {
+      btnRemoteChallenge.style.display = 'block';
+      console.log('✓ Remote Challenge enabled (Firebase configured)');
+      
+      // Check if there's a room code in URL
+      const roomCodeFromUrl = window.RemoteChallenge?.getRoomCodeFromUrl();
+      if (roomCodeFromUrl) {
+        // Auto-open join flow
+        setTimeout(() => {
+          showRemoteModal();
+          showRemoteStep('join');
+          remoteRoomCodeInput.value = roomCodeFromUrl;
+        }, 500);
+      }
+    } else {
+      console.log('ℹ Remote Challenge disabled (Firebase not configured)');
+    }
   }
   
   // Load or create player
@@ -570,6 +610,41 @@ function attachHandlers(){
   }
   // Community placeholder behavior
   // Community opens in a new tab via anchor href
+  
+  // Remote Challenge handlers
+  if (btnRemoteChallenge && window.RemoteChallengeUI) {
+    btnRemoteChallenge.addEventListener('click', window.RemoteChallengeUI.start);
+  }
+  if (btnRemoteClose && window.RemoteChallengeUI) {
+    btnRemoteClose.addEventListener('click', window.RemoteChallengeUI.hide);
+  }
+  if (btnRemoteBack && window.RemoteChallengeUI) {
+    btnRemoteBack.addEventListener('click', () => window.RemoteChallengeUI.showStep('1'));
+  }
+  if (btnCreateRoom && window.RemoteChallengeUI) {
+    btnCreateRoom.addEventListener('click', () => window.RemoteChallengeUI.showStep('create'));
+  }
+  if (btnJoinRoom && window.RemoteChallengeUI) {
+    btnJoinRoom.addEventListener('click', () => window.RemoteChallengeUI.showStep('join'));
+  }
+  if (btnConfirmCreate && window.RemoteChallengeUI) {
+    btnConfirmCreate.addEventListener('click', window.RemoteChallengeUI.createRoom);
+  }
+  if (btnConfirmJoin && window.RemoteChallengeUI) {
+    btnConfirmJoin.addEventListener('click', window.RemoteChallengeUI.joinRoom);
+  }
+  if (btnCopyLink && window.RemoteChallengeUI) {
+    btnCopyLink.addEventListener('click', window.RemoteChallengeUI.copyLink);
+  }
+  if (btnShareLink && window.RemoteChallengeUI) {
+    btnShareLink.addEventListener('click', window.RemoteChallengeUI.shareLink);
+  }
+  if (btnReadyHost && window.RemoteChallengeUI) {
+    btnReadyHost.addEventListener('click', window.RemoteChallengeUI.readyHost);
+  }
+  if (btnReadyGuest && window.RemoteChallengeUI) {
+    btnReadyGuest.addEventListener('click', window.RemoteChallengeUI.readyGuest);
+  }
   
   // Modal handlers
   btnSummaryClose.addEventListener('click', hideSummaryModal);
@@ -914,10 +989,18 @@ function handleAnswer(choice,q, el){
       state.players[state.currentPlayerIndex].score += 10;
       updateChallengeScores();
     }
+    // Remote challenge: sync score to Firebase
+    if(state.mode==='remote-challenge' && window.RemoteChallenge){
+      window.RemoteChallenge.submitAnswer(state.qnum - 1, true, 0);
+    }
     showToast({ title: getText('correctAnswer'), msg: getText('correctMsg'), type: 'success', timeout: 1500 });
   }else{
     state.streak = 0;
   afterRef.innerText = `${getText('wrongAnswer')}. ${getText('correctLabel')}: ${translateAnswerForQuestionType(q.type, q.answer)}. ${getText('references')}: ${(q.ref||[]).join(', ')}`;
+  // Remote challenge: sync score to Firebase
+    if(state.mode==='remote-challenge' && window.RemoteChallenge){
+      window.RemoteChallenge.submitAnswer(state.qnum - 1, false, 0);
+    }
   showToast({ title: getText('wrongAnswer'), msg: getText('wrongMsg', { answer: translateAnswerForQuestionType(q.type, q.answer) }), type: 'error', timeout: 1800 });
   }
 
@@ -968,6 +1051,11 @@ function endQuiz(){
   const correctAnswers = state.results.filter(r => r.correct).length;
   const totalQuestions = state.results.length;
   updatePlayerStats(state.score, state.streak, correctAnswers, totalQuestions, state.mode);
+  
+  // Complete remote challenge if in remote mode
+  if(state.mode==='remote-challenge' && window.RemoteChallenge){
+    window.RemoteChallenge.completeChallenge();
+  }
   
   state.current=null; state.questions=[]; state.qnum=0; state.qtotal=0;
   btnNext.disabled = true;
