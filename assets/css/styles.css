@@ -135,9 +135,7 @@ body {
 }
 
 /* Ensure body starts with night theme by default */
-body:not(.day) {
-  /* Apply night theme variables */
-}
+/* Default night theme variables are defined in :root, so no additional night-only overrides are needed. */
 
 /* ===== GLOBAL TRANSITION EFFECTS ===== */
 * {
@@ -1094,7 +1092,10 @@ button:disabled:hover {
   font-size: 14px;
   line-height: 1.5;
   text-align: center;
-  empty: display: none;
+}
+
+.after-ref:empty {
+  display: none;
 }
 
 .timer {
@@ -2063,7 +2064,7 @@ button:disabled:hover {
     padding: 16px;
   }
 }
-
+ 
 /* ===== COMMUNITY PAGE STYLES ===== */
 .community-panel {
   display: flex;
@@ -2308,6 +2309,63 @@ button:disabled:hover {
 #guidelines-list li {
   margin-bottom: 12px;
   padding-left: 8px;
+}
+
+/* Card icons for featured content */
+.card-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  text-align: center;
+  filter: drop-shadow(0 4px 8px var(--shadow));
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: var(--font-weight-bold);
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: var(--font-weight-medium);
+}
+
+/* Live rooms specific styles */
+#live-rooms-list .card {
+  transition: all var(--transition-fast);
+}
+
+#live-rooms-list .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px var(--shadow-2);
 }
 
 /* Responsive community page */
