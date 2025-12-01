@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Who-Bible Comprehensive Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #0a0a0a;
+      color: #e0e0e0;
+    }
+    h1 { color: #4a9eff; }
+    h2 { color: #6ab7ff; margin-top: 30px; }
+    .test-section {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .test-item {
+      padding: 10px;
+      margin: 5px 0;
+      border-left: 4px solid #666;
+      background: #0f0f0f;
+    }
+    .test-item.pass { border-left-color: #4caf50; }
+    .test-item.fail { border-left-color: #f44336; }
+    .test-item.warning { border-left-color: #ff9800; }
+    .test-item.info { border-left-color: #2196f3; }
+    button {
+      background: #4a9eff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover { background: #6ab7ff; }
+    code {
+      background: #222;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+    pre {
+      background: #0a0a0a;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2em;
+      font-weight: bold;
+      color: #4a9eff;
+    }
+    .stat-label {
+      color: #aaa;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Who-Bible Comprehensive Test Suite</h1>
+  <p>This page runs automated tests on all components of the Who-Bible application.</p>
+  
+  <div>
+    <button onclick="runAllTests()">▶️ Run All Tests</button>
+    <button onclick="testDataIntegrity()">📊 Test Data</button>
+    <button onclick="testUIElements()">🎨 Test UI</button>
+    <button onclick="testGameLogic()">🎮 Test Game Logic</button>
+    <button onclick="testFirebase()">🔥 Test Firebase</button>
+    <button onclick="testTranslations()">🌍 Test i18n</button>
+  </div>
+
+  <div id="results"></div>
+
+  <script>
+    const results = document.getElementById('results');
+
+    function addSection(title) {
+      const section = document.createElement('div');
+      section.className = 'test-section';
+      section.innerHTML = `<h2>${title}</h2>`;
+      results.appendChild(section);
+      return section;
+    }
+
+    function addTest(section, status, message) {
+      const item = document.createElement('div');
+      item.className = `test-item ${status}`;
+      item.textContent = message;
+      section.appendChild(item);
+    }
+
+    async function runAllTests() {
+      results.innerHTML = '';
+      await testDataIntegrity();
+      await testUIElements();
+      await testGameLogic();
+      await testFirebase();
+      await testTranslations();
+      
+      const section = addSection('✅ Test Summary');
+      addTest(section, 'pass', 'All tests completed! Check results above.');
+    }
+
+    async function testDataIntegrity() {
+      const section = addSection('📊 Data Integrity Tests');
+      
+      try {
+        const response = await fetch('assets/data/people.json');
+        const data = await response.json();
+        
+        addTest(section, 'pass', `✓ Loaded ${data.length} people from external JSON`);
+        
+        // Testament distribution
+        const ot = data.filter(p => p.testament === 'ot').length;
+        const nt = data.filter(p => p.testament === 'nt').length;
+        addTest(section, 'info', `Testament: ${ot} OT, ${nt} NT (Total: ${ot + nt})`);
+        
+        // Gender distribution
+        const male = data.filter(p => p.gender === 'male').length;
+        const female = data.filter(p => p.gender === 'female').length;
+        addTest(section, 'info', `Gender: ${male} male, ${female} female`);
+        
+        // Data completeness
+        const withVerses = data.filter(p => p.verses && p.verses.length > 0).length;
+        const withEvents = data.filter(p => p.notable_events && p.notable_events.length > 0).length;
+        const withFamily = data.filter(p => p.mother || p.father || p.spouse || (p.children && p.children.length > 0)).length;
+        
+        addTest(section, withVerses === data.length ? 'pass' : 'warning', 
+          `Verses: ${withVerses}/${data.length} (${Math.round(withVerses/data.length*100)}%)`);
+        addTest(section, withEvents === data.length ? 'pass' : 'warning', 
+          `Events: ${withEvents}/${data.length} (${Math.round(withEvents/data.length*100)}%)`);
+        addTest(section, 'info', `Family data: ${withFamily}/${data.length} (${Math.round(withFamily/data.length*100)}%)`);
+        
+        // Required fields check
+        let missingFields = 0;
+        data.forEach(person => {
+          if (!person.name) missingFields++;
+          if (!person.testament) missingFields++;
+          if (!person.gender) missingFields++;
+        });
+        
+        if (missingFields === 0) {
+          addTest(section, 'pass', '✓ All people have required fields (name, testament, gender)');
+        } else {
+          addTest(section, 'fail', `✗ ${missingFields} missing required fields`);
+        }
+        
+      } catch (error) {
+        addTest(section, 'fail', `✗ Failed to load data: ${error.message}`);
+      }
+    }
+
+    async function testUIElements() {
+      const section = addSection('🎨 UI Elements Tests');
+      
+      try {
+        // Check for critical DOM elements
+        const elements = {
+          'Setup Panel': document.querySelector('.setup-panel'),
+          'Game Area': document.querySelector('.game-area'),
+          'Study Panel': document.querySelector('.study-panel'),
+          'Solo Button': document.getElementById('btn-solo'),
+          'Timed Button': document.getElementById('btn-timed'),
+          'Challenge Button': document.getElementById('btn-challenge'),
+          'Study Button': document.getElementById('btn-study'),
+          'Remote Challenge Button': document.getElementById('btn-remote-challenge'),
+          'Theme Toggle': document.querySelector('.theme-toggle'),
+          'Language Selector': document.getElementById('language-select')
+        };
+        
+        let missing = 0;
+        for (const [name, element] of Object.entries(elements)) {
+          if (element) {
+            addTest(section, 'pass', `✓ Found ${name}`);
+          } else {
+            addTest(section, 'fail', `✗ Missing ${name}`);
+            missing++;
+          }
+        }
+        
+        if (missing === 0) {
+          addTest(section, 'pass', '✓ All UI elements present');
+        }
+        
+        // Check modals
+        const modals = ['summary-modal', 'settings-modal', 'remote-modal'];
+        modals.forEach(id => {
+          const modal = document.getElementById(id);
+          if (modal) {
+            addTest(section, 'pass', `✓ Found ${id}`);
+          } else {
+            addTest(section, 'warning', `⚠ Missing ${id}`);
+          }
+        });
+        
+      } catch (error) {
+        addTest(section, 'fail', `✗ UI test error: ${error.message}`);
+      }
+    }
+
+    async function testGameLogic() {
+      const section = addSection('🎮 Game Logic Tests');
+      
+      try {
+        // Check if app.js loaded
+        if (typeof state === 'undefined') {
+          addTest(section, 'fail', '✗ app.js not loaded - state object missing');
+          return;
+        }
+        
+        addTest(section, 'pass', '✓ app.js loaded successfully');
+        
+        // Check state object
+        if (state.people && state.people.length > 0) {
+          addTest(section, 'pass', `✓ State initialized with ${state.people.length} people`);
+        } else {
+          addTest(section, 'warning', '⚠ State people array is empty - may not be initialized yet');
+        }
+        
+        // Check if functions exist
+        const functions = ['startQuiz', 'generateQuestions', 'handleAnswer', 'endQuiz'];
+        functions.forEach(fn => {
+          if (typeof window[fn] === 'function') {
+            addTest(section, 'pass', `✓ Function ${fn} exists`);
+          } else {
+            addTest(section, 'warning', `⚠ Function ${fn} not found in global scope`);
+          }
+        });
+        
+      } catch (error) {
+        addTest(section, 'fail', `✗ Game logic test error: ${error.message}`);
+      }
+    }
+
+    async function testFirebase() {
+      const section = addSection('🔥 Firebase Tests');
+      
+      try {
+        if (typeof FirebaseConfig === 'undefined') {
+          addTest(section, 'fail', '✗ firebase-config.js not loaded');
+          return;
+        }
+        
+        addTest(section, 'pass', '✓ firebase-config.js loaded');
+        
+        if (typeof RemoteChallenge === 'undefined') {
+          addTest(section, 'fail', '✗ remote-challenge.js not loaded');
+          return;
+        }
+        
+        addTest(section, 'pass', '✓ remote-challenge.js loaded');
+        
+        // Check Firebase availability
+        if (FirebaseConfig.isFirebaseAvailable && FirebaseConfig.isFirebaseAvailable()) {
+          addTest(section, 'pass', '✓ Firebase SDK loaded and available');
+          
+          // Test database connection
+          try {
+            const db = FirebaseConfig.getDatabase();
+            if (db) {
+              addTest(section, 'pass', '✓ Firebase database initialized');
+            }
+          } catch (e) {
+            addTest(section, 'warning', `⚠ Database init issue: ${e.message}`);
+          }
+        } else {
+          addTest(section, 'warning', '⚠ Firebase SDK not available');
+        }
+        
+        // Check RemoteChallenge functions
+        const remoteFns = ['generateRoomCode', 'createRoom', 'joinRoom'];
+        remoteFns.forEach(fn => {
+          if (typeof RemoteChallenge[fn] === 'function') {
+            addTest(section, 'pass', `✓ RemoteChallenge.${fn} exists`);
+          } else {
+            addTest(section, 'fail', `✗ RemoteChallenge.${fn} missing`);
+          }
+        });
+        
+      } catch (error) {
+        addTest(section, 'fail', `✗ Firebase test error: ${error.message}`);
+      }
+    }
+
+    async function testTranslations() {
+      const section = addSection('🌍 Internationalization Tests');
+      
+      try {
+        if (typeof getText === 'undefined') {
+          addTest(section, 'fail', '✗ translations.js not loaded');
+          return;
+        }
+        
+        addTest(section, 'pass', '✓ translations.js loaded');
+        
+        // Test languages
+        const languages = ['en', 'es', 'fr'];
+        for (const lang of languages) {
+          try {
+            const response = await fetch(`assets/i18n/${lang}.json`);
+            if (response.ok) {
+              const data = await response.json();
+              const keys = Object.keys(data).length;
+              addTest(section, 'pass', `✓ ${lang}.json loaded (${keys} keys)`);
+            } else {
+              addTest(section, 'fail', `✗ ${lang}.json not found`);
+            }
+          } catch (e) {
+            addTest(section, 'fail', `✗ Error loading ${lang}.json: ${e.message}`);
+          }
+        }
+        
+        // Test getText function
+        const testKey = getText('app_title');
+        if (testKey) {
+          addTest(section, 'pass', `✓ getText works: "${testKey}"`);
+        } else {
+          addTest(section, 'warning', '⚠ getText returned empty for app_title');
+        }
+        
+      } catch (error) {
+        addTest(section, 'fail', `✗ i18n test error: ${error.message}`);
+      }
+    }
+
+    // Auto-run tests on load
+    window.addEventListener('load', () => {
+      setTimeout(runAllTests, 1000); // Give app time to initialize
+    });
+  </script>
+</body>
+</html>
