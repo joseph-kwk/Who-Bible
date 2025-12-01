@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Tool outputs (large generated files)
+tools/*.json
+tools/*.csv
+tools/wikidata_people_raw.json
+tools/people_from_wikidata.json
+tools/people_auto_annotated.json
+tools/data_quality_report.json
+
+# Keep important small files by negating
+!tools/people_from_wikidata.candidates.relaxed.json
+
+# Backups
+assets/data/*.backup.*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
