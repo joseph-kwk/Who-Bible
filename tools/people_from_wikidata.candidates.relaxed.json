@@ -1,0 +1,121 @@
+[
+  {
+    "name": "Joah",
+    "aliases": [],
+    "mother": "",
+    "father": "",
+    "spouse": "",
+    "children": [],
+    "occupation": "",
+    "age_notes": "",
+    "notable_events": [],
+    "verses": [],
+    "short_bio": "given name",
+    "testament": "unknown",
+    "gender": "unknown",
+    "_qid": "Q1690679",
+    "_source": "wikidata:Q1690679",
+    "_wikilink": "https://en.wikipedia.org/wiki/Joah",
+    "_inferred_testament": false,
+    "_inferred_gender": true,
+    "_verified": false,
+    "_candidates": [
+      {
+        "name": "Jonah",
+        "score": 0.8,
+        "source": "canonical"
+      }
+    ]
+  },
+  {
+    "name": "Abey",
+    "aliases": [],
+    "mother": "",
+    "father": "",
+    "spouse": "",
+    "children": [],
+    "occupation": "",
+    "age_notes": "",
+    "notable_events": [],
+    "verses": [],
+    "short_bio": "given name",
+    "testament": "unknown",
+    "gender": "unknown",
+    "_qid": "Q2821587",
+    "_source": "wikidata:Q2821587",
+    "_wikilink": "",
+    "_inferred_testament": false,
+    "_inferred_gender": true,
+    "_verified": false,
+    "_candidates": [
+      {
+        "name": "Abel",
+        "score": 0.75,
+        "source": "canonical"
+      }
+    ]
+  },
+  {
+    "name": "Maro",
+    "aliases": [
+      "Maro (given name)",
+      "Maro (first name)"
+    ],
+    "mother": "",
+    "father": "",
+    "spouse": "",
+    "children": [],
+    "occupation": "",
+    "age_notes": "",
+    "notable_events": [],
+    "verses": [],
+    "short_bio": "unisex given name",
+    "testament": "unknown",
+    "gender": "unknown",
+    "_qid": "Q3849764",
+    "_source": "wikidata:Q3849764",
+    "_wikilink": "https://en.wikipedia.org/wiki/Maro_(name)",
+    "_inferred_testament": false,
+    "_inferred_gender": true,
+    "_verified": false,
+    "_candidates": [
+      {
+        "name": "Mary (mother of Jesus)",
+        "score": 0.75,
+        "source": "canonical"
+      }
+    ]
+  },
+  {
+    "name": "Aram",
+    "aliases": [
+      "Արամ",
+      "Aram (given name)",
+      "Aram (first name)"
+    ],
+    "mother": "",
+    "father": "",
+    "spouse": "",
+    "children": [],
+    "occupation": "",
+    "age_notes": "",
+    "notable_events": [],
+    "verses": [],
+    "short_bio": "male given name (Արամ)",
+    "testament": "unknown",
+    "gender": "unknown",
+    "_qid": "Q4068496",
+    "_source": "wikidata:Q4068496",
+    "_wikilink": "https://en.wikipedia.org/wiki/Aram_(given_name)",
+    "_inferred_testament": false,
+    "_inferred_gender": true,
+    "_verified": false,
+    "_candidates": [
+      {
+        "name": "Adam",
+        "score": 0.75,
+        "source": "canonical"
+      }
+    ]
+  }
+]
