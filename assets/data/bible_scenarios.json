@@ -1,0 +1,107 @@
+[
+  {
+    "scenario_id": "Gideon_Army_Selection",
+    "theme": "Trust and Obedience",
+    "book_ref": "Judges 7:2-7",
+    "challenge": "Gideon's army of 32,000 is too large; God commands a reduction to prove victory comes from Him. After the first cut (fearful soldiers), 10,000 remain. How does God instruct Gideon to select the final 300 men?",
+    "options": [
+      "A. Select only the oldest and most seasoned warriors.",
+      "B. Choose those who kneel down to drink water directly from the stream.",
+      "C. Choose those who scoop water with their hands to drink while remaining vigilant."
+    ],
+    "correct_answer": "C",
+    "explanation": "God selected the 300 men who scooped the water with their hands to drink, remaining watchful of the enemy. This demonstrated their vigilance and preparedness, though their small number emphasized God's role in the victory.",
+    "level": "Intermediate",
+    "tags": ["Gideon", "Judges", "Faith", "Military"]
+  },
+  {
+    "scenario_id": "David_Nabal_Abigail",
+    "theme": "Wisdom vs. Revenge",
+    "book_ref": "1 Samuel 25:1-35",
+    "challenge": "David and his men protected Nabal's shepherds, but Nabal rudely refused to share provisions. David is ready to slaughter Nabal's entire household. What key action saves the family and prevents David from shedding innocent blood?",
+    "options": [
+      "A. David receives a vision from the Prophet Samuel to stop.",
+      "B. Nabal's wife, Abigail, intercepts David with a large gift and a plea for wisdom.",
+      "C. Jonathan arrives and reminds David of his covenant with Saul's family."
+    ],
+    "correct_answer": "B",
+    "explanation": "Abigail intercepted David with gifts and a humble, insightful plea, reminding David that vengeance belonged to the Lord. David praised God for sending her to restrain him from taking revenge.",
+    "level": "Advanced",
+    "tags": ["David", "Abigail", "Wisdom", "Ethics"]
+  },
+  {
+    "scenario_id": "Council_of_Jerusalem",
+    "theme": "Theology and Unity",
+    "book_ref": "Acts 15:1-29",
+    "challenge": "A critical dispute arose: Must Gentile believers be circumcised and obey the Law of Moses to be saved? What was the decision reached by the Apostles and elders in Jerusalem?",
+    "options": [
+      "A. They must fully convert to Judaism, including circumcision.",
+      "B. They must refrain from food polluted by idols, sexual immorality, strangled meat, and blood.",
+      "C. They must only believe in Jesus, with no requirements from the Mosaic Law."
+    ],
+    "correct_answer": "B",
+    "explanation": "The Council affirmed salvation by grace through faith, but asked Gentile converts to abstain from four specific practices (idolatry, sexual sin, meat with blood) to promote unity and respect with Jewish believers.",
+    "level": "Expert",
+    "tags": ["Apostles", "Paul", "Gentiles", "Law", "Acts"]
+  },
+  {
+    "scenario_id": "Moses_Burning_Bush",
+    "theme": "Divine Calling",
+    "book_ref": "Exodus 3:1-12",
+    "challenge": "Moses encounters God in a burning bush and is called to free Israel from Egypt. What reason does Moses initially give for why he cannot fulfill this mission?",
+    "options": [
+      "A. 'I am not eloquent; I am slow of speech and tongue.'",
+      "B. 'Who am I that I should go to Pharaoh?'",
+      "C. 'The Israelites will not believe me or listen to me.'"
+    ],
+    "correct_answer": "B",
+    "explanation": "Moses' first objection was about his inadequacy: 'Who am I that I should go to Pharaoh and bring the Israelites out of Egypt?' God responded by promising His presence: 'I will be with you.'",
+    "level": "Beginner",
+    "tags": ["Moses", "Exodus", "Calling", "Humility"]
+  },
+  {
+    "scenario_id": "Solomon_Two_Mothers",
+    "theme": "Wisdom and Justice",
+    "book_ref": "1 Kings 3:16-28",
+    "challenge": "Two women claim to be the mother of the same baby. How does Solomon determine the true mother?",
+    "options": [
+      "A. He asks them to swear an oath before the Ark of the Covenant.",
+      "B. He proposes to cut the baby in half and give each woman a portion.",
+      "C. He has the baby spend time with each woman to see which one it prefers."
+    ],
+    "correct_answer": "B",
+    "explanation": "Solomon proposed cutting the baby in half. The true mother immediately offered to give up the baby rather than see it harmed, revealing her genuine love. This demonstrated Solomon's God-given wisdom.",
+    "level": "Beginner",
+    "tags": ["Solomon", "Wisdom", "Justice", "Kings"]
+  },
+  {
+    "scenario_id": "Peter_Vision_Gentiles",
+    "theme": "Inclusion and Breaking Barriers",
+    "book_ref": "Acts 10:9-23",
+    "challenge": "Peter has a vision of unclean animals being lowered in a sheet, and a voice tells him to 'kill and eat.' What is the deeper meaning of this vision?",
+    "options": [
+      "A. The dietary laws of the Old Testament are now abolished for all believers.",
+      "B. God is declaring that Gentiles are no longer unclean and can receive the Gospel.",
+      "C. Peter must begin preaching to animals and all of creation."
+    ],
+    "correct_answer": "B",
+    "explanation": "The vision was about people, not just food. God was preparing Peter to accept Cornelius (a Gentile) and recognize that the Gospel was for all nations, not just Jews. 'God has shown me that I should not call anyone impure or unclean.'",
+    "level": "Advanced",
+    "tags": ["Peter", "Gentiles", "Vision", "Acts", "Inclusion"]
+  },
+  {
+    "scenario_id": "Job_Friends_Counsel",
+    "theme": "Suffering and Faith",
+    "book_ref": "Job 2:11-13, 42:7-9",
+    "challenge": "Job loses everything and sits in ashes. His three friends come to comfort him. What is God's ultimate verdict on the friends' counsel?",
+    "options": [
+      "A. They spoke the truth and helped Job understand his sin.",
+      "B. They did not speak the truth about God, and must offer sacrifices.",
+      "C. They were silent and therefore did no wrong."
+    ],
+    "correct_answer": "B",
+    "explanation": "At the end of the book, God rebukes Job's friends: 'You have not spoken the truth about me, as my servant Job has.' They had wrongly insisted Job was suffering due to personal sin, but Job's suffering was a test of faith.",
+    "level": "Expert",
+    "tags": ["Job", "Suffering", "Theology", "Friends"]
+  }
+]

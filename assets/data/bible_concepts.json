@@ -1,0 +1,116 @@
+[
+  {
+    "term": "Covenant (Berith)",
+    "definition": "A formal, legally binding agreement or treaty between God and an individual, or between God and Israel, establishing the terms of their relationship.",
+    "key_example": [
+      "Noahic Covenant: God promises never to destroy the world by flood again (Rainbow sign).",
+      "Abrahamic Covenant: God promises land, descendants, and a blessing to the nations (Circumcision sign).",
+      "New Covenant (Jeremiah/Jesus): A spiritual covenant where God writes His laws on human hearts (Blood of Christ)."
+    ],
+    "biblical_references": ["Genesis 9:11", "Genesis 12:1-3", "Jeremiah 31:31-34", "Luke 22:20"],
+    "tags": ["Law", "Relationship", "Theology"],
+    "difficulty": "Intermediate"
+  },
+  {
+    "term": "Shekinah Glory",
+    "definition": "A non-biblical term, but widely used to describe the visible manifestation of God's presence, specifically the cloud, fire, or bright light that signified His dwelling among the people.",
+    "key_example": [
+      "The pillar of cloud by day and fire by night during the Exodus.",
+      "The glorious cloud filling the Tabernacle/Temple, preventing the priests from entering.",
+      "The transfiguration of Jesus, where His appearance became dazzling white."
+    ],
+    "biblical_references": ["Exodus 13:21-22", "1 Kings 8:10-11", "Matthew 17:1-8"],
+    "tags": ["God", "Presence", "Worship", "Miracle"],
+    "difficulty": "Advanced"
+  },
+  {
+    "term": "Kinsman-Redeemer (Go'el)",
+    "definition": "In Israelite law, a male relative who had the duty to restore the rights and property of a relative, including avenging death, buying back land, or marrying a deceased brother's widow.",
+    "key_example": [
+      "Boaz acted as the Go'el for Ruth and Naomi, redeeming Elimelech's property and marrying Ruth.",
+      "The concept is often used theologically to describe Christ's role in redeeming humanity from sin."
+    ],
+    "biblical_references": ["Leviticus 25:25-34", "Book of Ruth"],
+    "tags": ["Law", "Redemption", "Marriage", "Ruth"],
+    "difficulty": "Advanced"
+  },
+  {
+    "term": "Atonement (Kaphar)",
+    "definition": "The act of covering or reconciling sin, making amends between a holy God and sinful humanity. In the Old Testament, achieved through animal sacrifices; in the New Testament, fulfilled by Christ's sacrifice.",
+    "key_example": [
+      "Day of Atonement (Yom Kippur): The high priest entered the Holy of Holies to make atonement for Israel's sins.",
+      "Jesus Christ as the ultimate atonement: 'He is the atoning sacrifice for our sins' (1 John 2:2)."
+    ],
+    "biblical_references": ["Leviticus 16", "Romans 3:25", "Hebrews 9:11-14", "1 John 2:2"],
+    "tags": ["Sacrifice", "Salvation", "Theology", "Jesus"],
+    "difficulty": "Intermediate"
+  },
+  {
+    "term": "Justification by Faith",
+    "definition": "The doctrine that humans are declared righteous before God not by their own works, but by faith in Jesus Christ. God credits righteousness to believers based on Christ's perfect obedience.",
+    "key_example": [
+      "Abraham believed God, and it was credited to him as righteousness (Genesis 15:6).",
+      "Paul's teaching: 'A person is justified by faith apart from the works of the law' (Romans 3:28)."
+    ],
+    "biblical_references": ["Genesis 15:6", "Romans 3:21-28", "Galatians 2:16", "Ephesians 2:8-9"],
+    "tags": ["Salvation", "Faith", "Paul", "Theology"],
+    "difficulty": "Intermediate"
+  },
+  {
+    "term": "Sanctification",
+    "definition": "The process of being made holy, set apart for God's purposes. It begins at conversion and continues throughout a believer's life as they grow in holiness through the Holy Spirit.",
+    "key_example": [
+      "The Israelites were sanctified as God's chosen people.",
+      "Believers are sanctified through faith in Christ and the work of the Holy Spirit."
+    ],
+    "biblical_references": ["Exodus 19:5-6", "1 Corinthians 6:11", "1 Thessalonians 4:3-7", "Hebrews 12:14"],
+    "tags": ["Holiness", "Holy Spirit", "Growth", "Theology"],
+    "difficulty": "Intermediate"
+  },
+  {
+    "term": "Prophecy (Nabi)",
+    "definition": "A message from God delivered through His chosen spokespeople (prophets). Prophecy includes foretelling future events and forthtelling (proclaiming God's will for the present).",
+    "key_example": [
+      "Isaiah prophesied the coming Messiah who would be born of a virgin (Isaiah 7:14).",
+      "Jeremiah prophesied the 70-year Babylonian exile (Jeremiah 25:11-12).",
+      "New Testament prophets like Agabus warned of famine (Acts 11:28)."
+    ],
+    "biblical_references": ["Isaiah 7:14", "Jeremiah 25:11-12", "Acts 11:28", "2 Peter 1:20-21"],
+    "tags": ["Prophets", "Revelation", "Future", "Message"],
+    "difficulty": "Beginner"
+  },
+  {
+    "term": "Resurrection",
+    "definition": "The act of rising from the dead. Central to Christian faith is the bodily resurrection of Jesus Christ, which validates His divinity and secures the promise of eternal life for believers.",
+    "key_example": [
+      "Jesus raised Lazarus from the dead after four days (John 11).",
+      "Jesus Himself rose from the dead on the third day (Matthew 28, Mark 16, Luke 24, John 20).",
+      "Paul teaches that believers will be resurrected in glorified bodies (1 Corinthians 15)."
+    ],
+    "biblical_references": ["John 11:38-44", "Matthew 28:1-10", "1 Corinthians 15:12-58"],
+    "tags": ["Jesus", "Miracle", "Salvation", "Hope"],
+    "difficulty": "Beginner"
+  },
+  {
+    "term": "Grace (Charis)",
+    "definition": "Unmerited favor from God. Grace is God's kindness and love given freely to humanity, despite our unworthiness. It is central to salvation, which is by grace through faith.",
+    "key_example": [
+      "God's grace shown through the gift of Jesus Christ.",
+      "Paul's teaching: 'For it is by grace you have been saved, through faith' (Ephesians 2:8)."
+    ],
+    "biblical_references": ["John 1:14-17", "Romans 5:20-21", "Ephesians 2:8-9", "Titus 2:11"],
+    "tags": ["Salvation", "God", "Love", "Mercy"],
+    "difficulty": "Beginner"
+  },
+  {
+    "term": "Trinity",
+    "definition": "The Christian doctrine that God exists as three distinct persons—Father, Son (Jesus Christ), and Holy Spirit—yet is one God in essence and being.",
+    "key_example": [
+      "The baptism of Jesus: The Father speaks from heaven, the Son is baptized, and the Holy Spirit descends like a dove (Matthew 3:16-17).",
+      "The Great Commission: 'Baptize them in the name of the Father and of the Son and of the Holy Spirit' (Matthew 28:19)."
+    ],
+    "biblical_references": ["Matthew 3:16-17", "Matthew 28:19", "John 14:16-17", "2 Corinthians 13:14"],
+    "tags": ["God", "Jesus", "Holy Spirit", "Doctrine"],
+    "difficulty": "Advanced"
+  }
+]

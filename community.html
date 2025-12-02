@@ -13,6 +13,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
   <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/scenarios.js" defer></script>
+  <script src="assets/js/locations.js" defer></script>
+  <script src="assets/js/concepts.js" defer></script>
   <script src="assets/js/translations.js" defer></script>
   <script src="assets/js/community.js" defer></script>
   <style>main{padding-top:16px}</style>
@@ -80,6 +83,8 @@
           <div class="community-tabs" role="tablist">
             <button id="tab-explore" class="tab-btn active" role="tab" aria-selected="true">Explore</button>
             <button id="tab-live" class="tab-btn" role="tab" aria-selected="false">Live</button>
+            <button id="tab-locations" class="tab-btn" role="tab" aria-selected="false">Places</button>
+            <button id="tab-concepts" class="tab-btn" role="tab" aria-selected="false">Learn</button>
             <button id="tab-profile" class="tab-btn" role="tab" aria-selected="false">Profile</button>
             <button id="tab-guidelines" class="tab-btn" role="tab" aria-selected="false">Guidelines</button>
           </div>
@@ -145,6 +150,58 @@
                 <div id="my-rooms" class="cards"></div>
               </div>
             </section>
+            
+            <!-- Locations Section -->
+            <section id="section-locations" class="community-section" role="tabpanel" style="display:none">
+              <h3>Biblical Places</h3>
+              <p class="muted" style="margin-bottom: 20px;">Explore key locations from biblical history with an interactive map.</p>
+              
+              <!-- Map Container -->
+              <div id="locations-map-container" style="width: 100%; height: 400px; margin-bottom: 24px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px;"></div>
+              
+              <!-- Filter Controls -->
+              <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                <select id="testament-filter-locations" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
+                  <option value="">All Testaments</option>
+                  <option value="OT">Old Testament</option>
+                  <option value="NT">New Testament</option>
+                  <option value="OT & NT">Both</option>
+                </select>
+                <select id="importance-filter-locations" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
+                  <option value="0">All Importance</option>
+                  <option value="8">High (8+)</option>
+                  <option value="9">Very High (9+)</option>
+                  <option value="10">Critical (10)</option>
+                </select>
+                <button id="btn-reset-map" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer;">Reset Map</button>
+              </div>
+              
+              <!-- Location Cards -->
+              <div id="locations-list" class="locations-grid"></div>
+            </section>
+            
+            <!-- Concepts/Glossary Section -->
+            <section id="section-concepts" class="community-section" role="tabpanel" style="display:none">
+              <h3>Biblical Concepts Glossary</h3>
+              <p class="muted" style="margin-bottom: 20px;">Learn about key theological concepts and doctrines.</p>
+              
+              <!-- Search and Filters -->
+              <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                <input id="concept-search" type="text" placeholder="Search concepts..." style="flex: 2; min-width: 200px; padding: 10px 16px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);" />
+                <select id="difficulty-filter-concepts" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
+                  <option value="">All Levels</option>
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                  <option value="Expert">Expert</option>
+                </select>
+                <button id="btn-random-concept" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer;">Random Concept</button>
+              </div>
+              
+              <!-- Concepts List -->
+              <div id="concepts-list" class="concepts-grid"></div>
+            </section>
+            
             <section id="section-profile" class="community-section" role="tabpanel" style="display:none">
               <h3 id="profile-title">Your Profile</h3>
               <div class="profile-form">

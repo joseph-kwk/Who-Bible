@@ -189,6 +189,7 @@ const btnTimed = document.getElementById('btn-timed');
 const btnChallenge = document.getElementById('btn-challenge');
 const btnRemoteChallenge = document.getElementById('btn-remote-challenge');
 const btnStudy = document.getElementById('btn-study');
+const btnScenarios = document.getElementById('btn-scenarios');
 const difficultySel = document.getElementById('difficulty');
 const numQuestionsInput = document.getElementById('num-questions');
 const timeLimitInput = document.getElementById('time-limit');
@@ -363,6 +364,22 @@ async function init(){
     console.log('✓ Relationship graph built for', state.people.length, 'people');
   }
   
+  // Initialize Scenarios, Locations, and Concepts modules
+  if (window.ScenarioModule) {
+    await window.ScenarioModule.init();
+    console.log('✓ Scenarios module loaded:', window.ScenarioModule.scenarios.length, 'scenarios');
+  }
+  
+  if (window.LocationModule) {
+    await window.LocationModule.init();
+    console.log('✓ Locations module loaded:', window.LocationModule.locations.length, 'locations');
+  }
+  
+  if (window.ConceptModule) {
+    await window.ConceptModule.init();
+    console.log('✓ Concepts module loaded:', window.ConceptModule.concepts.length, 'concepts');
+  }
+  
   // Initialize Firebase and show Remote Challenge if available
   if (window.FirebaseConfig) {
     const firebaseReady = window.FirebaseConfig.initialize();
@@ -432,6 +449,9 @@ function attachHandlers(){
   btnTimed.addEventListener('click', startTimed);
   btnChallenge.addEventListener('click', startChallenge);
   btnStudy.addEventListener('click', startStudy);
+  if (btnScenarios) {
+    btnScenarios.addEventListener('click', startScenarios);
+  }
   
   // Navigation
   btnBackToSetup.addEventListener('click', showSetup);
@@ -439,7 +459,13 @@ function attachHandlers(){
   // Community moved to separate page
   
   // Game controls
-  btnNext.addEventListener('click', nextQuestion);
+  btnNext.addEventListener('click', () => {
+    if (state.mode === 'scenarios') {
+      nextScenarioQuestion();
+    } else {
+      nextQuestion();
+    }
+  });
   btnQuit.addEventListener('click', quitQuiz);
   btnPause.addEventListener('click', togglePause);
   
@@ -696,6 +722,138 @@ function startChallengeFromModal(){
 function startStudy(){
   showStudy();
   showToast({ title: getText('studyStart'), msg: getText('studyStartMsg'), type: 'info' });
+}
+
+function startScenarios(){
+  if (!window.ScenarioModule || !window.ScenarioModule.scenarios || window.ScenarioModule.scenarios.length === 0) {
+    showToast({ title: 'Loading...', msg: 'Scenarios are loading, please try again.', type: 'warn', timeout: 2000 });
+    return;
+  }
+  
+  showGame();
+  gameTitle.textContent = getText('scenariosMode') || 'Scenarios Mode';
+  prepareScenarioQuiz();
+  showToast({ title: getText('scenariosStart') || 'Scenarios', msg: getText('scenariosStartMsg') || 'Test your knowledge of biblical scenarios!', type: 'info' });
+}
+
+function prepareScenarioQuiz(){
+  state.mode = 'scenarios';
+  afterRef.innerText='';
+  state.score = 0; state.streak = 0; state.qnum = 0; state.results = []; state.paused = false;
+  
+  // Reset and shuffle scenarios
+  window.ScenarioModule.reset();
+  window.ScenarioModule.shuffleScenarios();
+  
+  const count = parseInt(numQuestionsInput.value) || Math.min(10, window.ScenarioModule.scenarios.length);
+  state.questions = window.ScenarioModule.scenarios.slice(0, count);
+  state.qtotal = state.questions.length;
+  qtotalEl.innerText = state.qtotal;
+  scoreEl.innerText = state.score;
+  streakEl.innerText = state.streak;
+  btnNext.disabled = true;
+  
+  // Show the quiz interface
+  quizEl.style.display = 'block';
+  
+  // Hide mode-specific elements
+  timerEl.style.display = 'none';
+  btnPause.style.display = 'none';
+  challengeStatusEl.style.display = 'none';
+  stopTimer();
+  
+  nextScenarioQuestion();
+}
+
+function nextScenarioQuestion(){
+  if(state.qnum >= state.qtotal){
+    endQuiz();
+    return;
+  }
+  
+  state.qnum++;
+  qnumEl.innerText = state.qnum;
+  updateProgressBar();
+  
+  const scenario = state.questions[state.qnum - 1];
+  state.current = scenario;
+  
+  renderScenarioQuestion(scenario);
+  btnNext.disabled = true;
+  afterRef.innerText = '';
+}
+
+function renderScenarioQuestion(scenario){
+  // Build the question prompt
+  let prompt = `<div class="scenario-header">
+    <span class="scenario-theme">${scenario.theme}</span>
+    <span class="scenario-level">${scenario.level}</span>
+  </div>`;
+  
+  prompt += `<div class="scenario-challenge">${scenario.challenge}</div>`;
+  prompt += `<div class="scenario-reference">${scenario.book_ref}</div>`;
+  
+  qText.innerHTML = prompt;
+  
+  // Render answer options
+  answersEl.innerHTML = '';
+  scenario.options.forEach((option, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans';
+    btn.dataset.value = option.charAt(0); // A, B, C
+    btn.innerText = option;
+    btn.addEventListener('click', ()=> answerScenarioQuestion(option.charAt(0)));
+    answersEl.appendChild(btn);
+  });
+}
+
+function answerScenarioQuestion(selected){
+  const scenario = state.current;
+  const isCorrect = selected === scenario.correct_answer;
+  
+  // Disable all answer buttons
+  Array.from(answersEl.querySelectorAll('.ans')).forEach(btn => {
+    btn.disabled = true;
+    if (btn.dataset.value === scenario.correct_answer) {
+      btn.classList.add('correct');
+    }
+    if (btn.dataset.value === selected && !isCorrect) {
+      btn.classList.add('wrong');
+    }
+  });
+  
+  // Update score and streak
+  if (isCorrect) {
+    state.score += 10;
+    state.streak++;
+    scoreEl.innerText = state.score;
+    streakEl.innerText = state.streak;
+    showToast({ title: getText('correct') || 'Correct!', msg: '', type: 'success', timeout: 1000 });
+  } else {
+    state.streak = 0;
+    streakEl.innerText = state.streak;
+    showToast({ title: getText('wrong') || 'Wrong', msg: '', type: 'error', timeout: 1000 });
+  }
+  
+  // Record result
+  state.results.push({
+    question: scenario.challenge,
+    userAnswer: selected,
+    correct: scenario.correct_answer,
+    isCorrect: isCorrect,
+    explanation: scenario.explanation
+  });
+  
+  // Show explanation
+  afterRef.innerHTML = `
+    <div class="scenario-explanation">
+      <strong>${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</strong>
+      <p>${scenario.explanation}</p>
+      <p class="scenario-tags">${scenario.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')}</p>
+    </div>
+  `;
+  
+  btnNext.disabled = false;
 }
 
 function prepareQuiz(mode){

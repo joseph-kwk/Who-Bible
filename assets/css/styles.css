@@ -2601,3 +2601,95 @@ body.day {
   color: var(--text);
 }
 
+
+/* ===== SCENARIOS MODE STYLES ===== */
+.scenario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.scenario-theme {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--accent);
+  color: white;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.scenario-level {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--bg-secondary);
+  color: var(--text);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+
+.scenario-challenge {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border-left: 4px solid var(--accent);
+}
+
+.scenario-reference {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.scenario-explanation {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border-left: 4px solid var(--accent);
+}
+
+.scenario-explanation strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.scenario-explanation p {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.scenario-tags {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.scenario-tags .tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* ===== LOCATION & CONCEPT STYLES ===== */
+.location-map, .location-card, .concept-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}

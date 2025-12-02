@@ -1,0 +1,219 @@
+[
+  {
+    "location_name": "Jerusalem",
+    "era": "Iron Age to Roman",
+    "primary_role": "Capital City",
+    "testament_link": "OT & NT",
+    "coordinates": {
+      "lat": 31.7683,
+      "lon": 35.2137
+    },
+    "key_events": [
+      "David captured it and made it the capital (City of David).",
+      "Solomon built the First Temple.",
+      "Site of Jesus' trial, crucifixion, and resurrection.",
+      "Center of the early Church (Pentecost)."
+    ],
+    "related_figures": ["David", "Solomon", "Hezekiah", "Jesus", "Peter", "James"],
+    "modern_country": "Israel",
+    "importance": 10
+  },
+  {
+    "location_name": "Ur of the Chaldeans",
+    "era": "Bronze Age",
+    "primary_role": "Origin City",
+    "testament_link": "OT",
+    "coordinates": {
+      "lat": 30.9625,
+      "lon": 46.1030
+    },
+    "key_events": [
+      "Birthplace and early home of Abraham (Abram).",
+      "The starting point of Abraham's journey of faith."
+    ],
+    "related_figures": ["Abraham", "Terah"],
+    "modern_country": "Iraq",
+    "importance": 8
+  },
+  {
+    "location_name": "Nineveh",
+    "era": "Assyrian Empire",
+    "primary_role": "Capital City (Foreign)",
+    "testament_link": "OT",
+    "coordinates": {
+      "lat": 36.3489,
+      "lon": 43.1522
+    },
+    "key_events": [
+      "The city Jonah was sent to preach repentance to.",
+      "The entire city repented at Jonah's message.",
+      "Prophesied destruction by Nahum and Zephaniah."
+    ],
+    "related_figures": ["Jonah", "Nahum"],
+    "modern_country": "Iraq",
+    "importance": 7
+  },
+  {
+    "location_name": "Corinth",
+    "era": "Roman Empire",
+    "primary_role": "Missionary Hub",
+    "testament_link": "NT",
+    "coordinates": {
+      "lat": 37.9065,
+      "lon": 22.8792
+    },
+    "key_events": [
+      "Paul established a church and stayed for 18 months (Second Missionary Journey).",
+      "Site of conflicts over church leadership and immorality (addressed in 1 & 2 Corinthians)."
+    ],
+    "related_figures": ["Paul", "Aquila", "Priscilla", "Silas", "Timothy"],
+    "modern_country": "Greece",
+    "importance": 8
+  },
+  {
+    "location_name": "Sodom and Gomorrah",
+    "era": "Bronze Age",
+    "primary_role": "Destroyed City",
+    "testament_link": "OT",
+    "coordinates": {
+      "lat": 31.2001,
+      "lon": 35.4734
+    },
+    "key_events": [
+      "Destroyed by fire and sulfur due to their great wickedness.",
+      "Lot and his family fled the city just before its destruction."
+    ],
+    "related_figures": ["Lot", "Abraham"],
+    "modern_country": "Jordan/Israel (Dead Sea region)",
+    "importance": 7
+  },
+  {
+    "location_name": "Bethlehem",
+    "era": "Bronze Age to Roman",
+    "primary_role": "City of David / Birthplace of Jesus",
+    "testament_link": "OT & NT",
+    "coordinates": {
+      "lat": 31.7054,
+      "lon": 35.2024
+    },
+    "key_events": [
+      "Birthplace of King David.",
+      "Setting of the Book of Ruth.",
+      "Birthplace of Jesus Christ."
+    ],
+    "related_figures": ["David", "Ruth", "Boaz", "Jesus", "Mary", "Joseph"],
+    "modern_country": "Palestine/Israel",
+    "importance": 10
+  },
+  {
+    "location_name": "Mount Sinai (Horeb)",
+    "era": "Bronze Age",
+    "primary_role": "Sacred Mountain",
+    "testament_link": "OT",
+    "coordinates": {
+      "lat": 28.5392,
+      "lon": 33.9750
+    },
+    "key_events": [
+      "God gave Moses the Ten Commandments.",
+      "Site of the burning bush.",
+      "Elijah fled here and encountered God."
+    ],
+    "related_figures": ["Moses", "Elijah", "Aaron"],
+    "modern_country": "Egypt (Sinai Peninsula)",
+    "importance": 10
+  },
+  {
+    "location_name": "Babylon",
+    "era": "Neo-Babylonian Empire",
+    "primary_role": "Capital City (Foreign)",
+    "testament_link": "OT",
+    "coordinates": {
+      "lat": 32.5355,
+      "lon": 44.4275
+    },
+    "key_events": [
+      "Judah was exiled here for 70 years.",
+      "Daniel served in the royal court.",
+      "Site of the Tower of Babel (earlier)."
+    ],
+    "related_figures": ["Daniel", "Shadrach", "Meshach", "Abednego", "Ezekiel", "Nebuchadnezzar"],
+    "modern_country": "Iraq",
+    "importance": 9
+  },
+  {
+    "location_name": "Nazareth",
+    "era": "Roman Empire",
+    "primary_role": "Jesus' Hometown",
+    "testament_link": "NT",
+    "coordinates": {
+      "lat": 32.7016,
+      "lon": 35.2973
+    },
+    "key_events": [
+      "Mary and Joseph lived here.",
+      "Jesus grew up in Nazareth.",
+      "Jesus was rejected by His hometown synagogue."
+    ],
+    "related_figures": ["Jesus", "Mary", "Joseph"],
+    "modern_country": "Israel",
+    "importance": 9
+  },
+  {
+    "location_name": "Sea of Galilee",
+    "era": "Roman Empire",
+    "primary_role": "Ministry Hub",
+    "testament_link": "NT",
+    "coordinates": {
+      "lat": 32.8253,
+      "lon": 35.5897
+    },
+    "key_events": [
+      "Jesus called His first disciples here.",
+      "Jesus calmed the storm on the sea.",
+      "Jesus walked on water.",
+      "Site of many miracles and teachings."
+    ],
+    "related_figures": ["Jesus", "Peter", "Andrew", "James", "John"],
+    "modern_country": "Israel",
+    "importance": 9
+  },
+  {
+    "location_name": "Rome",
+    "era": "Roman Empire",
+    "primary_role": "Imperial Capital",
+    "testament_link": "NT",
+    "coordinates": {
+      "lat": 41.9028,
+      "lon": 12.4964
+    },
+    "key_events": [
+      "Paul was imprisoned here.",
+      "Paul wrote several epistles from Rome.",
+      "Early Christian persecution under Nero.",
+      "Center of the Gentile Christian world."
+    ],
+    "related_figures": ["Paul", "Peter", "Luke"],
+    "modern_country": "Italy",
+    "importance": 8
+  },
+  {
+    "location_name": "Jericho",
+    "era": "Bronze Age to Roman",
+    "primary_role": "Fortified City",
+    "testament_link": "OT & NT",
+    "coordinates": {
+      "lat": 31.8709,
+      "lon": 35.4443
+    },
+    "key_events": [
+      "First city conquered by Joshua in Canaan.",
+      "Walls fell after Israelites marched around it.",
+      "Site of the parable of the Good Samaritan.",
+      "Jesus healed blind Bartimaeus here."
+    ],
+    "related_figures": ["Joshua", "Rahab", "Jesus", "Zacchaeus"],
+    "modern_country": "Palestine/Israel",
+    "importance": 8
+  }
+]

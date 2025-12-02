@@ -17,6 +17,9 @@
   <script src="assets/js/firebase-config.js"></script>
   <script src="assets/js/remote-challenge.js"></script>
   <script src="assets/js/remote-challenge-ui.js"></script>
+  <script src="assets/js/scenarios.js" defer></script>
+  <script src="assets/js/locations.js" defer></script>
+  <script src="assets/js/concepts.js" defer></script>
   <script src="assets/js/relationships.js" defer></script>
   <script src="assets/js/translations.js" defer></script>
   <script src="assets/js/app.js" defer></script>
@@ -166,6 +169,13 @@
                 <div class="mode-text">
                   <div class="mode-title">Study Mode</div>
                   <div class="mode-desc" id="study-desc">Browse and learn</div>
+                </div>
+              </button>
+              <button id="btn-scenarios" class="mode-btn" data-mode="scenarios" aria-describedby="scenarios-desc">
+                <div class="mode-icon" aria-hidden="true">🎭</div>
+                <div class="mode-text">
+                  <div class="mode-title">Scenarios Mode</div>
+                  <div class="mode-desc" id="scenarios-desc">Moral dilemmas & decisions</div>
                 </div>
               </button>
             </div>

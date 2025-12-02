@@ -160,6 +160,8 @@
   const tabs = [
     { btn: document.getElementById('tab-explore'), sec: document.getElementById('section-explore') },
     { btn: document.getElementById('tab-live'), sec: document.getElementById('section-live') },
+    { btn: document.getElementById('tab-locations'), sec: document.getElementById('section-locations') },
+    { btn: document.getElementById('tab-concepts'), sec: document.getElementById('section-concepts') },
     { btn: document.getElementById('tab-profile'), sec: document.getElementById('section-profile') },
     { btn: document.getElementById('tab-guidelines'), sec: document.getElementById('section-guidelines') },
   ];
@@ -461,6 +463,264 @@
         const db = FirebaseConfig.getDatabase();
         db.ref('rooms').off('value', liveRoomsListener);
       } catch(_) {}
+    }
+  });
+
+  // ===== LOCATIONS TAB =====
+  let locationsMap = null;
+  
+  async function initLocationsTab() {
+    if (!window.LocationModule) {
+      showToast({ title: 'Loading...', msg: 'Locations module not loaded', type: 'warn' });
+      return;
+    }
+    
+    // Initialize map
+    locationsMap = window.LocationModule.initSimpleMap('locations-map-container');
+    window.LocationModule.addLocationMarkers();
+    
+    // Render location cards
+    renderLocationCards(window.LocationModule.locations);
+    
+    // Setup filters
+    const testamentFilter = document.getElementById('testament-filter-locations');
+    const importanceFilter = document.getElementById('importance-filter-locations');
+    const btnResetMap = document.getElementById('btn-reset-map');
+    
+    if (testamentFilter) {
+      testamentFilter.addEventListener('change', filterLocations);
+    }
+    
+    if (importanceFilter) {
+      importanceFilter.addEventListener('change', filterLocations);
+    }
+    
+    if (btnResetMap) {
+      btnResetMap.addEventListener('click', () => {
+        testamentFilter.value = '';
+        importanceFilter.value = '0';
+        filterLocations();
+      });
+    }
+    
+    // Listen for location selection from map
+    window.addEventListener('location-selected', (e) => {
+      showLocationDetails(e.detail);
+    });
+  }
+  
+  function filterLocations() {
+    const testamentFilter = document.getElementById('testament-filter-locations');
+    const importanceFilter = document.getElementById('importance-filter-locations');
+    
+    const filters = {
+      testament: testamentFilter?.value || '',
+      minImportance: parseInt(importanceFilter?.value || '0')
+    };
+    
+    const filtered = window.LocationModule.filterLocations(filters);
+    window.LocationModule.addLocationMarkers(filtered);
+    renderLocationCards(filtered);
+  }
+  
+  function renderLocationCards(locations) {
+    const container = document.getElementById('locations-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    const sorted = window.LocationModule.sortLocations(locations, 'importance');
+    
+    sorted.forEach(location => {
+      const card = document.createElement('div');
+      card.className = 'location-card';
+      card.innerHTML = `
+        <h3>${location.location_name}</h3>
+        <div class="location-meta">
+          <span>${location.testament_link}</span>
+          <span>${location.era}</span>
+          <span>${location.primary_role}</span>
+          <span>⭐ ${location.importance}/10</span>
+        </div>
+        <div><strong>Key Events:</strong></div>
+        <ul>
+          ${location.key_events.map(event => `<li>${event}</li>`).join('')}
+        </ul>
+        <div style="margin-top: 12px;"><strong>Related Figures:</strong> ${location.related_figures.join(', ')}</div>
+        <div style="margin-top: 8px; font-size: 14px; color: var(--muted);"><em>Modern location: ${location.modern_country}</em></div>
+      `;
+      
+      card.addEventListener('click', () => showLocationDetails(location));
+      container.appendChild(card);
+    });
+  }
+  
+  function showLocationDetails(location) {
+    const html = `
+      <div>
+        <h3 style="margin-top: 0; color: var(--accent);">${location.location_name}</h3>
+        <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+          <span style="padding: 6px 12px; background: var(--bg-secondary); border-radius: 12px; font-size: 13px;">${location.testament_link}</span>
+          <span style="padding: 6px 12px; background: var(--bg-secondary); border-radius: 12px; font-size: 13px;">${location.era}</span>
+          <span style="padding: 6px 12px; background: var(--bg-secondary); border-radius: 12px; font-size: 13px;">${location.primary_role}</span>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <strong>Key Events:</strong>
+          <ul style="margin: 8px 0; padding-left: 20px;">
+            ${location.key_events.map(event => `<li style="margin: 6px 0;">${event}</li>`).join('')}
+          </ul>
+        </div>
+        <div style="margin-bottom: 12px;">
+          <strong>Related Biblical Figures:</strong><br/>
+          ${location.related_figures.join(', ')}
+        </div>
+        <div style="padding: 12px; background: var(--bg-secondary); border-radius: 6px; margin-top: 16px;">
+          <strong>Modern Location:</strong> ${location.modern_country}<br/>
+          <small style="color: var(--muted);">Coordinates: ${location.coordinates.lat}°N, ${location.coordinates.lon}°E</small>
+        </div>
+      </div>
+    `;
+    
+    openCommunityModal(location.location_name, html);
+  }
+
+  // ===== CONCEPTS TAB =====
+  async function initConceptsTab() {
+    if (!window.ConceptModule) {
+      showToast({ title: 'Loading...', msg: 'Concepts module not loaded', type: 'warn' });
+      return;
+    }
+    
+    // Render all concepts
+    renderConceptCards(window.ConceptModule.concepts);
+    
+    // Setup search
+    const conceptSearch = document.getElementById('concept-search');
+    if (conceptSearch) {
+      conceptSearch.addEventListener('input', (e) => {
+        const query = e.target.value;
+        const results = window.ConceptModule.searchConcepts(query);
+        renderConceptCards(results);
+      });
+    }
+    
+    // Setup difficulty filter
+    const difficultyFilter = document.getElementById('difficulty-filter-concepts');
+    if (difficultyFilter) {
+      difficultyFilter.addEventListener('change', (e) => {
+        const difficulty = e.target.value;
+        if (difficulty) {
+          const filtered = window.ConceptModule.getConceptsByDifficulty(difficulty);
+          renderConceptCards(filtered);
+        } else {
+          renderConceptCards(window.ConceptModule.concepts);
+        }
+      });
+    }
+    
+    // Random concept button
+    const btnRandom = document.getElementById('btn-random-concept');
+    if (btnRandom) {
+      btnRandom.addEventListener('click', () => {
+        const concept = window.ConceptModule.getRandomConcept();
+        if (concept) {
+          showConceptDetails(concept);
+        }
+      });
+    }
+  }
+  
+  function renderConceptCards(concepts) {
+    const container = document.getElementById('concepts-list');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    const sorted = window.ConceptModule.sortConcepts(concepts, 'term');
+    
+    sorted.forEach(concept => {
+      const card = document.createElement('div');
+      card.className = 'concept-card';
+      card.innerHTML = `
+        <h3>${concept.term}</h3>
+        <div class="concept-difficulty">${concept.difficulty}</div>
+        <div class="concept-definition">${concept.definition}</div>
+        <div class="concept-tags">
+          ${concept.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+        </div>
+      `;
+      
+      card.addEventListener('click', () => showConceptDetails(concept));
+      container.appendChild(card);
+    });
+    
+    if (concepts.length === 0) {
+      container.innerHTML = '<p style="text-align: center; color: var(--muted);">No concepts found.</p>';
+    }
+  }
+  
+  function showConceptDetails(concept) {
+    const html = `
+      <div>
+        <h3 style="margin-top: 0; color: var(--accent);">${concept.term}</h3>
+        <div style="display: inline-block; padding: 6px 12px; background: var(--bg-secondary); border-radius: 12px; font-size: 13px; margin-bottom: 16px;">
+          ${concept.difficulty}
+        </div>
+        <div style="margin-bottom: 16px; line-height: 1.6;">
+          ${concept.definition}
+        </div>
+        ${concept.key_example.length > 0 ? `
+          <div style="margin-bottom: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+            <strong>Examples:</strong>
+            <ul style="margin: 8px 0; padding-left: 20px;">
+              ${concept.key_example.map(ex => `<li style="margin: 6px 0; line-height: 1.5;">${ex}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        ${concept.biblical_references.length > 0 ? `
+          <div style="padding: 12px; background: var(--bg-secondary); border-radius: 6px; margin-top: 16px;">
+            <strong>Biblical References:</strong><br/>
+            <span style="font-size: 14px; color: var(--muted);">${concept.biblical_references.join(', ')}</span>
+          </div>
+        ` : ''}
+        <div style="margin-top: 16px;">
+          <strong>Tags:</strong>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+            ${concept.tags.map(tag => `<span style="padding: 4px 10px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; font-size: 12px;">${tag}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    openCommunityModal(concept.term, html);
+  }
+
+  // Initialize new tabs when clicked
+  let locationsInitialized = false;
+  let conceptsInitialized = false;
+  
+  document.getElementById('tab-locations')?.addEventListener('click', () => {
+    if (!locationsInitialized) {
+      initLocationsTab();
+      locationsInitialized = true;
+    }
+  });
+  
+  document.getElementById('tab-concepts')?.addEventListener('click', () => {
+    if (!conceptsInitialized) {
+      initConceptsTab();
+      conceptsInitialized = true;
+    }
+  });
+
+  // Initialize modules on page load
+  window.addEventListener('DOMContentLoaded', async () => {
+    if (window.LocationModule) {
+      await window.LocationModule.init();
+      console.log('✓ Locations loaded:', window.LocationModule.locations.length);
+    }
+    
+    if (window.ConceptModule) {
+      await window.ConceptModule.init();
+      console.log('✓ Concepts loaded:', window.ConceptModule.concepts.length);
     }
   });
 
