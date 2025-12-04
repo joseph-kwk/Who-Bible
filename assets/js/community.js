@@ -37,8 +37,7 @@
     if(theme === 'day') {
       document.body.classList.add('day');
     } else {
-      // Default to night theme
-      document.body.classList.add('night');
+      // Default to night theme - no class needed (root variables are night by default)
       theme = 'night'; // Normalize to night if invalid theme
     }
     
@@ -344,7 +343,13 @@
     // Check if Firebase is available
     if (typeof FirebaseConfig === 'undefined' || !FirebaseConfig.isFirebaseAvailable || !FirebaseConfig.isFirebaseAvailable()) {
       if (liveRoomsList) {
-        liveRoomsList.innerHTML = '<div class="card"><div class="card-desc">Firebase not configured. Live rooms unavailable.</div></div>';
+        liveRoomsList.innerHTML = `
+          <div class="card">
+            <div class="card-icon">🔧</div>
+            <div class="card-title">Live Rooms Coming Soon</div>
+            <div class="card-desc">Firebase configuration needed for real-time multiplayer features. This feature will be available once the backend is set up.</div>
+          </div>
+        `;
       }
       return;
     }
@@ -468,6 +473,7 @@
 
   // ===== LOCATIONS TAB =====
   let locationsMap = null;
+  let locationsInitialized = false;
   
   async function initLocationsTab() {
     if (!window.LocationModule) {
@@ -475,38 +481,45 @@
       return;
     }
     
-    // Initialize map
-    locationsMap = window.LocationModule.initSimpleMap('locations-map-container');
-    window.LocationModule.addLocationMarkers();
-    
-    // Render location cards
-    renderLocationCards(window.LocationModule.locations);
-    
-    // Setup filters
-    const testamentFilter = document.getElementById('testament-filter-locations');
-    const importanceFilter = document.getElementById('importance-filter-locations');
-    const btnResetMap = document.getElementById('btn-reset-map');
-    
-    if (testamentFilter) {
-      testamentFilter.addEventListener('change', filterLocations);
-    }
-    
-    if (importanceFilter) {
-      importanceFilter.addEventListener('change', filterLocations);
-    }
-    
-    if (btnResetMap) {
-      btnResetMap.addEventListener('click', () => {
-        testamentFilter.value = '';
-        importanceFilter.value = '0';
-        filterLocations();
+    try {
+      // Initialize map
+      locationsMap = window.LocationModule.initSimpleMap('locations-map-container');
+      window.LocationModule.addLocationMarkers();
+      
+      // Render location cards
+      renderLocationCards(window.LocationModule.locations);
+      
+      // Setup filters
+      const testamentFilter = document.getElementById('testament-filter-locations');
+      const importanceFilter = document.getElementById('importance-filter-locations');
+      const btnResetMap = document.getElementById('btn-reset-map');
+      
+      if (testamentFilter) {
+        testamentFilter.addEventListener('change', filterLocations);
+      }
+      
+      if (importanceFilter) {
+        importanceFilter.addEventListener('change', filterLocations);
+      }
+      
+      if (btnResetMap) {
+        btnResetMap.addEventListener('click', () => {
+          testamentFilter.value = '';
+          importanceFilter.value = '0';
+          filterLocations();
+        });
+      }
+      
+      // Listen for location selection from map
+      window.addEventListener('location-selected', (e) => {
+        showLocationDetails(e.detail);
       });
+      
+      locationsInitialized = true;
+    } catch(err) {
+      console.error('Error initializing locations:', err);
+      showToast({ title: 'Error', msg: 'Failed to load locations', type: 'error' });
     }
-    
-    // Listen for location selection from map
-    window.addEventListener('location-selected', (e) => {
-      showLocationDetails(e.detail);
-    });
   }
   
   function filterLocations() {
@@ -559,9 +572,9 @@
       <div>
         <h3 style="margin-top: 0; color: var(--accent);">${location.location_name}</h3>
         <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
-          <span style="padding: 6px 12px; background: var(--bg-secondary); border-radius: 12px; font-size: 13px;">${location.testament_link}</span>
-          <span style="padding: 6px 12px; background: var(--bg-secondary); border-radius: 12px; font-size: 13px;">${location.era}</span>
-          <span style="padding: 6px 12px; background: var(--bg-secondary); border-radius: 12px; font-size: 13px;">${location.primary_role}</span>
+          <span style="padding: 6px 12px; background: var(--bg-3); border-radius: 12px; font-size: 13px;">${location.testament_link}</span>
+          <span style="padding: 6px 12px; background: var(--bg-3); border-radius: 12px; font-size: 13px;">${location.era}</span>
+          <span style="padding: 6px 12px; background: var(--bg-3); border-radius: 12px; font-size: 13px;">${location.primary_role}</span>
         </div>
         <div style="margin-bottom: 16px;">
           <strong>Key Events:</strong>
@@ -573,7 +586,7 @@
           <strong>Related Biblical Figures:</strong><br/>
           ${location.related_figures.join(', ')}
         </div>
-        <div style="padding: 12px; background: var(--bg-secondary); border-radius: 6px; margin-top: 16px;">
+        <div style="padding: 12px; background: var(--bg-2); border-radius: 6px; margin-top: 16px;">
           <strong>Modern Location:</strong> ${location.modern_country}<br/>
           <small style="color: var(--muted);">Coordinates: ${location.coordinates.lat}°N, ${location.coordinates.lon}°E</small>
         </div>
@@ -661,7 +674,7 @@
     const html = `
       <div>
         <h3 style="margin-top: 0; color: var(--accent);">${concept.term}</h3>
-        <div style="display: inline-block; padding: 6px 12px; background: var(--bg-secondary); border-radius: 12px; font-size: 13px; margin-bottom: 16px;">
+        <div style="display: inline-block; padding: 6px 12px; background: var(--bg-3); border-radius: 12px; font-size: 13px; margin-bottom: 16px;">
           ${concept.difficulty}
         </div>
         <div style="margin-bottom: 16px; line-height: 1.6;">
@@ -676,7 +689,7 @@
           </div>
         ` : ''}
         ${concept.biblical_references.length > 0 ? `
-          <div style="padding: 12px; background: var(--bg-secondary); border-radius: 6px; margin-top: 16px;">
+          <div style="padding: 12px; background: var(--bg-2); border-radius: 6px; margin-top: 16px;">
             <strong>Biblical References:</strong><br/>
             <span style="font-size: 14px; color: var(--muted);">${concept.biblical_references.join(', ')}</span>
           </div>
@@ -684,7 +697,7 @@
         <div style="margin-top: 16px;">
           <strong>Tags:</strong>
           <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
-            ${concept.tags.map(tag => `<span style="padding: 4px 10px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; font-size: 12px;">${tag}</span>`).join('')}
+            ${concept.tags.map(tag => `<span style="padding: 4px 10px; background: var(--bg-3); border: 1px solid var(--border); border-radius: 12px; font-size: 12px;">${tag}</span>`).join('')}
           </div>
         </div>
       </div>
@@ -694,20 +707,15 @@
   }
 
   // Initialize new tabs when clicked
-  let locationsInitialized = false;
-  let conceptsInitialized = false;
-  
   document.getElementById('tab-locations')?.addEventListener('click', () => {
     if (!locationsInitialized) {
       initLocationsTab();
-      locationsInitialized = true;
     }
   });
   
   document.getElementById('tab-concepts')?.addEventListener('click', () => {
     if (!conceptsInitialized) {
       initConceptsTab();
-      conceptsInitialized = true;
     }
   });
 

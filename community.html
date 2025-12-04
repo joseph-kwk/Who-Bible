@@ -83,8 +83,8 @@
           <div class="community-tabs" role="tablist">
             <button id="tab-explore" class="tab-btn active" role="tab" aria-selected="true">Explore</button>
             <button id="tab-live" class="tab-btn" role="tab" aria-selected="false">Live</button>
-            <button id="tab-locations" class="tab-btn" role="tab" aria-selected="false">Places</button>
-            <button id="tab-concepts" class="tab-btn" role="tab" aria-selected="false">Learn</button>
+            <button id="tab-locations" class="tab-btn" role="tab" aria-selected="false" aria-controls="section-locations" aria-label="Biblical Places - Explore locations with interactive map">Places</button>
+            <button id="tab-concepts" class="tab-btn" role="tab" aria-selected="false" aria-controls="section-concepts" aria-label="Learn - Biblical concepts glossary">Learn</button>
             <button id="tab-profile" class="tab-btn" role="tab" aria-selected="false">Profile</button>
             <button id="tab-guidelines" class="tab-btn" role="tab" aria-selected="false">Guidelines</button>
           </div>
@@ -157,10 +157,10 @@
               <p class="muted" style="margin-bottom: 20px;">Explore key locations from biblical history with an interactive map.</p>
               
               <!-- Map Container -->
-              <div id="locations-map-container" style="width: 100%; height: 400px; margin-bottom: 24px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px;"></div>
+              <div id="locations-map-container" role="img" aria-label="Interactive map of biblical locations" style="width: 100%; height: 750px; margin-bottom: 32px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;"></div>
               
               <!-- Filter Controls -->
-              <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+              <div style="display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap;">
                 <select id="testament-filter-locations" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
                   <option value="">All Testaments</option>
                   <option value="OT">Old Testament</option>
@@ -187,15 +187,15 @@
               
               <!-- Search and Filters -->
               <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
-                <input id="concept-search" type="text" placeholder="Search concepts..." style="flex: 2; min-width: 200px; padding: 10px 16px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);" />
-                <select id="difficulty-filter-concepts" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
+                <input id="concept-search" type="text" placeholder="Search concepts..." aria-label="Search biblical concepts" style="flex: 2; min-width: 200px; padding: 10px 16px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);" />
+                <select id="difficulty-filter-concepts" aria-label="Filter by difficulty level" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
                   <option value="">All Levels</option>
                   <option value="Beginner">Beginner</option>
                   <option value="Intermediate">Intermediate</option>
                   <option value="Advanced">Advanced</option>
                   <option value="Expert">Expert</option>
                 </select>
-                <button id="btn-random-concept" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer;">Random Concept</button>
+                <button id="btn-random-concept" aria-label="Show random biblical concept" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer;">Random Concept</button>
               </div>
               
               <!-- Concepts List -->

@@ -1,6 +1,12 @@
 // Bible People Challenge — structured app.js
 
 // =========================
+// Default People Data
+// =========================
+// This array is populated from assets/data/people.json during initialization
+const DEFAULT_PEOPLE_DATA = [];
+
+// =========================
 // State
 // =========================
 const state = {
@@ -1434,8 +1440,7 @@ function applyTheme(theme){
     document.body.classList.add('day');
     console.log('Applied day theme'); // Debug
   } else {
-    // Default to night theme
-    document.body.classList.add('night');
+    // Default to night theme - no class needed (root variables are night by default)
     theme = 'night'; // Normalize to night if invalid theme
     console.log('Applied night theme'); // Debug
   }

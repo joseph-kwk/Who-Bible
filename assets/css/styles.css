@@ -2070,7 +2070,8 @@ button:disabled:hover {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-width: 1400px;
+  max-width: 90%;
+  width: 90%;
   margin: 0 auto;
   padding: 20px;
 }
@@ -2135,7 +2136,12 @@ button:disabled:hover {
 }
 
 .community-section {
-  min-height: 300px;
+  min-height: auto;
+  padding-bottom: 20px;
+}
+
+.community-content {
+  min-height: auto;
 }
 
 .community-section h3 {
@@ -2386,6 +2392,12 @@ button:disabled:hover {
   .community-content {
     padding: 24px 20px;
   }
+  
+  .community-panel {
+    width: 95%;
+    max-width: 95%;
+    padding: 12px;
+  }
 }
 
 /* ===== ACCESSIBILITY FEATURES ===== */
@@ -2609,6 +2621,7 @@ body.day {
   align-items: center;
   margin-bottom: 16px;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .scenario-theme {
@@ -2624,7 +2637,7 @@ body.day {
 .scenario-level {
   display: inline-block;
   padding: 6px 12px;
-  background: var(--bg-secondary);
+  background: var(--bg-3);
   color: var(--text);
   border-radius: 20px;
   font-size: 13px;
@@ -2637,8 +2650,8 @@ body.day {
   line-height: 1.6;
   margin-bottom: 12px;
   padding: 16px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
+  background: var(--bg-2);
+  border-radius: var(--border-radius-sm);
   border-left: 4px solid var(--accent);
 }
 
@@ -2652,15 +2665,16 @@ body.day {
 .scenario-explanation {
   margin-top: 20px;
   padding: 16px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  border-left: 4px solid var(--accent);
+  background: var(--bg-2);
+  border-radius: var(--border-radius-sm);
+  border-left: 4px solid var(--good);
 }
 
 .scenario-explanation strong {
   display: block;
   margin-bottom: 8px;
   font-size: 15px;
+  color: var(--accent-2);
 }
 
 .scenario-explanation p {
@@ -2678,18 +2692,177 @@ body.day {
 .scenario-tags .tag {
   display: inline-block;
   padding: 4px 10px;
-  background: var(--bg);
+  background: var(--bg-3);
   border: 1px solid var(--border);
   border-radius: 12px;
   font-size: 12px;
-  color: var(--text);
+  color: var(--text-2);
 }
 
-/* ===== LOCATION & CONCEPT STYLES ===== */
-.location-map, .location-card, .concept-card {
-  background: var(--bg-secondary);
+/* ===== LOCATION STYLES ===== */
+.locations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 32px;
+  clear: both;
+}
+
+.location-card {
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   padding: 20px;
-  margin-bottom: 16px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+}
+
+.location-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px var(--shadow);
+}
+
+.location-card h4 {
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.location-card .location-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.location-card .location-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: var(--bg-3);
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.location-map {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.location-marker {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.location-marker:hover circle {
+  r: 8;
+  fill: var(--accent-2);
+}
+
+.location-marker text {
+  pointer-events: none;
+  font-size: 10px;
+  fill: var(--text);
+}
+
+/* ===== CONCEPT STYLES ===== */
+.concepts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.concept-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+}
+
+.concept-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px var(--shadow);
+}
+
+.concept-card h4 {
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.concept-difficulty {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--bg-3);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.concept-difficulty.beginner {
+  background: var(--good);
+  color: white;
+}
+
+.concept-difficulty.intermediate {
+  background: var(--accent-2);
+  color: white;
+}
+
+.concept-difficulty.advanced {
+  background: var(--accent);
+  color: white;
+}
+
+.concept-difficulty.expert {
+  background: var(--bad);
+  color: white;
+}
+
+.concept-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.concept-tags .tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+/* Responsive for new components */
+@media (max-width: 768px) {
+  .locations-grid,
+  .concepts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .scenario-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .location-card,
+  .concept-card {
+    padding: 16px;
+  }
+  
+  #locations-map-container {
+    height: 500px !important;
+    margin-bottom: 24px !important;
+  }
 }
