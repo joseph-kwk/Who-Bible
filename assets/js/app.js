@@ -219,7 +219,7 @@ const btnNext = document.getElementById('btn-next');
 const btnQuit = document.getElementById('btn-quit');
 const btnPause = document.getElementById('btn-pause');
 const timerEl = document.getElementById('timer');
-const timeRemainingEl = document.getElementById('time-remaining');
+// timeRemainingEl is fetched dynamically to avoid stale references if DOM is updated
 const challengeStatusEl = document.getElementById('challenge-status');
 const currentPlayerEl = document.getElementById('current-player');
 const p1ScoreEl = document.getElementById('p1-score');
@@ -422,6 +422,11 @@ async function init(){
     displayPlayerInfo();
   }
   
+  // Initialize history state
+  if (!history.state) {
+    history.replaceState({ view: 'setup' }, '', window.location.pathname);
+  }
+
   renderPeopleList();
   attachHandlers();
   // Footer year
@@ -607,11 +612,28 @@ function attachHandlers(){
   }
   
   // Modal handlers
-  btnSummaryClose.addEventListener('click', hideSummaryModal);
-  btnPlayAgain.addEventListener('click', ()=>{ hideSummaryModal(); showSetup(); });
-  btnPlayersClose.addEventListener('click', hidePlayersModal);
-  btnPlayersCancel.addEventListener('click', hidePlayersModal);
-  btnPlayersStart.addEventListener('click', startChallengeFromModal);
+  if (btnSummaryClose) btnSummaryClose.addEventListener('click', hideSummaryModal);
+  
+  // Close summary modal when clicking outside content
+  if (modalEl) {
+    modalEl.addEventListener('click', (e) => {
+      if (e.target === modalEl) hideSummaryModal();
+    });
+  }
+
+  if (btnPlayAgain) btnPlayAgain.addEventListener('click', ()=>{ hideSummaryModal(); showSetup(); });
+  
+  if (btnPlayersClose) btnPlayersClose.addEventListener('click', hidePlayersModal);
+  
+  // Close players modal when clicking outside content
+  if (playersModal) {
+    playersModal.addEventListener('click', (e) => {
+      if (e.target === playersModal) hidePlayersModal();
+    });
+  }
+
+  if (btnPlayersCancel) btnPlayersCancel.addEventListener('click', hidePlayersModal);
+  if (btnPlayersStart) btnPlayersStart.addEventListener('click', startChallengeFromModal);
   
   // Keyboard navigation on answers
   answersEl.addEventListener('keydown', onAnswersKeyDown);
@@ -619,9 +641,38 @@ function attachHandlers(){
 }
 
 // =========================
-// Panel Management
+// Panel Management & Navigation
 // =========================
-function showSetup(){
+
+function updateHistory(view) {
+  // Don't push if we're already on this view
+  if (history.state && history.state.view === view) return;
+  
+  const url = view === 'setup' ? window.location.pathname : `#${view}`;
+  history.pushState({ view: view }, '', url);
+}
+
+window.addEventListener('popstate', (event) => {
+  const view = event.state ? event.state.view : 'setup';
+  
+  if (view === 'game') {
+    // If we return to game but have no active game, go to setup
+    if(state.mode === 'idle') {
+      showSetup(true);
+      // Replace the 'game' state we just popped into with 'setup'
+      history.replaceState({ view: 'setup' }, '', window.location.pathname);
+    } else {
+      showGame(true);
+    }
+  } else if (view === 'study') {
+    showStudy(true);
+  } else {
+    showSetup(true);
+  }
+});
+
+function showSetup(fromHistory = false){
+  if(!fromHistory) updateHistory('setup');
   setupPanel.style.display = 'flex';
   gameArea.style.display = 'none';
   studyPanel.style.display = 'none';
@@ -640,13 +691,15 @@ function showSetup(){
   }
 }
 
-function showGame(){
+function showGame(fromHistory = false){
+  if(!fromHistory) updateHistory('game');
   setupPanel.style.display = 'none';
   gameArea.style.display = 'flex';
   studyPanel.style.display = 'none';
 }
 
-function showStudy(){
+function showStudy(fromHistory = false){
+  if(!fromHistory) updateHistory('study');
   setupPanel.style.display = 'none';
   gameArea.style.display = 'none';
   studyPanel.style.display = 'flex';
@@ -693,6 +746,8 @@ function startTimed(){
   gameTitle.textContent = getText('timedMode');
   prepareQuiz('timed');
   const secs = parseInt(timeLimitInput.value)||60;
+  // Ensure timer starts immediately
+  startTimer(secs);
   showToast({ title: getText('timedStart'), msg: getText('timedStartMsg'), type: 'warn' });
 }
 
@@ -717,6 +772,10 @@ function startChallengeFromModal(){
   currentPlayerEl.textContent = '1';
   p1ScoreEl.textContent = '0';
   p2ScoreEl.textContent = '0';
+  
+  // Ensure timer is stopped for challenge mode
+  stopTimer();
+  
   prepareQuiz('challenge');
   showToast({ 
     title: getText('challengeStart'), 
@@ -727,6 +786,7 @@ function startChallengeFromModal(){
 
 function startStudy(){
   showStudy();
+  stopTimer();
   showToast({ title: getText('studyStart'), msg: getText('studyStartMsg'), type: 'info' });
 }
 
@@ -903,7 +963,8 @@ function prepareQuiz(mode){
   
   if(mode==='timed'){
     const secs = parseInt(timeLimitInput.value) || 60;
-    startTimer(secs);
+    // Timer is started in startTimed, but if we restart or come from elsewhere:
+    if(!state.timerId) startTimer(secs);
     scheduleTimeWarnings();
   } else {
     stopTimer();
@@ -1169,19 +1230,21 @@ function winnerText(){
 function startTimer(seconds){
   stopTimer();
   state.timerSecondsRemaining = seconds;
-  timeRemainingEl.textContent = String(state.timerSecondsRemaining);
+  const trEl = document.getElementById('time-remaining');
+  if(trEl) trEl.textContent = String(state.timerSecondsRemaining);
   timerEl.style.display = 'inline-flex';
   state.timerId = setInterval(()=>{
     if(state.paused) return;
     state.timerSecondsRemaining -= 1;
-    timeRemainingEl.textContent = String(Math.max(0, state.timerSecondsRemaining));
+    const currentTrEl = document.getElementById('time-remaining');
+    if(currentTrEl) currentTrEl.textContent = String(Math.max(0, state.timerSecondsRemaining));
     // Timer styling thresholds
     timerEl.classList.remove('warn','danger');
     if(state.timerSecondsRemaining <= 5) timerEl.classList.add('danger');
     else if(state.timerSecondsRemaining <= 15) timerEl.classList.add('warn');
     if(state.timerSecondsRemaining <= 0){
       stopTimer();
-  showToast({ title: getText('timeUp'), msg: getText('timeUpMsg'), type: 'warn', timeout: 2000 });
+      showToast({ title: getText('timeUp'), msg: getText('timeUpMsg'), type: 'warn', timeout: 2000 });
       endQuiz();
     }
   },1000);
@@ -1192,12 +1255,34 @@ function stopTimer(){
     clearInterval(state.timerId);
     state.timerId = null;
   }
+  // Ensure timer display is hidden when stopped, unless in timed mode and paused
+  if(state.mode !== 'timed' || state.timerSecondsRemaining <= 0) {
+     // Optional: hide timer if desired, but keeping it visible with 0 is also fine
+  }
 }
 
 function togglePause(){
   if(state.mode!=='timed') return;
   state.paused = !state.paused;
   btnPause.textContent = state.paused ? getText('resume') : getText('pause');
+  
+  // Disable/Enable answers based on pause state
+  const ansNodes = Array.from(answersEl.querySelectorAll('.ans'));
+  ansNodes.forEach(node => {
+    if(state.paused) {
+      node.classList.add('disabled');
+      node.style.pointerEvents = 'none';
+      node.style.opacity = '0.5';
+    } else {
+      // Only re-enable if not already answered/disabled
+      if(!node.classList.contains('correct') && !node.classList.contains('incorrect')) {
+        node.classList.remove('disabled');
+        node.style.pointerEvents = 'auto';
+        node.style.opacity = '1';
+      }
+    }
+  });
+
   showToast({ title: state.paused ? getText('paused') : getText('resumed'), msg: state.paused ? getText('timerPaused') : getText('timerRunning'), type: 'info', timeout: 1200 });
 }
 
@@ -1472,6 +1557,9 @@ function loadSettings(){
 // Summary modal
 function showSummaryModal(){
   if(!modalEl) return;
+  // Prevent background scrolling
+  document.body.style.overflow = 'hidden';
+  
   const total = state.results.length;
   const correct = state.results.filter(r=>r.correct).length;
   const accuracy = total ? Math.round((correct/total)*100) : 0;
@@ -1493,6 +1581,8 @@ function showSummaryModal(){
 
 function hideSummaryModal(){
   if(modalEl) modalEl.style.display = 'none';
+  // Restore background scrolling
+  document.body.style.overflow = '';
 }
 
 // Players modal

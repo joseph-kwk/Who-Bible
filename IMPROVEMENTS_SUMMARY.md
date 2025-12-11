@@ -48,6 +48,16 @@ This document summarizes the comprehensive improvements made to the Who-Bible pr
 
 - **`assets/css/styles.css`**:
   - Added accessibility styles (`.sr-only`, focus states)
+
+### 6. Critical Bug Fixes & Stability (Latest)
+- **Timed Mode**: Fixed timer initialization and pause functionality. Pausing now correctly disables answer buttons.
+- **Summary Modal**: Fixed issue where the modal would not close via 'X' button or overlay click.
+- **Mode Stability**: Hardened Solo, Challenge, and Study modes to ensure timers are correctly stopped when switching contexts.
+- **Map & Layout**: Fixed map rendering issues, overlap with UI, and improved responsive layout.
+- **Theme Toggle**: Fixed issue where theme toggle required double-clicks or didn't persist correctly.
+- **Timer Display**: Fixed bug where timer text would freeze at 60s despite the timer running internally.
+- **Navigation**: Implemented browser history support (Back/Forward buttons now work within the app).
+- **Modal UX**: Prevented background scrolling when the Summary Modal is open.
   - Enhanced button interactions
   - Added support for reduced motion and high contrast
   - Improved mobile responsiveness
