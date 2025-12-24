@@ -318,6 +318,9 @@ function translateAnswerForQuestionType(qType, value){
 // Init
 // =========================
 async function init(){
+  console.log('Initializing app...');
+  attachHandlers(); // Attach listeners immediately
+  
   // Set default settings if not present
   const defaultSettings = {
     difficulty: 'medium',
@@ -428,7 +431,7 @@ async function init(){
   }
 
   renderPeopleList();
-  attachHandlers();
+  // attachHandlers(); // Moved to top of init to ensure UI is responsive immediately
   // Footer year
   const fy = document.getElementById('footer-year');
   if (fy) fy.textContent = String(new Date().getFullYear());
@@ -501,10 +504,10 @@ function attachHandlers(){
   }
   
   // Data management
-  btnExport.addEventListener('click', exportJson);
-  btnImport.addEventListener('click', ()=>fileInput.click());
-  btnResetData.addEventListener('click', resetData);
-  fileInput.addEventListener('change', handleImportFile);
+  if (btnExport) btnExport.addEventListener('click', exportJson);
+  if (btnImport) btnImport.addEventListener('click', ()=>fileInput.click());
+  if (btnResetData) btnResetData.addEventListener('click', resetData);
+  if (fileInput) fileInput.addEventListener('change', handleImportFile);
   
   // Settings persistence
   difficultySel.addEventListener('change', saveSettingsFromUI);
