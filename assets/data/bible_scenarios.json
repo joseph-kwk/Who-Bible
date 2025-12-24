@@ -103,5 +103,230 @@
     "explanation": "At the end of the book, God rebukes Job's friends: 'You have not spoken the truth about me, as my servant Job has.' They had wrongly insisted Job was suffering due to personal sin, but Job's suffering was a test of faith.",
     "level": "Expert",
     "tags": ["Job", "Suffering", "Theology", "Friends"]
+  },
+  {
+    "scenario_id": "SCN_016",
+    "theme": "Compassion",
+    "book_ref": "Luke 10:30-37",
+    "challenge": "A man is beaten and left half-dead on the road to Jericho. A priest and a Levite pass by on the other side. You are a Samaritan traveling the same road. What do you do?",
+    "options": [
+      "A. Avoid him to stay ritually clean",
+      "B. Bandage his wounds and take him to an inn",
+      "C. Report the incident to the authorities in Jericho"
+    ],
+    "correct_answer": "B",
+    "explanation": "The Good Samaritan showed mercy by caring for the man's immediate needs and paying for his recovery, illustrating what it means to be a neighbor.",
+    "level": "Beginner",
+    "tags": ["Parable", "New Testament", "Mercy"]
+  },
+  {
+    "scenario_id": "SCN_017",
+    "theme": "Conviction",
+    "book_ref": "Daniel 1:8-16",
+    "challenge": "You are Daniel, a captive in Babylon. The king has assigned you a daily ration of food and wine from his own table, which violates your dietary laws. How do you respond?",
+    "options": [
+      "A. Eat the food to avoid offending the king",
+      "B. Request a diet of vegetables and water for ten days",
+      "C. Go on a hunger strike until released"
+    ],
+    "correct_answer": "B",
+    "explanation": "Daniel resolved not to defile himself and proposed a test with vegetables and water. God honored his conviction, and he appeared healthier than those eating the king's food.",
+    "level": "Intermediate",
+    "tags": ["Old Testament", "Dilemma", "Faith"]
+  },
+  {
+    "scenario_id": "SCN_018",
+    "theme": "Courage",
+    "book_ref": "Esther 4:11-16",
+    "challenge": "You are Queen Esther. Your people are threatened with destruction, but approaching the king without a summons carries the death penalty. Mordecai urges you to act. What is your choice?",
+    "options": [
+      "A. Wait for the king to call you naturally",
+      "B. Flee the palace to save yourself",
+      "C. Fast for three days, then go to the king, saying 'If I perish, I perish'"
+    ],
+    "correct_answer": "C",
+    "explanation": "Esther chose to risk her life for her people after spiritual preparation, famously declaring her willingness to perish for the cause.",
+    "level": "Intermediate",
+    "tags": ["Old Testament", "Dilemma", "Bravery"]
+  },
+  {
+    "scenario_id": "SCN_019",
+    "theme": "Forgiveness",
+    "book_ref": "Luke 15:11-32",
+    "challenge": "In the parable of the Prodigal Son, you are the father. Your younger son, who squandered his inheritance, returns home in rags. How do you greet him?",
+    "options": [
+      "A. Run to him, embrace him, and throw a feast",
+      "B. Make him a hired servant as he requests",
+      "C. Tell him he has lost his place in the family"
+    ],
+    "correct_answer": "A",
+    "explanation": "The father represents God's grace. He ran to his son, embraced him, and celebrated his return, signifying full restoration.",
+    "level": "Beginner",
+    "tags": ["Parable", "New Testament", "Grace"]
+  },
+  {
+    "scenario_id": "SCN_020",
+    "theme": "Faith",
+    "book_ref": "1 Samuel 17:38-40",
+    "challenge": "You are David preparing to fight Goliath. King Saul offers you his own armor, helmet, and sword. It is heavy and you are not used to it. What do you take into battle?",
+    "options": [
+      "A. Wear Saul's armor for maximum protection",
+      "B. Take only your staff, sling, and five smooth stones",
+      "C. Ask for a shield bearer to go before you"
+    ],
+    "correct_answer": "B",
+    "explanation": "David removed the royal armor because he hadn't tested it. He trusted in the Lord and used the simple tools he was skilled with as a shepherd.",
+    "level": "Beginner",
+    "tags": ["Old Testament", "Battle", "Trust"]
+  },
+  {
+    "scenario_id": "SCN_021",
+    "theme": "Repentance",
+    "book_ref": "Luke 19:1-10",
+    "challenge": "You are Zacchaeus, a wealthy tax collector. You want to see Jesus, but the crowd is too thick and you are short. Once Jesus spots you and invites himself to your house, how do you respond to the crowd's grumbling?",
+    "options": [
+      "A. Defend your job as necessary for Rome",
+      "B. Give half your goods to the poor and restore fourfold to those you cheated",
+      "C. Ask Jesus to make the crowd leave you alone"
+    ],
+    "correct_answer": "B",
+    "explanation": "Zacchaeus demonstrated true repentance not just by words, but by restitution and generosity, causing Jesus to declare that salvation had come to his house.",
+    "level": "Intermediate",
+    "tags": ["New Testament", "Transformation", "Money"]
+  },
+  {
+    "scenario_id": "SCN_022",
+    "theme": "Wisdom",
+    "book_ref": "1 Kings 3:16-28",
+    "challenge": "You are King Solomon. Two women claim to be the mother of the same living baby. There are no witnesses. How do you determine the true mother?",
+    "options": [
+      "A. Give the baby to the woman who looks most like him",
+      "B. Order the baby cut in two, to see who pleads for its life",
+      "C. Flip a coin to decide fairly"
+    ],
+    "correct_answer": "B",
+    "explanation": "Solomon's feigned order to kill the child revealed the true mother's heart, as she was willing to give up the child to save its life.",
+    "level": "Advanced",
+    "tags": ["Old Testament", "Wisdom", "Judgment"]
+  },
+  {
+    "scenario_id": "SCN_023",
+    "theme": "Obedience",
+    "book_ref": "Jonah 1:1-3",
+    "challenge": "You are Jonah. God commands you to go to the great city of Nineveh and preach against it. You hate the Ninevites. What is your immediate reaction?",
+    "options": [
+      "A. Go to Nineveh immediately",
+      "B. Argue with God about the mission",
+      "C. Board a ship to Tarshish to flee from the Lord"
+    ],
+    "correct_answer": "C",
+    "explanation": "Jonah initially disobeyed and tried to flee in the opposite direction to Tarshish, leading to the incident with the great fish.",
+    "level": "Beginner",
+    "tags": ["Old Testament", "Prophecy", "Disobedience"]
+  },
+  {
+    "scenario_id": "SCN_024",
+    "theme": "Priorities",
+    "book_ref": "Luke 10:38-42",
+    "challenge": "You are Martha. Jesus is visiting your home. You are distracted by all the preparations that have to be made, while your sister Mary sits at Jesus' feet listening. What do you say to Jesus?",
+    "options": [
+      "A. 'Lord, tell her to help me!'",
+      "B. 'Lord, it is good that she listens to you.'",
+      "C. 'Lord, I will sit and listen too.'"
+    ],
+    "correct_answer": "A",
+    "explanation": "Martha complained that she was left to serve alone. Jesus gently corrected her, stating that Mary had chosen the 'better part' which would not be taken away.",
+    "level": "Intermediate",
+    "tags": ["New Testament", "Service", "Worship"]
+  },
+  {
+    "scenario_id": "SCN_025",
+    "theme": "Testing",
+    "book_ref": "Genesis 22:1-14",
+    "challenge": "You are Abraham. God tells you to take your son Isaac, whom you love, and offer him as a burnt offering on Mount Moriah. What do you do?",
+    "options": [
+      "A. Refuse, arguing that God promised Isaac would be the heir",
+      "B. Rise early the next morning to obey",
+      "C. Hide Isaac to protect him"
+    ],
+    "correct_answer": "B",
+    "explanation": "Abraham obeyed immediately, trusting that God could raise the dead. God stopped him at the last moment and provided a ram as a substitute.",
+    "level": "Advanced",
+    "tags": ["Old Testament", "Sacrifice", "Faith"]
+  },
+  {
+    "scenario_id": "SCN_026",
+    "theme": "Generosity",
+    "book_ref": "Mark 12:41-44",
+    "challenge": "You are a poor widow at the temple treasury. You have only two small copper coins (mites) to live on. Rich people are throwing in large amounts. What do you put in?",
+    "options": [
+      "A. Keep one coin and give the other",
+      "B. Keep both coins for food",
+      "C. Put in everything you have"
+    ],
+    "correct_answer": "C",
+    "explanation": "Jesus commended the widow for putting in 'everything she had to live on,' valuing her sacrificial heart over the monetary amount.",
+    "level": "Beginner",
+    "tags": ["New Testament", "Giving", "Sacrifice"]
+  },
+  {
+    "scenario_id": "SCN_027",
+    "theme": "Leadership",
+    "book_ref": "Acts 27:30-32",
+    "challenge": "You are a centurion on a ship caught in a storm. Paul warns that if the sailors escape on the lifeboat, you cannot be saved. The sailors are trying to lower the boat secretly. What do you order?",
+    "options": [
+      "A. Let the sailors go to get help",
+      "B. Cut the ropes of the lifeboat and let it fall away",
+      "C. Get in the lifeboat yourself"
+    ],
+    "correct_answer": "B",
+    "explanation": "The soldiers cut the ropes of the lifeboat and let it drift away, ensuring everyone stayed together on the ship as Paul had instructed for their survival.",
+    "level": "Expert",
+    "tags": ["New Testament", "Crisis", "Trust"]
+  },
+  {
+    "scenario_id": "SCN_028",
+    "theme": "Guidance",
+    "book_ref": "Judges 6:36-40",
+    "challenge": "You are Gideon. You want to be sure God will save Israel by your hand. You place a wool fleece on the threshing floor. What is your first test?",
+    "options": [
+      "A. Dew on the fleece only, and the ground dry",
+      "B. Dew on the ground only, and the fleece dry",
+      "C. Both fleece and ground completely dry"
+    ],
+    "correct_answer": "A",
+    "explanation": "Gideon first asked for dew on the fleece while the ground remained dry. God granted this. He then asked for the reverse (dry fleece, wet ground) the next night.",
+    "level": "Advanced",
+    "tags": ["Old Testament", "Signs", "Doubt"]
+  },
+  {
+    "scenario_id": "SCN_029",
+    "theme": "Integrity",
+    "book_ref": "Genesis 39:7-12",
+    "challenge": "You are Joseph, serving in Potiphar's house. Potiphar's wife tries to seduce you day after day. One day, she grabs your cloak when you are alone. What is your reaction?",
+    "options": [
+      "A. Reason with her to stop",
+      "B. Give in to keep your position secure",
+      "C. Leave your cloak in her hand and run out of the house"
+    ],
+    "correct_answer": "C",
+    "explanation": "Joseph fled temptation literally, leaving his garment behind rather than sinning against God, even though it led to false accusations and prison.",
+    "level": "Intermediate",
+    "tags": ["Old Testament", "Temptation", "Purity"]
+  },
+  {
+    "scenario_id": "SCN_030",
+    "theme": "Growth",
+    "book_ref": "Matthew 13:3-9",
+    "challenge": "In the Parable of the Sower, seeds fall on rocky ground. What happens to the plants that grow from them?",
+    "options": [
+      "A. They are choked by thorns",
+      "B. They spring up quickly but wither because they have no root",
+      "C. They produce a hundredfold crop"
+    ],
+    "correct_answer": "B",
+    "explanation": "Seeds on rocky ground represent those who receive the word with joy but fall away when trouble comes because they lack deep roots.",
+    "level": "Intermediate",
+    "tags": ["Parable", "New Testament", "Spiritual Growth"]
   }
 ]

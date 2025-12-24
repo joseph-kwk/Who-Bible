@@ -530,6 +530,22 @@
     </div>
   </div>
 
+  <!-- Person Details Modal -->
+  <div id="person-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="person-modal-title" aria-modal="true">
+    <div class="modal" role="document">
+      <header class="modal-header">
+        <h2 id="person-modal-title">Person Details</h2>
+        <button id="btn-person-close" aria-label="Close person details">✕</button>
+      </header>
+      <main class="modal-body" id="person-modal-body" aria-live="polite">
+        <!-- populated dynamically -->
+      </main>
+      <footer class="modal-footer">
+        <button id="btn-person-ok" class="primary">Close</button>
+      </footer>
+    </div>
+  </div>
+
   <!-- Toast Notifications -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 

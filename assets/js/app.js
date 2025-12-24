@@ -592,12 +592,61 @@ function attachHandlers(){
   if (btnJoinRoom && window.RemoteChallengeUI) {
     btnJoinRoom.addEventListener('click', () => window.RemoteChallengeUI.showStep('join'));
   }
+  // Note: Confirm buttons are handled by inline onclick or specific logic in remote-challenge-ui.js if set up there, 
+  // but let's ensure they are attached here if they exist in DOM
+  const btnConfirmCreate = document.getElementById('btn-create-room-confirm');
+  const btnConfirmJoin = document.getElementById('btn-join-room-confirm');
+  
   if (btnConfirmCreate && window.RemoteChallengeUI) {
     btnConfirmCreate.addEventListener('click', window.RemoteChallengeUI.createRoom);
   }
   if (btnConfirmJoin && window.RemoteChallengeUI) {
     btnConfirmJoin.addEventListener('click', window.RemoteChallengeUI.joinRoom);
   }
+  
+  // Modal Close Handlers
+  if (btnSummaryClose) btnSummaryClose.addEventListener('click', hideSummaryModal);
+  if (btnPlayAgain) btnPlayAgain.addEventListener('click', () => {
+    hideSummaryModal();
+    // Restart based on last mode
+    if (state.mode === 'solo') startSolo();
+    else if (state.mode === 'timed') startTimed();
+    else if (state.mode === 'challenge') startChallenge();
+    else showSetup();
+  });
+  
+  if (btnPlayersClose) btnPlayersClose.addEventListener('click', hidePlayersModal);
+  if (btnPlayersCancel) btnPlayersCancel.addEventListener('click', hidePlayersModal);
+  if (btnPlayersStart) btnPlayersStart.addEventListener('click', startChallengeFromModal);
+
+  // Click outside to close modals
+  window.addEventListener('click', (e) => {
+    if (e.target === modalEl) hideSummaryModal();
+    if (e.target === playersModal) hidePlayersModal();
+    if (e.target === remoteModal) {
+      if (window.RemoteChallengeUI && window.RemoteChallengeUI.hide) {
+        window.RemoteChallengeUI.hide();
+      } else {
+        remoteModal.style.display = 'none';
+      }
+    }
+  });
+
+  // Keyboard accessibility for modals (Escape key)
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (modalEl && modalEl.style.display === 'flex') hideSummaryModal();
+      if (playersModal && playersModal.style.display === 'flex') hidePlayersModal();
+      if (remoteModal && remoteModal.style.display === 'flex') {
+        if (window.RemoteChallengeUI && window.RemoteChallengeUI.hide) {
+          window.RemoteChallengeUI.hide();
+        } else {
+          remoteModal.style.display = 'none';
+        }
+      }
+    }
+  });
+
   if (btnCopyLink && window.RemoteChallengeUI) {
     btnCopyLink.addEventListener('click', window.RemoteChallengeUI.copyLink);
   }
@@ -610,30 +659,6 @@ function attachHandlers(){
   if (btnReadyGuest && window.RemoteChallengeUI) {
     btnReadyGuest.addEventListener('click', window.RemoteChallengeUI.readyGuest);
   }
-  
-  // Modal handlers
-  if (btnSummaryClose) btnSummaryClose.addEventListener('click', hideSummaryModal);
-  
-  // Close summary modal when clicking outside content
-  if (modalEl) {
-    modalEl.addEventListener('click', (e) => {
-      if (e.target === modalEl) hideSummaryModal();
-    });
-  }
-
-  if (btnPlayAgain) btnPlayAgain.addEventListener('click', ()=>{ hideSummaryModal(); showSetup(); });
-  
-  if (btnPlayersClose) btnPlayersClose.addEventListener('click', hidePlayersModal);
-  
-  // Close players modal when clicking outside content
-  if (playersModal) {
-    playersModal.addEventListener('click', (e) => {
-      if (e.target === playersModal) hidePlayersModal();
-    });
-  }
-
-  if (btnPlayersCancel) btnPlayersCancel.addEventListener('click', hidePlayersModal);
-  if (btnPlayersStart) btnPlayersStart.addEventListener('click', startChallengeFromModal);
   
   // Keyboard navigation on answers
   answersEl.addEventListener('keydown', onAnswersKeyDown);
@@ -851,13 +876,17 @@ function nextScenarioQuestion(){
 
 function renderScenarioQuestion(scenario){
   // Build the question prompt
-  let prompt = `<div class="scenario-header">
-    <span class="scenario-theme">${scenario.theme}</span>
-    <span class="scenario-level">${scenario.level}</span>
+  let prompt = `
+  <div class="scenario-card">
+    <div class="scenario-header">
+      <span class="scenario-theme">${scenario.theme}</span>
+      <span class="scenario-level">${scenario.level}</span>
+    </div>
+    <div class="scenario-body">
+      <div class="scenario-challenge">${scenario.challenge}</div>
+      <div class="scenario-context">What is the biblical outcome?</div>
+    </div>
   </div>`;
-  
-  prompt += `<div class="scenario-challenge">${scenario.challenge}</div>`;
-  prompt += `<div class="scenario-reference">${scenario.book_ref}</div>`;
   
   qText.innerHTML = prompt;
   
@@ -865,10 +894,15 @@ function renderScenarioQuestion(scenario){
   answersEl.innerHTML = '';
   scenario.options.forEach((option, index) => {
     const btn = document.createElement('button');
-    btn.className = 'ans';
-    btn.dataset.value = option.charAt(0); // A, B, C
-    btn.innerText = option;
-    btn.addEventListener('click', ()=> answerScenarioQuestion(option.charAt(0)));
+    btn.className = 'ans scenario-option';
+    const letter = option.charAt(0);
+    const text = option.substring(3);
+    btn.dataset.value = letter;
+    btn.innerHTML = `
+      <span class="option-letter">${letter}</span>
+      <span class="option-text">${text}</span>
+    `;
+    btn.addEventListener('click', ()=> answerScenarioQuestion(letter));
     answersEl.appendChild(btn);
   });
 }
@@ -1316,66 +1350,96 @@ function renderPeopleList(filter){
   if(peopleCountEl) peopleCountEl.textContent = String(arr.length);
   for(const p of arr){
     const item = document.createElement('div');
-    item.className = 'person-item';
-    const header = document.createElement('div');
-    header.className = 'person-header';
-    header.innerHTML = `<strong>${p.name}</strong> <span class="muted">${(p.short_bio||'').slice(0,80)}</span>`;
-    const details = document.createElement('div');
-    details.className = 'person-details';
-    details.style.display = 'none';
-    const aliasLabel = getText('aliases');
-    const motherLabel = getText('filterMother');
-    const occupationLabel = getText('filterOccupation');
-    const ageLabel = getText('filterAge');
-    const eventsLabel = getText('events');
-    const versesLabel = getText('verses');
-    const eventsJoined = (p.notable_events||[]).map(translateEvent).join(', ');
+    item.className = 'person-card';
     
-    // Build relationship badges
-    let relationshipBadges = '';
-    if (window.RelationshipSystem) {
-      const suggestions = RelationshipSystem.getSuggestions(p.name, state.people, 3);
-      
-      // Family badge
-      if (suggestions.family && suggestions.family.length > 0) {
-        const familyNames = suggestions.family.map(rel => `${rel.name} (${rel.relationship})`).join(', ');
-        relationshipBadges += `<div class="person-badge">👨‍👩‍👦 ${familyNames}</div>`;
-      }
-      
-      // Testament badge
-      if (p.testament) {
-        const testamentText = p.testament === 'ot' ? '📜 Old Testament' : '✝️ New Testament';
-        relationshipBadges += `<div class="person-badge">${testamentText}</div>`;
-      }
-      
-      // Occupation group badge
-      if (suggestions.sameOccupation && suggestions.sameOccupation.length > 0) {
-        const occGroup = RelationshipSystem.categorizeOccupation(p.occupation);
-        const occIcon = occGroup === 'prophet' ? '🔮' : occGroup === 'ruler' ? '👑' : occGroup === 'priest' ? '⛪' : occGroup === 'apostle' ? '✝️' : '👔';
-        const occNames = suggestions.sameOccupation.slice(0, 2).map(o => o.name).join(', ');
-        relationshipBadges += `<div class="person-badge">${occIcon} ${occNames}</div>`;
-      }
-    }
+    // Determine icon based on occupation/role
+    let icon = '👤';
+    const occ = (p.occupation || '').toLowerCase();
+    if(occ.includes('king') || occ.includes('queen') || occ.includes('pharaoh')) icon = '👑';
+    else if(occ.includes('prophet') || occ.includes('seer')) icon = '🔮';
+    else if(occ.includes('priest')) icon = '⛪';
+    else if(occ.includes('apostle') || occ.includes('disciple') || occ.includes('evangelist')) icon = '✝️';
+    else if(occ.includes('judge')) icon = '⚖️';
+    else if(occ.includes('warrior') || occ.includes('commander')) icon = '⚔️';
     
-    details.innerHTML = `
-      ${relationshipBadges}
-      ${p.aliases?.length?`<div><strong>${aliasLabel}:</strong> ${p.aliases.join(', ')}</div>`:''}
-      ${p.mother?`<div><strong>${motherLabel}:</strong> ${p.mother}</div>`:''}
-      ${p.father?`<div><strong>Father:</strong> ${p.father}</div>`:''}
-      ${p.spouse?`<div><strong>Spouse:</strong> ${Array.isArray(p.spouse) ? p.spouse.join(', ') : p.spouse}</div>`:''}
-      ${p.children?.length?`<div><strong>Children:</strong> ${p.children.join(', ')}</div>`:''}
-      ${p.occupation?`<div><strong>${occupationLabel}:</strong> ${p.occupation}</div>`:''}
-      ${p.age_notes?`<div><strong>${ageLabel}:</strong> ${p.age_notes}</div>`:''}
-      ${p.notable_events?.length?`<div><strong>${eventsLabel}:</strong> ${eventsJoined}</div>`:''}
-      <div class="ref"><strong>${versesLabel}:</strong> ${p.verses?.join(', ')||''}</div>
+    item.innerHTML = `
+      <div class="card-header">
+        <div class="card-icon">${icon}</div>
+        <div class="card-title">${p.name}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-info">${translateOccupation(p.occupation) || getText('unknownOccupation') || 'Unknown'}</div>
+        <div class="card-tags">
+          ${p.testament === 'ot' ? '<span class="tag tag-ot">Old Testament</span>' : '<span class="tag tag-nt">New Testament</span>'}
+        </div>
+      </div>
     `;
-    header.addEventListener('click',()=>{
-      details.style.display = details.style.display==='none' ? 'block' : 'none';
-    });
-    item.appendChild(header);
-    item.appendChild(details);
+    
+    item.addEventListener('click', () => showPersonDetails(p));
     peopleList.appendChild(item);
   }
+}
+
+function showPersonDetails(p){
+  const modal = document.getElementById('person-modal');
+  const title = document.getElementById('person-modal-title');
+  const body = document.getElementById('person-modal-body');
+  if(!modal || !title || !body) return;
+  
+  title.textContent = p.name;
+  
+  const aliasLabel = getText('aliases');
+  const motherLabel = getText('filterMother');
+  const occupationLabel = getText('filterOccupation');
+  const ageLabel = getText('filterAge');
+  const eventsLabel = getText('events');
+  const versesLabel = getText('verses');
+  const eventsJoined = (p.notable_events||[]).map(translateEvent).join(', ');
+  
+  let relationshipBadges = '';
+  if (window.RelationshipSystem) {
+    const suggestions = RelationshipSystem.getSuggestions(p.name, state.people, 3);
+    if (suggestions.family && suggestions.family.length > 0) {
+      const familyNames = suggestions.family.map(rel => `${rel.name} (${rel.relationship})`).join(', ');
+      relationshipBadges += `<div class="detail-row"><strong>Family:</strong> ${familyNames}</div>`;
+    }
+  }
+
+  body.innerHTML = `
+    <div class="person-detail-view">
+      <div class="detail-bio">${p.short_bio || ''}</div>
+      <div class="detail-grid">
+        ${relationshipBadges}
+        ${p.aliases?.length?`<div class="detail-row"><strong>${aliasLabel}:</strong> ${p.aliases.join(', ')}</div>`:''}
+        ${p.mother?`<div class="detail-row"><strong>${motherLabel}:</strong> ${p.mother}</div>`:''}
+        ${p.father?`<div class="detail-row"><strong>Father:</strong> ${p.father}</div>`:''}
+        ${p.spouse?`<div class="detail-row"><strong>Spouse:</strong> ${Array.isArray(p.spouse) ? p.spouse.join(', ') : p.spouse}</div>`:''}
+        ${p.children?.length?`<div class="detail-row"><strong>Children:</strong> ${p.children.join(', ')}</div>`:''}
+        ${p.occupation?`<div class="detail-row"><strong>${occupationLabel}:</strong> ${translateOccupation(p.occupation)}</div>`:''}
+        ${p.age_notes?`<div class="detail-row"><strong>${ageLabel}:</strong> ${p.age_notes}</div>`:''}
+        ${p.notable_events?.length?`<div class="detail-row"><strong>${eventsLabel}:</strong> ${eventsJoined}</div>`:''}
+        <div class="detail-row ref"><strong>${versesLabel}:</strong> ${p.verses?.join(', ')||''}</div>
+      </div>
+    </div>
+  `;
+  
+  modal.style.display = 'flex';
+  
+  // Ensure close handlers are attached (idempotent)
+  const btnClose = document.getElementById('btn-person-close');
+  const btnOk = document.getElementById('btn-person-ok');
+  
+  const closeFn = () => { modal.style.display = 'none'; };
+  
+  // Remove old listeners to avoid duplicates (simple way: clone node)
+  // But better to just set onclick for simplicity in this context
+  if(btnClose) btnClose.onclick = closeFn;
+  if(btnOk) btnOk.onclick = closeFn;
+  
+  // Click outside
+  modal.onclick = (e) => {
+    if(e.target === modal) closeFn();
+  };
 }
 
 function toggleAllDetails(expand){

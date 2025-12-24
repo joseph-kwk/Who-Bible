@@ -129,6 +129,18 @@
   function closeCommunityModal(){ if(communityModal) communityModal.style.display = 'none'; }
   btnCommunityClose?.addEventListener('click', closeCommunityModal);
   btnCommunityOk?.addEventListener('click', closeCommunityModal);
+  
+  // Click outside to close
+  window.addEventListener('click', (e) => {
+    if (e.target === communityModal) closeCommunityModal();
+  });
+  
+  // Escape key to close
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && communityModal && communityModal.style.display === 'flex') {
+      closeCommunityModal();
+    }
+  });
 
   if (featured) {
     featured.addEventListener('click', (e)=>{
