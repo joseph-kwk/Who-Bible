@@ -8,6 +8,7 @@
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/welcome-modal.css" />
   
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -573,6 +574,35 @@
       <footer class="modal-footer">
         <button id="btn-change-player-cancel">Cancel</button>
         <button id="btn-change-player-save" class="primary">Save</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Welcome / First Time Modal -->
+  <div id="welcome-modal" class="modal-overlay welcome-overlay" style="display:none" role="dialog" aria-labelledby="welcome-modal-title" aria-modal="true">
+    <div class="modal welcome-modal-content" role="document">
+      <header class="modal-header welcome-header">
+        <h2 id="welcome-modal-title">
+          <span class="welcome-icon">✨</span> Welcome, Friend!
+        </h2>
+        <button id="btn-welcome-close" aria-label="Close welcome message" class="welcome-close-btn">✕</button>
+      </header>
+      <main class="modal-body welcome-body">
+        <div class="welcome-hero-icon">📖</div>
+        <p class="welcome-intro">We're so glad you're here to explore the Bible with us!</p>
+        
+        <div class="welcome-tip-box">
+          <div class="tip-icon">💡</div>
+          <div class="tip-content">
+            <p class="tip-title">Quick Tip</p>
+            <p>The settings at the top (like <strong>Difficulty</strong>) control the whole game. Feel free to adjust them anytime to match your pace.</p>
+          </div>
+        </div>
+        
+        <p class="welcome-outro">Have fun learning & growing!</p>
+      </main>
+      <footer class="modal-footer welcome-footer">
+        <button id="btn-welcome-ok" class="primary welcome-btn">Let's Play! 🚀</button>
       </footer>
     </div>
   </div>

@@ -178,10 +178,6 @@ function promptForPlayerName() {
     input.addEventListener('keydown', handleKey);
   });
 }
-    savePlayer(player);
-    return player;
-  }
-}
 
 function getPlayerStats() {
   if (!state.currentPlayer) return null;
@@ -470,8 +466,42 @@ async function init(){
   // Footer year
   const fy = document.getElementById('footer-year');
   if (fy) fy.textContent = String(new Date().getFullYear());
-  // Welcome toast
-  showToast({ title: getText('brandTitle'), msg: getText('welcomeMessage'), type: 'info', timeout: 4000 });
+  
+  // Check for first-time user
+  checkFirstTimeUser();
+  
+  // Welcome toast (only if not first time, to avoid clutter)
+  if (localStorage.getItem('who-bible-visited')) {
+    showToast({ title: getText('brandTitle'), msg: getText('welcomeMessage'), type: 'info', timeout: 4000 });
+  }
+}
+
+function checkFirstTimeUser() {
+  const visited = localStorage.getItem('who-bible-visited');
+  if (!visited) {
+    const modal = document.getElementById('welcome-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+      // Close handler
+      const closeBtn = document.getElementById('btn-welcome-close');
+      const okBtn = document.getElementById('btn-welcome-ok');
+      const close = () => {
+        modal.style.display = 'none';
+        localStorage.setItem('who-bible-visited', 'true');
+        // Show welcome toast after closing modal
+        showToast({ title: getText('brandTitle'), msg: getText('welcomeMessage'), type: 'info', timeout: 4000 });
+      };
+      if(closeBtn) closeBtn.onclick = close;
+      if(okBtn) okBtn.onclick = close;
+      
+      // Close when clicking outside the modal content
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          close();
+        }
+      });
+    }
+  }
 }
 
 function attachHandlers(){
@@ -1085,8 +1115,17 @@ function quitQuiz(){
 // =========================
 function pickQuestionSet(count, difficulty, peoplePool = null){
   const types = ['whoDid','whoMother','occupation','age','event'];
-  const pool = filterPeopleByDifficulty(peoplePool || state.people, difficulty);
-  shuffle(pool);
+  let pool = filterPeopleByDifficulty(peoplePool || state.people, difficulty);
+  
+  if (difficulty === 'hard') {
+    // For hard mode, pool is sorted by difficulty. Take top candidates then shuffle.
+    const topCandidates = pool.slice(0, Math.max(count * 2, 20));
+    shuffle(topCandidates);
+    pool = topCandidates;
+  } else {
+    shuffle(pool);
+  }
+
   const selected = pool.slice(0, Math.min(count, pool.length));
   const questions = [];
   for(const person of selected){
@@ -1124,7 +1163,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null){
 function filterPeopleByDifficulty(people, difficulty){
   if(difficulty==='easy'){
     const common = new Set(['Noah','Moses','David','Solomon','Abraham','Isaac','Jacob','Ruth','Esther','Peter','Paul','Mary (mother of Jesus)','John the Baptist','Joseph (son of Jacob)','Lazarus']);
-    return people.filter(p=>common.has(p.name));
+    return people.filter(p => p.difficulty === 'easy' || common.has(p.name));
   }
   if(difficulty==='hard'){
     // Prefer entries with less-complete bios (harder), but include all
@@ -1172,7 +1211,18 @@ function renderQuestion(q){
   answersEl.innerHTML='';
   answersEl.setAttribute('aria-activedescendant','');
   answersEl.setAttribute('aria-label', getText('answersLabel'));
-  const choices = makeChoices(q);
+  
+  // Use pre-generated choices if available (for remote challenge consistency)
+  let choices;
+  if (q.choices && Array.isArray(q.choices)) {
+    choices = q.choices.map(c => ({ 
+      original: c, 
+      display: translateAnswerForQuestionType(q.type, c) 
+    }));
+  } else {
+    choices = makeChoices(q);
+  }
+  
   choices.forEach((choiceObj, idx)=>{
     const div = document.createElement('div');
     div.className='ans';
@@ -1697,7 +1747,25 @@ function showSummaryModal(){
   const total = state.results.length;
   const correct = state.results.filter(r=>r.correct).length;
   const accuracy = total ? Math.round((correct/total)*100) : 0;
-  summaryStatsEl.innerHTML = getText('summaryStats', { score: correct, total: total, percentage: accuracy, streak: state.streak });
+  
+  let headerHtml = getText('summaryStats', { score: correct, total: total, percentage: accuracy, streak: state.streak });
+  
+  // Add winner info for challenge modes
+  if (state.mode === 'challenge' || state.mode === 'remote-challenge') {
+    const [p1, p2] = state.players;
+    const winnerName = p1.score > p2.score ? p1.name : (p2.score > p1.score ? p2.name : 'Tie');
+    const winnerText = p1.score === p2.score ? (getText('tieGame') || 'Tie Game') : `${getText('winner') || 'Winner'}: ${winnerName}`;
+    
+    headerHtml = `
+      <div style="margin-bottom: 16px; font-size: 1.2em; color: var(--accent); text-align: center;">
+        <strong>${winnerText}</strong><br>
+        <small>${p1.name}: ${p1.score} vs ${p2.name}: ${p2.score}</small>
+      </div>
+      ${headerHtml}
+    `;
+  }
+  
+  summaryStatsEl.innerHTML = headerHtml;
   summaryListEl.innerHTML = '';
   state.results.forEach(r=>{
     const div = document.createElement('div');

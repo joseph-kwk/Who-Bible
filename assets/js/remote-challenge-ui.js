@@ -218,18 +218,43 @@ async function handleReadyGuest() {
   }
 }
 
-// Callback: When opponent joins
+// Callback: When opponent joins or updates
 window.onRemoteOpponentUpdate = function(opponent) {
   if (!opponent) return;
   
+  // Lobby updates
   const statusEl = document.getElementById('remote-opponent-status');
-  if (statusEl) {
+  if (statusEl && document.getElementById('remote-modal').style.display !== 'none') {
     statusEl.textContent = `${opponent.name} has joined! Click Ready when you're set.`;
   }
   
   const btnReady = document.getElementById('btn-ready-host');
-  if (btnReady) {
+  if (btnReady && document.getElementById('remote-modal').style.display !== 'none') {
     btnReady.style.display = 'inline-block';
+  }
+  
+  // In-game score updates
+  if (state.mode === 'remote-challenge') {
+    // Determine which score element belongs to opponent
+    // In remote mode, we can fix P1 as "You" and P2 as "Opponent" visually, 
+    // or stick to the P1/P2 slots.
+    // Let's stick to P1/P2 slots to match the data structure.
+    
+    const myPlayerNum = window.RemoteChallenge.playerNumber;
+    const opponentPlayerNum = myPlayerNum === 1 ? 2 : 1;
+    
+    // Update state
+    if (state.players && state.players[opponentPlayerNum - 1]) {
+      state.players[opponentPlayerNum - 1].score = opponent.score;
+      state.players[opponentPlayerNum - 1].name = opponent.name;
+    }
+    
+    // Update UI
+    const p1ScoreEl = document.getElementById('p1-score');
+    const p2ScoreEl = document.getElementById('p2-score');
+    
+    if (opponentPlayerNum === 1 && p1ScoreEl) p1ScoreEl.textContent = opponent.score;
+    if (opponentPlayerNum === 2 && p2ScoreEl) p2ScoreEl.textContent = opponent.score;
   }
 };
 
@@ -249,7 +274,7 @@ window.onRemoteQuestionsReady = function(questions) {
 };
 
 // Start the actual remote quiz
-function startRemoteQuiz() {
+async function startRemoteQuiz() {
   showGame();
   gameTitle.textContent = 'Remote Challenge';
   
@@ -261,6 +286,20 @@ function startRemoteQuiz() {
   state.results = [];
   state.paused = false;
   
+  // Get room state to set up players
+  try {
+    const roomState = await window.RemoteChallenge.getRoomState();
+    if (roomState && roomState.players) {
+      state.players = [
+        roomState.players.player1 || { name: 'Player 1', score: 0 },
+        roomState.players.player2 || { name: 'Player 2', score: 0 }
+      ];
+    }
+  } catch (e) {
+    console.warn('Could not fetch room state, using defaults', e);
+    state.players = [ { name: 'Player 1', score: 0 }, { name: 'Player 2', score: 0 } ];
+  }
+  
   // Use questions from Firebase
   if (window.remoteQuizQuestions) {
     state.questions = window.remoteQuizQuestions;
@@ -270,10 +309,27 @@ function startRemoteQuiz() {
     streakEl.innerText = state.streak;
     btnNext.disabled = true;
     
-    // Hide timer and challenge status for remote mode
+    // Hide timer but SHOW challenge status for remote mode
     timerEl.style.display = 'none';
     btnPause.style.display = 'none';
-    challengeStatusEl.style.display = 'none';
+    
+    // Show scores
+    const challengeStatusEl = document.getElementById('challenge-status');
+    if (challengeStatusEl) {
+      challengeStatusEl.style.display = 'inline-flex';
+      
+      // Update names/scores in UI
+      const p1ScoreEl = document.getElementById('p1-score');
+      const p2ScoreEl = document.getElementById('p2-score');
+      const currentPlayerEl = document.getElementById('current-player');
+      
+      if (p1ScoreEl) p1ScoreEl.textContent = state.players[0].score;
+      if (p2ScoreEl) p2ScoreEl.textContent = state.players[1].score;
+      
+      // In remote mode, "Current Player" indicator is less relevant as both play simultaneously,
+      // but we can set it to the user's number
+      if (currentPlayerEl) currentPlayerEl.textContent = window.RemoteChallenge.playerNumber;
+    }
     
     // Show the quiz interface
     quizEl.style.display = 'block';
@@ -297,8 +353,16 @@ window.generateRemoteQuestions = function(settings) {
   
   // Use existing question generation logic
   const types = ['whoDid','whoMother','occupation','age','event'];
-  const pool = filterPeopleByDifficulty(state.people, difficulty);
-  shuffle(pool);
+  let pool = filterPeopleByDifficulty(state.people, difficulty);
+  
+  if (difficulty === 'hard') {
+    const topCandidates = pool.slice(0, Math.max(count * 2, 20));
+    shuffle(topCandidates);
+    pool = topCandidates;
+  } else {
+    shuffle(pool);
+  }
+
   const selected = pool.slice(0, Math.min(count, pool.length));
   const questions = [];
   

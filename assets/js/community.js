@@ -1,5 +1,8 @@
 // Community page bootstrap: reuse app.js community helpers minimally without game setup.
 (function(){
+  let locationsInitialized = false;
+  let conceptsInitialized = false;
+
   // Minimal utilities copied from app.js
   const toastContainer = document.getElementById('toast-container');
   function showToast({ title, msg = '', type = 'info', timeout = 2000 }){
@@ -260,91 +263,6 @@
     showToast({ title: getText('profileSaved')||'Profile saved', type:'success', timeout: 1200 }); 
   });
 
-  // Room creation
-  const btnCreateRoom = document.getElementById('btn-create-room');
-  const roomNameInput = document.getElementById('room-name');
-  const myRoomsContainer = document.getElementById('my-rooms');
-  
-  function loadMyRooms() {
-    if (!myRoomsContainer) return;
-    try {
-      const rooms = JSON.parse(localStorage.getItem('communityRooms') || '[]');
-      myRoomsContainer.innerHTML = '';
-      
-      if (rooms.length === 0) {
-        myRoomsContainer.innerHTML = '<p class="muted">No rooms yet. Create one above!</p>';
-        return;
-      }
-      
-      rooms.forEach((room, idx) => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="card-title">${room.name}</div>
-          <div class="card-desc">Created ${new Date(room.created).toLocaleDateString()}</div>
-          <button class="small-btn delete-room" data-idx="${idx}" style="margin-top: 8px;">Delete</button>
-        `;
-        myRoomsContainer.appendChild(card);
-      });
-      
-      // Add delete handlers
-      myRoomsContainer.querySelectorAll('.delete-room').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const idx = parseInt(btn.dataset.idx);
-          deleteRoom(idx);
-        });
-      });
-    } catch(_) {
-      myRoomsContainer.innerHTML = '<p class="muted">Error loading rooms</p>';
-    }
-  }
-  
-  function createRoom() {
-    const name = roomNameInput?.value?.trim();
-    if (!name) {
-      showToast({ title: getText('error') || 'Error', msg: 'Please enter a room name', type: 'error', timeout: 1500 });
-      return;
-    }
-    
-    try {
-      const rooms = JSON.parse(localStorage.getItem('communityRooms') || '[]');
-      rooms.push({
-        name: name,
-        created: new Date().toISOString(),
-        owner: displayNameInput?.value?.trim() || 'Anonymous'
-      });
-      localStorage.setItem('communityRooms', JSON.stringify(rooms));
-      
-      if (roomNameInput) roomNameInput.value = '';
-      loadMyRooms();
-      showToast({ title: getText('success') || 'Success', msg: `Room "${name}" created!`, type: 'success', timeout: 2000 });
-    } catch(_) {
-      showToast({ title: getText('error') || 'Error', msg: 'Could not create room', type: 'error', timeout: 1500 });
-    }
-  }
-  
-  function deleteRoom(idx) {
-    try {
-      const rooms = JSON.parse(localStorage.getItem('communityRooms') || '[]');
-      const roomName = rooms[idx]?.name || 'this room';
-      rooms.splice(idx, 1);
-      localStorage.setItem('communityRooms', JSON.stringify(rooms));
-      loadMyRooms();
-      showToast({ title: getText('deleted') || 'Deleted', msg: `Removed "${roomName}"`, type: 'info', timeout: 1500 });
-    } catch(_) {
-      showToast({ title: getText('error') || 'Error', msg: 'Could not delete room', type: 'error', timeout: 1500 });
-    }
-  }
-  
-  btnCreateRoom?.addEventListener('click', createRoom);
-  roomNameInput?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') createRoom();
-  });
-  
-  // Load rooms on page load
-  loadMyRooms();
-
   // =========================
   // Firebase Live Rooms Integration
   // =========================
@@ -484,10 +402,11 @@
   });
 
   // ===== LOCATIONS TAB =====
+  // locationsInitialized is defined at top of scope
   let locationsMap = null;
-  let locationsInitialized = false;
   
   async function initLocationsTab() {
+    locationsInitialized = true;
     if (!window.LocationModule) {
       showToast({ title: 'Loading...', msg: 'Locations module not loaded', type: 'warn' });
       return;
@@ -610,6 +529,7 @@
 
   // ===== CONCEPTS TAB =====
   async function initConceptsTab() {
+    conceptsInitialized = true;
     if (!window.ConceptModule) {
       showToast({ title: 'Loading...', msg: 'Concepts module not loaded', type: 'warn' });
       return;
@@ -733,6 +653,17 @@
 
   // Initialize modules on page load
   window.addEventListener('DOMContentLoaded', async () => {
+    // Load people data for stats
+    try {
+      const response = await fetch('assets/data/people.json');
+      if (response.ok) {
+        const people = await response.json();
+        updateCommunityStats(people);
+      }
+    } catch (e) {
+      console.warn('Could not load people data for stats', e);
+    }
+
     if (window.LocationModule) {
       await window.LocationModule.init();
       console.log('✓ Locations loaded:', window.LocationModule.locations.length);
@@ -743,6 +674,25 @@
       console.log('✓ Concepts loaded:', window.ConceptModule.concepts.length);
     }
   });
+
+  function updateCommunityStats(people) {
+    if (!people || !Array.isArray(people)) return;
+    
+    const total = people.length;
+    const ot = people.filter(p => p.testament === 'ot').length;
+    const nt = people.filter(p => p.testament === 'nt').length;
+    const withVerses = people.filter(p => p.verses && p.verses.length > 0).length;
+    
+    const elTotal = document.getElementById('stat-people');
+    const elOt = document.getElementById('stat-ot');
+    const elNt = document.getElementById('stat-nt');
+    const elVerses = document.getElementById('stat-verses');
+    
+    if (elTotal) elTotal.textContent = total;
+    if (elOt) elOt.textContent = ot;
+    if (elNt) elNt.textContent = nt;
+    if (elVerses) elVerses.textContent = withVerses;
+  }
 
   // Localize static text
   if (typeof window.updateAllText === 'function') {

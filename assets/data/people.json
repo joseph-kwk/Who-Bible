@@ -18,7 +18,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Moses",
@@ -42,7 +43,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Solomon",
@@ -64,7 +66,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Joseph (son of Jacob)",
@@ -90,7 +93,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "David",
@@ -114,7 +118,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Esther",
@@ -136,7 +141,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Mary (mother of Jesus)",
@@ -157,7 +163,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "John the Baptist",
@@ -179,7 +186,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Paul",
@@ -204,7 +212,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Peter",
@@ -230,7 +239,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Lazarus",
@@ -250,7 +260,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Abraham",
@@ -276,7 +287,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Isaac",
@@ -298,7 +310,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Jacob",
@@ -323,7 +336,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Samuel",
@@ -345,7 +359,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Elijah",
@@ -368,7 +383,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Jonah",
@@ -388,7 +404,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Ruth",
@@ -408,7 +425,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "easy"
   },
   {
     "name": "Mary Magdalene",
@@ -430,7 +448,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Saul (first king)",
@@ -452,7 +471,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Daniel",
@@ -474,7 +494,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Joshua",
@@ -497,7 +518,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Deborah",
@@ -517,7 +539,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Gideon",
@@ -537,7 +560,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Samson",
@@ -557,7 +581,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Jeremiah",
@@ -579,7 +604,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Ezekiel",
@@ -601,7 +627,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Isaiah",
@@ -623,7 +650,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Job",
@@ -645,7 +673,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Nehemiah",
@@ -666,7 +695,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Ezra",
@@ -687,7 +717,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Adam",
@@ -708,7 +739,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Eve",
@@ -728,7 +760,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Cain",
@@ -748,7 +781,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Abel",
@@ -768,7 +802,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Lot",
@@ -789,7 +824,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Sarah",
@@ -813,7 +849,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Rebekah",
@@ -834,7 +871,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Rachel",
@@ -854,7 +892,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Leah",
@@ -874,7 +913,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Miriam",
@@ -896,7 +936,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Aaron",
@@ -919,7 +960,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Caleb",
@@ -939,7 +981,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Elisha",
@@ -962,7 +1005,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Naomi",
@@ -982,7 +1026,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Boaz",
@@ -1002,7 +1047,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Hannah",
@@ -1022,7 +1068,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Eli",
@@ -1042,7 +1089,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Goliath",
@@ -1061,7 +1109,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Jonathan",
@@ -1083,7 +1132,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Bathsheba",
@@ -1104,7 +1154,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Absalom",
@@ -1124,7 +1175,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Elkanah",
@@ -1143,7 +1195,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Mordecai",
@@ -1163,7 +1216,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Joah",
@@ -1187,7 +1241,8 @@
     "_inferred_testament": false,
     "_inferred_gender": true,
     "_verified": true,
-    "_accepted_date": "2025-12-01T03:31:49.594Z"
+    "_accepted_date": "2025-12-01T03:31:49.594Z",
+    "difficulty": "intermediate"
   },
   {
     "name": "Abey",
@@ -1211,7 +1266,8 @@
     "_inferred_testament": false,
     "_inferred_gender": true,
     "_verified": true,
-    "_accepted_date": "2025-12-01T03:31:49.595Z"
+    "_accepted_date": "2025-12-01T03:31:49.595Z",
+    "difficulty": "intermediate"
   },
   {
     "name": "Maro",
@@ -1238,7 +1294,8 @@
     "_inferred_testament": false,
     "_inferred_gender": true,
     "_verified": true,
-    "_accepted_date": "2025-12-01T03:31:49.595Z"
+    "_accepted_date": "2025-12-01T03:31:49.595Z",
+    "difficulty": "intermediate"
   },
   {
     "name": "Aram",
@@ -1266,7 +1323,8 @@
     "_inferred_testament": false,
     "_inferred_gender": true,
     "_verified": true,
-    "_accepted_date": "2025-12-01T03:31:49.595Z"
+    "_accepted_date": "2025-12-01T03:31:49.595Z",
+    "difficulty": "intermediate"
   },
   {
     "name": "Seth",
@@ -1291,7 +1349,8 @@
       "Genesis 4:25 - 5:8"
     ],
     "testament": "ot",
-    "gender": "male"
+    "gender": "male",
+    "difficulty": "intermediate"
   },
   {
     "name": "Enosh",
@@ -1312,7 +1371,8 @@
       "people began to call upon the name of the Lord"
     ],
     "testament": "genesis 5:9-11",
-    "gender": "OT"
+    "gender": "OT",
+    "difficulty": "intermediate"
   },
   {
     "name": "Kenan",
@@ -1333,7 +1393,8 @@
       "Genesis 5:12-14"
     ],
     "testament": "ot",
-    "gender": "male"
+    "gender": "male",
+    "difficulty": "intermediate"
   },
   {
     "name": "Mahalalel",
@@ -1354,7 +1415,8 @@
       "Genesis 5:15-17"
     ],
     "testament": "ot",
-    "gender": "male"
+    "gender": "male",
+    "difficulty": "intermediate"
   },
   {
     "name": "Jared",
@@ -1375,7 +1437,8 @@
       "Genesis 5:18-20"
     ],
     "testament": "ot",
-    "gender": "male"
+    "gender": "male",
+    "difficulty": "intermediate"
   },
   {
     "name": "Enoch (Jared's Son)",
@@ -1397,7 +1460,8 @@
       "Hebrews 11:5"
     ],
     "testament": "ot",
-    "gender": "male"
+    "gender": "male",
+    "difficulty": "intermediate"
   },
   {
     "name": "Methuselah",
@@ -1418,7 +1482,8 @@
       "Genesis 5:25-27"
     ],
     "testament": "ot",
-    "gender": "male"
+    "gender": "male",
+    "difficulty": "intermediate"
   },
   {
     "name": "Lamech (Methuselah's Son)",
@@ -1439,7 +1504,8 @@
       "believing he would bring comfort"
     ],
     "testament": "genesis 5:28-31",
-    "gender": "OT"
+    "gender": "OT",
+    "difficulty": "intermediate"
   },
   {
     "name": "Shem",
@@ -1467,7 +1533,8 @@
       "Genesis 10-11"
     ],
     "testament": "ot",
-    "gender": "male"
+    "gender": "male",
+    "difficulty": "intermediate"
   },
   {
     "name": "Ham",
@@ -1494,7 +1561,8 @@
       "Genesis 9-10"
     ],
     "testament": "ot",
-    "gender": "male"
+    "gender": "male",
+    "difficulty": "intermediate"
   },
   {
     "name": "Japheth",
@@ -1524,7 +1592,8 @@
       "Genesis 10:2-5"
     ],
     "testament": "ot",
-    "gender": "male"
+    "gender": "male",
+    "difficulty": "intermediate"
   },
   {
     "name": "Nimrod",
@@ -1552,7 +1621,8 @@
       "Established the kingdom of Babel and cities like Nineveh"
     ],
     "testament": "genesis 10:8-12",
-    "gender": "OT"
+    "gender": "OT",
+    "difficulty": "intermediate"
   },
   {
     "name": "Terah",
@@ -1576,7 +1646,8 @@
       "Genesis 11:24-32"
     ],
     "testament": "ot",
-    "gender": "male"
+    "gender": "male",
+    "difficulty": "intermediate"
   },
   {
     "name": "Hagar",
@@ -1599,7 +1670,8 @@
       "21"
     ],
     "testament": "ot",
-    "gender": "female"
+    "gender": "female",
+    "difficulty": "intermediate"
   },
   {
     "name": "Ishmael",
@@ -1633,7 +1705,8 @@
       "Prophesied to be a 'wild donkey of a man'"
     ],
     "testament": "genesis 16|21|25",
-    "gender": "OT"
+    "gender": "OT",
+    "difficulty": "intermediate"
   },
   {
     "name": "Stephen",
@@ -1653,7 +1726,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Nicodemus",
@@ -1675,7 +1749,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Barnabas",
@@ -1699,7 +1774,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Philip the Evangelist",
@@ -1722,7 +1798,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Ananias (of Damascus)",
@@ -1741,7 +1818,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Sapphira",
@@ -1760,7 +1838,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Cornelius",
@@ -1780,7 +1859,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Timothy",
@@ -1802,7 +1882,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Titus",
@@ -1822,7 +1903,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Judas Iscariot",
@@ -1843,7 +1925,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Simon the Zealot",
@@ -1863,7 +1946,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "James (brother of Jesus)",
@@ -1887,7 +1971,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Jairus",
@@ -1907,7 +1992,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Zacchaeus",
@@ -1927,7 +2013,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Good Samaritan",
@@ -1949,7 +2036,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Ehud",
@@ -1968,7 +2056,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Jethro",
@@ -1990,7 +2079,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Epaphroditus",
@@ -2011,7 +2101,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Rhoda",
@@ -2030,7 +2121,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Dodo",
@@ -2050,7 +2142,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Onesimus",
@@ -2070,7 +2163,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Philemon",
@@ -2089,7 +2183,8 @@
     "testament": "nt",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Gehazi",
@@ -2108,7 +2203,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Huldah",
@@ -2128,7 +2224,8 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "female",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   },
   {
     "name": "Baruch",
@@ -2148,6 +2245,977 @@
     "testament": "ot",
     "_inferred_testament": true,
     "gender": "male",
-    "_inferred_gender": true
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Abimelech",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Philistine king; also name of Gideon's son who became king",
+    "age_notes": null,
+    "notable_events": [
+      "Interacted with Abraham and Isaac over wells",
+      "Took a wife from Shechem (Gideon's son Abimelech)"
+    ],
+    "verses": [
+      "Genesis 20",
+      "Genesis 26",
+      "Judges 9"
+    ],
+    "short_bio": "Name borne by several rulers in the Bible; notable as a Philistine king and as Abimelech son of Gideon who seized power.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Achan",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Israelite soldier",
+    "age_notes": null,
+    "notable_events": [
+      "Took devoted things at Jericho",
+      "Caused Israel's defeat at Ai",
+      "Executed for disobedience"
+    ],
+    "verses": [
+      "Joshua 7"
+    ],
+    "short_bio": "Israelite who disobeyed God's command at Jericho, bringing judgment on himself and Israel.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Adonijah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prince",
+    "age_notes": null,
+    "notable_events": [
+      "Son of David who attempted to claim the throne",
+      "Opposed Solomon's succession",
+      "Executed after political intrigue"
+    ],
+    "verses": [
+      "1 Kings 1-2"
+    ],
+    "short_bio": "A son of David who sought kingship but was outmaneuvered by Solomon and later put to death.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Ahaz",
+    "aliases": [],
+    "mother": null,
+    "occupation": "King of Judah",
+    "age_notes": null,
+    "notable_events": [
+      "Reigned during Assyrian pressure",
+      "Introduced idolatrous practices",
+      "Sought Assyrian help"
+    ],
+    "verses": [
+      "2 Kings 16",
+      "Isaiah 7"
+    ],
+    "short_bio": "King of Judah known for unfaithfulness and political alliances with Assyria.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Amaziah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "King of Judah",
+    "age_notes": null,
+    "notable_events": [
+      "Defeated Edom",
+      "Later turned to idolatry",
+      "Assassinated after political turmoil"
+    ],
+    "verses": [
+      "2 Kings 14",
+      "2 Chronicles 25"
+    ],
+    "short_bio": "A king of Judah who experienced military success but later fell into idolatry and was overthrown.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Asa",
+    "aliases": [],
+    "mother": null,
+    "occupation": "King of Judah",
+    "age_notes": null,
+    "notable_events": [
+      "Reformed the nation early in his reign",
+      "Sought the Lord for deliverance",
+      "Later relied on foreign alliances"
+    ],
+    "verses": [
+      "1 Kings 15:9-24",
+      "2 Chronicles 14-16"
+    ],
+    "short_bio": "King of Judah noted for early reforms and later mixed trust in God and alliances.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Athaliah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Queen of Judah",
+    "age_notes": null,
+    "notable_events": [
+      "Seized the throne after her son's death",
+      "Promoted Baal worship",
+      "Overthrown and executed"
+    ],
+    "verses": [
+      "2 Kings 11",
+      "2 Chronicles 22-23"
+    ],
+    "short_bio": "A queen who usurped the throne of Judah and led the nation into idolatry before being removed.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Belshazzar",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Babylonian ruler (co-regent)",
+    "age_notes": null,
+    "notable_events": [
+      "Held a profane feast using temple vessels",
+      "Saw the writing on the wall",
+      "Babylon fell that night"
+    ],
+    "verses": [
+      "Daniel 5"
+    ],
+    "short_bio": "Last Babylonian ruler in Daniel's account who witnessed the handwriting predicting Babylon's fall.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Bildad",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Friend of Job",
+    "age_notes": null,
+    "notable_events": [
+      "One of Job's three friends",
+      "Argued that suffering indicates sin",
+      "Rebuked by God indirectly through Job's vindication"
+    ],
+    "verses": [
+      "Job 2-27"
+    ],
+    "short_bio": "A friend of Job who offered traditional but inadequate explanations for suffering.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Zophar",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Friend of Job",
+    "age_notes": null,
+    "notable_events": [
+      "One of Job's three friends",
+      "Spoke harshly about Job's supposed guilt",
+      "Part of the debate on suffering"
+    ],
+    "verses": [
+      "Job 11"
+    ],
+    "short_bio": "Another of Job's friends who insisted suffering was due to sin and urged repentance.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Elihu",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Young speaker in Job",
+    "age_notes": null,
+    "notable_events": [
+      "Intervened in Job's debate after the three friends",
+      "Offered a different perspective on suffering",
+      "Spoke with passion about God's justice"
+    ],
+    "verses": [
+      "Job 32-37"
+    ],
+    "short_bio": "A younger interlocutor in the Book of Job who challenged both Job and his older friends.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Mephibosheth",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Member of Saul's house",
+    "age_notes": null,
+    "notable_events": [
+      "Son of Jonathan who was lame in both feet",
+      "Shown kindness by David",
+      "Restored to David's table"
+    ],
+    "verses": [
+      "2 Samuel 4:4",
+      "2 Samuel 9"
+    ],
+    "short_bio": "Jonathan's son whom David honored, restoring his inheritance and showing covenantal kindness.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Shadrach",
+    "aliases": [
+      "Hananiah"
+    ],
+    "mother": null,
+    "occupation": "Jewish exile, companion of Daniel",
+    "age_notes": null,
+    "notable_events": [
+      "Refused to bow to Nebuchadnezzar's image",
+      "Survived the fiery furnace"
+    ],
+    "verses": [
+      "Daniel 1:6",
+      "Daniel 3"
+    ],
+    "short_bio": "One of three Jewish youths who trusted God and were miraculously preserved in a furnace.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Meshach",
+    "aliases": [
+      "Mishael"
+    ],
+    "mother": null,
+    "occupation": "Jewish exile, companion of Daniel",
+    "age_notes": null,
+    "notable_events": [
+      "Refused idolatry",
+      "Preserved in the fiery furnace with Shadrach and Abednego"
+    ],
+    "verses": [
+      "Daniel 1:6",
+      "Daniel 3"
+    ],
+    "short_bio": "Companion of Daniel who stood firm in faith and was protected in the furnace.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Abednego",
+    "aliases": [
+      "Azariah"
+    ],
+    "mother": null,
+    "occupation": "Jewish exile, companion of Daniel",
+    "age_notes": null,
+    "notable_events": [
+      "Refused to worship the golden image",
+      "Survived the fiery furnace unharmed"
+    ],
+    "verses": [
+      "Daniel 1:6",
+      "Daniel 3"
+    ],
+    "short_bio": "One of the three who trusted God rather than bow to idolatry and was miraculously saved.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Uriah the Hittite",
+    "aliases": [
+      "Uriah"
+    ],
+    "mother": null,
+    "occupation": "Soldier in David's army",
+    "age_notes": null,
+    "notable_events": [
+      "Husband of Bathsheba",
+      "Sent to the front and killed on David's orders"
+    ],
+    "verses": [
+      "2 Samuel 11"
+    ],
+    "short_bio": "A loyal soldier whose death was orchestrated by King David after David's adultery with Bathsheba.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Jephthah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Judge of Israel",
+    "age_notes": null,
+    "notable_events": [
+      "Delivered Israel from Ammonite oppression",
+      "Made a tragic vow involving his daughter"
+    ],
+    "verses": [
+      "Judges 11-12"
+    ],
+    "short_bio": "A judge who secured victory for Israel but whose rash vow brought sorrow to his household.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Manoah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Father of Samson",
+    "age_notes": null,
+    "notable_events": [
+      "Received angelic announcement of Samson's birth",
+      "Offered sacrifice and sought guidance"
+    ],
+    "verses": [
+      "Judges 13"
+    ],
+    "short_bio": "Father of Samson who encountered an angel announcing his son's Nazirite birth.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Delilah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Philistine woman",
+    "age_notes": null,
+    "notable_events": [
+      "Betrayed Samson by discovering the secret of his strength",
+      "Instrumental in Samson's capture"
+    ],
+    "verses": [
+      "Judges 16"
+    ],
+    "short_bio": "A Philistine woman who coaxed Samson into revealing his Nazirite secret, leading to his downfall.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Abishai",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Warrior, David's nephew",
+    "age_notes": null,
+    "notable_events": [
+      "Fought alongside David",
+      "Killed Abner's men and other enemies",
+      "Noted for bravery"
+    ],
+    "verses": [
+      "2 Samuel 2-21"
+    ],
+    "short_bio": "A valiant warrior in David's service and brother of Joab, known for military exploits.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Benaiah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Commander of David's bodyguard",
+    "age_notes": null,
+    "notable_events": [
+      "Performed daring exploits",
+      "Served as commander under David and Solomon"
+    ],
+    "verses": [
+      "2 Samuel 8:18",
+      "1 Kings 2:39-46"
+    ],
+    "short_bio": "A trusted military leader known for courageous deeds and later service under Solomon.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Keturah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Wife of Abraham (after Sarah)",
+    "age_notes": null,
+    "notable_events": [
+      "Bore Abraham several sons",
+      "Contributed to Abraham's extended lineage"
+    ],
+    "verses": [
+      "Genesis 25:1-4"
+    ],
+    "short_bio": "A later wife of Abraham who bore him additional children and expanded his family line.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Phinehas",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Priest, grandson of Aaron",
+    "age_notes": null,
+    "notable_events": [
+      "Acted zealously against idolatry at Peor",
+      "Rewarded with a covenant of peace"
+    ],
+    "verses": [
+      "Numbers 25",
+      "Psalms 106:30-31"
+    ],
+    "short_bio": "A priest noted for zealous action against idolatry and honored with a lasting covenant.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Eliab",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Eldest son of Jesse",
+    "age_notes": null,
+    "notable_events": [
+      "Present when Samuel came to anoint a king",
+      "Initially presumed to be chosen before David was selected"
+    ],
+    "verses": [
+      "1 Samuel 16"
+    ],
+    "short_bio": "Eldest son of Jesse who was overlooked by God when Samuel anointed David as king.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Abner",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Commander of Saul's army",
+    "age_notes": null,
+    "notable_events": [
+      "Led Israel's forces under Saul",
+      "Later allied with David briefly",
+      "Assassinated in political strife"
+    ],
+    "verses": [
+      "1 Samuel 14",
+      "2 Samuel 3"
+    ],
+    "short_bio": "A powerful military leader in Saul's time who played a key role in the transition to David's rule.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Joab",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Commander of David's army",
+    "age_notes": null,
+    "notable_events": [
+      "Led many of David's military campaigns",
+      "Involved in political killings",
+      "Executed after Solomon's rise"
+    ],
+    "verses": [
+      "2 Samuel 2-20",
+      "1 Kings 2"
+    ],
+    "short_bio": "David's military commander, effective but ruthless, whose actions shaped Israel's history.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Melchizedek",
+    "aliases": [],
+    "mother": null,
+    "occupation": "King of Salem, priest of God Most High",
+    "age_notes": null,
+    "notable_events": [
+      "Blessed Abraham",
+      "Received tithes from Abraham",
+      "Type of priesthood referenced in Psalms and Hebrews"
+    ],
+    "verses": [
+      "Genesis 14:18-20",
+      "Psalm 110:4",
+      "Hebrews 7"
+    ],
+    "short_bio": "Mysterious priest-king who blessed Abraham and serves as a model for Christ's priesthood in the New Testament.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Simeon (the devout man)",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Righteous man in Jerusalem",
+    "age_notes": null,
+    "notable_events": [
+      "Awaited the consolation of Israel",
+      "Blessed the infant Jesus in the temple"
+    ],
+    "verses": [
+      "Luke 2:25-35"
+    ],
+    "short_bio": "A devout man who recognized the infant Jesus as the promised consolation and prophesied over him.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Anna (prophetess)",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophetess",
+    "age_notes": null,
+    "notable_events": [
+      "Served in the temple with fasting and prayer",
+      "Recognized and spoke about the child Jesus"
+    ],
+    "verses": [
+      "Luke 2:36-38"
+    ],
+    "short_bio": "An elderly prophetess who worshiped in the temple and testified about Jesus to those awaiting redemption.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Cleopas",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Disciple on the road to Emmaus",
+    "age_notes": null,
+    "notable_events": [
+      "Walked with the risen Jesus on the road to Emmaus",
+      "Recognized Jesus in the breaking of bread"
+    ],
+    "verses": [
+      "Luke 24:13-35"
+    ],
+    "short_bio": "One of the two disciples who encountered the risen Jesus on the road to Emmaus and later reported the experience.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Matthias",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Apostolic replacement",
+    "age_notes": null,
+    "notable_events": [
+      "Chosen to replace Judas Iscariot",
+      "Selected by lot among the disciples"
+    ],
+    "verses": [
+      "Acts 1:15-26"
+    ],
+    "short_bio": "The disciple chosen to fill the vacancy among the twelve apostles after Judas' betrayal.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Lydia",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Merchant, seller of purple",
+    "age_notes": null,
+    "notable_events": [
+      "First European convert recorded in Acts",
+      "Hosted Paul and companions in her home"
+    ],
+    "verses": [
+      "Acts 16:11-15"
+    ],
+    "short_bio": "A businesswoman from Thyatira whose conversion and hospitality supported Paul's mission in Europe.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Priscilla",
+    "aliases": [
+      "Prisca"
+    ],
+    "mother": null,
+    "occupation": "Teacher, missionary partner",
+    "age_notes": null,
+    "notable_events": [
+      "Worked with Aquila in ministry",
+      "Instructed Apollos in deeper truth",
+      "Hosted a house church"
+    ],
+    "verses": [
+      "Acts 18:2-3, 18-28",
+      "Romans 16:3-5"
+    ],
+    "short_bio": "A prominent early Christian teacher and missionary who partnered with her husband Aquila in ministry.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Aquila",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Tentmaker, missionary partner",
+    "age_notes": null,
+    "notable_events": [
+      "Partnered with Paul in tentmaking and ministry",
+      "Hosted a church in his home"
+    ],
+    "verses": [
+      "Acts 18",
+      "Romans 16:3-5"
+    ],
+    "short_bio": "A close coworker of Paul who hosted and supported early Christian gatherings with his wife Priscilla.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Apollos",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Teacher, eloquent speaker",
+    "age_notes": null,
+    "notable_events": [
+      "Taught accurately about Jesus",
+      "Was instructed further by Priscilla and Aquila",
+      "Ministered in Corinth and Ephesus"
+    ],
+    "verses": [
+      "Acts 18:24-28",
+      "1 Corinthians 3:4-6"
+    ],
+    "short_bio": "An eloquent and knowledgeable teacher who played a significant role in early church instruction and ministry.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Sergius Paulus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Roman proconsul",
+    "age_notes": null,
+    "notable_events": [
+      "Converted after hearing Paul's message in Cyprus",
+      "Opposed by Elymas the sorcerer"
+    ],
+    "verses": [
+      "Acts 13:6-12"
+    ],
+    "short_bio": "A Roman official on Cyprus who responded to Paul's preaching and turned to faith.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Simon of Cyrene",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Bystander compelled to carry the cross",
+    "age_notes": null,
+    "notable_events": [
+      "Pressed into service to carry Jesus' cross",
+      "Father of Alexander and Rufus mentioned in Mark"
+    ],
+    "verses": [
+      "Matthew 27:32",
+      "Mark 15:21",
+      "Luke 23:26"
+    ],
+    "short_bio": "A passerby compelled to bear Jesus' cross on the way to Golgotha, later remembered by his sons' names.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Bartimaeus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Blind beggar",
+    "age_notes": null,
+    "notable_events": [
+      "Called out to Jesus for mercy",
+      "Received sight after demonstrating faith"
+    ],
+    "verses": [
+      "Mark 10:46-52",
+      "Luke 18:35-43"
+    ],
+    "short_bio": "A blind man who boldly called to Jesus and was healed, exemplifying persistent faith.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Jair",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Judge of Israel",
+    "age_notes": null,
+    "notable_events": [
+      "Judged Israel for twenty-two years",
+      "Had thirty sons who rode thirty donkeys"
+    ],
+    "verses": [
+      "Judges 10:3-5"
+    ],
+    "short_bio": "A judge of Israel noted for his household's wealth and influence during his tenure.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Nabal",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Wealthy landowner",
+    "age_notes": null,
+    "notable_events": [
+      "Refused David's men hospitality",
+      "Saved from David's vengeance by Abigail",
+      "Died after learning of his folly"
+    ],
+    "verses": [
+      "1 Samuel 25"
+    ],
+    "short_bio": "A wealthy but foolish man whose refusal to aid David nearly brought disaster on his household until Abigail intervened.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Gomer",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Wife of the prophet Hosea",
+      "Her unfaithfulness served as a prophetic symbol of Israel's infidelity"
+    ],
+    "verses": [
+      "Hosea 1-3"
+    ],
+    "short_bio": "Hosea's wife whose life illustrated Israel's unfaithfulness and God's redeeming love.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Hosea",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Prophesied to Israel about unfaithfulness",
+      "Used his marriage as a prophetic sign"
+    ],
+    "verses": [
+      "Hosea 1-14"
+    ],
+    "short_bio": "A prophet who used personal and symbolic actions to call Israel back to covenant faithfulness.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Nahum",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Prophesied the fall of Nineveh",
+      "Called for justice against Assyrian cruelty"
+    ],
+    "verses": [
+      "Nahum 1-3"
+    ],
+    "short_bio": "A minor prophet who foretold Nineveh's destruction as judgment for its violence.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Obadiah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Proclaimed judgment against Edom",
+      "Called for Israel's vindication"
+    ],
+    "verses": [
+      "Obadiah 1"
+    ],
+    "short_bio": "Author of a short prophetic book denouncing Edom and affirming God's justice for Israel.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Zechariah (prophet)",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Encouraged rebuilding of the temple",
+      "Received apocalyptic visions"
+    ],
+    "verses": [
+      "Zechariah 1-14"
+    ],
+    "short_bio": "A post-exilic prophet who encouraged restoration and offered visions pointing to future hope.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Malachi",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Called Israel to faithfulness after the exile",
+      "Addressed issues of worship and justice"
+    ],
+    "verses": [
+      "Malachi 1-4"
+    ],
+    "short_bio": "The final book of the Old Testament, calling God's people to renewed covenantal faithfulness.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   }
 ]
