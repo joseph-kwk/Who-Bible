@@ -351,6 +351,7 @@ function translateAnswerForQuestionType(qType, value){
 async function init(){
   console.log('Initializing app...');
   attachHandlers(); // Attach listeners immediately
+  initFeedback(); // Initialize feedback system
   
   // Set default settings if not present
   const defaultSettings = {
@@ -1370,6 +1371,13 @@ function endQuiz(){
   // Show summary modal
   showSummaryModal();
   showToast({ title: getText('quizComplete'), msg: `${getText('yourScore')}: ${state.score}${state.mode==='challenge'?`. ${winnerText()}`:''}`, type: 'success', timeout: 5000 });
+
+  // Auto-prompt feedback if not given yet
+  if (!localStorage.getItem('who-bible-feedback-prompted')) {
+    setTimeout(() => {
+      if (window.openFeedbackModal) window.openFeedbackModal();
+    }, 2000);
+  }
 }
 
 function winnerText(){
@@ -1834,6 +1842,113 @@ function scheduleTimeWarnings(){
   };
   requestAnimationFrame(check);
 }
+
+// =========================
+// Feedback System
+// =========================
+function initFeedback() {
+  const modal = document.getElementById('feedback-modal');
+  const btnOpen = document.getElementById('btn-feedback');
+  const btnClose = document.getElementById('btn-feedback-close');
+  const btnCancel = document.getElementById('btn-feedback-cancel');
+  const btnSubmit = document.getElementById('btn-feedback-submit');
+  const ratingBtns = document.querySelectorAll('.rating-btn');
+  
+  if (!modal) return;
+
+  let selectedRating = 0;
+
+  // Open Modal
+  const openFeedback = () => {
+    modal.classList.add('show');
+    // Reset form
+    selectedRating = 0;
+    ratingBtns.forEach(b => b.classList.remove('selected'));
+    document.getElementById('feedback-message').value = '';
+    // document.getElementById('feedback-email').value = ''; // Removed from new HTML
+    // document.getElementById('feedback-type').value = 'general'; // Removed from new HTML
+    
+    // Reset new selects
+    const selects = ['rating-modes', 'rating-accuracy', 'rating-scenarios'];
+    selects.forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.selectedIndex = 0;
+    });
+  };
+
+  if(btnOpen) btnOpen.addEventListener('click', openFeedback);
+
+  // Close Modal
+  const close = () => modal.classList.remove('show');
+  if(btnClose) btnClose.addEventListener('click', close);
+  if(btnCancel) btnCancel.addEventListener('click', close);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) close();
+  });
+
+  // Rating Selection
+  ratingBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedRating = parseInt(btn.dataset.rating);
+      ratingBtns.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+
+  // Submit
+  if(btnSubmit) {
+    btnSubmit.addEventListener('click', async () => {
+      const message = document.getElementById('feedback-message').value.trim();
+      
+      const ratingModes = document.getElementById('rating-modes')?.value;
+      const ratingAccuracy = document.getElementById('rating-accuracy')?.value;
+      const ratingScenarios = document.getElementById('rating-scenarios')?.value;
+
+      if (!message && selectedRating === 0 && !ratingModes && !ratingAccuracy && !ratingScenarios) {
+        showToast({ title: 'Feedback', msg: 'Please provide some feedback.', type: 'warn' });
+        return;
+      }
+
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Sending...';
+
+      const feedbackData = {
+        rating: selectedRating,
+        ratingModes: ratingModes || null,
+        ratingAccuracy: ratingAccuracy || null,
+        ratingScenarios: ratingScenarios || null,
+        message,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        url: window.location.href
+      };
+
+      try {
+        if (typeof database !== 'undefined' && database) {
+          await database.ref('feedback').push(feedbackData);
+          showToast({ title: 'Thank You!', msg: 'Your feedback has been received.', type: 'success' });
+          // Mark as given so we don't prompt again automatically
+          localStorage.setItem('who-bible-feedback-prompted', 'true');
+        } else {
+          // Fallback if Firebase not loaded
+          console.log('Feedback (simulated):', feedbackData);
+          showToast({ title: 'Thank You!', msg: 'Feedback received (simulated).', type: 'success' });
+        }
+        close();
+      } catch (error) {
+        console.error('Feedback error:', error);
+        showToast({ title: 'Error', msg: 'Could not send feedback. Please try again.', type: 'error' });
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Send Feedback';
+      }
+    });
+  }
+  
+  // Expose open function for auto-prompt
+  window.openFeedbackModal = openFeedback;
+}
+
 
 // Re-localize dynamic pieces when language changes
 window.onWhoBibleLanguageChange = function(lang){

@@ -651,8 +651,97 @@
     }
   });
 
+  // Feedback System
+  function initFeedback() {
+    const modal = document.getElementById('feedback-modal');
+    const btnOpen = document.getElementById('btn-feedback');
+    const btnClose = document.getElementById('btn-feedback-close');
+    const btnCancel = document.getElementById('btn-feedback-cancel');
+    const btnSubmit = document.getElementById('btn-feedback-submit');
+    const ratingBtns = document.querySelectorAll('.rating-btn');
+    
+    if (!modal || !btnOpen) return;
+
+    let selectedRating = 0;
+
+    // Open Modal
+    btnOpen.addEventListener('click', () => {
+      modal.classList.add('show');
+      // Reset form
+      selectedRating = 0;
+      ratingBtns.forEach(b => b.classList.remove('selected'));
+      document.getElementById('feedback-message').value = '';
+      document.getElementById('feedback-email').value = '';
+      document.getElementById('feedback-type').value = 'general';
+    });
+
+    // Close Modal
+    const close = () => modal.classList.remove('show');
+    if(btnClose) btnClose.addEventListener('click', close);
+    if(btnCancel) btnCancel.addEventListener('click', close);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) close();
+    });
+
+    // Rating Selection
+    ratingBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedRating = parseInt(btn.dataset.rating);
+        ratingBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    });
+
+    // Submit
+    if(btnSubmit) {
+      btnSubmit.addEventListener('click', async () => {
+        const type = document.getElementById('feedback-type').value;
+        const message = document.getElementById('feedback-message').value.trim();
+        const email = document.getElementById('feedback-email').value.trim();
+
+        if (!message && selectedRating === 0) {
+          showToast({ title: 'Feedback', msg: 'Please provide a rating or a message.', type: 'warn' });
+          return;
+        }
+
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Sending...';
+
+        const feedbackData = {
+          rating: selectedRating,
+          type,
+          message,
+          email,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          url: window.location.href
+        };
+
+        try {
+          // Check for global database object from firebase-config.js
+          if (typeof database !== 'undefined' && database) {
+            await database.ref('feedback').push(feedbackData);
+            showToast({ title: 'Thank You!', msg: 'Your feedback has been received.', type: 'success' });
+          } else {
+            // Fallback if Firebase not loaded
+            console.log('Feedback (simulated):', feedbackData);
+            showToast({ title: 'Thank You!', msg: 'Feedback received (simulated).', type: 'success' });
+          }
+          close();
+        } catch (error) {
+          console.error('Feedback error:', error);
+          showToast({ title: 'Error', msg: 'Could not send feedback. Please try again.', type: 'error' });
+        } finally {
+          btnSubmit.disabled = false;
+          btnSubmit.textContent = 'Send Feedback';
+        }
+      });
+    }
+  }
+
   // Initialize modules on page load
   window.addEventListener('DOMContentLoaded', async () => {
+    initFeedback();
     // Load people data for stats
     try {
       const response = await fetch('assets/data/people.json');

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Who-Bible - Admin Panel</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="assets/js/firebase-config.js"></script>
+
+  <style>
+    body { padding: 20px; max-width: 1200px; margin: 0 auto; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
+    .stat-value { font-size: 2rem; font-weight: bold; color: var(--primary-color); }
+    .stat-label { color: var(--text-muted); }
+    
+    .feedback-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden; }
+    .feedback-table th, .feedback-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+    .feedback-table th { background: var(--bg-hover); font-weight: 600; }
+    .feedback-table tr:last-child td { border-bottom: none; }
+    
+    .rating-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; }
+    .rating-5 { background: #10b981; color: white; }
+    .rating-4 { background: #34d399; color: white; }
+    .rating-3 { background: #fbbf24; color: black; }
+    .rating-2 { background: #f87171; color: white; }
+    .rating-1 { background: #ef4444; color: white; }
+
+    .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+    .login-box { background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; max-width: 400px; text-align: center; }
+    .login-box input { width: 100%; padding: 0.75rem; margin: 1rem 0; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); }
+    
+    .hidden { display: none !important; }
+    .timestamp { color: var(--text-muted); font-size: 0.85rem; }
+    .detail-row { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem; }
+  </style>
+</head>
+<body>
+
+  <div id="login-overlay" class="login-overlay">
+    <div class="login-box">
+      <h2>Admin Access</h2>
+      <p>Sign in to view feedback.</p>
+      <input type="email" id="admin-email" placeholder="Email" />
+      <input type="password" id="admin-password" placeholder="Password" />
+      <button id="btn-login" class="primary">Login</button>
+      <p id="login-error" style="color: var(--error-color); margin-top: 0.5rem; display: none;"></p>
+    </div>
+  </div>
+
+  <div id="admin-content" class="hidden">
+    <header class="admin-header">
+      <h1>Who-Bible Admin</h1>
+      <div style="display:flex; gap:1rem">
+        <button id="btn-refresh" class="secondary">Refresh Data</button>
+        <button id="btn-logout" class="secondary" style="border-color:var(--error-color); color:var(--error-color)">Logout</button>
+      </div>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">Total Feedback</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-avg">0.0</div>
+        <div class="stat-label">Avg Rating</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-today">0</div>
+        <div class="stat-label">Today</div>
+      </div>
+    </div>
+
+    <h2>Recent Feedback</h2>
+    <div style="overflow-x: auto;">
+      <table class="feedback-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Rating</th>
+            <th>Details</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody id="feedback-list">
+          <tr><td colspan="4" style="text-align:center">Loading...</td></tr>
+        </tbody>
+      </table>
+    </dFirebase Auth Integration
+    const auth = firebase.auth();
+    const loginOverlay = document.getElementById('login-overlay');
+    const adminContent = document.getElementById('admin-content');
+    const loginError = document.getElementById('login-error');
+
+    // Auth State Listener
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        loginOverlay.classList.add('hidden');
+        adminContent.classList.remove('hidden');
+        loadFeedback();
+      } else {
+        loginOverlay.classList.remove('hidden');
+        adminContent.classList.add('hidden');
+      }
+    });
+
+    // Login
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const email = document.getElementById('admin-email').value;
+      const pass = document.getElementById('admin-password').value;
+      
+      loginError.style.display = 'none';
+      document.getElementById('btn-login').textContent = 'Logging in...';
+      
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (error) {
+        loginError.textContent = error.message;
+        loginError.style.display = 'block';
+      } finally {
+        document.getElementById('btn-login').textContent = 'Login';
+      }
+    });
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      auth.signOut(); document.getElementById('admin-content').classList.remove('hidden');
+        loadFeedback();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    });
+
+    document.getElementById('btn-refresh').addEventListener('click', loadFeedback);
+
+    async function loadFeedback() {
+      if (!database) {
+        alert('Firebase not initialized. Check config.');
+        return;
+      }
+
+      const tbody = document.getElementById('feedback-list');
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Loading...</td></tr>';
+
+      try {
+        const snapshot = await database.ref('feedback').orderByChild('timestamp').limitToLast(50).once('value');
+        const data = snapshot.val();
+        
+        if (!data) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No feedback found.</td></tr>';
+          updateStats([]);
+          return;
+        }
+
+        const items = Object.values(data).reverse(); // Newest first
+        updateStats(items);
+        
+        tbody.innerHTML = items.map(item => {
+          const date = new Date(item.timestamp).toLocaleString();
+          const ratingClass = `rating-${item.rating || 0}`;
+          const ratingLabel = item.rating ? `${item.rating} ★` : '-';
+          
+          let details = [];
+          if(item.ratingModes) details.push(`Modes: ${item.ratingModes}/5`);
+          if(item.ratingAccuracy) details.push(`Accuracy: ${item.ratingAccuracy}/5`);
+          if(item.ratingScenarios) details.push(`Scenarios: ${item.ratingScenarios}/5`);
+          
+          return `
+            <tr>
+              <td class="timestamp">${date}</td>
+              <td><span class="rating-badge ${ratingClass}">${ratingLabel}</span></td>
+              <td>
+                ${details.length ? `<div class="detail-row">${details.join(' • ')}</div>` : '<span class="muted">-</span>'}
+              </td>
+              <td>${item.message || '<span class="muted">No message</span>'}</td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error(error);
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red">Error loading data: ${error.message}</td></tr>`;
+      }
+    }
+
+    function updateStats(items) {
+      document.getElementById('stat-total').textContent = items.length;
+      
+      const ratings = items.filter(i => i.rating).map(i => i.rating);
+      const avg = ratings.length ? (ratings.reduce((a,b)=>a+b,0) / ratings.length).toFixed(1) : '0.0';
+      document.getElementById('stat-avg').textContent = avg;
+
+      const today = new Date().toDateString();
+      const todayCount = items.filter(i => new Date(i.timestamp).toDateString() === today).length;
+      document.getElementById('stat-today').textContent = todayCount;
+    }
+  </script>
+</body>
+</html>

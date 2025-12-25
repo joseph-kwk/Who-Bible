@@ -9,6 +9,7 @@
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/welcome-modal.css" />
+  <link rel="stylesheet" href="assets/css/feedback-modal.css" />
   
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -368,7 +369,7 @@
         </div>
         
         <div class="footer-bottom">
-          <p>© <span id="footer-year"></span> Who-Bible</p>
+          <p>© <span id="footer-year"></span> Who-Bible | <button id="btn-feedback" style="background:none;border:none;color:inherit;text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;">Feedback</button></p>
         </div>
       </div>
     </footer>
@@ -606,7 +607,76 @@
       </footer>
     </div>
   </div>
+  <!-- Feedback Modal -->
+  <div id="feedback-modal" class="feedback-modal" role="dialog" aria-labelledby="feedback-title" aria-modal="true">
+    <div class="feedback-content">
+      <header class="feedback-header">
+        <h2 id="feedback-title">We'd love your feedback!</h2>
+        <button id="btn-feedback-close" class="close-feedback" aria-label="Close feedback">✕</button>
+      </header>
+      <main class="feedback-body">
+        <p class="feedback-intro">Help us improve Who-Bible by sharing your thoughts.</p>
+        
+        <div class="feedback-section">
+          <label>Overall Experience</label>
+          <div class="feedback-rating" id="rating-overall">
+            <button class="rating-btn" data-rating="1" aria-label="1 star">😠</button>
+            <button class="rating-btn" data-rating="2" aria-label="2 stars">😕</button>
+            <button class="rating-btn" data-rating="3" aria-label="3 stars">😐</button>
+            <button class="rating-btn" data-rating="4" aria-label="4 stars">🙂</button>
+            <button class="rating-btn" data-rating="5" aria-label="5 stars">🤩</button>
+          </div>
+        </div>
 
+        <div class="feedback-grid">
+          <div class="feedback-form-group">
+            <label for="rating-modes">Game Modes</label>
+            <select id="rating-modes">
+              <option value="" disabled selected>Select rating...</option>
+              <option value="5">Excellent</option>
+              <option value="4">Good</option>
+              <option value="3">Average</option>
+              <option value="2">Poor</option>
+              <option value="1">Terrible</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-accuracy">Question Accuracy</label>
+            <select id="rating-accuracy">
+              <option value="" disabled selected>Select rating...</option>
+              <option value="5">Accurate</option>
+              <option value="4">Mostly Accurate</option>
+              <option value="3">Okay</option>
+              <option value="2">Inaccurate</option>
+              <option value="1">Very Inaccurate</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-scenarios">Scenarios</label>
+            <select id="rating-scenarios">
+              <option value="" disabled selected>Select rating...</option>
+              <option value="5">Engaging</option>
+              <option value="4">Good</option>
+              <option value="3">Okay</option>
+              <option value="2">Boring</option>
+              <option value="1">Confusing</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="feedback-form-group">
+          <label for="feedback-message">Comments / Suggestions</label>
+          <textarea id="feedback-message" rows="3" placeholder="Any specific feedback?"></textarea>
+        </div>
+      </main>
+      <footer class="feedback-footer">
+        <button id="btn-feedback-cancel" class="btn-cancel">Maybe Later</button>
+        <button id="btn-feedback-submit" class="btn-submit">Send Feedback</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- 
   <!-- Toast Notifications -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
