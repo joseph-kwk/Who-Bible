@@ -1,3 +1,28 @@
+/* Beta Badge */
+.beta-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, #ff8a65, #ffb74d);
+  color: #222;
+  font-size: 0.75em;
+  font-weight: bold;
+  padding: 0.15em 0.6em;
+  border-radius: 8px;
+  margin-left: 0.5em;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+/* Feedback Button Attention Animation */
+.feedback-attention {
+  animation: feedbackPulse 1.2s cubic-bezier(0.4,0,0.2,1) infinite;
+  box-shadow: 0 0 0 0.2em var(--accent-2);
+  border-radius: 8px;
+}
+
+@keyframes feedbackPulse {
+  0% { box-shadow: 0 0 0 0.2em var(--accent-2), 0 0 0 0 var(--accent-2); }
+  70% { box-shadow: 0 0 0 0.5em rgba(255,183,77,0.3), 0 0 0 0.2em var(--accent-2); }
+  100% { box-shadow: 0 0 0 0.2em var(--accent-2), 0 0 0 0 var(--accent-2); }
+}
 /* Feedback Modal Styles */
 .feedback-modal {
   display: none;
@@ -19,14 +44,14 @@
 }
 
 .feedback-content {
-  background-color: var(--bg-card);
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-2) 80%);
   margin: auto;
   padding: 0;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 2px solid var(--accent-2);
+  border-radius: 16px;
+  width: 96%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
   animation: modalSlideIn 0.3s ease-out;
   position: relative;
 }
@@ -37,7 +62,7 @@
 }
 
 .feedback-header {
-  padding: 1.5rem;
+  padding: 1.25rem 1rem 1rem 1rem;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
@@ -68,7 +93,7 @@
 }
 
 .feedback-body {
-  padding: 1.5rem;
+  padding: 1.25rem 1rem 1rem 1rem;
 }
 
 .feedback-form-group {
@@ -134,11 +159,35 @@
 }
 
 .feedback-footer {
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   border-top: 1px solid var(--border-color);
   display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+  .feedback-content {
+    max-width: 98vw;
+    min-width: 0;
+    padding: 0;
+  }
+  .feedback-header, .feedback-body, .feedback-footer {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .feedback-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  .btn-submit, .btn-cancel {
+    width: 100%;
+    min-width: 0;
+  }
+  .feedback-form-group textarea {
+    min-height: 60px;
+    max-height: 120px;
+  }
+}
 }
 
 .btn-cancel {

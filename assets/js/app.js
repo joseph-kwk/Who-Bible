@@ -1373,11 +1373,14 @@ function endQuiz(){
   showToast({ title: getText('quizComplete'), msg: `${getText('yourScore')}: ${state.score}${state.mode==='challenge'?`. ${winnerText()}`:''}`, type: 'success', timeout: 5000 });
 
   // Auto-prompt feedback if not given yet
+  // Feedback is now user-initiated only. No auto-prompt after first game.
+// Gently animate feedback button after a delay if feedback not given
+setTimeout(() => {
   if (!localStorage.getItem('who-bible-feedback-prompted')) {
-    setTimeout(() => {
-      if (window.openFeedbackModal) window.openFeedbackModal();
-    }, 2000);
+    const btn = document.getElementById('btn-feedback');
+    if (btn) btn.classList.add('feedback-attention');
   }
+}, 180000); // 3 minutes
 }
 
 function winnerText(){
