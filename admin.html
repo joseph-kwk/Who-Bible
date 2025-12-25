@@ -6,6 +6,8 @@
   <title>Who-Bible - Admin Panel</title>
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -15,7 +17,9 @@
 
   <style>
     body { padding: 20px; max-width: 1200px; margin: 0 auto; }
-    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .admin-header-left { display: flex; align-items: center; gap: 1rem; }
+    .admin-header-left img { width: 48px; height: 48px; }
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
     .stat-card { background: var(--bg-card); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
     .stat-value { font-size: 2rem; font-weight: bold; color: var(--primary-color); }
@@ -27,6 +31,7 @@
     .feedback-table tr:last-child td { border-bottom: none; }
     
     .rating-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; }
+    .rating-0 { background: #6b7280; color: white; }
     .rating-5 { background: #10b981; color: white; }
     .rating-4 { background: #34d399; color: white; }
     .rating-3 { background: #fbbf24; color: black; }
@@ -35,7 +40,36 @@
 
     .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 9999; display: flex; align-items: center; justify-content: center; }
     .login-box { background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; max-width: 400px; text-align: center; }
-    .login-box input { width: 100%; padding: 0.75rem; margin: 1rem 0; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); }
+    .login-box .login-logo { width: 80px; height: 80px; margin-bottom: 0.5rem; }
+    .login-box h2 { margin: 0.5rem 0; }
+    .login-box p { color: var(--text-muted); margin-bottom: 1rem; }
+    .login-box input { 
+      width: 100%; 
+      padding: 0.75rem; 
+      margin: 0.5rem 0; 
+      border-radius: 6px; 
+      border: 1px solid var(--border-color); 
+      background-color: #1a1a2e; 
+      color: #ffffff; 
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    .login-box input::placeholder { color: #888; }
+    .login-box input:focus { outline: none; border-color: var(--primary-color); }
+    .login-box button { margin-top: 0.5rem; width: 100%; }
+    .login-box .btn-link { 
+      background: none; 
+      border: none; 
+      color: var(--primary-color); 
+      cursor: pointer; 
+      font-size: 0.9rem; 
+      margin-top: 1rem;
+      text-decoration: underline;
+    }
+    .login-box .btn-link:hover { opacity: 0.8; }
+    
+    .login-error { color: #ef4444; margin-top: 0.5rem; font-size: 0.9rem; }
+    .login-success { color: #10b981; margin-top: 0.5rem; font-size: 0.9rem; }
     
     .hidden { display: none !important; }
     .timestamp { color: var(--text-muted); font-size: 0.85rem; }
@@ -46,20 +80,28 @@
 
   <div id="login-overlay" class="login-overlay">
     <div class="login-box">
+      <img src="assets/images/logo.png" alt="Who-Bible Logo" class="login-logo" />
+      <h1 style="margin: 0; font-size: 1.5rem; color: var(--primary-color);">Who-Bible</h1>
       <h2>Admin Access</h2>
       <p>Sign in to view feedback.</p>
-      <input type="email" id="admin-email" placeholder="Email" />
-      <input type="password" id="admin-password" placeholder="Password" />
+      <input type="email" id="admin-email" placeholder="Email" autocomplete="email" />
+      <input type="password" id="admin-password" placeholder="Password" autocomplete="current-password" />
       <button id="btn-login" class="primary">Login</button>
-      <p id="login-error" style="color: var(--error-color); margin-top: 0.5rem; display: none;"></p>
+      <button id="btn-forgot" class="btn-link">Forgot Password?</button>
+      <p id="login-error" class="login-error" style="display: none;"></p>
+      <p id="login-success" class="login-success" style="display: none;"></p>
     </div>
   </div>
 
   <div id="admin-content" class="hidden">
     <header class="admin-header">
-      <h1>Who-Bible Admin</h1>
+      <div class="admin-header-left">
+        <img src="assets/images/logo.png" alt="Who-Bible Logo" />
+        <h1>Who-Bible Admin</h1>
+      </div>
       <div style="display:flex; gap:1rem">
         <button id="btn-refresh" class="secondary">Refresh Data</button>
+        <button id="btn-export" class="secondary">Export CSV</button>
         <button id="btn-logout" class="secondary" style="border-color:var(--error-color); color:var(--error-color)">Logout</button>
       </div>
     </header>
@@ -77,9 +119,48 @@
         <div class="stat-value" id="stat-today">0</div>
         <div class="stat-label">Today</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-views">0</div>
+        <div class="stat-label">Page Views</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-completions">0</div>
+        <div class="stat-label">Quiz Completions</div>
+      </div>
     </div>
 
+    <h2>Feedback Charts</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;margin-bottom:2rem">
+      <div>
+        <canvas id="chart-overall"></canvas>
+        <div style="text-align:center;font-size:0.95rem;color:var(--text-muted)">Overall Rating</div>
+      </div>
+      <div>
+        <canvas id="chart-modes"></canvas>
+        <div style="text-align:center;font-size:0.95rem;color:var(--text-muted)">Modes Rating</div>
+      </div>
+      <div>
+        <canvas id="chart-accuracy"></canvas>
+        <div style="text-align:center;font-size:0.95rem;color:var(--text-muted)">Accuracy Rating</div>
+      </div>
+      <div>
+        <canvas id="chart-scenarios"></canvas>
+        <div style="text-align:center;font-size:0.95rem;color:var(--text-muted)">Scenarios Rating</div>
+      </div>
+    </div>
     <h2>Recent Feedback</h2>
+    <div style="margin-bottom:1rem; display:flex; flex-wrap:wrap; gap:1rem; align-items:center;">
+      <input id="search-input" type="text" placeholder="Search message..." style="padding:0.5rem; border-radius:6px; border:1px solid var(--border-color); min-width:200px;" />
+      <select id="rating-filter" style="padding:0.5rem; border-radius:6px; border:1px solid var(--border-color);">
+        <option value="">All Ratings</option>
+        <option value="5">5 stars</option>
+        <option value="4">4 stars</option>
+        <option value="3">3 stars</option>
+        <option value="2">2 stars</option>
+        <option value="1">1 star</option>
+        <option value="0">No rating</option>
+      </select>
+    </div>
     <div style="overflow-x: auto;">
       <table class="feedback-table">
         <thead>
@@ -88,58 +169,129 @@
             <th>Rating</th>
             <th>Details</th>
             <th>Message</th>
+            <th>Delete</th>
           </tr>
         </thead>
         <tbody id="feedback-list">
-          <tr><td colspan="4" style="text-align:center">Loading...</td></tr>
+          <tr><td colspan="5" style="text-align:center">Loading...</td></tr>
         </tbody>
       </table>
-    </dFirebase Auth Integration
+    </div>
+  </div>
+
+  <script>
+    // Firebase Auth Integration
     const auth = firebase.auth();
     const loginOverlay = document.getElementById('login-overlay');
     const adminContent = document.getElementById('admin-content');
     const loginError = document.getElementById('login-error');
+    const loginSuccess = document.getElementById('login-success');
+    const btnLogin = document.getElementById('btn-login');
+    const emailInput = document.getElementById('admin-email');
+    const passInput = document.getElementById('admin-password');
 
-    // Auth State Listener
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        loginOverlay.classList.add('hidden');
-        adminContent.classList.remove('hidden');
-        loadFeedback();
-      } else {
-        loginOverlay.classList.remove('hidden');
-        adminContent.classList.add('hidden');
-      }
-    });
+      // Export CSV button
+      const btnExport = document.getElementById('btn-export');
+      let lastFeedbackItems = [];
 
-    // Login
-    document.getElementById('btn-login').addEventListener('click', async () => {
-      const email = document.getElementById('admin-email').value;
-      const pass = document.getElementById('admin-password').value;
-      
+    // Helper to show error
+    function showError(msg) {
+      loginError.textContent = msg;
+      loginError.style.display = 'block';
+      loginSuccess.style.display = 'none';
+    }
+
+    // Helper to show success
+    function showSuccess(msg) {
+      loginSuccess.textContent = msg;
+      loginSuccess.style.display = 'block';
       loginError.style.display = 'none';
-      document.getElementById('btn-login').textContent = 'Logging in...';
-      
-      try {
-        await auth.signInWithEmailAndPassword(email, pass);
-      } catch (error) {
-        loginError.textContent = error.message;
-        loginError.style.display = 'block';
-      } finally {
-        document.getElementById('btn-login').textContent = 'Login';
-      }
-    });
+    }
 
-    // Logout
-    document.getElementById('btn-logout').addEventListener('click', () => {
-      auth.signOut(); document.getElementById('admin-content').classList.remove('hidden');
-        loadFeedback();
-      } else {
-        document.getElementById('login-error').style.display = 'block';
-      }
-    });
+    // Helper to clear messages
+    function clearMessages() {
+      loginError.style.display = 'none';
+      loginSuccess.style.display = 'none';
+    }
 
-    document.getElementById('btn-refresh').addEventListener('click', loadFeedback);
+    // Friendly error messages
+    // Filtering logic
+    let filterText = '';
+    let filterRating = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('search-input');
+      const ratingFilter = document.getElementById('rating-filter');
+      if (searchInput) {
+        searchInput.addEventListener('input', e => {
+          filterText = e.target.value.toLowerCase();
+          renderFeedbackTable();
+        });
+      }
+      if (ratingFilter) {
+        ratingFilter.addEventListener('change', e => {
+          filterRating = e.target.value;
+          renderFeedbackTable();
+        });
+      }
+    // End of DOMContentLoaded
+
+    let feedbackKeys = [];
+    function renderFeedbackTable() {
+      const tbody = document.getElementById('feedback-list');
+      if (!lastFeedbackItems.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No feedback yet.</td></tr>';
+        return;
+      }
+      // Filtering
+      let filtered = lastFeedbackItems.map((item, idx) => ({...item, _key: feedbackKeys[idx]}));
+      if (filterText) {
+        filtered = filtered.filter(item => (item.message || '').toLowerCase().includes(filterText));
+      }
+      if (filterRating !== '') {
+        filtered = filtered.filter(item => String(item.rating || 0) === filterRating);
+      }
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No results.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = filtered.map((item, idx) => {
+        const date = new Date(item.timestamp).toLocaleString();
+        const ratingClass = `rating-${item.rating || 0}`;
+        const ratingLabel = item.rating ? `${item.rating} ★` : '-';
+        let details = [];
+        if(item.ratingModes) details.push(`Modes: ${item.ratingModes}/5`);
+        if(item.ratingAccuracy) details.push(`Accuracy: ${item.ratingAccuracy}/5`);
+        if(item.ratingScenarios) details.push(`Scenarios: ${item.ratingScenarios}/5`);
+        const safeMessage = item.message ? item.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+        const trash = `<button class="delete-btn" data-key="${item._key}" title="Delete Feedback" style="background:none;border:none;cursor:pointer;padding:0 0.5rem;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="9" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="13" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="3" y="6" width="14" height="2" rx="1" fill="#ef4444"/><rect x="7" y="2" width="6" height="2" rx="1" fill="#ef4444"/></svg></button>`;
+        return `
+          <tr>
+            <td class="timestamp">${date}</td>
+            <td><span class="rating-badge ${ratingClass}">${ratingLabel}</span></td>
+            <td>
+              ${details.length ? `<div class="detail-row">${details.join(' • ')}</div>` : '<span style="color:var(--text-muted)">-</span>'}
+            </td>
+            <td>${safeMessage || '<span style="color:var(--text-muted)">No message</span>'}</td>
+            <td>${trash}</td>
+          </tr>
+        `;
+      }).join('');
+      // Attach delete handlers
+      Array.from(document.querySelectorAll('.delete-btn')).forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const key = btn.getAttribute('data-key');
+          if (!key) return;
+          if (!confirm('Delete this feedback? This cannot be undone.')) return;
+          try {
+            await database.ref('feedback/' + key).remove();
+            loadFeedback();
+          } catch (err) {
+            alert('Failed to delete: ' + err.message);
+          }
+        });
+      });
+    }
 
     async function loadFeedback() {
       if (!database) {
@@ -148,59 +300,230 @@
       }
 
       const tbody = document.getElementById('feedback-list');
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Loading...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Loading...</td></tr>';
 
       try {
-        const snapshot = await database.ref('feedback').orderByChild('timestamp').limitToLast(50).once('value');
+        const snapshot = await database.ref('feedback').orderByChild('timestamp').limitToLast(100).once('value');
         const data = snapshot.val();
         
         if (!data) {
-          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No feedback found.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No feedback yet.</td></tr>';
           updateStats([]);
+          lastFeedbackItems = [];
+          feedbackKeys = [];
           return;
         }
 
+        // Store both keys and items for delete/filter
+        const keys = Object.keys(data);
         const items = Object.values(data).reverse(); // Newest first
+        const keysReversed = keys.reverse();
+        lastFeedbackItems = items;
+        feedbackKeys = keysReversed;
         updateStats(items);
+        renderFeedbackTable();
+
+      } catch (error) {
+        console.error('Load error:', error);
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ef4444;">Error: ${error.message}</td></tr>`;
+      }
+    }
+      
+    });
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      auth.signOut();
+    });
+
+    // Refresh
+    document.getElementById('btn-refresh').addEventListener('click', loadFeedback);
+
+    // Export CSV
+    btnExport.addEventListener('click', () => {
+      if (!lastFeedbackItems.length) {
+        alert('No feedback data to export.');
+        return;
+      }
+      const csvRows = [
+        'Date,Rating,RatingModes,RatingAccuracy,RatingScenarios,Message'
+      ];
+      lastFeedbackItems.forEach(item => {
+        const date = new Date(item.timestamp).toLocaleString().replace(/,/g, '');
+        const row = [
+          '"' + date + '"',
+          item.rating || '',
+          item.ratingModes || '',
+          item.ratingAccuracy || '',
+          item.ratingScenarios || '',
+          '"' + (item.message ? item.message.replace(/"/g, '""') : '') + '"'
+        ];
+        csvRows.push(row.join(','));
+      });
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'who-bible-feedback.csv';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+    });
+
+    // Load Feedback Data
+    async function loadFeedback() {
+      if (!database) {
+        alert('Firebase not initialized. Check config.');
+        return;
+      }
+
+      const tbody = document.getElementById('feedback-list');
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Loading...</td></tr>';
+
+      try {
+        const snapshot = await database.ref('feedback').orderByChild('timestamp').limitToLast(100).once('value');
+        const data = snapshot.val();
         
-        tbody.innerHTML = items.map(item => {
+        if (!data) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No feedback yet.</td></tr>';
+          updateStats([]);
+          lastFeedbackItems = [];
+          return;
+        }
+
+        // Store both keys and items for delete
+        const keys = Object.keys(data);
+        const items = Object.values(data).reverse(); // Newest first
+        const keysReversed = keys.reverse();
+        lastFeedbackItems = items;
+        updateStats(items);
+        tbody.innerHTML = items.map((item, idx) => {
           const date = new Date(item.timestamp).toLocaleString();
           const ratingClass = `rating-${item.rating || 0}`;
           const ratingLabel = item.rating ? `${item.rating} ★` : '-';
-          
           let details = [];
           if(item.ratingModes) details.push(`Modes: ${item.ratingModes}/5`);
           if(item.ratingAccuracy) details.push(`Accuracy: ${item.ratingAccuracy}/5`);
           if(item.ratingScenarios) details.push(`Scenarios: ${item.ratingScenarios}/5`);
-          
+          // Escape HTML in message to prevent XSS
+          const safeMessage = item.message ? item.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+          // Trash icon SVG
+          const trash = `<button class="delete-btn" data-key="${keysReversed[idx]}" title="Delete Feedback" style="background:none;border:none;cursor:pointer;padding:0 0.5rem;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="9" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="13" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="3" y="6" width="14" height="2" rx="1" fill="#ef4444"/><rect x="7" y="2" width="6" height="2" rx="1" fill="#ef4444"/></svg></button>`;
           return `
             <tr>
               <td class="timestamp">${date}</td>
               <td><span class="rating-badge ${ratingClass}">${ratingLabel}</span></td>
               <td>
-                ${details.length ? `<div class="detail-row">${details.join(' • ')}</div>` : '<span class="muted">-</span>'}
+                ${details.length ? `<div class="detail-row">${details.join(' • ')}</div>` : '<span style="color:var(--text-muted)">-</span>'}
               </td>
-              <td>${item.message || '<span class="muted">No message</span>'}</td>
+              <td>${safeMessage || '<span style="color:var(--text-muted)">No message</span>'}</td>
+              <td>${trash}</td>
             </tr>
           `;
         }).join('');
 
+        // Attach delete handlers
+        Array.from(document.querySelectorAll('.delete-btn')).forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const key = btn.getAttribute('data-key');
+            if (!key) return;
+            if (!confirm('Delete this feedback? This cannot be undone.')) return;
+            try {
+              await database.ref('feedback/' + key).remove();
+              loadFeedback();
+            } catch (err) {
+              alert('Failed to delete: ' + err.message);
+            }
+          });
+        });
+
       } catch (error) {
-        console.error(error);
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red">Error loading data: ${error.message}</td></tr>`;
+        console.error('Load error:', error);
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ef4444;">Error: ${error.message}</td></tr>`;
       }
     }
 
+    // Update Stats
+    // Chart.js chart instances
+    let chartOverall, chartModes, chartAccuracy, chartScenarios;
+
     function updateStats(items) {
       document.getElementById('stat-total').textContent = items.length;
-      
       const ratings = items.filter(i => i.rating).map(i => i.rating);
       const avg = ratings.length ? (ratings.reduce((a,b)=>a+b,0) / ratings.length).toFixed(1) : '0.0';
       document.getElementById('stat-avg').textContent = avg;
-
       const today = new Date().toDateString();
       const todayCount = items.filter(i => new Date(i.timestamp).toDateString() === today).length;
       document.getElementById('stat-today').textContent = todayCount;
+      updateCharts(items);
+      // Load analytics
+      loadAnalytics();
+    }
+
+    // Load analytics from Firebase
+    async function loadAnalytics() {
+      try {
+        const viewsSnap = await database.ref('analytics/pageViews').once('value');
+        const completionsSnap = await database.ref('analytics/quizCompletions').once('value');
+        document.getElementById('stat-views').textContent = viewsSnap.exists() ? viewsSnap.val() : 0;
+        document.getElementById('stat-completions').textContent = completionsSnap.exists() ? completionsSnap.val() : 0;
+      } catch (e) {
+        document.getElementById('stat-views').textContent = '?';
+        document.getElementById('stat-completions').textContent = '?';
+      }
+    }
+    function updateCharts(items) {
+      // Helper to count ratings 1-5
+      function countRatings(arr, key) {
+        const counts = [0,0,0,0,0];
+        arr.forEach(i => {
+          const val = parseInt(i[key] || 0);
+          if (val >= 1 && val <= 5) counts[val-1]++;
+        });
+        return counts;
+      }
+      // Overall
+      const overall = countRatings(items, 'rating');
+      const modes = countRatings(items, 'ratingModes');
+      const accuracy = countRatings(items, 'ratingAccuracy');
+      const scenarios = countRatings(items, 'ratingScenarios');
+      // Chart config
+      const labels = ['1','2','3','4','5'];
+      const colors = ['#ef4444','#f87171','#fbbf24','#34d399','#10b981'];
+      // Create or update charts
+      function makeOrUpdateChart(ctx, data, label, inst) {
+        if (inst) {
+          inst.data.datasets[0].data = data;
+          inst.update();
+          return inst;
+        }
+        return new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label,
+              data,
+              backgroundColor: colors,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, precision:0, ticks: { stepSize: 1 } } },
+            responsive: true,
+            animation: false
+          }
+        });
+      }
+      chartOverall = makeOrUpdateChart(document.getElementById('chart-overall'), overall, 'Overall', chartOverall);
+      chartModes = makeOrUpdateChart(document.getElementById('chart-modes'), modes, 'Modes', chartModes);
+      chartAccuracy = makeOrUpdateChart(document.getElementById('chart-accuracy'), accuracy, 'Accuracy', chartAccuracy);
+      chartScenarios = makeOrUpdateChart(document.getElementById('chart-scenarios'), scenarios, 'Scenarios', chartScenarios);
     }
   </script>
 </body>

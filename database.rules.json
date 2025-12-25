@@ -1,0 +1,18 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "feedback": {
+      ".write": true,
+      ".read": "auth != null"
+    },
+    "rooms": {
+      ".read": true,
+      ".write": true
+    },
+    "challenges": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
