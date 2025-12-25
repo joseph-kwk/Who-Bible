@@ -3217,5 +3217,602 @@
     "gender": "male",
     "_inferred_gender": true,
     "difficulty": "intermediate"
+  },
+  {
+    "name": "Andrew",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Fisherman, disciple",
+    "age_notes": null,
+    "notable_events": [
+      "First called by Jesus",
+      "Brought Peter to Jesus"
+    ],
+    "verses": [
+      "John 1:40-42",
+      "Matthew 4:18"
+    ],
+    "short_bio": "Brother of Peter and one of the first disciples called by Jesus.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "James son of Alphaeus",
+    "aliases": [
+      "James the Less"
+    ],
+    "mother": null,
+    "occupation": "Apostle",
+    "age_notes": null,
+    "notable_events": [
+      "Listed among the Twelve"
+    ],
+    "verses": [
+      "Matthew 10:3"
+    ],
+    "short_bio": "One of the Twelve apostles, distinguished from James son of Zebedee.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Thaddaeus",
+    "aliases": [
+      "Jude",
+      "Lebbaeus"
+    ],
+    "mother": null,
+    "occupation": "Apostle",
+    "age_notes": null,
+    "notable_events": [
+      "Asked Jesus why He would reveal Himself to the disciples and not the world"
+    ],
+    "verses": [
+      "John 14:22",
+      "Matthew 10:3"
+    ],
+    "short_bio": "One of the Twelve apostles, also called Jude or Lebbaeus.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Bartholomew",
+    "aliases": [
+      "Nathanael"
+    ],
+    "mother": null,
+    "occupation": "Apostle",
+    "age_notes": null,
+    "notable_events": [
+      "Called an Israelite without deceit",
+      "Recognized Jesus as Son of God"
+    ],
+    "verses": [
+      "John 1:45-51"
+    ],
+    "short_bio": "A sincere seeker who became one of the Twelve apostles, also known as Nathanael.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Philip (the Apostle)",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Apostle",
+    "age_notes": null,
+    "notable_events": [
+      "Brought Nathanael to Jesus",
+      "Asked Jesus to show the Father"
+    ],
+    "verses": [
+      "John 1:43-46",
+      "John 14:8"
+    ],
+    "short_bio": "One of the Twelve apostles known for inviting others to meet Jesus.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Thomas",
+    "aliases": [
+      "Didymus"
+    ],
+    "mother": null,
+    "occupation": "Apostle",
+    "age_notes": null,
+    "notable_events": [
+      "Initially doubted the resurrection",
+      "Declared Jesus 'My Lord and my God'"
+    ],
+    "verses": [
+      "John 20:24-29"
+    ],
+    "short_bio": "Apostle known for his honest doubt and later profound confession of faith.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Silas",
+    "aliases": [
+      "Silvanus"
+    ],
+    "mother": null,
+    "occupation": "Missionary, co-worker of Paul",
+    "age_notes": null,
+    "notable_events": [
+      "Imprisoned with Paul in Philippi",
+      "Helped deliver letters to churches"
+    ],
+    "verses": [
+      "Acts 15-16",
+      "1 Thessalonians 1:1"
+    ],
+    "short_bio": "A leading member of the early church who traveled with Paul on missionary journeys.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "John Mark",
+    "aliases": [
+      "Mark"
+    ],
+    "mother": "Mary of Jerusalem",
+    "occupation": "Evangelist, missionary",
+    "age_notes": null,
+    "notable_events": [
+      "Traveled with Paul and Barnabas",
+      "Author of the Gospel of Mark"
+    ],
+    "verses": [
+      "Acts 12:12",
+      "Acts 13:5"
+    ],
+    "short_bio": "Companion of Paul and Barnabas and traditionally regarded as the author of the Gospel of Mark.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Simeon called Niger",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Teacher in Antioch",
+    "age_notes": null,
+    "notable_events": [
+      "Part of the leadership team in Antioch"
+    ],
+    "verses": [
+      "Acts 13:1"
+    ],
+    "short_bio": "A leader in the multicultural Antioch church who helped commission Paul and Barnabas.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Lucius of Cyrene",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Teacher in Antioch",
+    "age_notes": null,
+    "notable_events": [
+      "Helped lead the Antioch church"
+    ],
+    "verses": [
+      "Acts 13:1"
+    ],
+    "short_bio": "One of the prophets and teachers in the Antioch church who supported early missions.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Manaen",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Teacher in Antioch",
+    "age_notes": null,
+    "notable_events": [
+      "Brought up with Herod Antipas",
+      "Leader in Antioch church"
+    ],
+    "verses": [
+      "Acts 13:1"
+    ],
+    "short_bio": "A prominent believer raised with Herod Antipas who became a leader in the Antioch church.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Agabus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophet",
+    "age_notes": null,
+    "notable_events": [
+      "Predicted a famine",
+      "Foretold Paul's arrest"
+    ],
+    "verses": [
+      "Acts 11:27-28",
+      "Acts 21:10-11"
+    ],
+    "short_bio": "A prophet in the early church known for accurate predictions about famine and Paul's imprisonment.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Eutychus",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Fell from a window during Paul's sermon",
+      "Raised back to life"
+    ],
+    "verses": [
+      "Acts 20:7-12"
+    ],
+    "short_bio": "A young man who fell asleep during Paul's preaching and was miraculously restored to life.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Trophimus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Companion of Paul",
+    "age_notes": null,
+    "notable_events": [
+      "Accompanied Paul on journeys",
+      "Illness prevented him from traveling"
+    ],
+    "verses": [
+      "Acts 20:4",
+      "2 Timothy 4:20"
+    ],
+    "short_bio": "An Ephesian believer who traveled with Paul and is mentioned in several letters.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Aristarchus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Missionary companion",
+    "age_notes": null,
+    "notable_events": [
+      "Dragged into the Ephesian riot",
+      "Traveled with Paul to Rome"
+    ],
+    "verses": [
+      "Acts 19:29",
+      "Acts 27:2"
+    ],
+    "short_bio": "A Macedonian believer who endured hardship with Paul and traveled with him to Rome.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Sopater",
+    "aliases": [
+      "Sosipater"
+    ],
+    "mother": null,
+    "occupation": "Companion of Paul",
+    "age_notes": null,
+    "notable_events": [
+      "Traveled with Paul through Asia"
+    ],
+    "verses": [
+      "Acts 20:4"
+    ],
+    "short_bio": "A Berean believer who accompanied Paul on his travels and supported his ministry.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Jason",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Host of Paul",
+    "age_notes": null,
+    "notable_events": [
+      "Sheltered Paul and Silas",
+      "Dragged before city officials"
+    ],
+    "verses": [
+      "Acts 17:5-9"
+    ],
+    "short_bio": "A Thessalonian believer who risked his safety to host Paul and Silas during persecution.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Stephanas",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Church leader",
+    "age_notes": null,
+    "notable_events": [
+      "First convert in Achaia",
+      "Devoted to serving the saints"
+    ],
+    "verses": [
+      "1 Corinthians 16:15"
+    ],
+    "short_bio": "A respected early convert whose household was known for dedicated service to the church.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Phoebe",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Deacon of Cenchreae",
+    "age_notes": null,
+    "notable_events": [
+      "Carrier of the letter to the Romans",
+      "Helper of many believers"
+    ],
+    "verses": [
+      "Romans 16:1-2"
+    ],
+    "short_bio": "A deacon and benefactor in the early church who delivered Paul's letter to the Romans.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Chloe",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Household leader",
+    "age_notes": null,
+    "notable_events": [
+      "Her household reported divisions in Corinth"
+    ],
+    "verses": [
+      "1 Corinthians 1:11"
+    ],
+    "short_bio": "A respected woman whose household informed Paul about issues in the Corinthian church.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Erastus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "City treasurer",
+    "age_notes": null,
+    "notable_events": [
+      "Held a civic office in Corinth",
+      "Associated with Paul"
+    ],
+    "verses": [
+      "Romans 16:23"
+    ],
+    "short_bio": "A high-ranking official in Corinth who supported Paul's ministry.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Crispus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Synagogue ruler",
+    "age_notes": null,
+    "notable_events": [
+      "Believed in the Lord with his household"
+    ],
+    "verses": [
+      "Acts 18:8"
+    ],
+    "short_bio": "A synagogue leader in Corinth who converted under Paul's preaching.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Sosthenes",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Synagogue ruler",
+    "age_notes": null,
+    "notable_events": [
+      "Beaten before Gallio",
+      "Later greeted as a brother in Christ"
+    ],
+    "verses": [
+      "Acts 18:17",
+      "1 Corinthians 1:1"
+    ],
+    "short_bio": "A synagogue leader who later became a believer and co-sender of 1 Corinthians.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Gallio",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Roman proconsul",
+    "age_notes": null,
+    "notable_events": [
+      "Dismissed charges against Paul"
+    ],
+    "verses": [
+      "Acts 18:12-17"
+    ],
+    "short_bio": "A Roman governor who refused to prosecute Paul, setting a legal precedent for early Christians.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Elymas",
+    "aliases": [
+      "Bar-Jesus"
+    ],
+    "mother": null,
+    "occupation": "Sorcerer",
+    "age_notes": null,
+    "notable_events": [
+      "Opposed Paul and Barnabas",
+      "Struck blind temporarily"
+    ],
+    "verses": [
+      "Acts 13:6-12"
+    ],
+    "short_bio": "A false prophet who opposed the gospel and was struck blind by Paul’s rebuke.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Demetrius the Silversmith",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Silversmith",
+    "age_notes": null,
+    "notable_events": [
+      "Started a riot in Ephesus over idol trade"
+    ],
+    "verses": [
+      "Acts 19:23-41"
+    ],
+    "short_bio": "A craftsman who incited a riot against Paul to protect the idol-making industry in Ephesus.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Alexander the Coppersmith",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Coppersmith",
+    "age_notes": null,
+    "notable_events": [
+      "Opposed Paul strongly"
+    ],
+    "verses": [
+      "2 Timothy 4:14"
+    ],
+    "short_bio": "A metalworker who caused Paul significant harm and opposed his ministry.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Onesiphorus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Church worker",
+    "age_notes": null,
+    "notable_events": [
+      "Refreshed Paul in prison",
+      "Sought him out in Rome"
+    ],
+    "verses": [
+      "2 Timothy 1:16-18"
+    ],
+    "short_bio": "A faithful believer who encouraged Paul during imprisonment and served the church sacrificially.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
+  },
+  {
+    "name": "Tychicus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Messenger, co-worker",
+    "age_notes": null,
+    "notable_events": [
+      "Delivered letters for Paul",
+      "Encouraged churches"
+    ],
+    "verses": [
+      "Ephesians 6:21",
+      "Colossians 4:7"
+    ],
+    "short_bio": "A trusted messenger who carried Paul’s letters and strengthened early churches.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true,
+    "difficulty": "intermediate"
   }
 ]
