@@ -48,6 +48,13 @@ This script, located at `tools/validate_import_sample.js`, checks the `validateP
 
 ## Conventions and Patterns
 
+### Biblical Ethics & Content Guidelines
+
+-   **Accuracy & Respect:** Ensure all biblical content is accurate to scripture and presented with respect. Avoid trivializing serious biblical events.
+-   **Neutrality:** When dealing with theological interpretations (like in Scenario Mode), stick to what is explicitly stated in the Bible or widely accepted historical context. Avoid denominational bias where possible.
+-   **Edification:** The goal is to help users learn and grow in their knowledge of the Bible. Feedback (correct/incorrect messages) should be encouraging and educational.
+-   **Appropriateness:** Ensure content is suitable for all ages. Avoid graphic descriptions of violence or sensitive topics unless necessary for the biblical narrative, and even then, handle with care.
+
 ### State Management
 
 All application state is managed in a single `state` object at the top of `assets/js/app.js`. This object holds everything from the current game mode to the player's score. All functions should read from and write to this `state` object.

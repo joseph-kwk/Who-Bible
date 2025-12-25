@@ -302,6 +302,16 @@ body.day .title-section h1 {
   gap: 12px;
 }
 
+.nav-menu-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#btn-menu {
+  display: none;
+}
+
 /* ===== THEME SELECTOR & LANGUAGE SELECTOR ===== */
 .language-selector {
   position: relative;
@@ -1144,14 +1154,30 @@ button:disabled:hover {
 }
 
 .control-btn.primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-  border-color: var(--primary);
-  color: white;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1a202c; /* Dark text for contrast on bright accent */
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.control-btn.primary:hover {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .control-btn.secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.control-btn.secondary:hover {
   border-color: var(--text-secondary);
-  color: var(--text-secondary);
+  color: var(--text);
+  background: var(--bg-2);
 }
 
 .control-btn:disabled {
@@ -1880,18 +1906,20 @@ button:disabled:hover {
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .app {
-    padding: 0 16px;
+    padding: 0 12px;
   }
   
   header {
-    padding: 16px 0;
-    margin-bottom: 24px;
+    padding: 8px 0;
+    margin-bottom: 16px;
   }
   
   .header-content {
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px 24px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 12px;
   }
   
   .footer-content {
@@ -1899,17 +1927,76 @@ button:disabled:hover {
   }
   
   .logo-section {
-    justify-content: center;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
   }
   
   .controls {
-    justify-content: center;
-    flex-wrap: wrap;
-    width: 100%;
+    width: auto;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: nowrap;
   }
   
   .brand-title {
-    font-size: 36px;
+    font-size: 20px;
+  }
+
+  .title-section .muted {
+    display: none;
+  }
+
+  /* Hamburger Menu Styles */
+  #btn-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+    padding: 8px;
+  }
+
+  .nav-menu-container {
+    display: none;
+    position: absolute;
+    top: 70px;
+    right: 16px;
+    background: var(--card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 10px 25px var(--shadow-2);
+    z-index: 1000;
+    width: 200px;
+  }
+
+  .nav-menu-container.active {
+    display: flex;
+  }
+
+  .nav-menu-container .site-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .nav-menu-container .language-selector {
+    width: 100%;
+  }
+  
+  .nav-menu-container .language-selector select {
+    width: 100%;
   }
   
   .setup-grid {
@@ -1933,25 +2020,64 @@ button:disabled:hover {
   
   .game-header,
   .study-header {
-    padding: 16px;
-    gap: 16px;
+    padding: 10px;
+    gap: 8px;
   }
   
   .study-header h2 {
-    font-size: 24px;
+    font-size: 18px;
+    margin: 0;
   }
   
   .study-subtitle {
-    font-size: 13px;
+    display: none;
+  }
+
+  .study-header-top {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4px;
+    gap: 12px;
+  }
+
+  .study-search-section {
+    gap: 8px;
   }
   
   .study-filter-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 8px;
   }
   
   .filter-chips {
-    justify-content: flex-start;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+    /* Fade out effect on the right to indicate scrolling */
+    mask-image: linear-gradient(to right, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+  }
+
+  .filter-chip {
+    padding: 6px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  
+  .study-actions-bar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .people-count-display {
+    font-size: 13px;
   }
   
   .study-actions-bar {

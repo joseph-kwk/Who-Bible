@@ -9,7 +9,8 @@ const ScenarioModule = (function() {
   // Load scenarios from JSON
   async function loadScenarios() {
     try {
-      const response = await fetch('assets/data/bible_scenarios.json');
+      // Add cache buster to prevent stale data
+      const response = await fetch('assets/data/bible_scenarios.json?v=' + new Date().getTime());
       if (!response.ok) throw new Error('Failed to load scenarios');
       scenarios = await response.json();
       return scenarios;

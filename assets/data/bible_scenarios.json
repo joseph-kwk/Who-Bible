@@ -328,5 +328,755 @@
     "explanation": "Seeds on rocky ground represent those who receive the word with joy but fall away when trouble comes because they lack deep roots.",
     "level": "Intermediate",
     "tags": ["Parable", "New Testament", "Spiritual Growth"]
+  },
+  {
+    "scenario_id": "SCN_031",
+    "theme": "Prophetic Confrontation",
+    "book_ref": "1 Kings 18",
+    "challenge": "You are Elijah confronting the prophets of Baal on Mount Carmel. After the prophets fail, what dramatic action does Elijah take to demonstrate God's power?",
+    "options": [
+      "A. Calls down fire from heaven to consume the drenched sacrifice",
+      "B. Challenges them to a debate judged by the people",
+      "C. Prays for rain immediately to end the drought"
+    ],
+    "correct_answer": "A",
+    "explanation": "Elijah prayed and God sent fire from heaven that consumed the drenched sacrifice, proving Yahweh's supremacy over Baal.",
+    "level": "Advanced",
+    "tags": ["Elijah", "Prophecy", "Miracle", "Kings"]
+  },
+  {
+    "scenario_id": "SCN_032",
+    "theme": "Healing and Humility",
+    "book_ref": "2 Kings 5",
+    "challenge": "Naaman, a commander, seeks healing for leprosy. Elisha instructs him to wash in the Jordan River seven times. How does Naaman respond initially and what does he ultimately do?",
+    "options": [
+      "A. Immediately obeys and is healed",
+      "B. Refuses angrily, then obeys and is healed",
+      "C. Offers a gift to Elisha instead of washing"
+    ],
+    "correct_answer": "B",
+    "explanation": "Naaman was offended at first but humbled himself, washed seven times in the Jordan, and was healed.",
+    "level": "Intermediate",
+    "tags": ["Elisha", "Healing", "Humility", "Kings"]
+  },
+  {
+    "scenario_id": "SCN_033",
+    "theme": "Faith Under Fire",
+    "book_ref": "Daniel 3",
+    "challenge": "Shadrach, Meshach, and Abednego refuse to bow to Nebuchadnezzar's image. What is the outcome when they are thrown into the fiery furnace?",
+    "options": [
+      "A. They are consumed and die",
+      "B. They are unharmed and a fourth figure appears with them",
+      "C. They bow under pressure but later repent"
+    ],
+    "correct_answer": "B",
+    "explanation": "They were unharmed in the fire and a fourth figure (described as like a son of the gods) was seen with them, leading the king to praise God.",
+    "level": "Beginner",
+    "tags": ["Daniel", "Faith", "Persecution", "OT"]
+  },
+  {
+    "scenario_id": "SCN_034",
+    "theme": "Loyalty and Redemption",
+    "book_ref": "Ruth 1-4",
+    "challenge": "Ruth pledges loyalty to Naomi and later marries Boaz. What key action demonstrates Ruth's loyalty to Naomi at the story's start?",
+    "options": [
+      "A. She insists Naomi return to Moab alone",
+      "B. She accompanies Naomi to Bethlehem and adopts her people and God",
+      "C. She sends food back to Naomi from afar"
+    ],
+    "correct_answer": "B",
+    "explanation": "Ruth refuses to leave Naomi, goes to Bethlehem with her, and adopts Naomi's people and God, showing steadfast loyalty.",
+    "level": "Beginner",
+    "tags": ["Ruth", "Loyalty", "Redemption", "OT"]
+  },
+  {
+    "scenario_id": "SCN_035",
+    "theme": "Prayer and Promise",
+    "book_ref": "1 Samuel 1",
+    "challenge": "Hannah prays for a son and vows to dedicate him to the Lord. How does God respond to her prayer?",
+    "options": [
+      "A. He ignores her because of her vow",
+      "B. He grants her a son, Samuel, whom she dedicates to the temple",
+      "C. He gives her wealth instead of a child"
+    ],
+    "correct_answer": "B",
+    "explanation": "God answered Hannah's prayer; she bore Samuel and dedicated him to the Lord's service as she had vowed.",
+    "level": "Intermediate",
+    "tags": ["Hannah", "Prayer", "Samuel", "OT"]
+  },
+  {
+    "scenario_id": "SCN_036",
+    "theme": "Calling and Obedience",
+    "book_ref": "1 Samuel 3",
+    "challenge": "Young Samuel hears God's voice in the night. Who mentors him to recognize and respond to God's call?",
+    "options": [
+      "A. Eli the priest",
+      "B. Saul the king",
+      "C. David the shepherd"
+    ],
+    "correct_answer": "A",
+    "explanation": "Eli instructs Samuel to respond to the Lord's call, helping him recognize and deliver God's message.",
+    "level": "Beginner",
+    "tags": ["Samuel", "Calling", "Priesthood", "OT"]
+  },
+  {
+    "scenario_id": "SCN_037",
+    "theme": "Conversion",
+    "book_ref": "Acts 9",
+    "challenge": "Saul encounters a blinding light on the road to Damascus. What immediate change follows this encounter?",
+    "options": [
+      "A. He becomes more zealous against Christians",
+      "B. He is blinded, led into Damascus, and later baptized as Paul",
+      "C. He is executed for his crimes"
+    ],
+    "correct_answer": "B",
+    "explanation": "Saul was struck blind, led into Damascus, met Ananias who healed and baptized him, and he became Paul, an apostle to the Gentiles.",
+    "level": "Intermediate",
+    "tags": ["Paul", "Conversion", "Acts", "NT"]
+  },
+  {
+    "scenario_id": "SCN_038",
+    "theme": "Provision",
+    "book_ref": "Matthew 14:13-21",
+    "challenge": "Jesus feeds 5,000 with five loaves and two fish. What does this miracle primarily demonstrate about Jesus?",
+    "options": [
+      "A. His political power",
+      "B. His compassion and ability to provide abundantly",
+      "C. His desire to start a food distribution program"
+    ],
+    "correct_answer": "B",
+    "explanation": "The feeding shows Jesus' compassion for the crowd and his power to provide abundantly from little.",
+    "level": "Beginner",
+    "tags": ["Miracle", "Provision", "Jesus", "NT"]
+  },
+  {
+    "scenario_id": "SCN_039",
+    "theme": "Authority",
+    "book_ref": "Mark 1:21-28",
+    "challenge": "Jesus casts out an unclean spirit in Capernaum. How do the people react to his teaching and exorcism?",
+    "options": [
+      "A. They ignore him",
+      "B. They are amazed at his authority",
+      "C. They arrest him immediately"
+    ],
+    "correct_answer": "B",
+    "explanation": "People were amazed because Jesus taught with authority and commanded unclean spirits, showing his unique power.",
+    "level": "Intermediate",
+    "tags": ["Authority", "Exorcism", "Jesus", "NT"]
+  },
+  {
+    "scenario_id": "SCN_040",
+    "theme": "Wisdom in Leadership",
+    "book_ref": "Nehemiah 2",
+    "challenge": "Nehemiah seeks permission to rebuild Jerusalem's walls. How does he approach the king to secure support?",
+    "options": [
+      "A. He demands the king's help publicly",
+      "B. He requests leave with a humble and strategic petition",
+      "C. He stages a rebellion to force action"
+    ],
+    "correct_answer": "B",
+    "explanation": "Nehemiah approached Artaxerxes with a respectful petition, explaining Jerusalem's condition and requesting leave and resources, which the king granted.",
+    "level": "Advanced",
+    "tags": ["Nehemiah", "Leadership", "Pray and Plan", "OT"]
+  },
+  {
+    "scenario_id": "SCN_041",
+    "theme": "Faith and Healing",
+    "book_ref": "Mark 5:21-43",
+    "challenge": "A synagogue leader asks Jesus to heal his daughter while a woman with chronic bleeding touches Jesus' cloak. What is notable about Jesus' response?",
+    "options": [
+      "A. He ignores the woman and heals the girl first",
+      "B. He stops and acknowledges the woman's faith before proceeding to the girl's healing",
+      "C. He refuses both because of ritual impurity"
+    ],
+    "correct_answer": "B",
+    "explanation": "Jesus commended the woman's faith and then proceeded to raise the leader's daughter, showing attention to individual faith amid urgent needs.",
+    "level": "Intermediate",
+    "tags": ["Healing", "Faith", "Jesus", "NT"]
+  },
+  {
+    "scenario_id": "SCN_042",
+    "theme": "Integrity",
+    "book_ref": "Genesis 39",
+    "challenge": "Joseph resists Potiphar's wife's advances and flees, leaving his cloak behind. What consequence follows his act of integrity?",
+    "options": [
+      "A. He is promoted immediately",
+      "B. He is falsely accused and imprisoned",
+      "C. He returns home in shame"
+    ],
+    "correct_answer": "B",
+    "explanation": "Joseph's refusal led to false accusation by Potiphar's wife and his imprisonment, yet God remained with him and later exalted him.",
+    "level": "Intermediate",
+    "tags": ["Joseph", "Integrity", "Temptation", "OT"]
+  },
+  {
+    "scenario_id": "SCN_043",
+    "theme": "Repentance and Restoration",
+    "book_ref": "2 Samuel 12",
+    "challenge": "After Nathan confronts David about Bathsheba and Uriah, how does David respond to his sin?",
+    "options": [
+      "A. He denies wrongdoing",
+      "B. He repents and confesses, though consequences follow",
+      "C. He blames Nathan for slander"
+    ],
+    "correct_answer": "B",
+    "explanation": "David confessed his sin when confronted, repented, but still faced consequences for his actions as recorded by Nathan.",
+    "level": "Advanced",
+    "tags": ["David", "Repentance", "Consequences", "OT"]
+  },
+  {
+    "scenario_id": "SCN_044",
+    "theme": "Perseverance",
+    "book_ref": "Hebrews 11",
+    "challenge": "Hebrews 11 lists many who lived by faith. Which pattern best summarizes the chapter's portrayal of faith?",
+    "options": [
+      "A. Faith guarantees earthly success",
+      "B. Faith trusts God's promises often without seeing their fulfillment",
+      "C. Faith is only for prophets"
+    ],
+    "correct_answer": "B",
+    "explanation": "Hebrews 11 highlights people who trusted God's promises, often enduring hardship without seeing full fulfillment in their lifetimes.",
+    "level": "Advanced",
+    "tags": ["Faith", "Heroes", "NT", "Theology"]
+  },
+  {
+    "scenario_id": "SCN_045",
+    "theme": "Stewardship",
+    "book_ref": "Matthew 25:14-30",
+    "challenge": "In the Parable of the Talents, what does the master do with the servant who hid his talent out of fear?",
+    "options": [
+      "A. Rewards him for safety",
+      "B. Rebukes him and gives his talent to the one with ten",
+      "C. Promotes him for caution"
+    ],
+    "correct_answer": "B",
+    "explanation": "The master rebukes the fearful servant, takes away his talent, and gives it to the one who produced ten, teaching responsible stewardship.",
+    "level": "Intermediate",
+    "tags": ["Parable", "Stewardship", "Jesus", "NT"]
+  },
+  {
+    "scenario_id": "SCN_046",
+    "theme": "Wisdom",
+    "book_ref": "Proverbs 3:5-6",
+    "challenge": "Proverbs urges trust in the Lord rather than leaning on one's own understanding. What practical posture does this encourage?",
+    "options": [
+      "A. Rely on personal insight alone",
+      "B. Acknowledge God in all ways and trust his guidance",
+      "C. Avoid making any plans"
+    ],
+    "correct_answer": "B",
+    "explanation": "The passage calls for trusting God, acknowledging him in decisions, and allowing him to direct one's paths.",
+    "level": "Beginner",
+    "tags": ["Wisdom", "Proverbs", "Trust", "OT"]
+  },
+  {
+    "scenario_id": "SCN_047",
+    "theme": "Courage",
+    "book_ref": "Esther 4-5",
+    "challenge": "Esther risks approaching the king unsummoned. What spiritual preparation does she call for before taking action?",
+    "options": [
+      "A. A public protest",
+      "B. A three-day fast by her people",
+      "C. A military uprising"
+    ],
+    "correct_answer": "B",
+    "explanation": "Esther asked the Jews to fast for three days before she approached the king, combining courage with spiritual dependence.",
+    "level": "Intermediate",
+    "tags": ["Esther", "Prayer", "Courage", "OT"]
+  },
+  {
+    "scenario_id": "SCN_048",
+    "theme": "Discipleship",
+    "book_ref": "Luke 14:25-33",
+    "challenge": "Jesus teaches about the cost of discipleship, including 'counting the cost.' What image does he use to illustrate careful planning?",
+    "options": [
+      "A. Building a tower and estimating the cost",
+      "B. Planting a vineyard",
+      "C. Sailing a ship without a compass"
+    ],
+    "correct_answer": "A",
+    "explanation": "Jesus compares discipleship to building a tower and calculating the cost to finish it, emphasizing deliberate commitment.",
+    "level": "Advanced",
+    "tags": ["Discipleship", "Jesus", "NT", "Commitment"]
+  },
+  {
+    "scenario_id": "SCN_049",
+    "theme": "Justice and Mercy",
+    "book_ref": "Micah 6:8",
+    "challenge": "Micah summarizes what God requires of his people. Which three actions does he list?",
+    "options": [
+      "A. Offer sacrifices, build altars, fast often",
+      "B. Do justice, love mercy, walk humbly with God",
+      "C. Accumulate wealth, judge others, enforce laws"
+    ],
+    "correct_answer": "B",
+    "explanation": "Micah 6:8 calls believers to act justly, love mercy, and walk humbly with God as the heart of faithful living.",
+    "level": "Beginner",
+    "tags": ["Prophecy", "Ethics", "OT", "Justice"]
+  },
+  {
+    "scenario_id": "SCN_050",
+    "theme": "Forgiveness",
+    "book_ref": "Matthew 18:21-35",
+    "challenge": "Peter asks Jesus how many times to forgive a brother. Jesus replies with a parable. What is the parable's main lesson?",
+    "options": [
+      "A. Forgive only seven times",
+      "B. Forgive repeatedly as God forgives you",
+      "C. Forgiveness is optional"
+    ],
+    "correct_answer": "B",
+    "explanation": "Jesus teaches that forgiveness should be abundant, illustrating with a servant forgiven a great debt who then refuses to forgive another.",
+    "level": "Intermediate",
+    "tags": ["Forgiveness", "Parable", "Jesus", "NT"]
+  },
+  {
+    "scenario_id": "SCN_051",
+    "theme": "Obedience and Testing",
+    "book_ref": "Exodus 16",
+    "challenge": "God provides manna for Israel in the wilderness. What instruction tested their obedience regarding gathering it?",
+    "options": [
+      "A. Gather as much as you want every day",
+      "B. Gather a daily portion and not keep it overnight except before Sabbath",
+      "C. Only the priests may gather manna"
+    ],
+    "correct_answer": "B",
+    "explanation": "God instructed daily gathering and forbade hoarding, except a double portion before the Sabbath, testing trust in daily provision.",
+    "level": "Intermediate",
+    "tags": ["Exodus", "Provision", "Obedience", "OT"]
+  },
+  {
+    "scenario_id": "SCN_052",
+    "theme": "Witness",
+    "book_ref": "Acts 1:8",
+    "challenge": "Jesus tells the disciples they will receive power to be his witnesses. Where does he say their witness will begin and extend to?",
+    "options": [
+      "A. Only in Jerusalem",
+      "B. Jerusalem, Judea, Samaria, and to the ends of the earth",
+      "C. Only to the Gentiles"
+    ],
+    "correct_answer": "B",
+    "explanation": "Jesus commissions the disciples to witness locally and globally: Jerusalem, Judea, Samaria, and the ends of the earth.",
+    "level": "Beginner",
+    "tags": ["Acts", "Mission", "Witness", "NT"]
+  },
+  {
+    "scenario_id": "SCN_053",
+    "theme": "Humility and Service",
+    "book_ref": "John 13:1-17",
+    "challenge": "At the Last Supper Jesus washes his disciples' feet. What lesson does he give about leadership?",
+    "options": [
+      "A. Leaders should demand honor",
+      "B. True leaders serve others humbly",
+      "C. Foot washing is a required ritual"
+    ],
+    "correct_answer": "B",
+    "explanation": "Jesus models servant leadership, teaching that greatness in his kingdom is shown through humble service.",
+    "level": "Intermediate",
+    "tags": ["Jesus", "Service", "Humility", "NT"]
+  },
+  {
+    "scenario_id": "SCN_054",
+    "theme": "Perseverance in Prayer",
+    "book_ref": "Luke 18:1-8",
+    "challenge": "Jesus tells the parable of the persistent widow. What point is he making about prayer?",
+    "options": [
+      "A. God answers only the first prayer",
+      "B. Persisting in prayer is encouraged because God hears and acts",
+      "C. Prayer is unnecessary"
+    ],
+    "correct_answer": "B",
+    "explanation": "The parable encourages persistent prayer and trust that God will bring justice for his elect.",
+    "level": "Intermediate",
+    "tags": ["Prayer", "Parable", "Perseverance", "NT"]
+  },
+  {
+    "scenario_id": "SCN_055",
+    "theme": "Repentance",
+    "book_ref": "Jonah 3",
+    "challenge": "Jonah finally preaches to Nineveh and the city repents. How does God respond to their repentance?",
+    "options": [
+      "A. Destroys the city anyway",
+      "B. Relents and spares the city",
+      "C. Ignores their repentance"
+    ],
+    "correct_answer": "B",
+    "explanation": "God saw their repentance and relented from the disaster he had threatened, showing mercy in response to genuine turning.",
+    "level": "Beginner",
+    "tags": ["Jonah", "Repentance", "Mercy", "OT"]
+  },
+  {
+    "scenario_id": "SCN_056",
+    "theme": "Faith and Sight",
+    "book_ref": "John 9",
+    "challenge": "Jesus heals a man born blind. How does the healed man's testimony affect the religious leaders?",
+    "options": [
+      "A. They celebrate his healing",
+      "B. They interrogate and ultimately reject Jesus' authority",
+      "C. They immediately believe and follow Jesus"
+    ],
+    "correct_answer": "B",
+    "explanation": "The healed man testified to Jesus' work, but the Pharisees questioned and rejected the implications, revealing spiritual blindness.",
+    "level": "Advanced",
+    "tags": ["Miracle", "Sight", "Jesus", "NT"]
+  },
+  {
+    "scenario_id": "SCN_057",
+    "theme": "Covenant Faithfulness",
+    "book_ref": "Genesis 17",
+    "challenge": "God establishes a covenant with Abraham and changes his name. What sign does God give to Abraham to mark the covenant?",
+    "options": [
+      "A. A rainbow",
+      "B. Circumcision",
+      "C. A temple"
+    ],
+    "correct_answer": "B",
+    "explanation": "God institutes circumcision as the sign of the covenant with Abraham and his descendants.",
+    "level": "Intermediate",
+    "tags": ["Abraham", "Covenant", "OT", "Sign"]
+  },
+  {
+    "scenario_id": "SCN_058",
+    "theme": "Suffering and Hope",
+    "book_ref": "Psalm 23",
+    "challenge": "The psalmist describes the Lord as shepherd. Which image best captures the psalm's assurance amid danger?",
+    "options": [
+      "A. Walking through the valley of the shadow of death with fear",
+      "B. Walking through the valley of the shadow of death with God's presence",
+      "C. Avoiding all valleys"
+    ],
+    "correct_answer": "B",
+    "explanation": "Psalm 23 assures believers that even in the darkest valleys God's presence comforts and protects them.",
+    "level": "Beginner",
+    "tags": ["Psalms", "Comfort", "Hope", "OT"]
+  },
+  {
+    "scenario_id": "SCN_059",
+    "theme": "Witness and Risk",
+    "book_ref": "Acts 4:1-22",
+    "challenge": "Peter and John are arrested for preaching about Jesus' resurrection. How do they respond when commanded to stop?",
+    "options": [
+      "A. They stop preaching",
+      "B. They boldly continue, saying they must obey God rather than men",
+      "C. They flee the city"
+    ],
+    "correct_answer": "B",
+    "explanation": "Peter and John boldly declared they must obey God, continuing to preach despite threats, demonstrating courageous witness.",
+    "level": "Advanced",
+    "tags": ["Acts", "Witness", "Persecution", "NT"]
+  },
+  {
+    "scenario_id": "SCN_060",
+    "theme": "Generosity",
+    "book_ref": "2 Corinthians 8-9",
+    "challenge": "Paul commends the Macedonian churches for their generosity despite poverty. What principle does he emphasize about giving?",
+    "options": [
+      "A. Give reluctantly under compulsion",
+      "B. Give cheerfully and according to ability",
+      "C. Only the wealthy should give"
+    ],
+    "correct_answer": "B",
+    "explanation": "Paul teaches that giving should be voluntary, cheerful, and proportional to one's means, reflecting grace and partnership.",
+    "level": "Intermediate",
+    "tags": ["Giving", "Paul", "NT", "Stewardship"]
+  },
+  {
+    "scenario_id": "SCN_061",
+    "theme": "Idolatry",
+    "book_ref": "Exodus 32",
+    "challenge": "While Moses is on Sinai, the people make a golden calf. What is Aaron's role in this incident?",
+    "options": [
+      "A. He refuses to participate",
+      "B. He fashions the calf and leads the people in revelry",
+      "C. He destroys the calf immediately"
+    ],
+    "correct_answer": "B",
+    "explanation": "Aaron yielded to the people's pressure, made the golden calf, and led in idolatrous celebration, provoking God's anger.",
+    "level": "Advanced",
+    "tags": ["Exodus", "Idolatry", "Leadership", "OT"]
+  },
+  {
+    "scenario_id": "SCN_062",
+    "theme": "Faith and Fear",
+    "book_ref": "Matthew 8:23-27",
+    "challenge": "Jesus calms a storm while on a boat with his disciples. How do the disciples react after the miracle?",
+    "options": [
+      "A. They remain fearful and unbelieving",
+      "B. They marvel and ask who he is that even the winds obey him",
+      "C. They abandon Jesus"
+    ],
+    "correct_answer": "B",
+    "explanation": "The disciples marvel at Jesus' authority over nature and question his identity, moving from fear to awe.",
+    "level": "Beginner",
+    "tags": ["Miracle", "Faith", "Jesus", "NT"]
+  },
+  {
+    "scenario_id": "SCN_063",
+    "theme": "Repentance and Leadership",
+    "book_ref": "2 Chronicles 34",
+    "challenge": "King Josiah leads reforms after the Book of the Law is found. What is his response upon hearing the words of the law?",
+    "options": [
+      "A. He ignores it",
+      "B. He tears his clothes, seeks the Lord, and initiates reforms",
+      "C. He burns the book"
+    ],
+    "correct_answer": "B",
+    "explanation": "Josiah humbled himself, sought God, and led national reforms to return to covenant faithfulness.",
+    "level": "Advanced",
+    "tags": ["Josiah", "Reform", "Law", "OT"]
+  },
+  {
+    "scenario_id": "SCN_064",
+    "theme": "Hospitality",
+    "book_ref": "Genesis 18",
+    "challenge": "Abraham shows hospitality to three visitors who announce Sarah will bear a son. What action demonstrates Abraham's hospitality?",
+    "options": [
+      "A. He ignores them",
+      "B. He runs to prepare a meal and serves them",
+      "C. He sends them away"
+    ],
+    "correct_answer": "B",
+    "explanation": "Abraham hurried to prepare a meal and serve his guests, exemplifying generous hospitality that precedes the promise.",
+    "level": "Beginner",
+    "tags": ["Abraham", "Hospitality", "Promise", "OT"]
+  },
+  {
+    "scenario_id": "SCN_065",
+    "theme": "Faithfulness",
+    "book_ref": "Luke 2:41-52",
+    "challenge": "At twelve, Jesus stays behind in the temple, amazing teachers with his understanding. How do Mary and Joseph respond when they find him?",
+    "options": [
+      "A. They scold him harshly",
+      "B. Mary questions him, and Jesus speaks of being about his Father's business",
+      "C. They ignore him"
+    ],
+    "correct_answer": "B",
+    "explanation": "Mary questioned Jesus; he replied that he must be about his Father's business, indicating early awareness of his mission.",
+    "level": "Intermediate",
+    "tags": ["Jesus", "Childhood", "Temple", "NT"]
+  },
+  {
+    "scenario_id": "SCN_066",
+    "theme": "Justice",
+    "book_ref": "Amos 5:21-24",
+    "challenge": "God rejects Israel's empty worship. What does he desire instead of ritual?",
+    "options": [
+      "A. More sacrifices",
+      "B. Justice and righteousness to flow like a river",
+      "C. Isolation from other nations"
+    ],
+    "correct_answer": "B",
+    "explanation": "Amos emphasizes that God values justice and righteousness over mere ritual observance.",
+    "level": "Advanced",
+    "tags": ["Prophecy", "Justice", "Worship", "OT"]
+  },
+  {
+    "scenario_id": "SCN_067",
+    "theme": "Obedience and Trust",
+    "book_ref": "Joshua 6",
+    "challenge": "Joshua follows God's unusual battle plan for Jericho. What was the key element of the strategy?",
+    "options": [
+      "A. A surprise night attack",
+      "B. Marching around the city for seven days with priests and trumpets",
+      "C. Building siege engines"
+    ],
+    "correct_answer": "B",
+    "explanation": "Israel marched around Jericho for seven days as instructed; on the seventh day the walls fell after the shout and trumpet blast.",
+    "level": "Intermediate",
+    "tags": ["Joshua", "Obedience", "Miracle", "OT"]
+  },
+  {
+    "scenario_id": "SCN_068",
+    "theme": "Humility",
+    "book_ref": "Philippians 2:1-11",
+    "challenge": "Paul points to Christ's humility as the model for believers. Which two actions of Christ does he highlight?",
+    "options": [
+      "A. His wealth and power",
+      "B. His emptying himself and obedience to death on a cross",
+      "C. His political reforms"
+    ],
+    "correct_answer": "B",
+    "explanation": "Paul highlights Christ's self-emptying (kenosis) and obedience even to death as the supreme example of humility.",
+    "level": "Advanced",
+    "tags": ["Christology", "Humility", "Paul", "NT"]
+  },
+  {
+    "scenario_id": "SCN_069",
+    "theme": "Providence",
+    "book_ref": "Genesis 50:20",
+    "challenge": "Joseph tells his brothers that what they intended for harm, God intended for what purpose?",
+    "options": [
+      "A. To punish them",
+      "B. To preserve many lives and bring about good",
+      "C. To end the family line"
+    ],
+    "correct_answer": "B",
+    "explanation": "Joseph interprets his suffering as part of God's providential plan to save many lives during famine.",
+    "level": "Intermediate",
+    "tags": ["Joseph", "Providence", "Forgiveness", "OT"]
+  },
+  {
+    "scenario_id": "SCN_070",
+    "theme": "Faith and Works",
+    "book_ref": "James 2:14-26",
+    "challenge": "James argues that faith without works is dead. Which example does he use to illustrate faith shown by actions?",
+    "options": [
+      "A. Abraham offering Isaac",
+      "B. Moses building the tabernacle",
+      "C. David writing psalms"
+    ],
+    "correct_answer": "A",
+    "explanation": "James cites Abraham's willingness to offer Isaac as evidence that faith is demonstrated and completed by works.",
+    "level": "Advanced",
+    "tags": ["Faith", "Works", "James", "NT"]
+  },
+  {
+    "scenario_id": "SCN_071",
+    "theme": "Compassion",
+    "book_ref": "Luke 7:11-17",
+    "challenge": "Jesus raises a widow's son at Nain. What is the crowd's reaction to this miracle?",
+    "options": [
+      "A. They ignore it",
+      "B. They glorify God and recognize a great prophet has appeared",
+      "C. They accuse Jesus of sorcery"
+    ],
+    "correct_answer": "B",
+    "explanation": "The crowd praised God and acknowledged that a great prophet had arisen among them, and Jesus' fame spread.",
+    "level": "Intermediate",
+    "tags": ["Miracle", "Compassion", "Jesus", "NT"]
+  },
+  {
+    "scenario_id": "SCN_072",
+    "theme": "Repentance",
+    "book_ref": "2 Chronicles 7:14",
+    "challenge": "God promises to heal the land if people humble themselves. What fourfold response does he require?",
+    "options": [
+      "A. Fast, build altars, sacrifice, and sing",
+      "B. Humble themselves, pray, seek God's face, and turn from wicked ways",
+      "C. Gather armies and fight"
+    ],
+    "correct_answer": "B",
+    "explanation": "God calls for humility, prayer, seeking him, and repentance as the path to restoration.",
+    "level": "Advanced",
+    "tags": ["Prayer", "Repentance", "Restoration", "OT"]
+  },
+  {
+    "scenario_id": "SCN_073",
+    "theme": "Leadership and Wisdom",
+    "book_ref": "1 Kings 3",
+    "challenge": "Solomon asks God for wisdom rather than long life or riches. How does God respond?",
+    "options": [
+      "A. Denies his request",
+      "B. Grants wisdom and also gives riches and honor",
+      "C. Gives only riches"
+    ],
+    "correct_answer": "B",
+    "explanation": "God grants Solomon exceptional wisdom and also adds riches and honor because he asked for discernment to govern well.",
+    "level": "Intermediate",
+    "tags": ["Solomon", "Wisdom", "Leadership", "OT"]
+  },
+  {
+    "scenario_id": "SCN_074",
+    "theme": "Faithfulness",
+    "book_ref": "Luke 8:1-3",
+    "challenge": "Several women supported Jesus and the disciples out of their resources. What does this detail highlight about Jesus' ministry?",
+    "options": [
+      "A. It was funded and supported by faithful followers, including women",
+      "B. It had no supporters",
+      "C. Only men supported the ministry"
+    ],
+    "correct_answer": "A",
+    "explanation": "Luke notes women like Mary Magdalene and Joanna who provided for Jesus' ministry, underscoring inclusive support and discipleship.",
+    "level": "Beginner",
+    "tags": ["Women", "Support", "Jesus", "NT"]
+  },
+  {
+    "scenario_id": "SCN_075",
+    "theme": "Courage",
+    "book_ref": "Acts 16:16-40",
+    "challenge": "Paul and Silas are imprisoned and sing praises; an earthquake frees them. What effect does this have on the jailer?",
+    "options": [
+      "A. He kills himself",
+      "B. He fears, asks how to be saved, and is baptized with his household",
+      "C. He ignores them"
+    ],
+    "correct_answer": "B",
+    "explanation": "The jailer, seeing their faith, asks how to be saved; Paul shares the gospel and the jailer and his household are baptized.",
+    "level": "Intermediate",
+    "tags": ["Acts", "Witness", "Conversion", "NT"]
+  },
+  {
+    "scenario_id": "SCN_076",
+    "theme": "Obedience",
+    "book_ref": "1 Peter 3:13-17",
+    "challenge": "Peter encourages believers to respond to suffering with a certain posture. What does he advise?",
+    "options": [
+      "A. Seek revenge",
+      "B. Always be ready to give a defense with gentleness and respect",
+      "C. Hide and avoid all conflict"
+    ],
+    "correct_answer": "B",
+    "explanation": "Peter urges readiness to explain one's hope, doing so with gentleness and respect even amid suffering.",
+    "level": "Advanced",
+    "tags": ["Suffering", "Witness", "NT", "Ethics"]
+  },
+  {
+    "scenario_id": "SCN_077",
+    "theme": "Providence and Prayer",
+    "book_ref": "1 Kings 17",
+    "challenge": "During a drought, Elijah is fed by ravens and later by a widow. What does the widow's provision reveal about God's care?",
+    "options": [
+      "A. God only cares for prophets",
+      "B. God provides through unexpected means and honors faith",
+      "C. God withholds provision"
+    ],
+    "correct_answer": "B",
+    "explanation": "God provided for Elijah through ravens and a poor widow, demonstrating provision through surprising channels and rewarding faith.",
+    "level": "Intermediate",
+    "tags": ["Elijah", "Provision", "Faith", "OT"]
+  },
+  {
+    "scenario_id": "SCN_078",
+    "theme": "Repentance and Reform",
+    "book_ref": "Jonah 4",
+    "challenge": "Jonah is angry when God spares Nineveh. What does God use to teach Jonah compassion?",
+    "options": [
+      "A. A parable about a shepherd",
+      "B. A plant that provides shade and then withers",
+      "C. A vision of the future"
+    ],
+    "correct_answer": "B",
+    "explanation": "God causes a plant to grow and wither to show Jonah his misplaced anger and to teach compassion for people who repent.",
+    "level": "Advanced",
+    "tags": ["Jonah", "Compassion", "Repentance", "OT"]
+  },
+  {
+    "scenario_id": "SCN_079",
+    "theme": "Faith and Healing",
+    "book_ref": "Mark 2:1-12",
+    "challenge": "Friends lower a paralyzed man through a roof to reach Jesus. What does Jesus first say to the man?",
+    "options": [
+      "A. 'Stand up and walk immediately'",
+      "B. 'Your sins are forgiven'",
+      "C. 'Go home and rest'"
+    ],
+    "correct_answer": "B",
+    "explanation": "Jesus first pronounces forgiveness of sins, prompting controversy, and then heals the man to demonstrate his authority to forgive.",
+    "level": "Intermediate",
+    "tags": ["Healing", "Forgiveness", "Jesus", "NT"]
+  },
+  {
+    "scenario_id": "SCN_080",
+    "theme": "Hope",
+    "book_ref": "Revelation 21",
+    "challenge": "John describes a new heaven and new earth where God dwells with people. What is a key feature of this vision?",
+    "options": [
+      "A. Eternal separation from God",
+      "B. No more death, mourning, crying, or pain",
+      "C. Return to the old order"
+    ],
+    "correct_answer": "B",
+    "explanation": "Revelation promises a renewed creation where suffering is ended and God dwells with his people, offering ultimate hope.",
+    "level": "Advanced",
+    "tags": ["Revelation", "Hope", "Eschatology", "NT"]
   }
 ]

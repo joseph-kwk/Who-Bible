@@ -1634,5 +1634,520 @@
     ],
     "testament": "genesis 16|21|25",
     "gender": "OT"
+  },
+  {
+    "name": "Stephen",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Deacon, first Christian martyr",
+    "age_notes": null,
+    "notable_events": [
+      "Served the early church",
+      "Accused of blasphemy",
+      "Stoned to death"
+    ],
+    "verses": [
+      "Acts 6-7"
+    ],
+    "short_bio": "One of the first deacons in the Jerusalem church and the first Christian martyr.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Nicodemus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Pharisee, teacher of Israel",
+    "age_notes": null,
+    "notable_events": [
+      "Visited Jesus by night to ask questions",
+      "Defended Jesus before other Pharisees",
+      "Assisted in Jesus' burial"
+    ],
+    "verses": [
+      "John 3",
+      "John 7:50-52",
+      "John 19:39"
+    ],
+    "short_bio": "A Pharisee who sought Jesus' teaching and later aided in his burial.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Barnabas",
+    "aliases": [
+      "Joseph"
+    ],
+    "mother": null,
+    "occupation": "Apostle, encourager",
+    "age_notes": null,
+    "notable_events": [
+      "Sold property and gave proceeds to apostles",
+      "Partnered with Paul on missionary journeys",
+      "Advocated for Paul to the Jerusalem church"
+    ],
+    "verses": [
+      "Acts 4:36-37",
+      "Acts 11",
+      "Acts 13"
+    ],
+    "short_bio": "Early Christian leader known for encouragement and missionary work with Paul.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Philip the Evangelist",
+    "aliases": [
+      "Philip (deacon)"
+    ],
+    "mother": null,
+    "occupation": "Evangelist, deacon",
+    "age_notes": null,
+    "notable_events": [
+      "Chosen as one of the seven to serve",
+      "Preached in Samaria",
+      "Baptized the Ethiopian eunuch"
+    ],
+    "verses": [
+      "Acts 6:5",
+      "Acts 8:5-40"
+    ],
+    "short_bio": "One of the seven deacons who became a prominent evangelist in Samaria and beyond.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Ananias (of Damascus)",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Disciple",
+    "age_notes": null,
+    "notable_events": [
+      "Sent by the Lord to restore Saul's sight",
+      "Baptized Saul (Paul)"
+    ],
+    "verses": [
+      "Acts 9:10-19"
+    ],
+    "short_bio": "Disciple in Damascus who obeyed God's call to heal and baptize Saul (Paul).",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Sapphira",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Conspired with husband to lie about proceeds",
+      "Struck dead after lying to apostles"
+    ],
+    "verses": [
+      "Acts 5"
+    ],
+    "short_bio": "Wife of Ananias (not the Damascus disciple) who died after deceit in the early church.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Cornelius",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Centurion",
+    "age_notes": null,
+    "notable_events": [
+      "Roman centurion described as God-fearing",
+      "Received Peter's message and was baptized",
+      "Household received the Holy Spirit"
+    ],
+    "verses": [
+      "Acts 10"
+    ],
+    "short_bio": "A Roman centurion whose conversion marked the opening of the church to Gentiles.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Timothy",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Companion of Paul, pastor",
+    "age_notes": null,
+    "notable_events": [
+      "Traveled with Paul on missionary journeys",
+      "Recipient of two pastoral epistles",
+      "Led churches in Ephesus"
+    ],
+    "verses": [
+      "Acts 16",
+      "1 Timothy",
+      "2 Timothy"
+    ],
+    "short_bio": "Young leader mentored by Paul who served churches in Asia Minor and received pastoral guidance in epistles.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Titus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Companion of Paul, pastor",
+    "age_notes": null,
+    "notable_events": [
+      "Trusted delegate of Paul",
+      "Oversaw church organization in Crete",
+      "Recipient of the Epistle to Titus"
+    ],
+    "verses": [
+      "Titus 1"
+    ],
+    "short_bio": "Pauline companion who helped organize churches and received a pastoral epistle.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Judas Iscariot",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Disciple, treasurer",
+    "age_notes": null,
+    "notable_events": [
+      "One of the twelve apostles",
+      "Betrayed Jesus for thirty pieces of silver",
+      "Died by suicide after betrayal"
+    ],
+    "verses": [
+      "Matthew 26-27",
+      "John 13:21-30"
+    ],
+    "short_bio": "One of Jesus' twelve disciples who betrayed him to the authorities.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Simon the Zealot",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Apostle",
+    "age_notes": null,
+    "notable_events": [
+      "Listed among the twelve apostles",
+      "Associated with the Zealot movement in some traditions"
+    ],
+    "verses": [
+      "Luke 6:14-16",
+      "Acts 1:13"
+    ],
+    "short_bio": "One of the twelve apostles, distinguished in tradition by the title 'the Zealot'.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "James (brother of Jesus)",
+    "aliases": [
+      "James the Just"
+    ],
+    "mother": null,
+    "occupation": "Leader of the Jerusalem church",
+    "age_notes": null,
+    "notable_events": [
+      "Brother of Jesus who led the Jerusalem church",
+      "Presided at the Jerusalem council",
+      "Author of the Epistle of James"
+    ],
+    "verses": [
+      "Galatians 1:19",
+      "Acts 15",
+      "James 1"
+    ],
+    "short_bio": "A leading figure in the early Jerusalem church and author of the Epistle of James.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Jairus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Synagogue leader",
+    "age_notes": null,
+    "notable_events": [
+      "Sought Jesus to heal his daughter",
+      "Witnessed his daughter's resurrection"
+    ],
+    "verses": [
+      "Mark 5:22-43",
+      "Luke 8:41-56"
+    ],
+    "short_bio": "A synagogue leader whose daughter was raised to life by Jesus.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Zacchaeus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Tax collector",
+    "age_notes": null,
+    "notable_events": [
+      "Climbed a sycamore tree to see Jesus",
+      "Hosted Jesus in his home",
+      "Repented and restored what he had taken"
+    ],
+    "verses": [
+      "Luke 19:1-10"
+    ],
+    "short_bio": "A short tax collector who welcomed Jesus and repented, becoming an example of restoration.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Good Samaritan",
+    "aliases": [
+      "The Samaritan in the parable"
+    ],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Stopped to help an injured man",
+      "Provided care and lodging",
+      "Used by Jesus to teach neighborly love"
+    ],
+    "verses": [
+      "Luke 10:25-37"
+    ],
+    "short_bio": "The central figure in Jesus' parable who showed mercy to a stranger.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Ehud",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Judge of Israel",
+    "age_notes": null,
+    "notable_events": [
+      "Delivered Israel from Moabite oppression",
+      "Assassinated King Eglon"
+    ],
+    "verses": [
+      "Judges 3:12-30"
+    ],
+    "short_bio": "Left-handed judge who delivered Israel by killing the Moabite king Eglon.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Jethro",
+    "aliases": [
+      "Reuel"
+    ],
+    "mother": null,
+    "occupation": "Priest of Midian, father-in-law of Moses",
+    "age_notes": null,
+    "notable_events": [
+      "Gave Moses counsel on leadership",
+      "Visited Moses in the wilderness"
+    ],
+    "verses": [
+      "Exodus 2:18",
+      "Exodus 18"
+    ],
+    "short_bio": "Priest of Midian and Moses' father-in-law who advised him on governing Israel.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Epaphroditus",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Messenger, companion of Paul",
+    "age_notes": null,
+    "notable_events": [
+      "Sent by Philippians to assist Paul",
+      "Fell ill but recovered",
+      "Commended by Paul for service"
+    ],
+    "verses": [
+      "Philippians 2:25-30",
+      "Philippians 4:18"
+    ],
+    "short_bio": "A trusted companion and messenger to Paul from the church at Philippi.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Rhoda",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Answered the door when Peter escaped prison",
+      "Ran to tell others but was not believed at first"
+    ],
+    "verses": [
+      "Acts 12:13-15"
+    ],
+    "short_bio": "A servant girl who recognized Peter's voice after his miraculous escape from prison.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Dodo",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Named as ancestor in David's mighty men lists",
+      "Mentioned in genealogical records"
+    ],
+    "verses": [
+      "1 Chronicles 11:35",
+      "1 Chronicles 27:4"
+    ],
+    "short_bio": "A minor figure listed among warriors and genealogies associated with David.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Onesimus",
+    "aliases": [],
+    "mother": null,
+    "occupation": null,
+    "age_notes": null,
+    "notable_events": [
+      "Runaway slave who became a Christian",
+      "Returned to Philemon and was reconciled through Paul's appeal"
+    ],
+    "verses": [
+      "Philemon 1:10-16",
+      "Colossians 4:9"
+    ],
+    "short_bio": "A former slave whose conversion and reconciliation are central to Paul's letter to Philemon.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Philemon",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Householder, Christian leader",
+    "age_notes": null,
+    "notable_events": [
+      "Recipient of Paul's personal letter",
+      "Hosted a church in his home"
+    ],
+    "verses": [
+      "Philemon 1"
+    ],
+    "short_bio": "A Christian host and the addressee of Paul's letter concerning Onesimus.",
+    "testament": "nt",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Gehazi",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Servant of Elisha",
+    "age_notes": null,
+    "notable_events": [
+      "Served the prophet Elisha",
+      "Struck with leprosy for deceit"
+    ],
+    "verses": [
+      "2 Kings 4-5"
+    ],
+    "short_bio": "Elisha's servant who was punished with leprosy for greed and deceit.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Huldah",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Prophetess",
+    "age_notes": null,
+    "notable_events": [
+      "Consulted about the Book of the Law found in the temple",
+      "Delivered a prophetic message to King Josiah's delegation"
+    ],
+    "verses": [
+      "2 Kings 22:14-20",
+      "2 Chronicles 34:22-28"
+    ],
+    "short_bio": "A prophetess who authenticated the Book of the Law and prophesied during Josiah's reforms.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "female",
+    "_inferred_gender": true
+  },
+  {
+    "name": "Baruch",
+    "aliases": [],
+    "mother": null,
+    "occupation": "Scribe, companion of Jeremiah",
+    "age_notes": null,
+    "notable_events": [
+      "Served as Jeremiah's scribe and companion",
+      "Associated with the preservation of Jeremiah's prophecies"
+    ],
+    "verses": [
+      "Jeremiah 36",
+      "Jeremiah 45"
+    ],
+    "short_bio": "Jeremiah's scribe who recorded and preserved prophetic messages.",
+    "testament": "ot",
+    "_inferred_testament": true,
+    "gender": "male",
+    "_inferred_gender": true
   }
 ]

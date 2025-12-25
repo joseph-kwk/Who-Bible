@@ -119,30 +119,65 @@ function updatePlayerStats(score, streak, correct, total, mode) {
 }
 
 function promptForPlayerName() {
+  // Show custom modal instead of prompt
+  const modal = document.getElementById('change-player-modal');
+  const input = document.getElementById('new-player-name');
+  const btnSave = document.getElementById('btn-change-player-save');
+  const btnCancel = document.getElementById('btn-change-player-cancel');
+  const btnClose = document.getElementById('btn-change-player-close');
+  
+  if (!modal || !input) return Promise.resolve(null);
+  
   const currentName = state.currentPlayer ? state.currentPlayer.name : 'Guest';
-  const message = getText('enterPlayerName') || `Enter your name (current: ${currentName}):`;
-  const name = prompt(message);
+  input.value = currentName;
+  modal.style.display = 'flex';
+  input.focus();
+  input.select();
   
-  if (name === null) {
-    // User cancelled - keep current player
-    return state.currentPlayer;
-  }
-  
-  if (name && name.trim()) {
-    // User entered a name
-    const player = createGuestPlayer(name.trim());
-    // Preserve stats from previous guest session if transitioning from Guest
-    if (state.currentPlayer && state.currentPlayer.name === 'Guest') {
-      player.stats = state.currentPlayer.stats;
-    }
-    state.currentPlayer = player;
-    savePlayer(player);
-    showToast({ title: getText('welcome') || 'Welcome', msg: `${getText('welcomePlayer') || 'Welcome'}, ${player.name}!`, type: 'success', timeout: 2000 });
-    return player;
-  } else {
-    // User left blank - use Guest
-    const player = createGuestPlayer('Guest');
-    state.currentPlayer = player;
+  return new Promise((resolve) => {
+    const close = () => {
+      modal.style.display = 'none';
+      cleanup();
+      resolve(null); // Cancelled
+    };
+    
+    const save = () => {
+      const name = input.value.trim();
+      modal.style.display = 'none';
+      cleanup();
+      if (name) {
+        const newPlayer = createGuestPlayer(name);
+        // Preserve stats if just renaming Guest
+        if (state.currentPlayer && state.currentPlayer.name === 'Guest') {
+          newPlayer.stats = state.currentPlayer.stats;
+        }
+        state.currentPlayer = newPlayer;
+        savePlayer(newPlayer);
+        showToast({ title: getText('welcome') || 'Welcome', msg: `${getText('welcomePlayer') || 'Welcome'}, ${newPlayer.name}!`, type: 'success', timeout: 2000 });
+        resolve(newPlayer);
+      } else {
+        resolve(null);
+      }
+    };
+    
+    const handleKey = (e) => {
+      if (e.key === 'Enter') save();
+      if (e.key === 'Escape') close();
+    };
+    
+    const cleanup = () => {
+      btnSave.removeEventListener('click', save);
+      btnCancel.removeEventListener('click', close);
+      btnClose.removeEventListener('click', close);
+      input.removeEventListener('keydown', handleKey);
+    };
+    
+    btnSave.addEventListener('click', save);
+    btnCancel.addEventListener('click', close);
+    btnClose.addEventListener('click', close);
+    input.addEventListener('keydown', handleKey);
+  });
+}
     savePlayer(player);
     return player;
   }
@@ -440,6 +475,26 @@ async function init(){
 }
 
 function attachHandlers(){
+  // Hamburger Menu
+  const btnMenu = document.getElementById('btn-menu');
+  const navMenuContainer = document.getElementById('nav-menu-container');
+  
+  if (btnMenu && navMenuContainer) {
+    btnMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navMenuContainer.classList.toggle('active');
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (navMenuContainer.classList.contains('active') && 
+          !navMenuContainer.contains(e.target) && 
+          !btnMenu.contains(e.target)) {
+        navMenuContainer.classList.remove('active');
+      }
+    });
+  }
+
   // Home link handler
   const homeLink = document.getElementById('home-link');
   if (homeLink) {
@@ -449,8 +504,8 @@ function attachHandlers(){
   // Player management
   const btnChangePlayer = document.getElementById('btn-change-player');
   if (btnChangePlayer) {
-    btnChangePlayer.addEventListener('click', ()=>{
-      const newPlayer = promptForPlayerName();
+    btnChangePlayer.addEventListener('click', async ()=>{
+      const newPlayer = await promptForPlayerName();
       if (newPlayer) {
         displayPlayerInfo();
         updatePlayerDisplayName();
@@ -867,7 +922,7 @@ function nextScenarioQuestion(){
   
   state.qnum++;
   qnumEl.innerText = state.qnum;
-  updateProgressBar();
+  updateProgress();
   
   const scenario = state.questions[state.qnum - 1];
   state.current = scenario;
@@ -878,15 +933,20 @@ function nextScenarioQuestion(){
 }
 
 function renderScenarioQuestion(scenario){
+  if (!scenario) {
+    qText.innerHTML = '<div class="scenario-card"><div class="scenario-body">Error: Scenario data is missing.</div></div>';
+    return;
+  }
+
   // Build the question prompt
   let prompt = `
   <div class="scenario-card">
     <div class="scenario-header">
-      <span class="scenario-theme">${scenario.theme}</span>
-      <span class="scenario-level">${scenario.level}</span>
+      <span class="scenario-theme">${scenario.theme || 'Unknown Theme'}</span>
+      <span class="scenario-level">${scenario.level || 'Level N/A'}</span>
     </div>
     <div class="scenario-body">
-      <div class="scenario-challenge">${scenario.challenge}</div>
+      <div class="scenario-challenge">${scenario.challenge || 'Error: Challenge text is missing.'}</div>
       <div class="scenario-context">What is the biblical outcome?</div>
     </div>
   </div>`;
@@ -895,9 +955,10 @@ function renderScenarioQuestion(scenario){
   
   // Render answer options
   answersEl.innerHTML = '';
-  scenario.options.forEach((option, index) => {
-    const btn = document.createElement('button');
-    btn.className = 'ans scenario-option';
+  if (scenario.options && Array.isArray(scenario.options)) {
+    scenario.options.forEach((option, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'ans scenario-option';
     const letter = option.charAt(0);
     const text = option.substring(3);
     btn.dataset.value = letter;
@@ -908,6 +969,7 @@ function renderScenarioQuestion(scenario){
     btn.addEventListener('click', ()=> answerScenarioQuestion(letter));
     answersEl.appendChild(btn);
   });
+  }
 }
 
 function answerScenarioQuestion(selected){
@@ -939,11 +1001,16 @@ function answerScenarioQuestion(selected){
   }
   
   // Record result
+  // Find the full text for the selected and correct options
+  const selectedOptionText = scenario.options.find(o => o.startsWith(selected))?.substring(3) || selected;
+  const correctOptionText = scenario.options.find(o => o.startsWith(scenario.correct_answer))?.substring(3) || scenario.correct_answer;
+
   state.results.push({
-    question: scenario.challenge,
-    userAnswer: selected,
-    correct: scenario.correct_answer,
-    isCorrect: isCorrect,
+    prompt: scenario.challenge,
+    chosenDisplay: `${selected}. ${selectedOptionText}`,
+    correctDisplay: `${scenario.correct_answer}. ${correctOptionText}`,
+    correct: isCorrect,
+    ref: [scenario.book_ref],
     explanation: scenario.explanation
   });
   
@@ -1637,9 +1704,10 @@ function showSummaryModal(){
     div.className = 'summary-item ' + (r.correct?'correct':'incorrect');
     div.innerHTML = `
       <div><strong>${getText('questionLabelShort')}:</strong> ${r.prompt}</div>
-  <div><strong>${getText('yourAnswer')}:</strong> ${r.chosenDisplay}</div>
-  <div><strong>${getText('correctLabel')}:</strong> ${r.correctDisplay}</div>
+      <div><strong>${getText('yourAnswer')}:</strong> ${r.chosenDisplay}</div>
+      <div><strong>${getText('correctLabel')}:</strong> ${r.correctDisplay}</div>
       <div class="ref"><strong>${getText('references')}:</strong> ${(r.ref||[]).join(', ')}</div>
+      ${r.explanation ? `<div class="summary-explanation" style="margin-top:8px; font-style:italic; color:var(--text-2);">${r.explanation}</div>` : ''}
     `;
     summaryListEl.appendChild(div);
   });
