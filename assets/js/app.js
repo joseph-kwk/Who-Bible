@@ -131,8 +131,16 @@ function promptForPlayerName() {
   const currentName = state.currentPlayer ? state.currentPlayer.name : 'Guest';
   input.value = currentName;
   modal.style.display = 'flex';
-  input.focus();
-  input.select();
+  setTimeout(() => { input.focus(); input.select(); }, 100);
+  // Animate Save button when input changes
+  let lastValue = input.value;
+  input.addEventListener('input', () => {
+    if (input.value.trim() !== lastValue) {
+      btnSave.style.boxShadow = '0 0 0 2px var(--primary-color)';
+      setTimeout(() => { btnSave.style.boxShadow = ''; }, 400);
+      lastValue = input.value.trim();
+    }
+  });
   
   return new Promise((resolve) => {
     const close = () => {
@@ -1975,8 +1983,29 @@ window.onWhoBibleLanguageChange = function(lang){
 };
 
 // Initialize app when DOM is ready
+
+// Robust feedback modal event attachment
+function ensureFeedbackButtonWorks() {
+  setTimeout(() => {
+    const btn = document.getElementById('btn-feedback');
+    if (btn && !btn._feedbackAttached) {
+      btn.addEventListener('click', function handler() {
+        if (typeof window.openFeedbackModal === 'function') {
+          window.openFeedbackModal();
+        }
+      });
+      btn._feedbackAttached = true;
+      console.log('[Who-Bible] Feedback button event attached (fallback)');
+    }
+  }, 1000); // Wait for DOM and dynamic content
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', () => {
+    init();
+    ensureFeedbackButtonWorks();
+  });
 } else {
   init();
+  ensureFeedbackButtonWorks();
 }

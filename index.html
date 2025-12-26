@@ -369,7 +369,7 @@
         </div>
         
         <div class="footer-bottom">
-          <p>© <span id="footer-year"></span> Who-Bible | <button id="btn-feedback" style="background:none;border:none;color:inherit;text-decoration:underline;cursor:pointer;font-size:inherit;font-family:inherit;padding:0;">Feedback</button></p>
+          <p>© <span id="footer-year"></span> Who-Bible | <button id="btn-feedback" class="footer-feedback-btn">Feedback</button></p>
         </div>
       </div>
     </footer>
@@ -570,11 +570,12 @@
         <div class="row">
           <label for="new-player-name">Enter your name</label>
           <input id="new-player-name" type="text" placeholder="Guest" maxlength="20" />
+          <div id="player-name-hint" style="font-size:0.95em;color:var(--text-muted);margin-top:0.25em;">Press <b>Enter</b> or click <b>Save</b> to confirm your name.</div>
         </div>
       </main>
       <footer class="modal-footer">
         <button id="btn-change-player-cancel">Cancel</button>
-        <button id="btn-change-player-save" class="primary">Save</button>
+        <button id="btn-change-player-save" class="primary" style="transition:box-shadow 0.2s;">Save</button>
       </footer>
     </div>
   </div>
