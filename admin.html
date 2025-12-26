@@ -83,10 +83,6 @@
       <img src="assets/images/logo.png" alt="Who-Bible Logo" class="login-logo" />
       <h1 style="margin: 0; font-size: 1.5rem; color: var(--primary-color);">Who-Bible</h1>
       <h2>Admin Access</h2>
-      <div style="background: #fbbf24; color: #222; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 1rem; font-weight: 500;">
-        <span style="font-weight:bold;">BETA:</span> This app is still in development. Your feedback is always appreciated!<br>
-        <span style="font-size:0.97em; color:#444;">Explore the game to learn more about the Bible.</span>
-      </div>
       <p>Sign in to view feedback.</p>
       <input type="email" id="admin-email" placeholder="Email" autocomplete="email" />
       <input type="password" id="admin-password" placeholder="Password" autocomplete="current-password" />
@@ -186,6 +182,7 @@
   <script>
     // Firebase Auth Integration
     const auth = firebase.auth();
+    const database = firebase.database();
     const loginOverlay = document.getElementById('login-overlay');
     const adminContent = document.getElementById('admin-content');
     const loginError = document.getElementById('login-error');
@@ -197,6 +194,18 @@
       // Export CSV button
       const btnExport = document.getElementById('btn-export');
       let lastFeedbackItems = [];
+
+    // Auth state listener
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        loginOverlay.classList.add('hidden');
+        adminContent.classList.remove('hidden');
+        loadFeedback();
+      } else {
+        loginOverlay.classList.remove('hidden');
+        adminContent.classList.add('hidden');
+      }
+    });
 
     // Helper to show error
     function showError(msg) {
@@ -218,8 +227,38 @@
       loginSuccess.style.display = 'none';
     }
 
-    // Friendly error messages
-    // Filtering logic
+    // Login button
+    btnLogin.addEventListener('click', async () => {
+      const email = emailInput.value.trim();
+      const pass = passInput.value.trim();
+      if (!email || !pass) {
+        showError('Please enter email and password.');
+        return;
+      }
+      clearMessages();
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (error) {
+        showError(error.message);
+      }
+    });
+
+    // Forgot password
+    const btnForgot = document.getElementById('btn-forgot');
+    btnForgot.addEventListener('click', async () => {
+      const email = emailInput.value.trim();
+      if (!email) {
+        showError('Please enter your email.');
+        return;
+      }
+      clearMessages();
+      try {
+        await auth.sendPasswordResetEmail(email);
+        showSuccess('Password reset email sent.');
+      } catch (error) {
+        showError(error.message);
+      }
+    });
     let filterText = '';
     let filterRating = '';
 
@@ -377,79 +416,6 @@
         URL.revokeObjectURL(url);
       }, 100);
     });
-
-    // Load Feedback Data
-    async function loadFeedback() {
-      if (!database) {
-        alert('Firebase not initialized. Check config.');
-        return;
-      }
-
-      const tbody = document.getElementById('feedback-list');
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Loading...</td></tr>';
-
-      try {
-        const snapshot = await database.ref('feedback').orderByChild('timestamp').limitToLast(100).once('value');
-        const data = snapshot.val();
-        
-        if (!data) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No feedback yet.</td></tr>';
-          updateStats([]);
-          lastFeedbackItems = [];
-          return;
-        }
-
-        // Store both keys and items for delete
-        const keys = Object.keys(data);
-        const items = Object.values(data).reverse(); // Newest first
-        const keysReversed = keys.reverse();
-        lastFeedbackItems = items;
-        updateStats(items);
-        tbody.innerHTML = items.map((item, idx) => {
-          const date = new Date(item.timestamp).toLocaleString();
-          const ratingClass = `rating-${item.rating || 0}`;
-          const ratingLabel = item.rating ? `${item.rating} ★` : '-';
-          let details = [];
-          if(item.ratingModes) details.push(`Modes: ${item.ratingModes}/5`);
-          if(item.ratingAccuracy) details.push(`Accuracy: ${item.ratingAccuracy}/5`);
-          if(item.ratingScenarios) details.push(`Scenarios: ${item.ratingScenarios}/5`);
-          // Escape HTML in message to prevent XSS
-          const safeMessage = item.message ? item.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
-          // Trash icon SVG
-          const trash = `<button class="delete-btn" data-key="${keysReversed[idx]}" title="Delete Feedback" style="background:none;border:none;cursor:pointer;padding:0 0.5rem;"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="9" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="13" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="3" y="6" width="14" height="2" rx="1" fill="#ef4444"/><rect x="7" y="2" width="6" height="2" rx="1" fill="#ef4444"/></svg></button>`;
-          return `
-            <tr>
-              <td class="timestamp">${date}</td>
-              <td><span class="rating-badge ${ratingClass}">${ratingLabel}</span></td>
-              <td>
-                ${details.length ? `<div class="detail-row">${details.join(' • ')}</div>` : '<span style="color:var(--text-muted)">-</span>'}
-              </td>
-              <td>${safeMessage || '<span style="color:var(--text-muted)">No message</span>'}</td>
-              <td>${trash}</td>
-            </tr>
-          `;
-        }).join('');
-
-        // Attach delete handlers
-        Array.from(document.querySelectorAll('.delete-btn')).forEach(btn => {
-          btn.addEventListener('click', async (e) => {
-            const key = btn.getAttribute('data-key');
-            if (!key) return;
-            if (!confirm('Delete this feedback? This cannot be undone.')) return;
-            try {
-              await database.ref('feedback/' + key).remove();
-              loadFeedback();
-            } catch (err) {
-              alert('Failed to delete: ' + err.message);
-            }
-          });
-        });
-
-      } catch (error) {
-        console.error('Load error:', error);
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ef4444;">Error: ${error.message}</td></tr>`;
-      }
-    }
 
     // Update Stats
     // Chart.js chart instances
