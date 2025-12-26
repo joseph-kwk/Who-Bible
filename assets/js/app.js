@@ -2000,12 +2000,27 @@ function ensureFeedbackButtonWorks() {
   }, 1000); // Wait for DOM and dynamic content
 }
 
+function robustFeedbackButtonAttach() {
+  setTimeout(() => {
+    const btn = document.getElementById('btn-feedback');
+    if (btn && !btn._feedbackAttached) {
+      btn.addEventListener('click', function handler() {
+        if (typeof window.openFeedbackModal === 'function') {
+          window.openFeedbackModal();
+        }
+      });
+      btn._feedbackAttached = true;
+      console.log('[Who-Bible] Feedback button event attached (robust fallback)');
+    }
+  }, 500);
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     init();
-    ensureFeedbackButtonWorks();
+    robustFeedbackButtonAttach();
   });
 } else {
   init();
-  ensureFeedbackButtonWorks();
+  robustFeedbackButtonAttach();
 }
