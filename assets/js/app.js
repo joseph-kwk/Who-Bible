@@ -1367,6 +1367,7 @@ function endQuiz(){
   const correctAnswers = state.results.filter(r => r.correct).length;
   const totalQuestions = state.results.length;
   updatePlayerStats(state.score, state.streak, correctAnswers, totalQuestions, state.mode);
+    displayPlayerInfo();
   
   // Complete remote challenge if in remote mode
   if(state.mode==='remote-challenge' && window.RemoteChallenge){
