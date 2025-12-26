@@ -1,3 +1,20 @@
+/* Footer Feedback Button Styling */
+.footer-feedback-btn {
+  background: none;
+  border: none;
+  color: var(--accent-2, #fbbf24);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 1em;
+  font-family: inherit;
+  padding: 0 0.25em;
+  transition: color 0.2s;
+}
+.footer-feedback-btn:hover, .footer-feedback-btn:focus {
+  color: var(--accent, #ff8a65);
+  outline: none;
+  text-decoration: underline wavy;
+}
 /* Beta Badge */
 .beta-badge {
   display: inline-block;
