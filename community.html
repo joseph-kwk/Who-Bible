@@ -14,6 +14,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
   <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/remote-challenge.js" defer></script>
   <script src="assets/js/scenarios.js" defer></script>
   <script src="assets/js/locations.js" defer></script>
   <script src="assets/js/concepts.js" defer></script>
@@ -80,6 +81,8 @@
       </div>
     </header>
 
+    <!-- Community Guidelines Modal -->\n    <div id=\"guidelines-modal\" style=\"display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;\">\n      <div style=\"background: var(--bg); border-radius: 12px; max-width: 600px; max-height: 80vh; overflow-y: auto; padding: 32px; margin: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);\">\n        <div style=\"text-align: center; margin-bottom: 24px;\">\n          <h2 style=\"color: var(--accent); margin-bottom: 8px;\">📖 Community Guidelines</h2>\n          <p style=\"color: var(--muted); font-size: 14px;\">Growing in faith, together</p>\n        </div>\n\n        <div style=\"margin-bottom: 24px;\">\n          <h3 style=\"color: var(--accent); font-size: 18px; margin-bottom: 12px;\">✨ Our Purpose</h3>\n          <p style=\"line-height: 1.6; color: var(--text);\">This community exists to help you <strong>grow in knowing the Bible and God</strong> while having fun! We're here to learn together, encourage one another, and celebrate our journey in faith.</p>\n        </div>\n\n        <div style=\"margin-bottom: 24px;\">\n          <h3 style=\"color: var(--accent); font-size: 18px; margin-bottom: 12px;\">💖 Our Values</h3>\n          <ul style=\"line-height: 1.8; color: var(--text); padding-left: 20px;\">\n            <li><strong>Biblical Truth:</strong> All content must be scripturally accurate</li>\n            <li><strong>Respect:</strong> Treat everyone with Christ-like love and kindness</li>\n            <li><strong>Encouragement:</strong> Build others up in their faith journey</li>\n            <li><strong>Fun:</strong> Enjoy learning and growing together</li>\n            <li><strong>Unity:</strong> Focus on what unites us, not what divides</li>\n          </ul>\n        </div>\n\n        <div style=\"margin-bottom: 24px;\">\n          <h3 style=\"color: #ff6b6b; font-size: 18px; margin-bottom: 12px;\">🚫 Not Allowed</h3>\n          <ul style=\"line-height: 1.8; color: var(--text); padding-left: 20px;\">\n            <li><strong>Harassment or bullying</strong> of any kind</li>\n            <li><strong>Profanity or inappropriate content</strong></li>\n            <li><strong>False teaching</strong> or misrepresenting Scripture</li>\n            <li><strong>Spam or self-promotion</strong></li>\n            <li><strong>Cheating</strong> (sharing answers, score manipulation)</li>\n            <li><strong>Denominational attacks</strong> or divisive arguments</li>\n            <li><strong>Offensive usernames</strong> or impersonation</li>\n            <li><strong>Sharing personal info</strong> (addresses, phone numbers)</li>\n          </ul>\n        </div>\n\n        <div style=\"margin-bottom: 24px;\">\n          <h3 style=\"color: var(--accent); font-size: 18px; margin-bottom: 12px;\">🛡️ Safety First</h3>\n          <ul style=\"line-height: 1.8; color: var(--text); padding-left: 20px;\">\n            <li>All interactions are family-friendly (ages 10+)</li>\n            <li>Report inappropriate behavior immediately</li>\n            <li>Block users who make you uncomfortable</li>\n            <li>Never share personal information publicly</li>\n          </ul>\n        </div>\n\n        <div style=\"padding: 16px; background: var(--bg-2); border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 24px;\">\n          <p style=\"margin: 0; font-size: 14px; color: var(--text);\"><strong>\"Let your conversation be always full of grace, seasoned with salt, so that you may know how to answer everyone.\"</strong> - Colossians 4:6</p>\n        </div>\n\n        <div style=\"display: flex; gap: 12px; justify-content: center;\">\n          <button id=\"accept-guidelines-btn\" style=\"padding: 12px 32px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;\">I Agree</button>\n          <button onclick=\"window.location.href='index.html'\" style=\"padding: 12px 32px; background: var(--bg-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 16px;\">Go Back</button>\n        </div>\n      </div>\n    </div>
+
     <main class="requires-js">
       <div class="community-panel" style="display:flex">
         <div class="community-header">
@@ -142,102 +145,213 @@
               </div>
             </section>
             <section id="section-live" class="community-section" role="tabpanel" style="display:none">
-              <h3 id="live-rooms-title">Live Rooms</h3>
-              <p id="live-rooms-desc">Join a live room to play in real time.</p>
-              <div id="live-rooms-list" class="cards" style="margin-bottom:24px"></div>
-              
-              <div class="host-room" style="margin-top:24px; padding: 24px; background: var(--glass); border-radius: 8px; text-align: center;">
-                <h4 id="host-room-title" style="margin-top: 0;">Want to host a game?</h4>
-                <p style="color: var(--muted); margin-bottom: 16px;">Create a room in the main app and invite friends!</p>
-                <a href="index.html" class="primary" style="text-decoration: none; display: inline-block; padding: 12px 24px; border-radius: 8px; background: var(--accent); color: white;">Go to Main App</a>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h3 id="live-rooms-title" style="margin: 0;">Live Rooms</h3>
+                  <p id="live-rooms-desc" style="color: var(--muted); margin: 4px 0 0 0;">Join a live room or create your own!</p>
+                </div>
+                <button id="btn-create-room" class="primary" style="padding: 12px 24px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; border: none; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s;">
+                  🎮 Create Room
+                </button>
               </div>
+              <div id="live-rooms-list" class="cards" style="margin-bottom:24px"></div>
             </section>
             
             <!-- Locations Section -->
             <section id="section-locations" class="community-section" role="tabpanel" style="display:none">
-              <h3>Biblical Places</h3>
-              <p class="muted" style="margin-bottom: 20px;">Explore key locations from biblical history with an interactive map.</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h3 style="margin: 0;">Biblical Places</h3>
+                  <p class="muted" style="margin: 4px 0 0 0;">Explore key locations with an interactive map</p>
+                </div>
+                <button id="btn-location-quiz" style="padding: 10px 20px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;">
+                  🎯 Location Quiz
+                </button>
+              </div>
               
               <!-- Map Container -->
-              <div id="locations-map-container" role="img" aria-label="Interactive map of biblical locations" style="width: 100%; height: 750px; margin-bottom: 32px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;"></div>
+              <div id="locations-map-container" role="img" aria-label="Interactive map of biblical locations" style="width: 100%; height: 500px; margin-bottom: 24px; background: var(--bg-2); border: 2px solid var(--border); border-radius: 12px; overflow: hidden; position: relative;">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--muted);">
+                  <div style="font-size: 48px; margin-bottom: 12px;">🗺️</div>
+                  <div>Map loading...</div>
+                </div>
+              </div>
+              
+              <!-- Journey Paths Selector -->
+              <div style="margin-bottom: 24px; padding: 16px; background: var(--glass); border-radius: 12px; border: 2px solid var(--border);">
+                <div style="font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                  🛤️ Biblical Journeys
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <button class="journey-btn" data-journey="exodus" style="padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">📜 Exodus Route</button>
+                  <button class="journey-btn" data-journey="paul" style="padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">⛵ Paul's Journeys</button>
+                  <button class="journey-btn" data-journey="jesus" style="padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">✝️ Jesus' Ministry</button>
+                  <button class="journey-btn" data-journey="abraham" style="padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">🌟 Abraham's Journey</button>
+                  <button id="btn-clear-journey" style="padding: 8px 16px; border-radius: 20px; border: 2px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s;">✕ Clear</button>
+                </div>
+              </div>
               
               <!-- Filter Controls -->
               <div style="display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap;">
-                <select id="testament-filter-locations" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
+                <select id="testament-filter-locations" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
                   <option value="">All Testaments</option>
                   <option value="OT">Old Testament</option>
                   <option value="NT">New Testament</option>
                   <option value="OT & NT">Both</option>
                 </select>
-                <select id="importance-filter-locations" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
+                <select id="importance-filter-locations" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
                   <option value="0">All Importance</option>
                   <option value="8">High (8+)</option>
                   <option value="9">Very High (9+)</option>
                   <option value="10">Critical (10)</option>
                 </select>
-                <button id="btn-reset-map" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer;">Reset Map</button>
+                <button id="btn-reset-map" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Reset Map</button>
               </div>
               
               <!-- Location Cards -->
-              <div id="locations-list" class="locations-grid"></div>
+              <div id="locations-list" class="locations-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;"></div>
             </section>
             
             <!-- Concepts/Glossary Section -->
             <section id="section-concepts" class="community-section" role="tabpanel" style="display:none">
-              <h3>Biblical Concepts Glossary</h3>
-              <p class="muted" style="margin-bottom: 20px;">Learn about key theological concepts and doctrines.</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h3 style="margin: 0;">Biblical Concepts Glossary</h3>
+                  <p class="muted" style="margin: 4px 0 0 0;">Learn key theological concepts</p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button id="btn-flashcard-mode" style="padding: 10px 20px; background: var(--bg-2); color: var(--text); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
+                    🎴 Flashcards
+                  </button>
+                  <button id="btn-concept-quiz" style="padding: 10px 20px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                    🎯 Concept Quiz
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Flashcard Mode -->
+              <div id="flashcard-container" style="display: none; margin-bottom: 32px;">
+                <div style="background: var(--glass); border: 2px solid var(--border); border-radius: 16px; padding: 40px; text-align: center; min-height: 300px; display: flex; flex-direction: column; justify-content: center; position: relative; cursor: pointer; transition: transform 0.3s;">
+                  <div id="flashcard-term" style="font-size: 28px; font-weight: bold; color: var(--accent); margin-bottom: 24px;"></div>
+                  <div id="flashcard-definition" style="font-size: 18px; line-height: 1.6; color: var(--text); display: none;"></div>
+                  <div id="flashcard-hint" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: var(--muted); font-size: 14px;">Click to reveal</div>
+                  <div style="position: absolute; top: 20px; right: 20px; background: var(--bg-2); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--muted);">
+                    <span id="flashcard-progress">1 / 10</span>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px; justify-content: center;">
+                  <button id="btn-flashcard-prev" style="padding: 12px 24px; background: var(--bg-2); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--text);">← Previous</button>
+                  <button id="btn-flashcard-shuffle" style="padding: 12px 24px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">🔀 Shuffle</button>
+                  <button id="btn-flashcard-next" style="padding: 12px 24px; background: var(--bg-2); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--text);">Next →</button>
+                </div>
+              </div>
               
               <!-- Search and Filters -->
-              <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
-                <input id="concept-search" type="text" placeholder="Search concepts..." aria-label="Search biblical concepts" style="flex: 2; min-width: 200px; padding: 10px 16px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);" />
-                <select id="difficulty-filter-concepts" aria-label="Filter by difficulty level" style="flex: 1; min-width: 150px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
+              <div id="concepts-controls" style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                <input id="concept-search" type="text" placeholder="Search concepts..." aria-label="Search biblical concepts" style="flex: 2; min-width: 200px; padding: 10px 16px; border: 2px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);" />
+                <select id="difficulty-filter-concepts" aria-label="Filter by difficulty level" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
                   <option value="">All Levels</option>
                   <option value="Beginner">Beginner</option>
                   <option value="Intermediate">Intermediate</option>
                   <option value="Advanced">Advanced</option>
                   <option value="Expert">Expert</option>
                 </select>
-                <button id="btn-random-concept" aria-label="Show random biblical concept" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer;">Random Concept</button>
+                <button id="btn-random-concept" aria-label="Show random biblical concept" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🎲 Random</button>
               </div>
               
               <!-- Concepts List -->
-              <div id="concepts-list" class="concepts-grid"></div>
+              <div id="concepts-list" class="concepts-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;"></div>
             </section>
             
             <section id="section-profile" class="community-section" role="tabpanel" style="display:none">
               <h3 id="profile-title">Your Profile</h3>
               <div class="profile-form">
-                <div class="avatar-row">
-                  <div id="avatar-preview" class="avatar" aria-label="Avatar" role="img">WB</div>
-                  <button id="btn-generate-avatar" class="small-btn" type="button">Generate Avatar</button>
-                </div>
-                <div class="row">
-                  <label for="display-name" id="profile-name-label">Display name</label>
-                  <input id="display-name" type="text" placeholder="Your name" />
-                </div>
-                <div class="row">
-                  <label for="profile-bio">Bio (optional)</label>
-                  <textarea id="profile-bio" rows="3" placeholder="Tell us about yourself..." style="width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--border-radius); background: var(--glass); color: var(--text); font-size: 16px; resize: vertical; font-family: inherit;"></textarea>
-                </div>
-                <div class="row">
-                  <label>Your Stats</label>
-                  <div class="stats-grid" style="margin-top: 12px;">
-                    <div class="stat-card">
-                      <div class="stat-value" id="user-quizzes-played">0</div>
-                      <div class="stat-label">Quizzes Played</div>
-                    </div>
-                    <div class="stat-card">
-                      <div class="stat-value" id="user-best-score">0</div>
-                      <div class="stat-label">Best Score</div>
-                    </div>
-                    <div class="stat-card">
-                      <div class="stat-value" id="user-streak">0</div>
-                      <div class="stat-label">Best Streak</div>
+                <!-- Avatar Section -->
+                <div class="avatar-row" style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding: 20px; background: var(--glass); border-radius: 12px; border: 2px solid var(--border);">
+                  <div style="position: relative;">
+                    <div id="avatar-preview" class="avatar" aria-label="Avatar" role="img" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 3px solid var(--bg);">WB</div>
+                    <div id="avatar-icon" style="position: absolute; bottom: -4px; right: -4px; width: 32px; height: 32px; background: var(--card); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid var(--bg); box-shadow: 0 2px 6px rgba(0,0,0,0.2);">📖</div>
+                  </div>
+                  <div style="flex: 1;">
+                    <button id="btn-generate-avatar" class="small-btn" type="button" style="margin-bottom: 8px; padding: 8px 16px; border-radius: 6px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600; font-size: 14px;">🎨 Change Avatar Style</button>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                      <button class="avatar-icon-btn" data-icon="📖" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); cursor: pointer; font-size: 16px; transition: all 0.2s;" title="Book">📖</button>
+                      <button class="avatar-icon-btn" data-icon="✝️" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); cursor: pointer; font-size: 16px; transition: all 0.2s;" title="Cross">✝️</button>
+                      <button class="avatar-icon-btn" data-icon="🕊️" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); cursor: pointer; font-size: 16px; transition: all 0.2s;" title="Dove">🕊️</button>
+                      <button class="avatar-icon-btn" data-icon="⛪" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); cursor: pointer; font-size: 16px; transition: all 0.2s;" title="Church">⛪</button>
+                      <button class="avatar-icon-btn" data-icon="🙏" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); cursor: pointer; font-size: 16px; transition: all 0.2s;" title="Praying Hands">🙏</button>
+                      <button class="avatar-icon-btn" data-icon="👑" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); cursor: pointer; font-size: 16px; transition: all 0.2s;" title="Crown">👑</button>
                     </div>
                   </div>
                 </div>
+                
+                <!-- Basic Info -->
+                <div class="row" style="margin-bottom: 16px;">
+                  <label for="display-name" id="profile-name-label" style="display: block; margin-bottom: 6px; font-weight: 600;">Display name</label>
+                  <input id="display-name" type="text" placeholder="Your name" style="width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 16px;" />
+                </div>
+                <div class="row" style="margin-bottom: 24px;">
+                  <label for="profile-bio" style="display: block; margin-bottom: 6px; font-weight: 600;">Bio (optional)</label>
+                  <textarea id="profile-bio" rows="3" placeholder="Tell us about yourself..." style="width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 16px; resize: vertical; font-family: inherit;"></textarea>
+                </div>
+                
+                <!-- Stats Overview -->
+                <div style="margin-bottom: 24px;">
+                  <h4 style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">📊 Your Stats</h4>
+                  <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+                    <div class="stat-card" style="background: var(--glass); padding: 16px; border-radius: 8px; text-align: center; border: 2px solid var(--border);">
+                      <div class="stat-value" id="user-quizzes-played" style="font-size: 28px; font-weight: bold; color: var(--accent);">0</div>
+                      <div class="stat-label" style="font-size: 13px; color: var(--muted); margin-top: 4px;">Quizzes Played</div>
+                    </div>
+                    <div class="stat-card" style="background: var(--glass); padding: 16px; border-radius: 8px; text-align: center; border: 2px solid var(--border);">
+                      <div class="stat-value" id="user-best-score" style="font-size: 28px; font-weight: bold; color: var(--accent);">0</div>
+                      <div class="stat-label" style="font-size: 13px; color: var(--muted); margin-top: 4px;">Best Score</div>
+                    </div>
+                    <div class="stat-card" style="background: var(--glass); padding: 16px; border-radius: 8px; text-align: center; border: 2px solid var(--border);">
+                      <div class="stat-value" id="user-streak" style="font-size: 28px; font-weight: bold; color: var(--accent);">0</div>
+                      <div class="stat-label" style="font-size: 13px; color: var(--muted); margin-top: 4px;">Best Streak</div>
+                    </div>
+                    <div class="stat-card" style="background: var(--glass); padding: 16px; border-radius: 8px; text-align: center; border: 2px solid var(--border);">
+                      <div class="stat-value" id="user-accuracy" style="font-size: 28px; font-weight: bold; color: var(--accent);">0%</div>
+                      <div class="stat-label" style="font-size: 13px; color: var(--muted); margin-top: 4px;">Accuracy</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Achievements -->
+                <div style="margin-bottom: 24px;">
+                  <h4 style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">🏆 Achievements</h4>
+                  <div id="achievements-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;"></div>
+                </div>
+                
+                <!-- Learning Progress -->
+                <div style="margin-bottom: 24px;">
+                  <h4 style="margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">📚 Learning Progress</h4>
+                  <div style="background: var(--glass); padding: 20px; border-radius: 12px; border: 2px solid var(--border);">
+                    <div style="display: grid; gap: 16px;">
+                      <div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                          <span style="font-weight: 600;">People Mastered</span>
+                          <span id="people-mastered" style="color: var(--accent); font-weight: 600;">0 / 73</span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background: var(--bg-2); border-radius: 4px; overflow: hidden;">
+                          <div id="people-progress-bar" style="height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div style="font-weight: 600; margin-bottom: 8px;">Favorite Game Mode</div>
+                        <div id="favorite-mode" style="color: var(--muted);">Play more to discover!</div>
+                      </div>
+                      <div>
+                        <div style="font-weight: 600; margin-bottom: 8px;">Focus Areas</div>
+                        <div id="weak-areas" style="color: var(--muted); font-size: 14px;">Complete more quizzes for personalized suggestions</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
                 <div class="row">
-                  <button id="btn-save-profile" class="primary" type="button">Save Profile</button>
+                  <button id="btn-save-profile" class="primary" type="button" style="width: 100%; padding: 14px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; border: none; cursor: pointer; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform 0.2s;">💾 Save Profile</button>
                 </div>
               </div>
             </section>
@@ -353,6 +467,64 @@
   </div>
 
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Join Room Modal -->
+  <div id="join-room-modal" class="modal-overlay" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center;">
+    <div class="modal" style="background: var(--card); border-radius: 12px; padding: 0; max-width: 400px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+      <div class="modal-header" style="padding: 20px; border-bottom: 2px solid var(--border); background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 12px 12px 0 0;">
+        <h2 style="margin: 0; color: white; font-size: 1.35rem;">🎮 Join Room</h2>
+        <button id="btn-join-room-close" aria-label="Close" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s;">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <p style="margin: 0 0 16px 0; color: var(--muted);">Enter your name to join <strong id="join-room-code-display" style="color: var(--accent);"></strong></p>
+        <input id="join-player-name" type="text" placeholder="Your name" style="width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 16px; margin-bottom: 16px;" />
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button id="btn-join-cancel" class="secondary" style="padding: 10px 20px; border-radius: 8px; border: 2px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font-weight: 600;">Cancel</button>
+          <button id="btn-join-confirm" class="primary" style="padding: 10px 24px; border-radius: 8px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">Join Game</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Room Modal -->
+  <div id="create-room-modal" class="modal-overlay" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center;">
+    <div class="modal" style="background: var(--card); border-radius: 12px; padding: 0; max-width: 450px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+      <div class="modal-header" style="padding: 20px; border-bottom: 2px solid var(--border); background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 12px 12px 0 0;">
+        <h2 style="margin: 0; color: white; font-size: 1.35rem;">🎮 Create Room</h2>
+        <button id="btn-create-room-close" aria-label="Close" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px;">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text);">Your Name</label>
+          <input id="create-host-name" type="text" placeholder="Enter your name" style="width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 16px;" />
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text);">Number of Questions</label>
+          <select id="create-num-questions" style="width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 16px;">
+            <option value="5">5 Questions</option>
+            <option value="10" selected>10 Questions</option>
+            <option value="15">15 Questions</option>
+            <option value="20">20 Questions</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text);">Difficulty</label>
+          <select id="create-difficulty" style="width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 16px;">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button id="btn-create-cancel" class="secondary" style="padding: 10px 20px; border-radius: 8px; border: 2px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font-weight: 600;">Cancel</button>
+          <button id="btn-create-confirm" class="primary" style="padding: 10px 24px; border-radius: 8px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">Create Room</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guidelines Section Content (hidden by default) -->
+  <section id=\"section-guidelines\" class=\"community-section\" style=\"display: none;\" role=\"tabpanel\">\n    <div style=\"display: grid; gap: 20px; max-width: 800px; margin: 0 auto;\">\n      \n      <div class=\"card\" style=\"padding: 24px;\">\n        <div style=\"text-align: center; font-size: 48px; margin-bottom: 16px;\">✨</div>\n        <h3 style=\"color: var(--accent); margin-bottom: 12px; text-align: center;\">Our Purpose</h3>\n        <p style=\"text-align: center; line-height: 1.8;\">This community exists to help you <strong>grow in knowing the Bible and God</strong> while having fun! We're here to learn together, encourage one another, and celebrate our journey in faith.</p>\n      </div>\n\n      <div class=\"card\" style=\"padding: 24px;\">\n        <h3 style=\"color: var(--accent); margin-bottom: 16px;\">💖 Core Values</h3>\n        <div style=\"display: grid; gap: 12px;\">\n          <div style=\"padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);\">\n            <strong>Biblical Truth:</strong> All content must be scripturally accurate\n          </div>\n          <div style=\"padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);\">\n            <strong>Respect:</strong> Treat everyone with Christ-like love and kindness\n          </div>\n          <div style=\"padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);\">\n            <strong>Encouragement:</strong> Build others up in their faith journey\n          </div>\n          <div style=\"padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);\">\n            <strong>Fun:</strong> Enjoy learning and growing together\n          </div>\n          <div style=\"padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);\">\n            <strong>Unity:</strong> Focus on what unites us, not what divides\n          </div>\n        </div>\n      </div>\n\n      <div class=\"card\" style=\"padding: 24px; border: 2px solid #ff6b6b;\">\n        <h3 style=\"color: #ff6b6b; margin-bottom: 16px;\">🚫 Prohibited Behaviors</h3>\n        <ul style=\"line-height: 2; padding-left: 20px;\">\n          <li>Harassment, bullying, or hateful speech</li>\n          <li>Profanity or inappropriate content</li>\n          <li>False teaching or misrepresenting Scripture</li>\n          <li>Spam, advertising, or self-promotion</li>\n          <li>Cheating (sharing answers, score manipulation)</li>\n          <li>Denominational attacks or divisive arguments</li>\n          <li>Offensive usernames or impersonation</li>\n          <li>Sharing personal information publicly</li>\n        </ul>\n      </div>\n\n      <div class=\"card\" style=\"padding: 24px; background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-3) 100%);\">\n        <h3 style=\"color: var(--accent); margin-bottom: 16px;\">🛡️ Safety & Privacy</h3>\n        <ul style=\"line-height: 2; padding-left: 20px;\">\n          <li><strong>Family-Friendly:</strong> Content appropriate for ages 10+</li>\n          <li><strong>Report System:</strong> Report inappropriate behavior immediately</li>\n          <li><strong>Block Feature:</strong> Block users who make you uncomfortable</li>\n          <li><strong>Privacy:</strong> Never share personal contact information</li>\n          <li><strong>Parental Guidance:</strong> Minors should use with adult supervision</li>\n        </ul>\n      </div>\n\n      <div class=\"card\" style=\"padding: 24px; text-align: center; border: 2px solid var(--accent);\">\n        <p style=\"font-size: 16px; line-height: 1.8; margin-bottom: 16px;\"><strong>\"Let your conversation be always full of grace, seasoned with salt, so that you may know how to answer everyone.\"</strong></p>\n        <p style=\"color: var(--muted);\">- Colossians 4:6</p>\n      </div>\n\n      <div class=\"card\" style=\"padding: 24px;\">\n        <h3 style=\"color: var(--accent); margin-bottom: 16px;\">⚠️ Consequences</h3>\n        <p style=\"margin-bottom: 12px;\">Violations may result in:</p>\n        <ol style=\"line-height: 2; padding-left: 20px;\">\n          <li><strong>Warning:</strong> First-time minor offenses</li>\n          <li><strong>Temporary Suspension:</strong> Repeated or moderate violations</li>\n          <li><strong>Permanent Ban:</strong> Severe or repeated serious violations</li>\n        </ol>\n        <p style=\"margin-top: 16px; padding: 12px; background: var(--bg-2); border-radius: 8px; font-size: 14px;\">We believe in grace and restoration. Contact admin if you have questions or concerns.</p>\n      </div>\n\n    </div>\n  </section>
 
 </body>
 </html>

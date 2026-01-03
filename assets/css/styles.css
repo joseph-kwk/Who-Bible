@@ -2509,11 +2509,16 @@ button:disabled:hover {
 @media (max-width: 768px) {
   .community-tabs {
     gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
   
   .tab-btn {
-    padding: 10px 16px;
-    font-size: 14px;
+    padding: 10px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   
   .cards {
@@ -2521,13 +2526,162 @@ button:disabled:hover {
   }
   
   .community-content {
-    padding: 24px 20px;
+    padding: 24px 16px;
   }
   
   .community-panel {
     width: 95%;
     max-width: 95%;
     padding: 12px;
+  }
+  
+  /* Guidelines modal responsive */
+  #guidelines-modal > div {
+    max-width: 95vw;
+    max-height: 90vh;
+    padding: 24px 16px;
+    margin: 10px;
+  }
+  
+  #guidelines-modal h2 {
+    font-size: 20px;
+  }
+  
+  #guidelines-modal h3 {
+    font-size: 16px;
+  }
+  
+  #guidelines-modal ul, #guidelines-modal ol {
+    font-size: 14px;
+    padding-left: 16px;
+  }
+  
+  /* Biblical map responsive */
+  #biblical-map {
+    height: 400px;
+  }
+  
+  #map-container {
+    min-height: 400px;
+  }
+  
+  #map-legend {
+    transform: translate(10, 10) scale(0.8);
+  }
+  
+  #map-tooltip {
+    max-width: 200px;
+    font-size: 12px;
+    padding: 8px;
+  }
+  
+  /* Journey selector responsive */
+  .journey-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .journey-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  /* Report button mobile */
+  .btn-report-room {
+    padding: 10px 12px !important;
+    font-size: 14px;
+  }
+  
+  /* Live room cards mobile */
+  #live-rooms-list .card {
+    padding: 16px;
+  }
+  
+  /* Flashcard mode mobile */
+  #flashcard-container > div {
+    min-height: 250px;
+    padding: 20px;
+  }
+  
+  #flashcard-term {
+    font-size: 20px;
+  }
+  
+  #flashcard-definition {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  
+  /* Guidelines modal extra small screens */
+  #guidelines-modal > div {
+    padding: 20px 12px;
+  }
+  
+  #guidelines-modal h2 {
+    font-size: 18px;
+  }
+  
+  #guidelines-modal h3 {
+    font-size: 15px;
+  }
+  
+  #guidelines-modal ul, #guidelines-modal ol {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  
+  /* Map extra small */
+  #biblical-map {
+    height: 300px;
+  }
+  
+  #map-container {
+    min-height: 300px;
+  }
+  
+  #map-legend {
+    display: none; /* Hide legend on very small screens */
+  }
+  
+  #map-tooltip {
+    max-width: 150px;
+    font-size: 11px;
+    padding: 6px;
+  }
+  
+  /* Journey buttons stack */
+  .journey-selector {
+    grid-template-columns: 1fr;
+  }
+  
+  .journey-btn {
+    width: 100%;
+  }
+  
+  /* Button groups stack vertically */
+  #live-rooms-list .card > div:last-child {
+    flex-direction: column;
+  }
+  
+  #live-rooms-list .card button {
+    width: 100%;
+  }
+  
+  /* Flashcard controls stack */
+  #flashcard-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  #flashcard-controls button {
+    width: 100%;
   }
 }
 

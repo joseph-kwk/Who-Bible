@@ -3,6 +3,54 @@
   let locationsInitialized = false;
   let conceptsInitialized = false;
 
+  // Profanity filter for usernames
+  const PROFANITY_LIST = ['damn', 'hell', 'crap', 'stupid', 'idiot', 'dumb', 'hate', 'kill', 'die', 'sex', 'porn', 'xxx'];
+  
+  function containsProfanity(text) {
+    if (!text) return false;
+    const lower = text.toLowerCase();
+    return PROFANITY_LIST.some(word => lower.includes(word));
+  }
+  
+  function validateUsername(username) {
+    if (!username || username.trim().length < 2) {
+      return { valid: false, error: 'Username must be at least 2 characters' };
+    }
+    if (username.length > 20) {
+      return { valid: false, error: 'Username must be 20 characters or less' };
+    }
+    if (containsProfanity(username)) {
+      return { valid: false, error: 'Username contains inappropriate language' };
+    }
+    if (!/^[a-zA-Z0-9\s_-]+$/.test(username)) {
+      return { valid: false, error: 'Username can only contain letters, numbers, spaces, hyphens and underscores' };
+    }
+    return { valid: true };
+  }
+
+  // Check if user has seen guidelines
+  function checkGuidelines() {
+    const accepted = localStorage.getItem('who-bible-guidelines-accepted');
+    if (!accepted) {
+      setTimeout(() => {
+        const modal = document.getElementById('guidelines-modal');
+        if (modal) {
+          modal.style.display = 'flex';
+        }
+      }, 500);
+    }
+  }
+  
+  // Accept guidelines
+  document.getElementById('accept-guidelines-btn')?.addEventListener('click', () => {
+    localStorage.setItem('who-bible-guidelines-accepted', 'true');
+    const modal = document.getElementById('guidelines-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+    showToast({ title: '✅ Guidelines Accepted', msg: 'Welcome to the community!', type: 'success' });
+  });
+
   // Minimal utilities copied from app.js
   const toastContainer = document.getElementById('toast-container');
   function showToast({ title, msg = '', type = 'info', timeout = 2000 }){
@@ -192,10 +240,21 @@
 
   // Profile simple handlers (initials)
   const avatarPreview = document.getElementById('avatar-preview');
+  const avatarIcon = document.getElementById('avatar-icon');
   const btnGenerateAvatar = document.getElementById('btn-generate-avatar');
   const displayNameInput = document.getElementById('display-name');
   const profileBioTextarea = document.getElementById('profile-bio');
   const btnSaveProfile = document.getElementById('btn-save-profile');
+  
+  // Avatar colors palette
+  const avatarColors = [
+    '#ff8a65', '#ffb74d', '#81c784', '#64b5f6', 
+    '#ba68c8', '#4db6ac', '#f06292', '#ffd54f',
+    '#a1887f', '#90a4ae', '#ff7043', '#ffa726'
+  ];
+  
+  let currentAvatarColorIndex = 0;
+  let currentAvatarIcon = '📖';
   
   function initialsFromName(name){
     const parts = (name||'').trim().split(/[\s-]+/).filter(Boolean);
@@ -204,31 +263,120 @@
     const second = parts.length>1 ? parts[1][0] : '';
     return (first+second).toUpperCase();
   }
+  
   function generateAvatarText(name){
     const txt = initialsFromName(name);
     return txt || 'WB';
   }
-  function setAvatarText(txt){ if(avatarPreview) avatarPreview.textContent = (txt||'WB'); }
+  
+  function setAvatarText(txt){ 
+    if(avatarPreview) avatarPreview.textContent = (txt||'WB'); 
+  }
+  
+  function updateAvatarStyle() {
+    if (avatarPreview) {
+      avatarPreview.style.background = avatarColors[currentAvatarColorIndex];
+    }
+    if (avatarIcon) {
+      avatarIcon.textContent = currentAvatarIcon;
+    }
+  }
+  
+  // Achievement definitions
+  const achievements = [
+    { id: 'first_quiz', icon: '🎯', title: 'First Steps', desc: 'Complete your first quiz', check: (stats) => stats.quizzes >= 1 },
+    { id: 'ten_games', icon: '🎮', title: 'Getting Started', desc: 'Play 10 quizzes', check: (stats) => stats.quizzes >= 10 },
+    { id: 'perfect_score', icon: '💯', title: 'Perfection', desc: 'Get a perfect score', check: (stats) => stats.perfectGames >= 1 },
+    { id: 'high_streak', icon: '🔥', title: 'On Fire!', desc: 'Get a 5+ streak', check: (stats) => stats.bestStreak >= 5 },
+    { id: 'scholar', icon: '📚', title: 'Bible Scholar', desc: 'Play 50+ quizzes', check: (stats) => stats.quizzes >= 50 },
+    { id: 'master', icon: '👑', title: 'Master', desc: 'Play 100+ quizzes', check: (stats) => stats.quizzes >= 100 },
+    { id: 'high_accuracy', icon: '🎯', title: 'Sharp Mind', desc: '80%+ accuracy', check: (stats) => stats.accuracy >= 80 },
+    { id: 'dedicated', icon: '⭐', title: 'Dedicated', desc: 'Play 25+ quizzes', check: (stats) => stats.quizzes >= 25 }
+  ];
+  
+  function renderAchievements(stats) {
+    const grid = document.getElementById('achievements-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    achievements.forEach(achievement => {
+      const unlocked = achievement.check(stats);
+      const badge = document.createElement('div');
+      badge.className = 'achievement-badge';
+      badge.style.cssText = `
+        background: ${unlocked ? 'linear-gradient(135deg, var(--accent), var(--accent-2))' : 'var(--bg-2)'};
+        border: 2px solid ${unlocked ? 'var(--accent)' : 'var(--border)'};
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        transition: all 0.3s;
+        cursor: pointer;
+        ${unlocked ? 'box-shadow: 0 4px 12px rgba(0,0,0,0.15);' : 'opacity: 0.6;'}
+      `;
+      
+      badge.innerHTML = `
+        <div style=\"font-size: 32px; margin-bottom: 8px; ${unlocked ? '' : 'filter: grayscale(100%);'}\">${achievement.icon}</div>
+        <div style=\"font-weight: 600; font-size: 13px; color: ${unlocked ? 'white' : 'var(--muted)'}; margin-bottom: 4px;\">${achievement.title}</div>
+        <div style=\"font-size: 11px; color: ${unlocked ? 'rgba(255,255,255,0.8)' : 'var(--muted)'};\">${achievement.desc}</div>
+      `;
+      
+      badge.addEventListener('mouseenter', () => {
+        if (unlocked) {
+          badge.style.transform = 'translateY(-4px) scale(1.05)';
+        }
+      });
+      badge.addEventListener('mouseleave', () => {
+        badge.style.transform = 'translateY(0) scale(1)';
+      });
+      
+      grid.appendChild(badge);
+    });
+  }
   
   function loadProfile(){
     try{
       const txt = localStorage.getItem('communityProfile');
-      if(!txt) { setAvatarText('WB'); return; }
+      if(!txt) { 
+        setAvatarText('WB'); 
+        updateAvatarStyle();
+        return; 
+      }
       const p = JSON.parse(txt);
       if(displayNameInput) displayNameInput.value = p.displayName || '';
       if(profileBioTextarea) profileBioTextarea.value = p.bio || '';
       setAvatarText(p.avatarText || generateAvatarText(p.displayName));
-    }catch(_){ setAvatarText('WB'); }
+      currentAvatarColorIndex = p.avatarColorIndex || 0;
+      currentAvatarIcon = p.avatarIcon || '📖';
+      updateAvatarStyle();
+    }catch(_){ 
+      setAvatarText('WB'); 
+      updateAvatarStyle();
+    }
   }
   
   function saveProfile(){
+    const name = displayNameInput?.value?.trim() || '';
+    
+    // Validate username
+    const validation = validateUsername(name);
+    if (!validation.valid) {
+      showToast({ title: '❌ Invalid Username', msg: validation.error, type: 'error', timeout: 3000 });
+      return false;
+    }
+    
     const profile = {
-      displayName: displayNameInput?.value?.trim() || '',
+      displayName: name,
       bio: profileBioTextarea?.value?.trim() || '',
       avatarText: avatarPreview?.textContent || 'WB',
+      avatarColorIndex: currentAvatarColorIndex,
+      avatarIcon: currentAvatarIcon,
       locale: (localStorage.getItem('who-bible-language')||'en')
     };
-    try{ localStorage.setItem('communityProfile', JSON.stringify(profile)); }catch(_){/* ignore */}
+    try{ 
+      localStorage.setItem('communityProfile', JSON.stringify(profile)); 
+      localStorage.setItem('who-bible-profile-name', name); // For reports
+    }catch(_){/* ignore */}
+    return true;
   }
   
   function loadUserStats() {
@@ -242,25 +390,155 @@
       const bestScore = results.length > 0 ? Math.max(...results.map(r => r.score || 0)) : 0;
       const bestStreak = results.length > 0 ? Math.max(...results.map(r => r.streak || 0)) : 0;
       
+      // Calculate accuracy
+      let totalQuestions = 0;
+      let correctAnswers = 0;
+      results.forEach(r => {
+        if (r.score !== undefined && r.qtotal !== undefined) {
+          totalQuestions += r.qtotal;
+          correctAnswers += r.score;
+        }
+      });
+      const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+      
+      // Count perfect games
+      const perfectGames = results.filter(r => r.score === r.qtotal && r.qtotal > 0).length;
+      
+      // Find favorite mode
+      const modeCounts = {};
+      results.forEach(r => {
+        const mode = r.mode || 'classic';
+        modeCounts[mode] = (modeCounts[mode] || 0) + 1;
+      });
+      const favoriteMode = Object.keys(modeCounts).length > 0 
+        ? Object.entries(modeCounts).sort((a, b) => b[1] - a[1])[0][0] 
+        : null;
+      
+      // Update UI
       const quizzesEl = document.getElementById('user-quizzes-played');
       const scoreEl = document.getElementById('user-best-score');
       const streakEl = document.getElementById('user-streak');
+      const accuracyEl = document.getElementById('user-accuracy');
       
       if (quizzesEl) quizzesEl.textContent = quizzesPlayed;
       if (scoreEl) scoreEl.textContent = bestScore;
       if (streakEl) streakEl.textContent = bestStreak;
-    } catch(_) {
-      // Ignore errors
+      if (accuracyEl) accuracyEl.textContent = accuracy + '%';
+      
+      // Learning progress
+      const peopleMastered = new Set();
+      results.forEach(r => {
+        if (r.correctPeople) {
+          r.correctPeople.forEach(person => peopleMastered.add(person));
+        }
+      });
+      const masteredCount = peopleMastered.size;
+      const masteredEl = document.getElementById('people-mastered');
+      const progressBar = document.getElementById('people-progress-bar');
+      if (masteredEl) masteredEl.textContent = `${masteredCount} / 73`;
+      if (progressBar) progressBar.style.width = `${(masteredCount / 73) * 100}%`;
+      
+      // Favorite mode
+      const favModeEl = document.getElementById('favorite-mode');
+      if (favModeEl && favoriteMode) {
+        const modeNames = {
+          classic: '🎯 Classic Mode',
+          timed: '⏱️ Timed Mode',
+          'remote-challenge': '🌐 Remote Challenge',
+          study: '📚 Study Mode'
+        };
+        favModeEl.textContent = modeNames[favoriteMode] || favoriteMode;
+      }
+      
+      // Weak areas (people frequently missed)
+      const mistakes = {};
+      results.forEach(r => {
+        if (r.incorrectPeople) {
+          r.incorrectPeople.forEach(person => {
+            mistakes[person] = (mistakes[person] || 0) + 1;
+          });
+        }
+      });
+      const weakAreas = Object.entries(mistakes)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([person]) => person);
+      
+      const weakAreasEl = document.getElementById('weak-areas');
+      if (weakAreasEl && weakAreas.length > 0) {
+        weakAreasEl.innerHTML = `<strong>Review:</strong> ${weakAreas.join(', ')}`;
+      }
+      
+      // Render achievements
+      const stats = {
+        quizzes: quizzesPlayed,
+        bestScore,
+        bestStreak,
+        accuracy,
+        perfectGames
+      };
+      renderAchievements(stats);
+      
+    } catch(e) {
+      console.error('Error loading stats:', e);
+      // Set defaults
+      renderAchievements({ quizzes: 0, bestScore: 0, bestStreak: 0, accuracy: 0, perfectGames: 0 });
     }
   }
   
   loadProfile();
   loadUserStats();
   
-  btnGenerateAvatar?.addEventListener('click', ()=>{ setAvatarText(generateAvatarText(displayNameInput?.value)); });
+  // Avatar color cycle button
+  btnGenerateAvatar?.addEventListener('click', ()=>{ 
+    currentAvatarColorIndex = (currentAvatarColorIndex + 1) % avatarColors.length;
+    updateAvatarStyle();
+  });
+  
+  // Avatar icon selection buttons
+  document.querySelectorAll('.avatar-icon-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const icon = btn.dataset.icon;
+      currentAvatarIcon = icon;
+      updateAvatarStyle();
+      
+      // Highlight selected
+      document.querySelectorAll('.avatar-icon-btn').forEach(b => {
+        b.style.borderColor = 'var(--border)';
+        b.style.background = 'var(--bg-2)';
+        b.style.transform = 'scale(1)';
+      });
+      btn.style.borderColor = 'var(--accent)';
+      btn.style.background = 'var(--accent-2)';
+      btn.style.transform = 'scale(1.1)';
+    });
+    
+    // Hover effect
+    btn.addEventListener('mouseenter', () => {
+      if (btn.dataset.icon !== currentAvatarIcon) {
+        btn.style.borderColor = 'var(--accent)';
+        btn.style.transform = 'scale(1.05)';
+      }
+    });
+    btn.addEventListener('mouseleave', () => {
+      if (btn.dataset.icon !== currentAvatarIcon) {
+        btn.style.borderColor = 'var(--border)';
+        btn.style.transform = 'scale(1)';
+      }
+    });
+  });
+  
   btnSaveProfile?.addEventListener('click', ()=>{ 
-    saveProfile(); 
-    showToast({ title: getText('profileSaved')||'Profile saved', type:'success', timeout: 1200 }); 
+    if (saveProfile()) {
+      showToast({ title: getText('profileSaved')||'Profile saved', type:'success', timeout: 1200 }); 
+      // Add subtle animation
+      if (btnSaveProfile) {
+        btnSaveProfile.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          btnSaveProfile.style.transform = 'scale(1)';
+        }, 100);
+      }
+    }
   });
 
   // =========================
@@ -268,6 +546,26 @@
   // =========================
   let liveRoomsListener = null;
   const liveRoomsList = document.getElementById('live-rooms-list');
+  let currentRoomData = null;
+  
+  // Helper to generate avatar color from name
+  function getAvatarColor(name) {
+    const colors = ['#ff8a65', '#ffb74d', '#81c784', '#64b5f6', '#ba68c8', '#4db6ac', '#f06292', '#ffd54f'];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  }
+  
+  // Helper to get initials from name
+  function getInitials(name) {
+    if (!name) return '??';
+    const parts = name.trim().split(/[\s-]+/).filter(Boolean);
+    if (parts.length === 0) return '??';
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
   
   function setupLiveRoomsListener() {
     // Check if Firebase is available
@@ -288,7 +586,7 @@
       const db = FirebaseConfig.getDatabase();
       const roomsRef = db.ref('rooms');
       
-      // Listen for all active rooms
+      // Listen for all active rooms with real-time updates
       liveRoomsListener = roomsRef.on('value', (snapshot) => {
         const rooms = snapshot.val();
         displayLiveRooms(rooms);
@@ -309,7 +607,14 @@
     liveRoomsList.innerHTML = '';
     
     if (!rooms) {
-      liveRoomsList.innerHTML = '<div class="card"><div class="card-desc muted">No live rooms available. Create one to get started!</div></div>';
+      liveRoomsList.innerHTML = `
+        <div class="card" style="text-align: center; padding: 40px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">🎮</div>
+          <div class="card-title">No Active Rooms</div>
+          <div class="card-desc" style="margin-bottom: 16px;">Be the first to create a room and invite friends!</div>
+          <button onclick="document.getElementById('btn-create-room').click()" class="primary" style="padding: 10px 24px; border-radius: 8px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600;">Create Room</button>
+        </div>
+      `;
       return;
     }
     
@@ -319,41 +624,186 @@
     });
     
     if (activeRooms.length === 0) {
-      liveRoomsList.innerHTML = '<div class="card"><div class="card-desc muted">No active rooms right now. Be the first to create one!</div></div>';
+      liveRoomsList.innerHTML = `
+        <div class="card" style="text-align: center; padding: 40px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
+          <div class="card-title">All Rooms Finished</div>
+          <div class="card-desc" style="margin-bottom: 16px;">Create a new room to start playing!</div>
+          <button onclick="document.getElementById('btn-create-room').click()" class="primary" style="padding: 10px 24px; border-radius: 8px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600;">Create Room</button>
+        </div>
+      `;
       return;
     }
     
-    // Display each room
+    // Display each room with enhanced styling
     activeRooms.forEach(([roomCode, room]) => {
       const card = document.createElement('div');
-      card.className = 'card';
-      card.style.cursor = 'pointer';
+      card.className = 'card room-card';
+      card.style.cssText = 'cursor: pointer; transition: all 0.3s ease; border: 2px solid var(--border); position: relative; overflow: hidden;';
       card.dataset.roomCode = roomCode;
       
-      const hostName = room.host?.name || 'Unknown Host';
-      const playerCount = room.players ? Object.keys(room.players).length : 0;
-      const statusText = room.status === 'ready' ? '🎮 Ready' : room.status === 'waiting' ? '⏳ Waiting' : '🎯 In Progress';
+      const hostName = room.host || 'Unknown Host';
+      const players = room.players || {};
+      const playerCount = Object.keys(players).length;
+      const maxPlayers = room.settings?.maxPlayers || 8;
+      const isFull = playerCount >= maxPlayers;
+      
+      // Status badges and colors
+      let statusBadge = '';
+      let statusColor = '';
+      if (room.status === 'active') {
+        statusBadge = '🔥 Active';
+        statusColor = '#10b981';
+      } else if (room.status === 'ready') {
+        statusBadge = '🎮 Ready';
+        statusColor = '#3b82f6';
+      } else {
+        statusBadge = '⏳ Waiting';
+        statusColor = '#f59e0b';
+      }
+      
       const settings = room.settings || {};
       const difficulty = settings.difficulty || 'medium';
-      const questionCount = settings.questionCount || 10;
+      const numQuestions = settings.numQuestions || 10;
+      
+      // Create player avatars
+      let avatarsHTML = '<div style=\"display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px;\">';
+      Object.entries(players).slice(0, 6).forEach(([key, player]) => {
+        if (player && player.name) {
+          const initials = getInitials(player.name);
+          const bgColor = getAvatarColor(player.name);
+          avatarsHTML += `
+            <div style=\"width: 32px; height: 32px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.2);\" title=\"${player.name}\">${initials}</div>
+          `;
+        }
+      });
+      if (playerCount > 6) {
+        avatarsHTML += `<div style=\"width: 32px; height: 32px; border-radius: 50%; background: var(--bg-3); color: var(--muted); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; border: 2px solid var(--bg);\">+${playerCount - 6}</div>`;
+      }
+      avatarsHTML += '</div>';
       
       card.innerHTML = `
-        <div class="card-title">🏆 ${roomCode}</div>
-        <div class="card-desc">
-          <div style="margin-bottom: 4px;">Host: <strong>${hostName}</strong></div>
-          <div style="margin-bottom: 4px;">Players: ${playerCount}/2 | ${statusText}</div>
-          <div style="font-size: 0.9em; color: var(--color-text-secondary);">
-            ${questionCount} questions • ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+        <div style=\"position: absolute; top: 12px; right: 12px; padding: 4px 12px; background: ${statusColor}; color: white; border-radius: 12px; font-size: 12px; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.2);\">${statusBadge}</div>
+        <div class=\"card-icon\" style=\"font-size: 32px; margin-bottom: 8px;\">🏆</div>
+        <div class=\"card-title\" style=\"font-size: 18px; margin-bottom: 8px; padding-right: 80px;\">${roomCode}</div>
+        <div class=\"card-desc\" style=\"font-size: 14px;\">
+          <div style=\"margin-bottom: 6px;\"><strong>Host:</strong> ${hostName}</div>
+          <div style=\"margin-bottom: 6px;\">
+            <strong>Players:</strong> 
+            <span style=\"color: ${isFull ? '#ef4444' : '#10b981'}; font-weight: 600;\">${playerCount}/${maxPlayers}</span>
+            ${isFull ? '<span style=\"margin-left: 8px; color: #ef4444; font-weight: 600;\">FULL</span>' : ''}
           </div>
+          ${avatarsHTML}
+          <div style=\"margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted);\">
+            ${numQuestions} questions • ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+          </div>
+        </div>
+        <div style=\"margin-top: 16px; display: flex; gap: 8px;\">
+          ${!isFull && room.status === 'waiting' ? `<button class=\"btn-join-room primary\" data-room-code=\"${roomCode}\" style=\"flex: 1; padding: 10px; border-radius: 6px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600; transition: transform 0.2s;\">Join Now</button>` : ''}
+          <button class=\"btn-view-room secondary\" data-room-code=\"${roomCode}\" style=\"${!isFull && room.status === 'waiting' ? 'padding: 10px 16px;' : 'flex: 1; padding: 10px;'} border-radius: 6px; border: 2px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font-weight: 600;\">Details</button>
+          <button class=\"btn-report-room\" data-room-code=\"${roomCode}\" data-host=\"${hostName}\" style=\"padding: 10px 16px; border-radius: 6px; border: 2px solid #ff6b6b; background: transparent; color: #ff6b6b; cursor: pointer; font-weight: 600; transition: all 0.2s;\" title=\"Report inappropriate behavior\">⚠️</button>
         </div>
       `;
       
-      // Make clickable to view or join
-      card.addEventListener('click', () => {
-        viewRoomDetails(roomCode, room);
+      // Add hover effect
+      card.addEventListener('mouseenter', () => {
+        card.style.transform = 'translateY(-4px)';
+        card.style.boxShadow = '0 8px 16px rgba(0,0,0,0.15)';
+        card.style.borderColor = 'var(--accent)';
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0)';
+        card.style.boxShadow = 'none';
+        card.style.borderColor = 'var(--border)';
       });
       
+      // Add click handlers
+      const joinBtn = card.querySelector('.btn-join-room');
+      const viewBtn = card.querySelector('.btn-view-room');
+      
+      if (joinBtn) {
+        joinBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showJoinRoomModal(roomCode, room);
+        });
+      }
+      
+      if (viewBtn) {
+        viewBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          viewRoomDetails(roomCode, room);
+        });
+      }
+      
+      // Report button
+      const reportBtn = card.querySelector('.btn-report-room');
+      if (reportBtn) {
+        reportBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const hostName = reportBtn.dataset.host;
+          showReportModal(roomCode, hostName);
+        });
+      }
+      
       liveRoomsList.appendChild(card);
+    });
+  }
+  
+  function showReportModal(roomCode, hostName) {
+    const html = `
+      <div style="margin-bottom: 20px;">
+        <p style="color: var(--muted); margin-bottom: 16px;">You are reporting room <strong>${roomCode}</strong> hosted by <strong>${hostName}</strong></p>
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Reason:</label>
+        <select id="report-reason" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); margin-bottom: 16px;">
+          <option value="">Select a reason...</option>
+          <option value="harassment">Harassment or bullying</option>
+          <option value="profanity">Profanity or inappropriate language</option>
+          <option value="cheating">Cheating or unfair play</option>
+          <option value="spam">Spam or advertising</option>
+          <option value="false_teaching">False teaching or misrepresenting Scripture</option>
+          <option value="offensive_name">Offensive username</option>
+          <option value="other">Other</option>
+        </select>
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Additional details (optional):</label>
+        <textarea id="report-details" rows="4" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); resize: vertical;" placeholder="Please provide any additional context..."></textarea>
+      </div>
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button onclick="document.getElementById('community-modal').style.display='none'" class="secondary" style="padding: 10px 20px; border-radius: 8px; border: 2px solid var(--border); background: transparent; cursor: pointer;">Cancel</button>
+        <button id="submit-report-btn" class="primary" style="padding: 10px 24px; border-radius: 8px; background: #ff6b6b; color: white; border: none; cursor: pointer; font-weight: 600;">Submit Report</button>
+      </div>
+    `;
+    
+    openCommunityModal('⚠️ Report Room', html);
+    
+    document.getElementById('submit-report-btn')?.addEventListener('click', () => {
+      const reason = document.getElementById('report-reason')?.value;
+      const details = document.getElementById('report-details')?.value;
+      
+      if (!reason) {
+        showToast({ title: 'Error', msg: 'Please select a reason', type: 'error' });
+        return;
+      }
+      
+      // Save report to Firebase (admin can review)
+      try {
+        if (typeof FirebaseConfig !== 'undefined' && FirebaseConfig.isFirebaseAvailable && FirebaseConfig.isFirebaseAvailable()) {
+          const db = FirebaseConfig.getDatabase();
+          const reportRef = db.ref('reports').push();
+          reportRef.set({
+            roomCode: roomCode,
+            hostName: hostName,
+            reason: reason,
+            details: details || '',
+            timestamp: Date.now(),
+            reporter: localStorage.getItem('who-bible-profile-name') || 'Anonymous'
+          });
+        }
+      } catch (error) {
+        console.error('Report error:', error);
+      }
+      
+      document.getElementById('community-modal').style.display = 'none';
+      showToast({ title: '✅ Report Submitted', msg: 'Thank you for helping keep our community safe', type: 'success', timeout: 3000 });
     });
   }
   
@@ -404,6 +854,70 @@
   // ===== LOCATIONS TAB =====
   // locationsInitialized is defined at top of scope
   let locationsMap = null;
+  let currentJourney = null;
+  
+  // Journey path definitions with biblical accuracy
+  const journeyPaths = {
+    exodus: {
+      color: '#FF6B6B',
+      icon: '📜',
+      locations: [
+        { name: 'Rameses', coords: [180, 320], type: 'start', desc: 'Starting point in Egypt, land of bondage (Ex 12:37)', person: '👥' },
+        { name: 'Succoth', coords: [200, 330], type: 'stop', desc: 'First encampment: 600,000 men plus families (Ex 12:37)' },
+        { name: 'Etham', coords: [220, 350], type: 'stop', desc: 'Edge of the wilderness, pillar of cloud and fire appeared (Ex 13:20-22)' },
+        { name: 'Pi-hahiroth', coords: [190, 370], type: 'stop', desc: 'Before the Red Sea, trapped by Pharaoh\'s army (Ex 14:2)' },
+        { name: 'Red Sea Crossing', coords: [180, 390], type: 'miracle', desc: 'Waters parted, walked on dry ground (Ex 14:21-29)', person: '🌊' },
+        { name: 'Marah', coords: [200, 410], type: 'stop', desc: 'Bitter waters made sweet by a tree (Ex 15:23-25)' },
+        { name: 'Elim', coords: [220, 420], type: 'stop', desc: 'Oasis with 12 springs and 70 palm trees (Ex 15:27)', person: '🌴' },
+        { name: 'Wilderness of Sin', coords: [240, 400], type: 'stop', desc: 'Manna and quail provided from heaven (Ex 16:1-36)', person: '🍞' },
+        { name: 'Rephidim', coords: [260, 390], type: 'stop', desc: 'Water from rock; defeated Amalek (Ex 17:1-16)' },
+        { name: 'Mount Sinai', coords: [270, 370], type: 'holy', desc: 'Ten Commandments received amid thunder and fire (Ex 19-20)', person: '⚡' }
+      ]
+    },
+    paul: {
+      color: '#4ECDC4',
+      icon: '⛵',
+      locations: [
+        { name: 'Antioch', coords: [420, 160], type: 'start', desc: 'Church commissioned Paul and Barnabas (Acts 13:1-3)', person: '⛪' },
+        { name: 'Seleucia', coords: [430, 170], type: 'stop', desc: 'Port city where journey began by sea (Acts 13:4)' },
+        { name: 'Cyprus', coords: [360, 190], type: 'stop', desc: 'Barnabas\' homeland; proconsul Sergius Paulus believed (Acts 13:4-12)', person: '🏛️' },
+        { name: 'Perga', coords: [340, 200], type: 'stop', desc: 'John Mark departed here and returned to Jerusalem (Acts 13:13)' },
+        { name: 'Antioch (Pisidia)', coords: [360, 210], type: 'city', desc: 'Preached in synagogue; many believed (Acts 13:14-52)', person: '📖' },
+        { name: 'Iconium', coords: [380, 215], type: 'city', desc: 'Long ministry despite persecution plot (Acts 14:1-7)' },
+        { name: 'Lystra', coords: [370, 225], type: 'city', desc: 'Stoned and left for dead; Timothy\'s hometown (Acts 14:8-20)', person: '👤' },
+        { name: 'Derbe', coords: [390, 230], type: 'city', desc: 'Made many disciples without persecution (Acts 14:20-21)' },
+        { name: 'Attalia', coords: [340, 210], type: 'stop', desc: 'Sailed back to Antioch from this port (Acts 14:25-26)' }
+      ]
+    },
+    jesus: {
+      color: '#95E1D3',
+      icon: '✝️',
+      locations: [
+        { name: 'Bethlehem', coords: [350, 270], type: 'holy', desc: 'Born in manger, city of David (Luke 2:4-7)', person: '⭐' },
+        { name: 'Nazareth', coords: [370, 200], type: 'city', desc: 'Grew up here; rejected in synagogue (Luke 4:16-30)', person: '🏠' },
+        { name: 'Capernaum', coords: [385, 175], type: 'city', desc: 'Base of Galilee ministry; many miracles (Matt 4:13)', person: '🏘️' },
+        { name: 'Sea of Galilee', coords: [380, 180], type: 'holy', desc: 'Called disciples; walked on water; calmed storm (Mark 4:35-41)', person: '🚣' },
+        { name: 'Cana', coords: [375, 195], type: 'miracle', desc: 'First miracle: water to wine at wedding (John 2:1-11)', person: '🍷' },
+        { name: 'Jerusalem', coords: [355, 260], type: 'holy', desc: 'Crucifixion and resurrection (John 19-20)', person: '✝️' },
+        { name: 'Bethany', coords: [360, 265], type: 'city', desc: 'Lazarus raised; Mary & Martha\'s home (John 11)', person: '👨' },
+        { name: 'Jericho', coords: [365, 275], type: 'city', desc: 'Healed blind Bartimaeus; Zacchaeus believed (Luke 18-19)', person: '🌳' },
+        { name: 'Jordan River', coords: [370, 250], type: 'holy', desc: 'Baptized by John the Baptist (Matt 3:13-17)', person: '💧' }
+      ]
+    },
+    abraham: {
+      color: '#FFD93D',
+      icon: '🌟',
+      locations: [
+        { name: 'Ur', coords: [650, 340], type: 'start', desc: 'Birthplace in Mesopotamia (Gen 11:28-31)', person: '🏛️' },
+        { name: 'Haran', coords: [520, 140], type: 'city', desc: 'Father Terah died; God called Abraham (Gen 11:31-12:1)', person: '🏘️' },
+        { name: 'Shechem', coords: [365, 230], type: 'stop', desc: 'First stop in Canaan; God appeared, built altar (Gen 12:6-7)', person: '🔥' },
+        { name: 'Bethel', coords: [358, 250], type: 'holy', desc: 'Built altar, called on the Lord (Gen 12:8)', person: '⛪' },
+        { name: 'Egypt', coords: [180, 360], type: 'stop', desc: 'Went during famine (Gen 12:10)', person: '🌾' },
+        { name: 'Hebron', coords: [350, 280], type: 'city', desc: 'Settled near oaks of Mamre (Gen 13:18)', person: '🌳' },
+        { name: 'Beersheba', coords: [340, 310], type: 'city', desc: 'Made covenant with Abimelech (Gen 21:32)', person: '🤝' }
+      ]
+    }
+  };
   
   async function initLocationsTab() {
     locationsInitialized = true;
@@ -437,8 +951,33 @@
         btnResetMap.addEventListener('click', () => {
           testamentFilter.value = '';
           importanceFilter.value = '0';
+          currentJourney = null;
+          updateJourneyButtons();
           filterLocations();
         });
+      }
+      
+      // Journey buttons
+      document.querySelectorAll('.journey-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const journey = btn.dataset.journey;
+          showJourney(journey);
+        });
+      });
+      
+      const btnClearJourney = document.getElementById('btn-clear-journey');
+      if (btnClearJourney) {
+        btnClearJourney.addEventListener('click', () => {
+          currentJourney = null;
+          updateJourneyButtons();
+          window.LocationModule.addLocationMarkers();
+        });
+      }
+      
+      // Location Quiz button
+      const btnLocationQuiz = document.getElementById('btn-location-quiz');
+      if (btnLocationQuiz) {
+        btnLocationQuiz.addEventListener('click', startLocationQuiz);
       }
       
       // Listen for location selection from map
@@ -447,10 +986,222 @@
       });
       
       locationsInitialized = true;
+      
+      // Add touch support for mobile
+      const mapSvg = document.getElementById('biblical-map');
+      if (mapSvg && 'ontouchstart' in window) {
+        mapSvg.style.touchAction = 'pan-y';
+      }
     } catch(err) {
       console.error('Error initializing locations:', err);
       showToast({ title: 'Error', msg: 'Failed to load locations', type: 'error' });
     }
+  }
+  
+  function showJourney(journeyKey) {
+    currentJourney = journeyKey;
+    updateJourneyButtons();
+    
+    const journey = journeyPaths[journeyKey];
+    if (!journey) return;
+    
+    const pathsGroup = document.getElementById('journey-paths');
+    const markersGroup = document.getElementById('location-markers');
+    const tooltip = document.getElementById('map-tooltip');
+    
+    if (!pathsGroup || !markersGroup) return;
+    
+    // Clear previous journey
+    pathsGroup.innerHTML = '';
+    markersGroup.innerHTML = '';
+    
+    const locations = journey.locations;
+    const color = journey.color;
+    
+    // Draw animated path connecting all locations
+    let pathData = `M ${locations[0].coords[0]} ${locations[0].coords[1]}`;
+    for (let i = 1; i < locations.length; i++) {
+      pathData += ` L ${locations[i].coords[0]} ${locations[i].coords[1]}`;
+    }
+    
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', pathData);
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '3');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('opacity', '0.7');
+    path.setAttribute('stroke-dasharray', '8,4');
+    path.setAttribute('marker-end', 'url(#arrowhead)');
+    path.classList.add('journey-path');
+    
+    // Animate the path
+    const pathLength = path.getTotalLength();
+    path.style.strokeDasharray = pathLength;
+    path.style.strokeDashoffset = pathLength;
+    path.style.animation = 'drawPath 2s ease-in-out forwards';
+    
+    pathsGroup.appendChild(path);
+    
+    // Add CSS animation if not exists
+    if (!document.getElementById('path-animation-style')) {
+      const style = document.createElement('style');
+      style.id = 'path-animation-style';
+      style.textContent = `
+        @keyframes drawPath {
+          to { stroke-dashoffset: 0; }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.2); opacity: 1; }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        .location-marker { cursor: pointer; transition: all 0.3s; }
+        .location-marker:hover { filter: url(#glow); transform: scale(1.3); }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    // Draw location markers with icons
+    locations.forEach((loc, idx) => {
+      const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      group.classList.add('location-marker');
+      group.setAttribute('transform', `translate(${loc.coords[0]}, ${loc.coords[1]})`);
+      
+      // Determine color based on type
+      let markerColor = color;
+      if (loc.type === 'holy') markerColor = '#4ECDC4';
+      if (loc.type === 'miracle') markerColor = '#FFD93D';
+      if (loc.type === 'start') markerColor = '#FF6B6B';
+      
+      // Outer ring (pulsing)
+      const outerRing = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      outerRing.setAttribute('r', '12');
+      outerRing.setAttribute('fill', markerColor);
+      outerRing.setAttribute('opacity', '0.3');
+      outerRing.style.animation = 'pulse 2s ease-in-out infinite';
+      outerRing.style.animationDelay = `${idx * 0.2}s`;
+      
+      // Inner circle
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('r', '8');
+      circle.setAttribute('fill', markerColor);
+      circle.setAttribute('stroke', 'white');
+      circle.setAttribute('stroke-width', '2');
+      
+      // Person/icon emoji
+      if (loc.person) {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('y', '5');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('font-size', '12');
+        text.textContent = loc.person;
+        text.style.pointerEvents = 'none';
+        text.style.animation = 'float 3s ease-in-out infinite';
+        text.style.animationDelay = `${idx * 0.3}s`;
+        group.appendChild(text);
+      }
+      
+      // Label
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('y', '24');
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('font-size', '10');
+      label.setAttribute('fill', 'var(--text)');
+      label.setAttribute('font-weight', 'bold');
+      label.textContent = loc.name;
+      label.style.pointerEvents = 'none';
+      
+      group.appendChild(outerRing);
+      group.appendChild(circle);
+      group.appendChild(label);
+      
+      // Tooltip on hover/touch
+      const showTooltip = (e) => {
+        const rect = document.getElementById('biblical-map').getBoundingClientRect();
+        const isMobile = window.innerWidth <= 768;
+        tooltip.style.display = 'block';
+        
+        // Position tooltip, keeping it on screen
+        let left = rect.left + loc.coords[0] + 15;
+        let top = rect.top + loc.coords[1] - 30;
+        
+        // Adjust if tooltip would go off screen
+        if (isMobile) {
+          left = Math.min(left, window.innerWidth - 160);
+          top = Math.max(top, 10);
+        }
+        
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+        document.getElementById('tooltip-title').textContent = loc.name;
+        document.getElementById('tooltip-desc').textContent = loc.desc;
+      };
+      
+      const hideTooltip = () => {
+        tooltip.style.display = 'none';
+      };
+      
+      group.addEventListener('mouseenter', showTooltip);
+      group.addEventListener('mouseleave', hideTooltip);
+      
+      // Touch support for mobile
+      group.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        showTooltip(e);
+        setTimeout(hideTooltip, 3000); // Auto-hide after 3 seconds on touch
+      });
+      
+      markersGroup.appendChild(group);
+    });
+    
+    showToast({ 
+      title: `${journey.icon} ${journeyKey.toUpperCase()}`, 
+      msg: `Following ${locations.length} locations`, 
+      type: 'success',
+      timeout: 2000
+    });
+  }
+  
+  function updateJourneyButtons() {
+    document.querySelectorAll('.journey-btn').forEach(btn => {
+      const isActive = btn.dataset.journey === currentJourney;
+      btn.style.background = isActive ? 'var(--accent)' : 'var(--bg)';
+      btn.style.color = isActive ? 'white' : 'var(--text)';
+      btn.style.borderColor = isActive ? 'var(--accent)' : 'var(--border)';
+    });
+  }
+  
+  function startLocationQuiz() {
+    const locations = window.LocationModule?.locations || [];
+    if (locations.length === 0) {
+      showToast({ title: 'Error', msg: 'No locations loaded', type: 'error' });
+      return;
+    }
+    
+    // Pick 5 random locations
+    const shuffled = locations.sort(() => 0.5 - Math.random());
+    const quizLocations = shuffled.slice(0, 5);
+    
+    let html = '<div style=\"margin-bottom: 20px;\"><strong>Match these events to locations:</strong></div>';
+    html += '<div style=\"display: grid; gap: 16px;\">';
+    
+    quizLocations.forEach((loc, i) => {
+      const event = loc.key_events[0] || 'A significant biblical event';
+      html += `
+        <div style=\"padding: 16px; background: var(--bg-2); border-radius: 8px; border: 2px solid var(--border);\">
+          <div style=\"font-weight: 600; margin-bottom: 8px; color: var(--accent);\">${i + 1}. ${event}</div>
+          <div style=\"color: var(--muted); font-size: 14px;\">Answer: <strong style=\"color: var(--text);\">${loc.location_name}</strong></div>
+        </div>
+      `;
+    });
+    
+    html += '</div>';
+    html += '<div style=\"margin-top: 20px; text-align: center; color: var(--muted); font-size: 14px;\">Full quiz mode coming soon!</div>';
+    
+    openCommunityModal('📍 Location Quiz', html);
   }
   
   function filterLocations() {
@@ -528,6 +1279,11 @@
   }
 
   // ===== CONCEPTS TAB =====
+  let flashcardMode = false;
+  let flashcardConcepts = [];
+  let currentFlashcardIndex = 0;
+  let flashcardRevealed = false;
+  
   async function initConceptsTab() {
     conceptsInitialized = true;
     if (!window.ConceptModule) {
@@ -572,6 +1328,162 @@
         }
       });
     }
+    
+    // Flashcard mode button
+    const btnFlashcardMode = document.getElementById('btn-flashcard-mode');
+    if (btnFlashcardMode) {
+      btnFlashcardMode.addEventListener('click', toggleFlashcardMode);
+    }
+    
+    // Concept quiz button
+    const btnConceptQuiz = document.getElementById('btn-concept-quiz');
+    if (btnConceptQuiz) {
+      btnConceptQuiz.addEventListener('click', startConceptQuiz);
+    }
+    
+    // Flashcard controls
+    setupFlashcardControls();
+  }
+  
+  function toggleFlashcardMode() {
+    flashcardMode = !flashcardMode;
+    const container = document.getElementById('flashcard-container');
+    const controls = document.getElementById('concepts-controls');
+    const list = document.getElementById('concepts-list');
+    const btnFlashcard = document.getElementById('btn-flashcard-mode');
+    
+    if (flashcardMode) {
+      // Enter flashcard mode
+      if (container) container.style.display = 'block';
+      if (controls) controls.style.display = 'none';
+      if (list) list.style.display = 'none';
+      if (btnFlashcard) {
+        btnFlashcard.style.background = 'var(--accent)';
+        btnFlashcard.style.color = 'white';
+        btnFlashcard.style.borderColor = 'var(--accent)';
+        btnFlashcard.textContent = '📋 Show List';
+      }
+      
+      // Load concepts for flashcards
+      flashcardConcepts = [...(window.ConceptModule?.concepts || [])];
+      currentFlashcardIndex = 0;
+      showFlashcard();
+    } else {
+      // Exit flashcard mode
+      if (container) container.style.display = 'none';
+      if (controls) controls.style.display = 'flex';
+      if (list) list.style.display = 'grid';
+      if (btnFlashcard) {
+        btnFlashcard.style.background = 'var(--bg-2)';
+        btnFlashcard.style.color = 'var(--text)';
+        btnFlashcard.style.borderColor = 'var(--border)';
+        btnFlashcard.textContent = '🎴 Flashcards';
+      }
+    }
+  }
+  
+  function setupFlashcardControls() {
+    const flashcardEl = document.querySelector('#flashcard-container > div');
+    if (flashcardEl) {
+      flashcardEl.addEventListener('click', revealFlashcard);
+    }
+    
+    const btnPrev = document.getElementById('btn-flashcard-prev');
+    const btnNext = document.getElementById('btn-flashcard-next');
+    const btnShuffle = document.getElementById('btn-flashcard-shuffle');
+    
+    if (btnPrev) {
+      btnPrev.addEventListener('click', () => {
+        if (currentFlashcardIndex > 0) {
+          currentFlashcardIndex--;
+          flashcardRevealed = false;
+          showFlashcard();
+        }
+      });
+    }
+    
+    if (btnNext) {
+      btnNext.addEventListener('click', () => {
+        if (currentFlashcardIndex < flashcardConcepts.length - 1) {
+          currentFlashcardIndex++;
+          flashcardRevealed = false;
+          showFlashcard();
+        }
+      });
+    }
+    
+    if (btnShuffle) {
+      btnShuffle.addEventListener('click', () => {
+        flashcardConcepts.sort(() => 0.5 - Math.random());
+        currentFlashcardIndex = 0;
+        flashcardRevealed = false;
+        showFlashcard();
+        showToast({ title: '🔀 Shuffled', msg: 'Cards randomized', type: 'success', timeout: 1000 });
+      });
+    }
+  }
+  
+  function showFlashcard() {
+    if (flashcardConcepts.length === 0) return;
+    
+    const concept = flashcardConcepts[currentFlashcardIndex];
+    const termEl = document.getElementById('flashcard-term');
+    const definitionEl = document.getElementById('flashcard-definition');
+    const hintEl = document.getElementById('flashcard-hint');
+    const progressEl = document.getElementById('flashcard-progress');
+    
+    if (termEl) termEl.textContent = concept.term;
+    if (definitionEl) {
+      definitionEl.textContent = concept.definition;
+      definitionEl.style.display = 'none';
+    }
+    if (hintEl) hintEl.style.display = 'block';
+    if (progressEl) progressEl.textContent = `${currentFlashcardIndex + 1} / ${flashcardConcepts.length}`;
+    
+    flashcardRevealed = false;
+  }
+  
+  function revealFlashcard() {
+    const definitionEl = document.getElementById('flashcard-definition');
+    const termEl = document.getElementById('flashcard-term');
+    const hintEl = document.getElementById('flashcard-hint');
+    
+    if (!flashcardRevealed) {
+      if (definitionEl) definitionEl.style.display = 'block';
+      if (termEl) termEl.style.fontSize = '22px';
+      if (hintEl) hintEl.style.display = 'none';
+      flashcardRevealed = true;
+    }
+  }
+  
+  function startConceptQuiz() {
+    const concepts = window.ConceptModule?.concepts || [];
+    if (concepts.length === 0) {
+      showToast({ title: 'Error', msg: 'No concepts loaded', type: 'error' });
+      return;
+    }
+    
+    // Pick 5 random concepts
+    const shuffled = concepts.sort(() => 0.5 - Math.random());
+    const quizConcepts = shuffled.slice(0, 5);
+    
+    let html = '<div style=\"margin-bottom: 20px;\"><strong>Match these definitions to concepts:</strong></div>';
+    html += '<div style=\"display: grid; gap: 16px;\">';
+    
+    quizConcepts.forEach((concept, i) => {
+      html += `
+        <div style=\"padding: 16px; background: var(--bg-2); border-radius: 8px; border: 2px solid var(--border);\">
+          <div style=\"font-weight: 600; margin-bottom: 8px; color: var(--accent);\">${i + 1}. ${concept.definition.substring(0, 80)}...</div>
+          <div style=\"color: var(--muted); font-size: 14px;\">Answer: <strong style=\"color: var(--text);\">${concept.term}</strong></div>
+          <div style=\"margin-top: 8px; padding: 6px 12px; background: var(--bg-3); border-radius: 12px; display: inline-block; font-size: 12px;\">${concept.difficulty}</div>
+        </div>
+      `;
+    });
+    
+    html += '</div>';
+    html += '<div style=\"margin-top: 20px; text-align: center; color: var(--muted); font-size: 14px;\">Interactive quiz mode coming soon!</div>';
+    
+    openCommunityModal('📚 Concept Quiz', html);
   }
   
   function renderConceptCards(concepts) {
@@ -787,4 +1699,158 @@
   if (typeof window.updateAllText === 'function') {
     window.updateAllText();
   }
+
+  // =========================
+  // Join Room Modal
+  // =========================
+  const joinRoomModal = document.getElementById('join-room-modal');
+  const joinRoomCodeDisplay = document.getElementById('join-room-code-display');
+  const joinPlayerNameInput = document.getElementById('join-player-name');
+  const btnJoinCancel = document.getElementById('btn-join-cancel');
+  const btnJoinConfirm = document.getElementById('btn-join-confirm');
+  const btnJoinRoomClose = document.getElementById('btn-join-room-close');
+  
+  function showJoinRoomModal(roomCode, room) {
+    currentRoomData = { roomCode, room };
+    if (joinRoomCodeDisplay) joinRoomCodeDisplay.textContent = roomCode;
+    if (joinPlayerNameInput) {
+      // Try to get name from profile
+      try {
+        const profile = JSON.parse(localStorage.getItem('communityProfile') || '{}');
+        joinPlayerNameInput.value = profile.displayName || '';
+      } catch(_) {
+        joinPlayerNameInput.value = '';
+      }
+    }
+    if (joinRoomModal) joinRoomModal.style.display = 'flex';
+  }
+  
+  function hideJoinRoomModal() {
+    if (joinRoomModal) joinRoomModal.style.display = 'none';
+    currentRoomData = null;
+  }
+  
+  if (btnJoinCancel) btnJoinCancel.addEventListener('click', hideJoinRoomModal);
+  if (btnJoinRoomClose) btnJoinRoomClose.addEventListener('click', hideJoinRoomModal);
+  
+  if (btnJoinConfirm) {
+    btnJoinConfirm.addEventListener('click', async () => {
+      const playerName = joinPlayerNameInput?.value.trim();
+      if (!playerName) {
+        showToast({ title: 'Error', msg: 'Please enter your name', type: 'warn' });
+        return;
+      }
+      
+      if (!currentRoomData) return;
+      
+      btnJoinConfirm.disabled = true;
+      btnJoinConfirm.textContent = 'Joining...';
+      
+      try {
+        // Redirect to main app with room code and player name
+        const url = `index.html?room=${currentRoomData.roomCode}&playerName=${encodeURIComponent(playerName)}`;
+        window.location.href = url;
+      } catch (error) {
+        console.error('Error joining room:', error);
+        showToast({ title: 'Error', msg: 'Failed to join room: ' + error.message, type: 'error' });
+        btnJoinConfirm.disabled = false;
+        btnJoinConfirm.textContent = 'Join Game';
+      }
+    });
+  }
+  
+  // =========================
+  // Create Room Modal
+  // =========================
+  const createRoomModal = document.getElementById('create-room-modal');
+  const createHostNameInput = document.getElementById('create-host-name');
+  const createNumQuestionsSelect = document.getElementById('create-num-questions');
+  const createDifficultySelect = document.getElementById('create-difficulty');
+  const btnCreateCancel = document.getElementById('btn-create-cancel');
+  const btnCreateConfirm = document.getElementById('btn-create-confirm');
+  const btnCreateRoomClose = document.getElementById('btn-create-room-close');
+  const btnCreateRoom = document.getElementById('btn-create-room');
+  
+  function showCreateRoomModal() {
+    if (createHostNameInput) {
+      // Try to get name from profile
+      try {
+        const profile = JSON.parse(localStorage.getItem('communityProfile') || '{}');
+        createHostNameInput.value = profile.displayName || '';
+      } catch(_) {
+        createHostNameInput.value = '';
+      }
+    }
+    if (createRoomModal) createRoomModal.style.display = 'flex';
+  }
+  
+  function hideCreateRoomModal() {
+    if (createRoomModal) createRoomModal.style.display = 'none';
+  }
+  
+  if (btnCreateRoom) btnCreateRoom.addEventListener('click', showCreateRoomModal);
+  if (btnCreateCancel) btnCreateCancel.addEventListener('click', hideCreateRoomModal);
+  if (btnCreateRoomClose) btnCreateRoomClose.addEventListener('click', hideCreateRoomModal);
+  
+  if (btnCreateConfirm) {
+    btnCreateConfirm.addEventListener('click', async () => {
+      const hostName = createHostNameInput?.value.trim();
+      const numQuestions = parseInt(createNumQuestionsSelect?.value || '10');
+      const difficulty = createDifficultySelect?.value || 'medium';
+      
+      if (!hostName) {
+        showToast({ title: 'Error', msg: 'Please enter your name', type: 'warn' });
+        return;
+      }
+      
+      // Check if RemoteChallenge module is available
+      if (typeof RemoteChallenge === 'undefined') {
+        showToast({ title: 'Error', msg: 'Remote challenge module not loaded', type: 'error' });
+        return;
+      }
+      
+      btnCreateConfirm.disabled = true;
+      btnCreateConfirm.textContent = 'Creating...';
+      
+      try {
+        // Create room using RemoteChallenge module
+        const result = await RemoteChallenge.createRoom(hostName, {
+          numQuestions,
+          difficulty,
+          timeLimit: 60
+        });
+        
+        hideCreateRoomModal();
+        showToast({ title: 'Room Created!', msg: `Room ${result.roomCode} created successfully`, type: 'success', timeout: 2000 });
+        
+        // Redirect to main app with room code
+        setTimeout(() => {
+          window.location.href = `index.html?room=${result.roomCode}&host=true`;
+        }, 1000);
+        
+      } catch (error) {
+        console.error('Error creating room:', error);
+        showToast({ title: 'Error', msg: 'Failed to create room: ' + error.message, type: 'error' });
+        btnCreateConfirm.disabled = false;
+        btnCreateConfirm.textContent = 'Create Room';
+      }
+    });
+  }
+  
+  // Close modals on click outside
+  window.addEventListener('click', (e) => {
+    if (e.target === joinRoomModal) hideJoinRoomModal();
+    if (e.target === createRoomModal) hideCreateRoomModal();
+  });
+  
+  // Close modals on Escape key
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (joinRoomModal && joinRoomModal.style.display === 'flex') hideJoinRoomModal();
+      if (createRoomModal && createRoomModal.style.display === 'flex') hideCreateRoomModal();
+    }
+  });
+  
+  // Initialize - check guidelines acceptance
+  checkGuidelines();
 })();
