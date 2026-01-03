@@ -1937,8 +1937,9 @@ function initFeedback() {
       const ratingModes = document.getElementById('rating-modes')?.value;
       const ratingAccuracy = document.getElementById('rating-accuracy')?.value;
       const ratingScenarios = document.getElementById('rating-scenarios')?.value;
+      const ratingOnline = document.getElementById('rating-online')?.value;
 
-      if (!message && selectedRating === 0 && !ratingModes && !ratingAccuracy && !ratingScenarios) {
+      if (!message && selectedRating === 0 && !ratingModes && !ratingAccuracy && !ratingScenarios && !ratingOnline) {
         showToast({ title: 'Feedback', msg: 'Please provide some feedback.', type: 'warn' });
         return;
       }
@@ -1951,6 +1952,7 @@ function initFeedback() {
         ratingModes: ratingModes || null,
         ratingAccuracy: ratingAccuracy || null,
         ratingScenarios: ratingScenarios || null,
+        ratingOnline: ratingOnline || null,
         message,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,

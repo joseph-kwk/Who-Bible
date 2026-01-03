@@ -665,7 +665,7 @@
           renderFeedbackTable();
         });
       }
-    // End of DOMContentLoaded
+    }); // End of DOMContentLoaded
 
     let feedbackKeys = [];
     function renderFeedbackTable() {
@@ -699,6 +699,7 @@
         if(item.ratingModes) details.push(`🎮 ${item.ratingModes}/5`);
         if(item.ratingAccuracy) details.push(`✓ ${item.ratingAccuracy}/5`);
         if(item.ratingScenarios) details.push(`📖 ${item.ratingScenarios}/5`);
+        if(item.ratingOnline) details.push(`👥 ${item.ratingOnline}/5`);
         const safeMessage = item.message ? item.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
         const truncatedMsg = safeMessage.length > 150 ? safeMessage.substring(0, 150) + '...' : safeMessage;
         const trash = `<button class="delete-btn" data-key="${item._key}" title="Delete this feedback" aria-label="Delete"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="9" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="13" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="3" y="6" width="14" height="2" rx="1" fill="#ef4444"/><rect x="7" y="2" width="6" height="2" rx="1" fill="#ef4444"/></svg></button>`;
@@ -771,8 +772,6 @@
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ef4444; padding: 2rem;">❌ Error loading data: ${error.message}</td></tr>`;
       }
     }
-      
-    });
 
     // Logout
     document.getElementById('btn-logout').addEventListener('click', () => {
@@ -790,7 +789,7 @@
       }
       try {
         const csvRows = [
-          'Date,Time,Rating,Modes Rating,Accuracy Rating,Scenarios Rating,Message,User Agent'
+          'Date,Time,Rating,Modes Rating,Accuracy Rating,Scenarios Rating,Online Play Rating,Message,User Agent'
         ];
         lastFeedbackItems.forEach(item => {
           const dt = new Date(item.timestamp);
@@ -803,6 +802,7 @@
             item.ratingModes || '',
             item.ratingAccuracy || '',
             item.ratingScenarios || '',
+            item.ratingOnline || '',
             `"${(item.message || '').replace(/"/g, '""')}"`,
             `"${(item.userAgent || '').replace(/"/g, '""')}"`
           ];

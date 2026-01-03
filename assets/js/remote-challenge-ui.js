@@ -290,14 +290,18 @@ async function startRemoteQuiz() {
   try {
     const roomState = await window.RemoteChallenge.getRoomState();
     if (roomState && roomState.players) {
-      state.players = [
-        roomState.players.player1 || { name: 'Player 1', score: 0 },
-        roomState.players.player2 || { name: 'Player 2', score: 0 }
-      ];
+      // Convert players object to array
+      state.players = Object.entries(roomState.players)
+        .sort(([a], [b]) => {
+          const numA = parseInt(a.replace('player', ''));
+          const numB = parseInt(b.replace('player', ''));
+          return numA - numB;
+        })
+        .map(([key, player]) => player || { name: key, score: 0 });
     }
   } catch (e) {
     console.warn('Could not fetch room state, using defaults', e);
-    state.players = [ { name: 'Player 1', score: 0 }, { name: 'Player 2', score: 0 } ];
+    state.players = [ { name: 'Player 1', score: 0 } ];
   }
   
   // Use questions from Firebase

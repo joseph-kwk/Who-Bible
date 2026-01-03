@@ -1,6 +1,8 @@
 // Remote Challenge System for Who-Bible
 // Handles real-time multiplayer quiz challenges via Firebase
 
+const MAX_PLAYERS = 8; // Maximum players per room
+
 const RemoteChallenge = {
   currentRoom: null,
   playerNumber: null,
@@ -37,7 +39,8 @@ const RemoteChallenge = {
       settings: {
         difficulty: settings.difficulty || 'medium',
         numQuestions: settings.numQuestions || 10,
-        timeLimit: settings.timeLimit || 60
+        timeLimit: settings.timeLimit || 60,
+        maxPlayers: MAX_PLAYERS
       },
       players: {
         player1: {
@@ -46,14 +49,11 @@ const RemoteChallenge = {
           streak: 0,
           ready: false,
           currentQuestion: 0
-        },
-        player2: null
+        }
       },
-      questions: null, // Will be set when both players ready
-      results: {
-        player1: [],
-        player2: []
-      }
+      playerCount: 1,
+      questions: null, // Will be set when all players ready
+      results: {}
     };
     
     await roomRef.set(roomData);
@@ -91,18 +91,34 @@ const RemoteChallenge = {
     
     const roomData = snapshot.val();
     
-    // Check if room is full
-    if (roomData.players.player2 !== null) {
-      throw new Error('Room is full. Only 2 players allowed.');
-    }
-    
     // Check if room is already completed
     if (roomData.status === 'completed') {
       throw new Error('This room has already finished.');
     }
     
-    // Join as player 2
-    await roomRef.child('players/player2').set({
+    // Find the next available player slot
+    const maxPlayers = roomData.settings?.maxPlayers || MAX_PLAYERS;
+    const playerCount = roomData.playerCount || Object.keys(roomData.players).length;
+    
+    if (playerCount >= maxPlayers) {
+      throw new Error(`Room is full. Maximum ${maxPlayers} players allowed.`);
+    }
+    
+    // Find next available player number
+    let playerNum = null;
+    for (let i = 2; i <= maxPlayers; i++) {
+      if (!roomData.players[`player${i}`]) {
+        playerNum = i;
+        break;
+      }
+    }
+    
+    if (!playerNum) {
+      throw new Error('Could not find available player slot.');
+    }
+    
+    // Join as the next available player
+    await roomRef.child(`players/player${playerNum}`).set({
       name: playerName,
       score: 0,
       streak: 0,
@@ -110,8 +126,11 @@ const RemoteChallenge = {
       currentQuestion: 0
     });
     
+    // Update player count
+    await roomRef.child('playerCount').set(playerCount + 1);
+    
     this.currentRoom = roomCode;
-    this.playerNumber = 2;
+    this.playerNumber = playerNum;
     this.roomRef = roomRef;
     this.isHost = false;
     
@@ -160,13 +179,17 @@ const RemoteChallenge = {
     
     await this.roomRef.child(`players/player${this.playerNumber}/ready`).set(true);
     
-    // If host and both players ready, generate questions
+    // If host, check if all players are ready
     if (this.isHost) {
       const snapshot = await this.roomRef.once('value');
       const room = snapshot.val();
       
-      if (room.players.player1.ready && room.players.player2?.ready) {
-        // Both ready - generate questions
+      // Check if all players are ready
+      const players = room.players || {};
+      const allReady = Object.values(players).every(player => player && player.ready);
+      
+      if (allReady && Object.keys(players).length >= 1) {
+        // All ready - generate questions
         await this.generateQuestions(room.settings);
         await this.roomRef.child('status').set('active');
       }
