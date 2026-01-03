@@ -1859,26 +1859,38 @@ function scheduleTimeWarnings(){
 // Feedback System
 // =========================
 function initFeedback() {
+  console.log('[Feedback] Initializing feedback system...');
   const modal = document.getElementById('feedback-modal');
-  const btnOpen = document.getElementById('btn-feedback');
   const btnClose = document.getElementById('btn-feedback-close');
   const btnCancel = document.getElementById('btn-feedback-cancel');
   const btnSubmit = document.getElementById('btn-feedback-submit');
   const ratingBtns = document.querySelectorAll('.rating-btn');
   
-  if (!modal) return;
+  console.log('[Feedback] Elements found:', {
+    modal: !!modal,
+    btnClose: !!btnClose,
+    btnCancel: !!btnCancel,
+    btnSubmit: !!btnSubmit,
+    ratingBtns: ratingBtns.length
+  });
+  
+  if (!modal) {
+    console.error('[Feedback] Modal not found! Cannot initialize feedback system.');
+    return;
+  }
 
   let selectedRating = 0;
 
   // Open Modal
   const openFeedback = () => {
+    console.log('[Feedback] Opening feedback modal...');
+    modal.style.display = 'flex';
     modal.classList.add('show');
     // Reset form
     selectedRating = 0;
     ratingBtns.forEach(b => b.classList.remove('selected'));
-    document.getElementById('feedback-message').value = '';
-    // document.getElementById('feedback-email').value = ''; // Removed from new HTML
-    // document.getElementById('feedback-type').value = 'general'; // Removed from new HTML
+    const msgEl = document.getElementById('feedback-message');
+    if (msgEl) msgEl.value = '';
     
     // Reset new selects
     const selects = ['rating-modes', 'rating-accuracy', 'rating-scenarios'];
@@ -1888,10 +1900,20 @@ function initFeedback() {
     });
   };
 
-  if(btnOpen) btnOpen.addEventListener('click', openFeedback);
+  // Attach to button if it exists now
+  const btnOpen = document.getElementById('btn-feedback');
+  if(btnOpen) {
+    btnOpen.addEventListener('click', openFeedback);
+    console.log('[Feedback] Click event attached to feedback button directly');
+  }
 
   // Close Modal
-  const close = () => modal.classList.remove('show');
+  const close = () => {
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.style.display = 'none';
+    }, 300); // Wait for animation
+  };
   if(btnClose) btnClose.addEventListener('click', close);
   if(btnCancel) btnCancel.addEventListener('click', close);
   modal.addEventListener('click', (e) => {
@@ -1957,8 +1979,9 @@ function initFeedback() {
     });
   }
   
-  // Expose open function for auto-prompt
+  // Always expose open function, even if button wasn't found initially
   window.openFeedbackModal = openFeedback;
+  console.log('[Feedback] window.openFeedbackModal has been set');
 }
 
 

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Button Test - Simple</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="assets/css/feedback-modal.css" />
+</head>
+<body>
+    <div style="padding: 50px; text-align: center;">
+        <h1>Simple Feedback Test</h1>
+        <p>Click the button below:</p>
+        <button id="btn-feedback" class="footer-feedback-btn" style="font-size: 18px; padding: 10px 20px;">
+            Open Feedback Modal
+        </button>
+
+        <div id="status" style="margin-top: 30px; padding: 20px; background: #f0f0f0; border-radius: 8px;">
+            <strong>Status:</strong> <span id="status-text">Waiting...</span>
+        </div>
+    </div>
+    
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="feedback-modal" style="display:none" role="dialog" aria-labelledby="feedback-title" aria-modal="true">
+        <div class="feedback-content">
+            <header class="feedback-header">
+                <h2 id="feedback-title">We'd love your feedback!</h2>
+                <button id="btn-feedback-close" class="close-feedback" aria-label="Close feedback">✕</button>
+            </header>
+            <main class="feedback-body">
+                <p class="feedback-intro">Help us improve Who-Bible by sharing your thoughts.</p>
+                
+                <div class="feedback-section">
+                    <label>Overall Experience</label>
+                    <div class="feedback-rating" id="rating-overall">
+                        <button class="rating-btn" data-rating="1" aria-label="1 star">😠</button>
+                        <button class="rating-btn" data-rating="2" aria-label="2 stars">😕</button>
+                        <button class="rating-btn" data-rating="3" aria-label="3 stars">😐</button>
+                        <button class="rating-btn" data-rating="4" aria-label="4 stars">🙂</button>
+                        <button class="rating-btn" data-rating="5" aria-label="5 stars">🤩</button>
+                    </div>
+                </div>
+
+                <div class="feedback-grid">
+                    <div class="feedback-form-group">
+                        <label for="rating-modes">Game Modes</label>
+                        <select id="rating-modes">
+                            <option value="" disabled selected>Select rating...</option>
+                            <option value="5">Excellent</option>
+                            <option value="4">Good</option>
+                            <option value="3">Average</option>
+                            <option value="2">Poor</option>
+                            <option value="1">Terrible</option>
+                        </select>
+                    </div>
+                    <div class="feedback-form-group">
+                        <label for="rating-accuracy">Question Accuracy</label>
+                        <select id="rating-accuracy">
+                            <option value="" disabled selected>Select rating...</option>
+                            <option value="5">Accurate</option>
+                            <option value="4">Mostly Accurate</option>
+                            <option value="3">Okay</option>
+                            <option value="2">Inaccurate</option>
+                            <option value="1">Very Inaccurate</option>
+                        </select>
+                    </div>
+                    <div class="feedback-form-group">
+                        <label for="rating-scenarios">Scenarios</label>
+                        <select id="rating-scenarios">
+                            <option value="" disabled selected>Select rating...</option>
+                            <option value="5">Engaging</option>
+                            <option value="4">Good</option>
+                            <option value="3">Okay</option>
+                            <option value="2">Boring</option>
+                            <option value="1">Confusing</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="feedback-form-group">
+                    <label for="feedback-message">Comments / Suggestions</label>
+                    <textarea id="feedback-message" rows="3" placeholder="Any specific feedback?"></textarea>
+                </div>
+            </main>
+            <footer class="feedback-footer">
+                <button id="btn-feedback-cancel" class="btn-cancel">Maybe Later</button>
+                <button id="btn-feedback-submit" class="btn-submit">Send Feedback</button>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const statusText = document.getElementById('status-text');
+        const modal = document.getElementById('feedback-modal');
+        const btnOpen = document.getElementById('btn-feedback');
+        const btnClose = document.getElementById('btn-feedback-close');
+        const btnCancel = document.getElementById('btn-feedback-cancel');
+        const btnSubmit = document.getElementById('btn-feedback-submit');
+
+        statusText.textContent = 'Elements loaded. Ready!';
+        console.log('Elements:', {modal, btnOpen, btnClose, btnCancel, btnSubmit});
+
+        if (btnOpen) {
+            btnOpen.addEventListener('click', () => {
+                console.log('Button clicked!');
+                statusText.textContent = 'Opening modal...';
+                modal.style.display = 'flex';
+                modal.classList.add('show');
+                statusText.textContent = 'Modal opened!';
+            });
+        }
+
+        if (btnClose) {
+            btnClose.addEventListener('click', () => {
+                console.log('Close clicked');
+                statusText.textContent = 'Closing modal...';
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    statusText.textContent = 'Modal closed.';
+                }, 300);
+            });
+        }
+
+        if (btnCancel) {
+            btnCancel.addEventListener('click', () => {
+                console.log('Cancel clicked');
+                statusText.textContent = 'Closing modal...';
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    statusText.textContent = 'Modal cancelled.';
+                }, 300);
+            });
+        }
+
+        if (btnSubmit) {
+            btnSubmit.addEventListener('click', () => {
+                console.log('Submit clicked');
+                alert('Feedback submitted! (This is a test)');
+                statusText.textContent = 'Feedback submitted!';
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            });
+        }
+
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                console.log('Background clicked');
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    statusText.textContent = 'Modal closed (background click).';
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>
