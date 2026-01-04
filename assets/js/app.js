@@ -1903,8 +1903,13 @@ function initFeedback() {
   // Attach to button if it exists now
   const btnOpen = document.getElementById('btn-feedback');
   if(btnOpen) {
+    // Add both click and touchend for better mobile support
     btnOpen.addEventListener('click', openFeedback);
-    console.log('[Feedback] Click event attached to feedback button directly');
+    btnOpen.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      openFeedback();
+    });
+    console.log('[Feedback] Click and touch events attached to feedback button');
   }
 
   // Close Modal
@@ -2015,10 +2020,15 @@ function ensureFeedbackButtonWorks() {
   setTimeout(() => {
     const btn = document.getElementById('btn-feedback');
     if (btn && !btn._feedbackAttached) {
-      btn.addEventListener('click', function handler() {
+      const handler = function() {
         if (typeof window.openFeedbackModal === 'function') {
           window.openFeedbackModal();
         }
+      };
+      btn.addEventListener('click', handler);
+      btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handler();
       });
       btn._feedbackAttached = true;
       console.log('[Who-Bible] Feedback button event attached (fallback)');
@@ -2030,10 +2040,15 @@ function robustFeedbackButtonAttach() {
   setTimeout(() => {
     const btn = document.getElementById('btn-feedback');
     if (btn && !btn._feedbackAttached) {
-      btn.addEventListener('click', function handler() {
+      const handler = function() {
         if (typeof window.openFeedbackModal === 'function') {
           window.openFeedbackModal();
         }
+      };
+      btn.addEventListener('click', handler);
+      btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handler();
       });
       btn._feedbackAttached = true;
       console.log('[Who-Bible] Feedback button event attached (robust fallback)');

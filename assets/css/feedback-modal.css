@@ -7,13 +7,23 @@
   cursor: pointer;
   font-size: 1em;
   font-family: inherit;
-  padding: 0 0.25em;
+  padding: 0.5em;
   transition: color 0.2s;
+  position: relative;
+  z-index: 10;
+  -webkit-tap-highlight-color: rgba(255, 183, 77, 0.3);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .footer-feedback-btn:hover, .footer-feedback-btn:focus {
   color: var(--accent, #ff8a65);
   outline: none;
   text-decoration: underline wavy;
+}
+.footer-feedback-btn:active {
+  background: rgba(255, 183, 77, 0.1);
+  border-radius: 4px;
 }
 /* Beta Badge */
 .beta-badge {
@@ -46,7 +56,7 @@
 .feedback-modal {
   display: none;
   position: fixed;
-  z-index: 2000;
+  z-index: 9999;
   left: 0;
   top: 0;
   width: 100%;
@@ -56,6 +66,7 @@
   backdrop-filter: blur(4px);
   align-items: center;
   justify-content: center;
+  -webkit-overflow-scrolling: touch;
 }
 
 .feedback-modal.show {
@@ -237,6 +248,16 @@
 
 /* Mobile responsiveness */
 @media (max-width: 640px) {
+  /* Larger tap target for mobile */
+  .footer-feedback-btn {
+    padding: 0.75em 1em;
+    font-size: 1.1em;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .feedback-content {
     max-width: 95vw;
     width: 95vw;

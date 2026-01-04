@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Feedback Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: sans-serif;
+            background: #f0f0f0;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .footer-feedback-btn {
+            background: none;
+            border: none;
+            color: #ff8a65;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 1em;
+            padding: 10px;
+            -webkit-tap-highlight-color: rgba(255, 138, 101, 0.3);
+            touch-action: manipulation;
+        }
+        .footer-feedback-btn:active {
+            background: rgba(255, 138, 101, 0.1);
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e8f4f8;
+            border-radius: 8px;
+        }
+        .event-log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .event-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 90%;
+        }
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Mobile Feedback Button Test</h1>
+        <p>This test checks if the feedback button works on mobile devices.</p>
+        
+        <div class="status">
+            <strong>Status:</strong> <span id="status">Ready</span>
+        </div>
+        
+        <h2>Test Button:</h2>
+        <p>
+            © 2025 Who-Bible | 
+            <button id="btn-feedback" class="footer-feedback-btn">Feedback</button>
+        </p>
+        
+        <div class="event-log">
+            <h3>Event Log:</h3>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="feedback-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h2>Feedback Modal</h2>
+            <p>The modal opened successfully!</p>
+        </div>
+    </div>
+
+    <script>
+        const log = document.getElementById('log');
+        const status = document.getElementById('status');
+        const btn = document.getElementById('btn-feedback');
+        const modal = document.getElementById('feedback-modal');
+        const closeBtn = document.getElementById('close-modal');
+
+        function addLog(message) {
+            const item = document.createElement('div');
+            item.className = 'event-item';
+            item.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            log.insertBefore(item, log.firstChild);
+        }
+
+        addLog('Page loaded');
+        addLog('Button element: ' + (btn ? 'Found' : 'Not found'));
+        addLog('Modal element: ' + (modal ? 'Found' : 'Not found'));
+        
+        // Test computed styles
+        if (btn) {
+            const styles = window.getComputedStyle(btn);
+            addLog('Button display: ' + styles.display);
+            addLog('Button pointer-events: ' + styles.pointerEvents);
+            addLog('Button position: ' + styles.position);
+            addLog('Button z-index: ' + styles.zIndex);
+        }
+
+        // Add multiple event listeners to catch everything
+        if (btn) {
+            btn.addEventListener('touchstart', (e) => {
+                addLog('touchstart event fired');
+                status.textContent = 'Touch started';
+            });
+
+            btn.addEventListener('touchend', (e) => {
+                addLog('touchend event fired');
+                status.textContent = 'Touch ended';
+            });
+
+            btn.addEventListener('click', (e) => {
+                addLog('click event fired');
+                status.textContent = 'Click detected!';
+                modal.classList.add('show');
+                addLog('Modal opened');
+            });
+
+            btn.addEventListener('mousedown', (e) => {
+                addLog('mousedown event fired');
+            });
+
+            btn.addEventListener('mouseup', (e) => {
+                addLog('mouseup event fired');
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('show');
+                addLog('Modal closed');
+                status.textContent = 'Modal closed';
+            });
+        }
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                addLog('Modal closed (backdrop click)');
+            }
+        });
+
+        // Check for overlays
+        setTimeout(() => {
+            const rect = btn.getBoundingClientRect();
+            addLog(`Button position: top=${rect.top}, left=${rect.left}, width=${rect.width}, height=${rect.height}`);
+            
+            const elementAtPoint = document.elementFromPoint(
+                rect.left + rect.width / 2,
+                rect.top + rect.height / 2
+            );
+            addLog('Element at button center: ' + (elementAtPoint === btn ? 'Button itself (GOOD)' : elementAtPoint?.tagName + ' (PROBLEM!)'));
+        }, 1000);
+    </script>
+</body>
+</html>
