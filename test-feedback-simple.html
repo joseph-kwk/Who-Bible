@@ -99,15 +99,41 @@
 
         statusText.textContent = 'Elements loaded. Ready!';
         console.log('Elements:', {modal, btnOpen, btnClose, btnCancel, btnSubmit});
+        console.log('User agent:', navigator.userAgent);
 
         if (btnOpen) {
-            btnOpen.addEventListener('click', () => {
-                console.log('Button clicked!');
-                statusText.textContent = 'Opening modal...';
-                modal.style.display = 'flex';
-                modal.classList.add('show');
-                statusText.textContent = 'Modal opened!';
+            let touchHandled = false;
+            
+            btnOpen.addEventListener('touchstart', (e) => {
+                touchHandled = true;
+                console.log('Touch start detected!');
+                statusText.textContent = 'Touch detected...';
+            }, {passive: true});
+            
+            btnOpen.addEventListener('touchend', (e) => {
+                if (touchHandled) {
+                    e.preventDefault();
+                    console.log('Touch end - opening modal!');
+                    statusText.textContent = 'Touch end - opening...';
+                    modal.style.display = 'flex';
+                    modal.classList.add('show');
+                    statusText.textContent = 'Modal opened via touch!';
+                    touchHandled = false;
+                }
             });
+            
+            btnOpen.addEventListener('click', (e) => {
+                if (!touchHandled) {
+                    console.log('Click detected - opening modal!');
+                    statusText.textContent = 'Click - opening...';
+                    modal.style.display = 'flex';
+                    modal.classList.add('show');
+                    statusText.textContent = 'Modal opened via click!';
+                }
+                touchHandled = false;
+            });
+            
+            console.log('Touch and click events attached');
         }
 
         if (btnClose) {

@@ -8,6 +8,8 @@
   font-size: 1em;
   font-family: inherit;
   padding: 0.5em;
+  min-height: 44px; /* iOS minimum touch target */
+  min-width: 44px;
   transition: color 0.2s;
   position: relative;
   z-index: 10;
@@ -15,6 +17,8 @@
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
+  /* Ensure button is clickable */
+  pointer-events: auto;
 }
 .footer-feedback-btn:hover, .footer-feedback-btn:focus {
   color: var(--accent, #ff8a65);

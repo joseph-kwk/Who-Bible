@@ -1903,13 +1903,33 @@ function initFeedback() {
   // Attach to button if it exists now
   const btnOpen = document.getElementById('btn-feedback');
   if(btnOpen) {
-    // Add both click and touchend for better mobile support
-    btnOpen.addEventListener('click', openFeedback);
+    // Use pointer events for better mobile/touch support
+    let touchHandled = false;
+    
+    btnOpen.addEventListener('touchstart', (e) => {
+      touchHandled = true;
+      console.log('[Feedback] Touch start detected');
+    }, {passive: true});
+    
     btnOpen.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      openFeedback();
+      if (touchHandled) {
+        e.preventDefault();
+        console.log('[Feedback] Touch end - opening modal');
+        openFeedback();
+        touchHandled = false;
+      }
     });
-    console.log('[Feedback] Click and touch events attached to feedback button');
+    
+    // Also add click for desktop and as fallback
+    btnOpen.addEventListener('click', (e) => {
+      if (!touchHandled) {
+        console.log('[Feedback] Click - opening modal');
+        openFeedback();
+      }
+      touchHandled = false;
+    });
+    
+    console.log('[Feedback] Touch and click events attached to feedback button');
   }
 
   // Close Modal
@@ -2020,16 +2040,35 @@ function ensureFeedbackButtonWorks() {
   setTimeout(() => {
     const btn = document.getElementById('btn-feedback');
     if (btn && !btn._feedbackAttached) {
+      let touchHandled = false;
+      
       const handler = function() {
         if (typeof window.openFeedbackModal === 'function') {
+          console.log('[Who-Bible] Fallback handler - opening modal');
           window.openFeedbackModal();
         }
       };
-      btn.addEventListener('click', handler);
+      
+      btn.addEventListener('touchstart', (e) => {
+        touchHandled = true;
+        console.log('[Who-Bible] Fallback touchstart');
+      }, {passive: true});
+      
       btn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        handler();
+        if (touchHandled) {
+          e.preventDefault();
+          handler();
+          touchHandled = false;
+        }
       });
+      
+      btn.addEventListener('click', (e) => {
+        if (!touchHandled) {
+          handler();
+        }
+        touchHandled = false;
+      });
+      
       btn._feedbackAttached = true;
       console.log('[Who-Bible] Feedback button event attached (fallback)');
     }
@@ -2040,16 +2079,35 @@ function robustFeedbackButtonAttach() {
   setTimeout(() => {
     const btn = document.getElementById('btn-feedback');
     if (btn && !btn._feedbackAttached) {
+      let touchHandled = false;
+      
       const handler = function() {
         if (typeof window.openFeedbackModal === 'function') {
+          console.log('[Who-Bible] Robust handler - opening modal');
           window.openFeedbackModal();
         }
       };
-      btn.addEventListener('click', handler);
+      
+      btn.addEventListener('touchstart', (e) => {
+        touchHandled = true;
+        console.log('[Who-Bible] Robust touchstart');
+      }, {passive: true});
+      
       btn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        handler();
+        if (touchHandled) {
+          e.preventDefault();
+          handler();
+          touchHandled = false;
+        }
       });
+      
+      btn.addEventListener('click', (e) => {
+        if (!touchHandled) {
+          handler();
+        }
+        touchHandled = false;
+      });
+      
       btn._feedbackAttached = true;
       console.log('[Who-Bible] Feedback button event attached (robust fallback)');
     }
