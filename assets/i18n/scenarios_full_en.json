@@ -1,0 +1,24 @@
+{
+  "scenarioTranslations": {
+    "Gideon_Army_Selection": {
+      "theme": "Trust and Obedience",
+      "challenge": "Gideon's army of 32,000 is too large; God commands a reduction to prove victory comes from Him. After the first cut (fearful soldiers), 10,000 remain. How does God instruct Gideon to select the final 300 men?",
+      "options": [
+        "A. Select only the oldest and most seasoned warriors.",
+        "B. Choose those who kneel down to drink water directly from the stream.",
+        "C. Choose those who scoop water with their hands to drink while remaining vigilant."
+      ],
+      "explanation": "God selected the 300 men who scooped the water with their hands to drink, remaining watchful of the enemy. This demonstrated their vigilance and preparedness, though their small number emphasized God's role in the victory."
+    },
+    "David_Nabal_Abigail": {
+      "theme": "Wisdom vs. Revenge",
+      "challenge": "David and his men protected Nabal's shepherds, but Nabal rudely refused to share provisions. David is ready to slaughter Nabal's entire household. What key action saves the family and prevents David from shedding innocent blood?",
+      "options": [
+        "A. David receives a vision from the Prophet Samuel to stop.",
+        "B. Nabal's wife, Abigail, intercepts David with a large gift and a plea for wisdom.",
+        "C. Jonathan arrives and reminds David of his covenant with Saul's family."
+      ],
+      "explanation": "Abigail intercepted David with gifts and a humble, insightful plea, reminding David that vengeance belonged to the Lord. David praised God for sending her to restrain him from taking revenge."
+    }
+  }
+}

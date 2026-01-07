@@ -360,7 +360,7 @@
     // Validate username
     const validation = validateUsername(name);
     if (!validation.valid) {
-      showToast({ title: '❌ Invalid Username', msg: validation.error, type: 'error', timeout: 3000 });
+      showToast({ title: `❌ ${getText('invalidUsername')}`, msg: validation.error, type: 'error', timeout: 3000 });
       return false;
     }
     
@@ -595,7 +595,7 @@
     } catch (error) {
       console.error('Firebase error:', error);
       if (liveRoomsList) {
-        liveRoomsList.innerHTML = '<div class="card"><div class="card-desc">Error loading live rooms. Please refresh.</div></div>';
+        liveRoomsList.innerHTML = `<div class="card"><div class="card-desc">${getText('errorLoadingRooms')}</div></div>`;
       }
     }
   }
@@ -610,9 +610,9 @@
       liveRoomsList.innerHTML = `
         <div class="card" style="text-align: center; padding: 40px;">
           <div style="font-size: 48px; margin-bottom: 16px;">🎮</div>
-          <div class="card-title">No Active Rooms</div>
-          <div class="card-desc" style="margin-bottom: 16px;">Be the first to create a room and invite friends!</div>
-          <button onclick="document.getElementById('btn-create-room').click()" class="primary" style="padding: 10px 24px; border-radius: 8px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600;">Create Room</button>
+          <div class="card-title">${getText('noActiveRooms')}</div>
+          <div class="card-desc" style="margin-bottom: 16px;">${getText('beFirstToCreate')}</div>
+          <button onclick="document.getElementById('btn-create-room').click()" class="primary" style="padding: 10px 24px; border-radius: 8px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600;">${getText('createRoom')}</button>
         </div>
       `;
       return;
@@ -627,9 +627,9 @@
       liveRoomsList.innerHTML = `
         <div class="card" style="text-align: center; padding: 40px;">
           <div style="font-size: 48px; margin-bottom: 16px;">🎯</div>
-          <div class="card-title">All Rooms Finished</div>
-          <div class="card-desc" style="margin-bottom: 16px;">Create a new room to start playing!</div>
-          <button onclick="document.getElementById('btn-create-room').click()" class="primary" style="padding: 10px 24px; border-radius: 8px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600;">Create Room</button>
+          <div class="card-title">${getText('allRoomsFinished')}</div>
+          <div class="card-desc" style="margin-bottom: 16px;">${getText('createNewRoom')}</div>
+          <button onclick="document.getElementById('btn-create-room').click()" class="primary" style="padding: 10px 24px; border-radius: 8px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600;">${getText('createRoom')}</button>
         </div>
       `;
       return;
@@ -780,7 +780,7 @@
       const details = document.getElementById('report-details')?.value;
       
       if (!reason) {
-        showToast({ title: 'Error', msg: 'Please select a reason', type: 'error' });
+        showToast({ title: getText('error'), msg: getText('pleaseSelectReason'), type: 'error' });
         return;
       }
       
@@ -994,7 +994,7 @@
       }
     } catch(err) {
       console.error('Error initializing locations:', err);
-      showToast({ title: 'Error', msg: 'Failed to load locations', type: 'error' });
+      showToast({ title: getText('error'), msg: getText('failedToLoadLocations'), type: 'error' });
     }
   }
   
@@ -1177,7 +1177,7 @@
   function startLocationQuiz() {
     const locations = window.LocationModule?.locations || [];
     if (locations.length === 0) {
-      showToast({ title: 'Error', msg: 'No locations loaded', type: 'error' });
+      showToast({ title: getText('error'), msg: getText('noLocationsLoaded'), type: 'error' });
       return;
     }
     
@@ -1361,7 +1361,7 @@
         btnFlashcard.style.background = 'var(--accent)';
         btnFlashcard.style.color = 'white';
         btnFlashcard.style.borderColor = 'var(--accent)';
-        btnFlashcard.textContent = '📋 Show List';
+        btnFlashcard.textContent = `📋 ${getText('showList')}`;
       }
       
       // Load concepts for flashcards
@@ -1377,7 +1377,7 @@
         btnFlashcard.style.background = 'var(--bg-2)';
         btnFlashcard.style.color = 'var(--text)';
         btnFlashcard.style.borderColor = 'var(--border)';
-        btnFlashcard.textContent = '🎴 Flashcards';
+        btnFlashcard.textContent = `🎴 ${getText('flashcards')}`;
       }
     }
   }
@@ -1459,7 +1459,7 @@
   function startConceptQuiz() {
     const concepts = window.ConceptModule?.concepts || [];
     if (concepts.length === 0) {
-      showToast({ title: 'Error', msg: 'No concepts loaded', type: 'error' });
+      showToast({ title: getText('error'), msg: getText('noConceptsLoaded'), type: 'error' });
       return;
     }
     
@@ -1510,7 +1510,7 @@
     });
     
     if (concepts.length === 0) {
-      container.innerHTML = '<p style="text-align: center; color: var(--muted);">No concepts found.</p>';
+      container.innerHTML = `<p style="text-align: center; color: var(--muted);">${getText('noConceptsFound')}</p>`;
     }
   }
   
@@ -1617,7 +1617,7 @@
         }
 
         btnSubmit.disabled = true;
-        btnSubmit.textContent = 'Sending...';
+        btnSubmit.textContent = getText('sendingFeedback');
 
         const feedbackData = {
           rating: selectedRating,
@@ -1633,19 +1633,19 @@
           // Check for global database object from firebase-config.js
           if (typeof database !== 'undefined' && database) {
             await database.ref('feedback').push(feedbackData);
-            showToast({ title: 'Thank You!', msg: 'Your feedback has been received.', type: 'success' });
+            showToast({ title: getText('thankYou'), msg: getText('feedbackReceived'), type: 'success' });
           } else {
             // Fallback if Firebase not loaded
             console.log('Feedback (simulated):', feedbackData);
-            showToast({ title: 'Thank You!', msg: 'Feedback received (simulated).', type: 'success' });
+            showToast({ title: getText('thankYou'), msg: getText('feedbackSimulated'), type: 'success' });
           }
           close();
         } catch (error) {
           console.error('Feedback error:', error);
-          showToast({ title: 'Error', msg: 'Could not send feedback. Please try again.', type: 'error' });
+          showToast({ title: getText('feedbackError'), msg: getText('feedbackErrorMsg'), type: 'error' });
         } finally {
           btnSubmit.disabled = false;
-          btnSubmit.textContent = 'Send Feedback';
+          btnSubmit.textContent = getText('sendFeedback');
         }
       });
     }
@@ -1737,14 +1737,14 @@
     btnJoinConfirm.addEventListener('click', async () => {
       const playerName = joinPlayerNameInput?.value.trim();
       if (!playerName) {
-        showToast({ title: 'Error', msg: 'Please enter your name', type: 'warn' });
+        showToast({ title: getText('error'), msg: getText('pleaseEnterName'), type: 'warn' });
         return;
       }
       
       if (!currentRoomData) return;
       
       btnJoinConfirm.disabled = true;
-      btnJoinConfirm.textContent = 'Joining...';
+      btnJoinConfirm.textContent = getText('joining');
       
       try {
         // Redirect to main app with room code and player name
@@ -1752,9 +1752,9 @@
         window.location.href = url;
       } catch (error) {
         console.error('Error joining room:', error);
-        showToast({ title: 'Error', msg: 'Failed to join room: ' + error.message, type: 'error' });
+        showToast({ title: getText('error'), msg: `${getText('failedToJoinRoom')}: ${error.message}`, type: 'error' });
         btnJoinConfirm.disabled = false;
-        btnJoinConfirm.textContent = 'Join Game';
+        btnJoinConfirm.textContent = getText('joinGame');
       }
     });
   }
@@ -1799,18 +1799,18 @@
       const difficulty = createDifficultySelect?.value || 'medium';
       
       if (!hostName) {
-        showToast({ title: 'Error', msg: 'Please enter your name', type: 'warn' });
+        showToast({ title: getText('error'), msg: getText('pleaseEnterName'), type: 'warn' });
         return;
       }
       
       // Check if RemoteChallenge module is available
       if (typeof RemoteChallenge === 'undefined') {
-        showToast({ title: 'Error', msg: 'Remote challenge module not loaded', type: 'error' });
+        showToast({ title: getText('error'), msg: getText('remoteModuleNotLoaded'), type: 'error' });
         return;
       }
       
       btnCreateConfirm.disabled = true;
-      btnCreateConfirm.textContent = 'Creating...';
+      btnCreateConfirm.textContent = getText('creating');
       
       try {
         // Create room using RemoteChallenge module
@@ -1821,7 +1821,7 @@
         });
         
         hideCreateRoomModal();
-        showToast({ title: 'Room Created!', msg: `Room ${result.roomCode} created successfully`, type: 'success', timeout: 2000 });
+        showToast({ title: getText('roomCreated'), msg: getText('roomCreatedSuccess', { roomCode: result.roomCode }), type: 'success', timeout: 2000 });
         
         // Redirect to main app with room code
         setTimeout(() => {
@@ -1830,9 +1830,9 @@
         
       } catch (error) {
         console.error('Error creating room:', error);
-        showToast({ title: 'Error', msg: 'Failed to create room: ' + error.message, type: 'error' });
+        showToast({ title: getText('error'), msg: `${getText('failedToCreateRoom')}: ${error.message}`, type: 'error' });
         btnCreateConfirm.disabled = false;
-        btnCreateConfirm.textContent = 'Create Room';
+        btnCreateConfirm.textContent = getText('createRoom');
       }
     });
   }

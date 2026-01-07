@@ -140,7 +140,82 @@ const DEFAULT_EN = {
   myRoomsTitle: "My Rooms",
   noRoomsYet: "No rooms yet",
   hostLabel: "Host",
-  roomCreatedBy: "Room created by {host}."
+  roomCreatedBy: "Room created by {host}.",
+  sendingFeedback: "Sending...",
+  sendFeedback: "Send Feedback",
+  errorScenarioMissing: "Error: Scenario data is missing.",
+  unknownTheme: "Unknown Theme",
+  levelNA: "Level N/A",
+  errorChallengeMissing: "Error: Challenge text is missing.",
+  scenarioQuestion: "What is the biblical outcome?",
+  clipboardUnavailable: "Clipboard unavailable",
+  feedbackError: "Error",
+  feedbackErrorMsg: "Could not send feedback. Please try again.",
+  scenarioCorrect: "✓ Correct!",
+  scenarioIncorrect: "✗ Incorrect",
+  item: "Item",
+  more: "more",
+  correct: "Correct",
+  wrong: "Wrong",
+  feedback: "Feedback",
+  feedbackPrompt: "Please provide some feedback.",
+  thankYou: "Thank You!",
+  feedbackReceived: "Your feedback has been received.",
+  feedbackSimulated: "Feedback received (simulated).",
+  errorLoadingRooms: "Error loading live rooms. Please refresh.",
+  noConceptsFound: "No concepts found.",
+  showList: "Show List",
+  flashcards: "Flashcards",
+  joining: "Joining...",
+  joinGame: "Join Game",
+  creating: "Creating...",
+  noActiveRooms: "No Active Rooms",
+  beFirstToCreate: "Be the first to create a room and invite friends!",
+  allRoomsFinished: "All Rooms Finished",
+  createNewRoom: "Create a new room to start playing!",
+  invalidUsername: "Invalid Username",
+  pleaseSelectReason: "Please select a reason",
+  failedToLoadLocations: "Failed to load locations",
+  noLocationsLoaded: "No locations loaded",
+  noConceptsLoaded: "No concepts loaded",
+  pleaseEnterName: "Please enter your name",
+  failedToJoinRoom: "Failed to join room",
+  remoteModuleNotLoaded: "Remote challenge module not loaded",
+  failedToCreateRoom: "Failed to create room",
+  roomCreated: "Room Created!",
+  roomCreatedSuccess: "Room {roomCode} created successfully",
+  nameRequired: "Name Required",
+  roomCodeRequired: "Room Code Required",
+  pleaseEnterRoomCode: "Please enter a room code",
+  couldNotSetReady: "Could not set ready status",
+  exploreBibleIntro: "Explore the Bible through interactive quizzes, character studies, and moral scenarios.",
+  welcomePlayer: "Welcome, {name}!",
+  gamesPlayed: "Games",
+  highScore: "High Score",
+  bestStreak: "Best Streak",
+  winRate: "Win Rate",
+  clickToChangePlayer: "Click to change player",
+  playOnlineWithFriends: "Play Online with Friends",
+  challengeAnyoneDesc: "Challenge anyone, anywhere! Create a room, share the link, and compete in real-time.",
+  startRemoteChallenge: "Start Remote Challenge",
+  noSignupRequired: "No sign-up required",
+  instantMatchmaking: "Instant matchmaking",
+  liveScoring: "Live scoring",
+  welcomeFriend: "Welcome, Friend!",
+  welcomeGlad: "We're so glad you're here to explore the Bible with us!",
+  betaNotice: "BETA: This app is still in development. Your feedback is always appreciated!",
+  exploreToLearn: "Explore the game to learn more about the Bible.",
+  quickTip: "Quick Tip",
+  settingsTip: "The settings at the top (like Difficulty) control the whole game. Feel free to adjust them anytime to match your pace.",
+  haveFunLearning: "Have fun learning & growing!",
+  letsPlay: "Let's Play!",
+  feedbackLove: "We'd love your feedback!",
+  genderFilter: "Gender",
+  allGenders: "All",
+  male: "Male",
+  female: "Female",
+  testamentFilter: "Testament",
+  challengeModeDesc: "Two players, same device"
 };
 
 // Externalized translations loaded at runtime (seed English with fallback)
@@ -425,6 +500,181 @@ function updateAllText() {
   }
   const shuffleBtn = document.getElementById('btn-shuffle-list');
   if (shuffleBtn) shuffleBtn.title = getText('shuffleList');
+
+  // Update brand description in setup panel
+  const setupBrandDesc = document.querySelector('.setup-panel .brand .brand-desc');
+  if (setupBrandDesc) setupBrandDesc.textContent = getText('exploreBibleIntro');
+
+  // Update player section heading
+  const playerHeading = document.getElementById('player-heading');
+  if (playerHeading) playerHeading.textContent = getText('player');
+  
+  // Update "Click to change player" text
+  const changePlayerDesc = document.querySelector('#btn-change-player .mode-desc');
+  if (changePlayerDesc) changePlayerDesc.textContent = getText('clickToChangePlayer');
+
+  // Update Remote Challenge section
+  const remoteHeading = document.getElementById('remote-heading');
+  if (remoteHeading) remoteHeading.textContent = getText('playOnlineWithFriends');
+  
+  const remoteChallengeDesc = document.querySelector('.remote-challenge-desc');
+  if (remoteChallengeDesc) remoteChallengeDesc.textContent = getText('challengeAnyoneDesc');
+  
+  const remoteChallengeBtn = document.querySelector('#btn-remote-challenge span:not(.remote-btn-icon)');
+  if (remoteChallengeBtn) remoteChallengeBtn.textContent = getText('startRemoteChallenge');
+  
+  const remoteChallengeNote = document.querySelector('.remote-challenge-note');
+  if (remoteChallengeNote) {
+    const iconSpan = remoteChallengeNote.querySelector('.remote-status-icon');
+    const iconText = iconSpan ? iconSpan.textContent : '✓';
+    remoteChallengeNote.innerHTML = `<span class="remote-status-icon">${iconText}</span> ${getText('noSignupRequired')} • ${getText('instantMatchmaking')} • ${getText('liveScoring')}`;
+  }
+
+  // Update Welcome Modal
+  const welcomeModalTitle = document.querySelector('#welcome-modal-title');
+  if (welcomeModalTitle) {
+    const icon = welcomeModalTitle.querySelector('.welcome-icon');
+    const iconText = icon ? icon.textContent : '✨';
+    welcomeModalTitle.innerHTML = `<span class="welcome-icon">${iconText}</span> ${getText('welcomeFriend')}`;
+  }
+  
+  const welcomeIntro = document.querySelector('.welcome-intro');
+  if (welcomeIntro) welcomeIntro.textContent = getText('welcomeGlad');
+  
+  const welcomeBetaBox = document.querySelector('.welcome-beta-box');
+  if (welcomeBetaBox) {
+    welcomeBetaBox.innerHTML = `<span style="font-weight:bold;">${getText('betaNotice').split(':')[0]}:</span> ${getText('betaNotice').split(':')[1]}<br><span style="font-size:0.97em; color:#444;">${getText('exploreToLearn')}</span>`;
+  }
+  
+  const tipTitle = document.querySelector('.tip-title');
+  if (tipTitle) tipTitle.textContent = getText('quickTip');
+  
+  const tipContent = document.querySelector('.tip-content p:last-child');
+  if (tipContent) tipContent.innerHTML = getText('settingsTip').replace('Difficulty', `<strong>${getText('difficulty')}</strong>`);
+  
+  const welcomeOutro = document.querySelector('.welcome-outro');
+  if (welcomeOutro) welcomeOutro.textContent = getText('haveFunLearning');
+  
+  const btnWelcomeOk = document.getElementById('btn-welcome-ok');
+  if (btnWelcomeOk) btnWelcomeOk.innerHTML = `${getText('letsPlay')} 🚀`;
+
+  // Update Feedback Modal title
+  const feedbackTitle = document.getElementById('feedback-title');
+  if (feedbackTitle) feedbackTitle.textContent = getText('feedbackLove');
+  
+  // Update Feedback Modal content
+  const feedbackIntro = document.querySelector('.feedback-intro');
+  if (feedbackIntro) feedbackIntro.textContent = getText('feedbackIntro');
+  
+  // Update feedback section labels
+  const feedbackSections = document.querySelectorAll('.feedback-section label');
+  if (feedbackSections[0]) feedbackSections[0].textContent = getText('feedbackOverallExp');
+  
+  const feedbackFormGroups = document.querySelectorAll('.feedback-form-group label');
+  if (feedbackFormGroups[0]) feedbackFormGroups[0].textContent = getText('feedbackOverallQuestion');
+  if (feedbackFormGroups[1]) feedbackFormGroups[1].textContent = getText('feedbackGameModes');
+  if (feedbackFormGroups[2]) feedbackFormGroups[2].textContent = getText('feedbackQuestionAccuracy');
+  if (feedbackFormGroups[3]) feedbackFormGroups[3].textContent = getText('feedbackScenarios');
+  if (feedbackFormGroups[4]) feedbackFormGroups[4].textContent = getText('feedbackPlayingOnline');
+  if (feedbackFormGroups[5]) feedbackFormGroups[5].textContent = getText('feedbackCommentsSuggestions');
+  
+  // Update feedback textarea placeholders
+  const feedbackExperience = document.getElementById('feedback-experience');
+  if (feedbackExperience) feedbackExperience.placeholder = getText('feedbackOverallPlaceholder');
+  
+  const feedbackMessage = document.getElementById('feedback-message');
+  if (feedbackMessage) feedbackMessage.placeholder = getText('feedbackPlaceholder');
+  
+  // Update feedback select options - Game Modes
+  const ratingModes = document.getElementById('rating-modes');
+  if (ratingModes) {
+    const options = ratingModes.querySelectorAll('option');
+    if (options[0]) options[0].textContent = getText('feedbackSelectRating');
+    if (options[1]) options[1].textContent = getText('feedbackExcellent');
+    if (options[2]) options[2].textContent = getText('feedbackGood');
+    if (options[3]) options[3].textContent = getText('feedbackAverage');
+    if (options[4]) options[4].textContent = getText('feedbackPoor');
+    if (options[5]) options[5].textContent = getText('feedbackTerrible');
+  }
+  
+  // Update feedback select options - Question Accuracy
+  const ratingAccuracy = document.getElementById('rating-accuracy');
+  if (ratingAccuracy) {
+    const options = ratingAccuracy.querySelectorAll('option');
+    if (options[0]) options[0].textContent = getText('feedbackSelectRating');
+    if (options[1]) options[1].textContent = getText('feedbackAccurate');
+    if (options[2]) options[2].textContent = getText('feedbackMostlyAccurate');
+    if (options[3]) options[3].textContent = getText('feedbackOkay');
+    if (options[4]) options[4].textContent = getText('feedbackInaccurate');
+    if (options[5]) options[5].textContent = getText('feedbackVeryInaccurate');
+  }
+  
+  // Update feedback select options - Scenarios
+  const ratingScenarios = document.getElementById('rating-scenarios');
+  if (ratingScenarios) {
+    const options = ratingScenarios.querySelectorAll('option');
+    if (options[0]) options[0].textContent = getText('feedbackSelectRating');
+    if (options[1]) options[1].textContent = getText('feedbackEngaging');
+    if (options[2]) options[2].textContent = getText('feedbackGood');
+    if (options[3]) options[3].textContent = getText('feedbackOkay');
+    if (options[4]) options[4].textContent = getText('feedbackBoring');
+    if (options[5]) options[5].textContent = getText('feedbackConfusing');
+  }
+  
+  // Update feedback select options - Online Play
+  const ratingOnline = document.getElementById('rating-online');
+  if (ratingOnline) {
+    const options = ratingOnline.querySelectorAll('option');
+    if (options[0]) options[0].textContent = getText('feedbackSelectRating');
+    if (options[1]) options[1].textContent = getText('feedbackAmazing');
+    if (options[2]) options[2].textContent = getText('feedbackWorksGreat');
+    if (options[3]) options[3].textContent = getText('feedbackWorksOK');
+    if (options[4]) options[4].textContent = getText('feedbackHadIssues');
+    if (options[5]) options[5].textContent = getText('feedbackDidntWork');
+    if (options[6]) options[6].textContent = getText('feedbackHaventTried');
+  }
+  
+  // Update feedback buttons
+  const btnFeedbackCancel = document.getElementById('btn-feedback-cancel');
+  if (btnFeedbackCancel) btnFeedbackCancel.textContent = getText('feedbackMaybeLater');
+  
+  const btnFeedbackSubmit = document.getElementById('btn-feedback-submit');
+  if (btnFeedbackSubmit) btnFeedbackSubmit.textContent = getText('sendFeedback');
+
+  // Update gender filter
+  const genderFilterLabel = document.querySelector('label[for="gender-filter"]');
+  if (genderFilterLabel) genderFilterLabel.textContent = getText('genderFilter');
+  
+  const genderFilter = document.getElementById('gender-filter');
+  if (genderFilter) {
+    const options = genderFilter.querySelectorAll('option');
+    if (options[0]) options[0].textContent = getText('allGenders');
+    if (options[1]) options[1].textContent = getText('male');
+    if (options[2]) options[2].textContent = getText('female');
+  }
+
+  // Update testament filter
+  const testamentFilterLabel = document.querySelector('label[for="testament-filter"]');
+  if (testamentFilterLabel) testamentFilterLabel.textContent = getText('testamentFilter');
+  
+  const testamentFilter = document.getElementById('testament-filter');
+  if (testamentFilter) {
+    const options = testamentFilter.querySelectorAll('option');
+    if (options[0]) options[0].textContent = getText('allTestaments');
+    if (options[1]) options[1].textContent = getText('oldTestament');
+    if (options[2]) options[2].textContent = getText('newTestament');
+  }
+
+  // Update Challenge Mode description
+  const challengeModeDesc = document.querySelector('#btn-challenge .mode-desc');
+  if (challengeModeDesc && challengeModeDesc.textContent.includes('Two players')) {
+    challengeModeDesc.textContent = getText('challengeModeDesc');
+  }
+
+  // Trigger player info update if displayPlayerInfo exists
+  if (typeof window.displayPlayerInfo === 'function') {
+    window.displayPlayerInfo();
+  }
 
   // Nav items (use English fallback keys if missing)
   const navCommunity = document.getElementById('nav-community');

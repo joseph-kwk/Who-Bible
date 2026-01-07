@@ -198,17 +198,32 @@ function displayPlayerInfo() {
   const welcomeEl = document.getElementById('welcome-message');
   if (welcomeEl) {
     const stats = state.currentPlayer.stats;
-    welcomeEl.innerHTML = `
-      <div style="text-align: center; padding: 20px;">
-        <h3>Welcome, ${state.currentPlayer.name}!</h3>
-        <div style="display: flex; gap: 20px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
-          <div><strong>Games:</strong> ${stats.gamesPlayed}</div>
-          <div><strong>High Score:</strong> ${stats.highestScore}</div>
-          <div><strong>Best Streak:</strong> ${stats.bestStreak}</div>
-          <div><strong>Win Rate:</strong> ${stats.winRate}%</div>
+    if (typeof getText === 'function') {
+      welcomeEl.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+          <h3>${getText('welcomePlayer', { name: state.currentPlayer.name })}</h3>
+          <div style="display: flex; gap: 20px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
+            <div><strong>${getText('gamesPlayed')}:</strong> ${stats.gamesPlayed}</div>
+            <div><strong>${getText('highScore')}:</strong> ${stats.highestScore}</div>
+            <div><strong>${getText('bestStreak')}:</strong> ${stats.bestStreak}</div>
+            <div><strong>${getText('winRate')}:</strong> ${stats.winRate}%</div>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    } else {
+      // Fallback if getText not available yet
+      welcomeEl.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+          <h3>Welcome, ${state.currentPlayer.name}!</h3>
+          <div style="display: flex; gap: 20px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
+            <div><strong>Games:</strong> ${stats.gamesPlayed}</div>
+            <div><strong>High Score:</strong> ${stats.highestScore}</div>
+            <div><strong>Best Streak:</strong> ${stats.bestStreak}</div>
+            <div><strong>Win Rate:</strong> ${stats.winRate}%</div>
+          </div>
+        </div>
+      `;
+    }
   }
   updatePlayerDisplayName();
 }
@@ -347,10 +362,42 @@ function translateOccupation(text){
   return text; // fallback to original text
 }
 
+function translateName(name){
+  if(!name) return name;
+  const lang = (typeof currentLanguage !== 'undefined' ? currentLanguage : (window.currentLanguage || 'en'));
+  if (lang === 'en') return name;
+  try{
+    const mapping = (window.TRANSLATIONS && window.TRANSLATIONS[lang] && window.TRANSLATIONS[lang].nameTranslations) || null;
+    if(mapping && mapping[name]) return mapping[name];
+  }catch(_){ }
+  return name; // fallback to original name
+}
+
+function translateScenario(scenario){
+  if(!scenario || !scenario.scenario_id) return scenario;
+  const lang = (typeof currentLanguage !== 'undefined' ? currentLanguage : (window.currentLanguage || 'en'));
+  if (lang === 'en') return scenario;
+  try{
+    const mapping = (window.TRANSLATIONS && window.TRANSLATIONS[lang] && window.TRANSLATIONS[lang].scenarioTranslations) || null;
+    if(mapping && mapping[scenario.scenario_id]){
+      const translated = mapping[scenario.scenario_id];
+      return {
+        ...scenario,
+        theme: translated.theme || scenario.theme,
+        challenge: translated.challenge || scenario.challenge,
+        options: translated.options || scenario.options,
+        explanation: translated.explanation || scenario.explanation
+      };
+    }
+  }catch(_){ }
+  return scenario; // fallback to original
+}
+
 function translateAnswerForQuestionType(qType, value){
   if(qType==='occupation') return translateOccupation(value);
   if(qType==='age') return translateEvent(value);
-  return value; // names and mothers remain as-is
+  if(qType==='name' || qType==='mother') return translateName(value);
+  return value;
 }
 
 // =========================
@@ -973,20 +1020,23 @@ function nextScenarioQuestion(){
 
 function renderScenarioQuestion(scenario){
   if (!scenario) {
-    qText.innerHTML = '<div class="scenario-card"><div class="scenario-body">Error: Scenario data is missing.</div></div>';
+    qText.innerHTML = `<div class="scenario-card"><div class="scenario-body">${getText('errorScenarioMissing')}</div></div>`;
     return;
   }
+
+  // Translate scenario content
+  const translatedScenario = translateScenario(scenario);
 
   // Build the question prompt
   let prompt = `
   <div class="scenario-card">
     <div class="scenario-header">
-      <span class="scenario-theme">${scenario.theme || 'Unknown Theme'}</span>
-      <span class="scenario-level">${scenario.level || 'Level N/A'}</span>
+      <span class="scenario-theme">${translatedScenario.theme || getText('unknownTheme')}</span>
+      <span class="scenario-level">${translatedScenario.level || getText('levelNA')}</span>
     </div>
     <div class="scenario-body">
-      <div class="scenario-challenge">${scenario.challenge || 'Error: Challenge text is missing.'}</div>
-      <div class="scenario-context">What is the biblical outcome?</div>
+      <div class="scenario-challenge">${translatedScenario.challenge || getText('errorChallengeMissing')}</div>
+      <div class="scenario-context">${getText('scenarioQuestion')}</div>
     </div>
   </div>`;
   
@@ -994,8 +1044,8 @@ function renderScenarioQuestion(scenario){
   
   // Render answer options
   answersEl.innerHTML = '';
-  if (scenario.options && Array.isArray(scenario.options)) {
-    scenario.options.forEach((option, index) => {
+  if (translatedScenario.options && Array.isArray(translatedScenario.options)) {
+    translatedScenario.options.forEach((option, index) => {
       const btn = document.createElement('button');
       btn.className = 'ans scenario-option';
     const letter = option.charAt(0);
@@ -1013,6 +1063,7 @@ function renderScenarioQuestion(scenario){
 
 function answerScenarioQuestion(selected){
   const scenario = state.current;
+  const translatedScenario = translateScenario(scenario);
   const isCorrect = selected === scenario.correct_answer;
   
   // Disable all answer buttons
@@ -1036,28 +1087,28 @@ function answerScenarioQuestion(selected){
   } else {
     state.streak = 0;
     streakEl.innerText = state.streak;
-    showToast({ title: getText('wrong') || 'Wrong', msg: '', type: 'error', timeout: 1000 });
+    showToast({ title: getText('wrongAnswer') || getText('wrong'), msg: '', type: 'error', timeout: 1000 });
   }
   
   // Record result
-  // Find the full text for the selected and correct options
-  const selectedOptionText = scenario.options.find(o => o.startsWith(selected))?.substring(3) || selected;
-  const correctOptionText = scenario.options.find(o => o.startsWith(scenario.correct_answer))?.substring(3) || scenario.correct_answer;
+  // Find the full text for the selected and correct options (use translated versions)
+  const selectedOptionText = translatedScenario.options.find(o => o.startsWith(selected))?.substring(3) || selected;
+  const correctOptionText = translatedScenario.options.find(o => o.startsWith(scenario.correct_answer))?.substring(3) || scenario.correct_answer;
 
   state.results.push({
-    prompt: scenario.challenge,
+    prompt: translatedScenario.challenge,
     chosenDisplay: `${selected}. ${selectedOptionText}`,
     correctDisplay: `${scenario.correct_answer}. ${correctOptionText}`,
     correct: isCorrect,
     ref: [scenario.book_ref],
-    explanation: scenario.explanation
+    explanation: translatedScenario.explanation
   });
   
   // Show explanation
   afterRef.innerHTML = `
     <div class="scenario-explanation">
-      <strong>${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</strong>
-      <p>${scenario.explanation}</p>
+      <strong>${isCorrect ? getText('scenarioCorrect') : getText('scenarioIncorrect')}</strong>
+      <p>${translatedScenario.explanation}</p>
       <p class="scenario-tags">${scenario.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')}</p>
     </div>
   `;
@@ -1204,11 +1255,14 @@ function renderQuestion(q){
       const ev = translateEvent(q.raw.event);
       qText.innerText = getText(q.type==='whoDid' ? 'questionWhoDid' : 'questionEvent', { event: ev });
     } else if(q.type==='occupation'){
-      qText.innerText = getText('questionOccupation', { name: q.raw.name });
+      const translatedName = translateName(q.raw.name);
+      qText.innerText = getText('questionOccupation', { name: translatedName });
     } else if(q.type==='whoMother'){
-      qText.innerText = getText('questionWhoMother', { name: q.raw.name });
+      const translatedName = translateName(q.raw.name);
+      qText.innerText = getText('questionWhoMother', { name: translatedName });
     } else if(q.type==='age'){
-      qText.innerText = getText('questionAge', { name: q.raw.name });
+      const translatedName = translateName(q.raw.name);
+      qText.innerText = getText('questionAge', { name: translatedName });
     } else {
       qText.innerText = q.prompt;
     }
@@ -1623,10 +1677,10 @@ async function handleImportFile(e){
       parsed.forEach((item, idx)=>{
         const res = validatePerson(item);
         if(res.valid) valid.push(item);
-        else errors.push(`Item ${idx+1}: ${res.reason}`);
+        else errors.push(`${getText('item')} ${idx+1}: ${res.reason}`);
       });
       if(errors.length){
-        const msg = `${getText('importError')}: ${errors.slice(0,5).join('; ')}${errors.length>5?` (+${errors.length-5} more)`:''}`;
+        const msg = `${getText('importError')}: ${errors.slice(0,5).join('; ')}${errors.length>5?` (+${errors.length-5} ${getText('more')})`:''}`;
         showToast({ title: getText('importError'), msg, type: 'error', timeout: 5000 });
       }
       if(valid.length>0){
@@ -1735,9 +1789,11 @@ function applyTheme(theme){
   }
   
   // Update theme toggle button tooltip
-  const themeKey = theme === 'day' ? 'themeDay' : 'themeNight';
-  const keyText = getText(themeKey) || (theme === 'day' ? 'Day' : 'Night');
-  if(btnTheme) btnTheme.setAttribute('title', `Toggle theme — ${keyText}`);
+  if (typeof getText === 'function') {
+    const themeKey = theme === 'day' ? 'themeDay' : 'themeNight';
+    const keyText = getText(themeKey) || (theme === 'day' ? 'Day' : 'Night');
+    if(btnTheme) btnTheme.setAttribute('title', `Toggle theme — ${keyText}`);
+  }
 }
 
 function saveSettingsFromUI(){
@@ -1958,22 +2014,24 @@ function initFeedback() {
   if(btnSubmit) {
     btnSubmit.addEventListener('click', async () => {
       const message = document.getElementById('feedback-message').value.trim();
+      const experience = document.getElementById('feedback-experience')?.value.trim();
       
       const ratingModes = document.getElementById('rating-modes')?.value;
       const ratingAccuracy = document.getElementById('rating-accuracy')?.value;
       const ratingScenarios = document.getElementById('rating-scenarios')?.value;
       const ratingOnline = document.getElementById('rating-online')?.value;
 
-      if (!message && selectedRating === 0 && !ratingModes && !ratingAccuracy && !ratingScenarios && !ratingOnline) {
-        showToast({ title: 'Feedback', msg: 'Please provide some feedback.', type: 'warn' });
+      if (!message && !experience && selectedRating === 0 && !ratingModes && !ratingAccuracy && !ratingScenarios && !ratingOnline) {
+        showToast({ title: getText('feedback'), msg: getText('feedbackPrompt'), type: 'warn' });
         return;
       }
 
       btnSubmit.disabled = true;
-      btnSubmit.textContent = 'Sending...';
+      btnSubmit.textContent = getText('sendingFeedback');
 
       const feedbackData = {
         rating: selectedRating,
+        experience: experience || null,
         ratingModes: ratingModes || null,
         ratingAccuracy: ratingAccuracy || null,
         ratingScenarios: ratingScenarios || null,
@@ -1987,21 +2045,21 @@ function initFeedback() {
       try {
         if (typeof database !== 'undefined' && database) {
           await database.ref('feedback').push(feedbackData);
-          showToast({ title: 'Thank You!', msg: 'Your feedback has been received.', type: 'success' });
+          showToast({ title: getText('thankYou'), msg: getText('feedbackReceived'), type: 'success' });
           // Mark as given so we don't prompt again automatically
           localStorage.setItem('who-bible-feedback-prompted', 'true');
         } else {
           // Fallback if Firebase not loaded
           console.log('Feedback (simulated):', feedbackData);
-          showToast({ title: 'Thank You!', msg: 'Feedback received (simulated).', type: 'success' });
+          showToast({ title: getText('thankYou'), msg: getText('feedbackSimulated'), type: 'success' });
         }
         close();
       } catch (error) {
         console.error('Feedback error:', error);
-        showToast({ title: 'Error', msg: 'Could not send feedback. Please try again.', type: 'error' });
+        showToast({ title: getText('feedbackError'), msg: getText('feedbackErrorMsg'), type: 'error' });
       } finally {
         btnSubmit.disabled = false;
-        btnSubmit.textContent = 'Send Feedback';
+        btnSubmit.textContent = getText('sendFeedback');
       }
     });
   }
@@ -2011,10 +2069,14 @@ function initFeedback() {
   console.log('[Feedback] window.openFeedbackModal has been set');
 }
 
+// Expose displayPlayerInfo globally so translations.js can call it
+window.displayPlayerInfo = displayPlayerInfo;
 
 // Re-localize dynamic pieces when language changes
 window.onWhoBibleLanguageChange = function(lang){
   try{
+    // Re-display player info with new language
+    displayPlayerInfo();
     // Re-render study list (people) to reflect translated events/occupations
     if(document.getElementById('study-panel') && state.people.length>0){
       renderPeopleList(searchPerson.value || '');

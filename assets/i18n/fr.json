@@ -152,7 +152,7 @@
   "guidelines": "Règles",
   "enterPlayerName": "Entrez votre nom (actuel : {current}) :",
   "welcome": "Bienvenue",
-  "welcomePlayer": "Bienvenue",
+  "welcomePlayer": "Bienvenue, {name} !",
   "shareText": "Découvrez Who-Bible !",
   "linkCopied": "Lien copié",
   "linkCopiedMsg": "Lien copié dans le presse-papiers",
@@ -177,11 +177,9 @@
   "profileNamePlaceholder": "Votre nom",
   "generateAvatar": "Générer un avatar",
   "saveProfile": "Enregistrer le profil",
-  "profileSaved": "Profil enregistré",
   "details": "Détails",
   "hostRoomTitle": "Héberger un salon",
   "roomNamePlaceholder": "Nom du salon",
-  "createRoom": "Créer un salon",
   "myRoomsTitle": "Mes salons",
   "noRoomsYet": "Aucun salon pour l'instant",
   "hostLabel": "Hôte",
@@ -192,8 +190,112 @@
   "renameRoomPrompt": "Renommer le salon :",
   "roomRenamed": "Salon renommé",
   "confirmDeleteRoom": "Supprimer ce salon ?",
-  "roomDeleted": "Salon supprimé"
-  ,
+  "roomDeleted": "Salon supprimé",
+  "sendingFeedback": "Envoi en cours...",
+  "sendFeedback": "Envoyer des Commentaires",
+  "errorScenarioMissing": "Erreur : Données du scénario manquantes.",
+  "unknownTheme": "Thème Inconnu",
+  "levelNA": "Niveau N/D",
+  "errorChallengeMissing": "Erreur : Texte du défi manquant.",
+  "scenarioQuestion": "Quel est le résultat biblique ?",
+  "clipboardUnavailable": "Presse-papiers indisponible",
+  "feedbackError": "Erreur",
+  "feedbackErrorMsg": "Impossible d'envoyer les commentaires. Veuillez réessayer.",
+  "scenarioCorrect": "✓ Correct !",
+  "scenarioIncorrect": "✗ Incorrect",
+  "item": "Élément",
+  "more": "plus",
+  "correct": "Correct",
+  "wrong": "Incorrect",
+  "feedback": "Commentaires",
+  "feedbackPrompt": "Veuillez fournir des commentaires.",
+  "thankYou": "Merci !",
+  "feedbackReceived": "Vos commentaires ont été reçus.",
+  "feedbackSimulated": "Commentaires reçus (simulé).",
+  "errorLoadingRooms": "Erreur lors du chargement des salons en direct. Veuillez actualiser.",
+  "noConceptsFound": "Aucun concept trouvé.",
+  "showList": "Afficher la Liste",
+  "flashcards": "Cartes Mémoire",
+  "joining": "Connexion en cours...",
+  "joinGame": "Rejoindre le Jeu",
+  "creating": "Création en cours...",
+  "noActiveRooms": "Aucun Salon Actif",
+  "beFirstToCreate": "Soyez le premier à créer un salon et inviter des amis !",
+  "allRoomsFinished": "Tous les Salons Terminés",
+  "createNewRoom": "Créez un nouveau salon pour commencer à jouer !",
+  "invalidUsername": "Nom d'Utilisateur Invalide",
+  "pleaseSelectReason": "Veuillez sélectionner une raison",
+  "failedToLoadLocations": "Échec du chargement des emplacements",
+  "noLocationsLoaded": "Aucun emplacement chargé",
+  "noConceptsLoaded": "Aucun concept chargé",
+  "pleaseEnterName": "Veuillez entrer votre nom",
+  "failedToJoinRoom": "Échec de rejoindre le salon",
+  "remoteModuleNotLoaded": "Module de défi à distance non chargé",
+  "failedToCreateRoom": "Échec de création du salon",
+  "roomCreated": "Salon Créé !",
+  "roomCreatedSuccess": "Salon {roomCode} créé avec succès",
+  "nameRequired": "Nom Requis",
+  "roomCodeRequired": "Code de Salon Requis",
+  "pleaseEnterRoomCode": "Veuillez entrer un code de salon",
+  "couldNotSetReady": "Impossible de définir l'état prêt",
+  "exploreBibleIntro": "Explorez la Bible à travers des quiz interactifs, des études de personnages et des scénarios moraux.",
+  "gamesPlayed": "Parties",
+  "highScore": "Meilleur Score",
+  "bestStreak": "Meilleure Série",
+  "winRate": "Taux de Victoire",
+  "clickToChangePlayer": "Cliquez pour changer de joueur",
+  "playOnlineWithFriends": "Jouez en Ligne avec des Amis",
+  "challengeAnyoneDesc": "Défiez n'importe qui, n'importe où ! Créez un salon, partagez le lien et affrontez-vous en temps réel.",
+  "startRemoteChallenge": "Démarrer un Défi à Distance",
+  "noSignupRequired": "Aucune inscription requise",
+  "instantMatchmaking": "Appariement instantané",
+  "liveScoring": "Score en direct",
+  "welcomeFriend": "Bienvenue, Ami !",
+  "welcomeGlad": "Nous sommes ravis que vous soyez ici pour explorer la Bible avec nous !",
+  "betaNotice": "BETA : Cette application est toujours en développement. Vos commentaires sont toujours appréciés !",
+  "exploreToLearn": "Explorez le jeu pour en savoir plus sur la Bible.",
+  "quickTip": "Conseil Rapide",
+  "settingsTip": "Les paramètres en haut (comme la Difficulté) contrôlent tout le jeu. N'hésitez pas à les ajuster à tout moment pour correspondre à votre rythme.",
+  "haveFunLearning": "Amusez-vous bien en apprenant et en grandissant !",
+  "letsPlay": "Jouons !",
+  "feedbackLove": "Nous aimerions avoir vos commentaires !",
+  "feedbackIntro": "Aidez-nous à améliorer Who-Bible en partageant vos réflexions.",
+  "feedbackOverallExp": "Expérience Globale",
+  "feedbackOverallQuestion": "Que pensez-vous de l'application dans l'ensemble ?",
+  "feedbackOverallPlaceholder": "Parlez-nous de votre expérience avec Who-Bible...",
+  "feedbackGameModes": "Modes de Jeu",
+  "feedbackQuestionAccuracy": "Précision des Questions",
+  "feedbackScenarios": "Scénarios",
+  "feedbackPlayingOnline": "Jouer en Ligne avec des Amis",
+  "feedbackCommentsSuggestions": "Commentaires / Suggestions",
+  "feedbackPlaceholder": "Des commentaires spécifiques ?",
+  "feedbackMaybeLater": "Peut-être plus tard",
+  "feedbackSelectRating": "Sélectionner une note...",
+  "feedbackExcellent": "Excellent",
+  "feedbackGood": "Bon",
+  "feedbackAverage": "Moyen",
+  "feedbackPoor": "Mauvais",
+  "feedbackTerrible": "Terrible",
+  "feedbackAccurate": "Précis",
+  "feedbackMostlyAccurate": "Plutôt précis",
+  "feedbackOkay": "Acceptable",
+  "feedbackInaccurate": "Imprécis",
+  "feedbackVeryInaccurate": "Très imprécis",
+  "feedbackEngaging": "Captivant",
+  "feedbackBoring": "Ennuyeux",
+  "feedbackConfusing": "Déroutant",
+  "feedbackAmazing": "Incroyable !",
+  "feedbackWorksGreat": "Fonctionne très bien",
+  "feedbackWorksOK": "Fonctionne bien",
+  "feedbackHadIssues": "A eu des problèmes",
+  "feedbackDidntWork": "N'a pas fonctionné",
+  "feedbackHaventTried": "Pas encore essayé",
+  "genderFilter": "Genre",
+  "allGenders": "Tous",
+  "male": "Masculin",
+  "female": "Féminin",
+  "testamentFilter": "Testament",
+  "challengeModeDesc": "Deux joueurs, même appareil",
   "eventTranslations": {
     "Built the ark": "A construit l'arche",
     "Survived the flood": "A survécu au déluge",
@@ -241,6 +343,776 @@
     "Prophet": "Prophète",
     "Apostle": "Apôtre",
     "Disciple, Apostle": "Disciple, apôtre",
-    "Prophet, Judge": "Prophète, juge"
+    "Prophet, Judge": "Prophète, juge",
+    "allTestaments": "Tous (AT + NT)",
+    "oldTestament": "Ancien Testament",
+    "newTestament": "Nouveau Testament"
+  },
+  "nameTranslations": {
+    "Moses": "Moïse",
+    "Noah": "Noé",
+    "Abraham": "Abraham",
+    "Isaac": "Isaac",
+    "Jacob": "Jacob",
+    "Joseph (son of Jacob)": "Joseph (fils de Jacob)",
+    "David": "David",
+    "Solomon": "Salomon",
+    "Esther": "Esther",
+    "Ruth": "Ruth",
+    "Mary (mother of Jesus)": "Marie (mère de Jésus)",
+    "Peter": "Pierre",
+    "Paul": "Paul",
+    "John the Baptist": "Jean le Baptiste",
+    "Lazarus": "Lazare",
+    "Jochebed": "Jokébed",
+    "Eve": "Ève",
+    "Sarah": "Sara",
+    "Rebekah": "Rébecca",
+    "Rachel": "Rachel",
+    "Leah": "Léa",
+    "Hagar": "Agar",
+    "Mary of Jerusalem": "Marie de Jérusalem",
+    "Bathsheba": "Bethsabée",
+    "Elizabeth": "Élisabeth",
+    "Aaron": "Aaron",
+    "Miriam": "Miriam",
+    "Joshua": "Josué",
+    "Samson": "Samson",
+    "Samuel": "Samuel",
+    "Saul": "Saül",
+    "Jonathan": "Jonathan",
+    "Elijah": "Élie",
+    "Elisha": "Élisée",
+    "Daniel": "Daniel",
+    "Jonah": "Jonas",
+    "John": "Jean",
+    "Matthew": "Matthieu",
+    "Mark": "Marc",
+    "Luke": "Luc",
+    "Thomas": "Thomas",
+    "James": "Jacques",
+    "Andrew": "André"
+  },
+  "scenarioTranslations": {
+    "Gideon_Army_Selection": {
+      "theme": "Trust and Obedience",
+      "challenge": "Gideon's army of 32,000 is too large; God commands a reduction to prove victory comes from Him. After the first cut (fearful soldiers), 10,000 remain. How does God instruct Gideon to select the final 300 men?",
+      "options": [
+        "A. Select only the oldest and most seasoned warriors.",
+        "B. Choose those who kneel down to drink water directly from the stream.",
+        "C. Choose those who scoop water with their hands to drink while remaining vigilant."
+      ],
+      "explanation": "God selected the 300 men who scooped the water with their hands to drink, remaining watchful of the enemy. This demonstrated their vigilance and preparedness, though their small number emphasized God's role in the victory."
+    },
+    "David_Nabal_Abigail": {
+      "theme": "Wisdom vs. Revenge",
+      "challenge": "David and his men protected Nabal's shepherds, but Nabal rudely refused to share provisions. David is ready to slaughter Nabal's entire household. What key action saves the family and prevents David from shedding innocent blood?",
+      "options": [
+        "A. David receives a vision from the Prophet Samuel to stop.",
+        "B. Nabal's wife, Abigail, intercepts David with a large gift and a plea for wisdom.",
+        "C. Jonathan arrives and reminds David of his covenant with Saul's family."
+      ],
+      "explanation": "Abigail intercepted David with gifts and a humble, insightful plea, reminding David that vengeance belonged to the Lord. David praised God for sending her to restrain him from taking revenge."
+    },
+    "Council_of_Jerusalem": {
+      "theme": "Theology and Unity",
+      "challenge": "A critical dispute arose: Must Gentile believers be circumcised and obey the Law of Moses to be saved? What was the decision reached by the Apostles and elders in Jerusalem?",
+      "options": [
+        "A. They must fully convert to Judaism, including circumcision.",
+        "B. They must refrain from food polluted by idols, sexual immorality, strangled meat, and blood.",
+        "C. They must only believe in Jesus, with no requirements from the Mosaic Law."
+      ],
+      "explanation": "The Council affirmed salvation by grace through faith, but asked Gentile converts to abstain from four specific practices (idolatry, sexual sin, meat with blood) to promote unity and respect with Jewish believers."
+    },
+    "Moses_Burning_Bush": {
+      "theme": "Divine Calling",
+      "challenge": "Moses encounters God in a burning bush and is called to free Israel from Egypt. What reason does Moses initially give for why he cannot fulfill this mission?",
+      "options": [
+        "A. 'I am not eloquent; I am slow of speech and tongue.'",
+        "B. 'Who am I that I should go to Pharaoh?'",
+        "C. 'The Israelites will not believe me or listen to me.'"
+      ],
+      "explanation": "Moses' first objection was about his inadequacy: 'Who am I that I should go to Pharaoh and bring the Israelites out of Egypt?' God responded by promising His presence: 'I will be with you.'"
+    },
+    "Solomon_Two_Mothers": {
+      "theme": "Wisdom and Justice",
+      "challenge": "Two women claim to be the mother of the same baby. How does Solomon determine the true mother?",
+      "options": [
+        "A. He asks them to swear an oath before the Ark of the Covenant.",
+        "B. He proposes to cut the baby in half and give each woman a portion.",
+        "C. He has the baby spend time with each woman to see which one it prefers."
+      ],
+      "explanation": "Solomon proposed cutting the baby in half. The true mother immediately offered to give up the baby rather than see it harmed, revealing her genuine love. This demonstrated Solomon's God-given wisdom."
+    },
+    "Peter_Vision_Gentiles": {
+      "theme": "Inclusion and Breaking Barriers",
+      "challenge": "Peter has a vision of unclean animals being lowered in a sheet, and a voice tells him to 'kill and eat.' What is the deeper meaning of this vision?",
+      "options": [
+        "A. The dietary laws of the Old Testament are now abolished for all believers.",
+        "B. God is declaring that Gentiles are no longer unclean and can receive the Gospel.",
+        "C. Peter must begin preaching to animals and all of creation."
+      ],
+      "explanation": "The vision was about people, not just food. God was preparing Peter to accept Cornelius (a Gentile) and recognize that the Gospel was for all nations, not just Jews. 'God has shown me that I should not call anyone impure or unclean.'"
+    },
+    "Job_Friends_Counsel": {
+      "theme": "Suffering and Faith",
+      "challenge": "Job loses everything and sits in ashes. His three friends come to comfort him. What is God's ultimate verdict on the friends' counsel?",
+      "options": [
+        "A. They spoke the truth and helped Job understand his sin.",
+        "B. They did not speak the truth about God, and must offer sacrifices.",
+        "C. They were silent and therefore did no wrong."
+      ],
+      "explanation": "At the end of the book, God rebukes Job's friends: 'You have not spoken the truth about me, as my servant Job has.' They had wrongly insisted Job was suffering due to personal sin, but Job's suffering was a test of faith."
+    },
+    "SCN_016": {
+      "theme": "Compassion",
+      "challenge": "A man is beaten and left half-dead on the road to Jericho. A priest and a Levite pass by on the other side. You are a Samaritan traveling the same road. What do you do?",
+      "options": [
+        "A. Avoid him to stay ritually clean",
+        "B. Bandage his wounds and take him to an inn",
+        "C. Report the incident to the authorities in Jericho"
+      ],
+      "explanation": "The Good Samaritan showed mercy by caring for the man's immediate needs and paying for his recovery, illustrating what it means to be a neighbor."
+    },
+    "SCN_017": {
+      "theme": "Conviction",
+      "challenge": "You are Daniel, a captive in Babylon. The king has assigned you a daily ration of food and wine from his own table, which violates your dietary laws. How do you respond?",
+      "options": [
+        "A. Eat the food to avoid offending the king",
+        "B. Request a diet of vegetables and water for ten days",
+        "C. Go on a hunger strike until released"
+      ],
+      "explanation": "Daniel resolved not to defile himself and proposed a test with vegetables and water. God honored his conviction, and he appeared healthier than those eating the king's food."
+    },
+    "SCN_018": {
+      "theme": "Courage",
+      "challenge": "You are Queen Esther. Your people are threatened with destruction, but approaching the king without a summons carries the death penalty. Mordecai urges you to act. What is your choice?",
+      "options": [
+        "A. Wait for the king to call you naturally",
+        "B. Flee the palace to save yourself",
+        "C. Fast for three days, then go to the king, saying 'If I perish, I perish'"
+      ],
+      "explanation": "Esther chose to risk her life for her people after spiritual preparation, famously declaring her willingness to perish for the cause."
+    },
+    "SCN_019": {
+      "theme": "Forgiveness",
+      "challenge": "In the parable of the Prodigal Son, you are the father. Your younger son, who squandered his inheritance, returns home in rags. How do you greet him?",
+      "options": [
+        "A. Run to him, embrace him, and throw a feast",
+        "B. Make him a hired servant as he requests",
+        "C. Tell him he has lost his place in the family"
+      ],
+      "explanation": "The father represents God's grace. He ran to his son, embraced him, and celebrated his return, signifying full restoration."
+    },
+    "SCN_020": {
+      "theme": "Faith",
+      "challenge": "You are David preparing to fight Goliath. King Saul offers you his own armor, helmet, and sword. It is heavy and you are not used to it. What do you take into battle?",
+      "options": [
+        "A. Wear Saul's armor for maximum protection",
+        "B. Take only your staff, sling, and five smooth stones",
+        "C. Ask for a shield bearer to go before you"
+      ],
+      "explanation": "David removed the royal armor because he hadn't tested it. He trusted in the Lord and used the simple tools he was skilled with as a shepherd."
+    },
+    "SCN_021": {
+      "theme": "Repentance",
+      "challenge": "You are Zacchaeus, a wealthy tax collector. You want to see Jesus, but the crowd is too thick and you are short. Once Jesus spots you and invites himself to your house, how do you respond to the crowd's grumbling?",
+      "options": [
+        "A. Defend your job as necessary for Rome",
+        "B. Give half your goods to the poor and restore fourfold to those you cheated",
+        "C. Ask Jesus to make the crowd leave you alone"
+      ],
+      "explanation": "Zacchaeus demonstrated true repentance not just by words, but by restitution and generosity, causing Jesus to declare that salvation had come to his house."
+    },
+    "SCN_022": {
+      "theme": "Wisdom",
+      "challenge": "You are King Solomon. Two women claim to be the mother of the same living baby. There are no witnesses. How do you determine the true mother?",
+      "options": [
+        "A. Give the baby to the woman who looks most like him",
+        "B. Order the baby cut in two, to see who pleads for its life",
+        "C. Flip a coin to decide fairly"
+      ],
+      "explanation": "Solomon's feigned order to kill the child revealed the true mother's heart, as she was willing to give up the child to save its life."
+    },
+    "SCN_023": {
+      "theme": "Obedience",
+      "challenge": "You are Jonah. God commands you to go to the great city of Nineveh and preach against it. You hate the Ninevites. What is your immediate reaction?",
+      "options": [
+        "A. Go to Nineveh immediately",
+        "B. Argue with God about the mission",
+        "C. Board a ship to Tarshish to flee from the Lord"
+      ],
+      "explanation": "Jonah initially disobeyed and tried to flee in the opposite direction to Tarshish, leading to the incident with the great fish."
+    },
+    "SCN_024": {
+      "theme": "Priorities",
+      "challenge": "You are Martha. Jesus is visiting your home. You are distracted by all the preparations that have to be made, while your sister Mary sits at Jesus' feet listening. What do you say to Jesus?",
+      "options": [
+        "A. 'Lord, tell her to help me!'",
+        "B. 'Lord, it is good that she listens to you.'",
+        "C. 'Lord, I will sit and listen too.'"
+      ],
+      "explanation": "Martha complained that she was left to serve alone. Jesus gently corrected her, stating that Mary had chosen the 'better part' which would not be taken away."
+    },
+    "SCN_025": {
+      "theme": "Testing",
+      "challenge": "You are Abraham. God tells you to take your son Isaac, whom you love, and offer him as a burnt offering on Mount Moriah. What do you do?",
+      "options": [
+        "A. Refuse, arguing that God promised Isaac would be the heir",
+        "B. Rise early the next morning to obey",
+        "C. Hide Isaac to protect him"
+      ],
+      "explanation": "Abraham obeyed immediately, trusting that God could raise the dead. God stopped him at the last moment and provided a ram as a substitute."
+    },
+    "SCN_026": {
+      "theme": "Generosity",
+      "challenge": "You are a poor widow at the temple treasury. You have only two small copper coins (mites) to live on. Rich people are throwing in large amounts. What do you put in?",
+      "options": [
+        "A. Keep one coin and give the other",
+        "B. Keep both coins for food",
+        "C. Put in everything you have"
+      ],
+      "explanation": "Jesus commended the widow for putting in 'everything she had to live on,' valuing her sacrificial heart over the monetary amount."
+    },
+    "SCN_027": {
+      "theme": "Leadership",
+      "challenge": "You are a centurion on a ship caught in a storm. Paul warns that if the sailors escape on the lifeboat, you cannot be saved. The sailors are trying to lower the boat secretly. What do you order?",
+      "options": [
+        "A. Let the sailors go to get help",
+        "B. Cut the ropes of the lifeboat and let it fall away",
+        "C. Get in the lifeboat yourself"
+      ],
+      "explanation": "The soldiers cut the ropes of the lifeboat and let it drift away, ensuring everyone stayed together on the ship as Paul had instructed for their survival."
+    },
+    "SCN_028": {
+      "theme": "Guidance",
+      "challenge": "You are Gideon. You want to be sure God will save Israel by your hand. You place a wool fleece on the threshing floor. What is your first test?",
+      "options": [
+        "A. Dew on the fleece only, and the ground dry",
+        "B. Dew on the ground only, and the fleece dry",
+        "C. Both fleece and ground completely dry"
+      ],
+      "explanation": "Gideon first asked for dew on the fleece while the ground remained dry. God granted this. He then asked for the reverse (dry fleece, wet ground) the next night."
+    },
+    "SCN_029": {
+      "theme": "Integrity",
+      "challenge": "You are Joseph, serving in Potiphar's house. Potiphar's wife tries to seduce you day after day. One day, she grabs your cloak when you are alone. What is your reaction?",
+      "options": [
+        "A. Reason with her to stop",
+        "B. Give in to keep your position secure",
+        "C. Leave your cloak in her hand and run out of the house"
+      ],
+      "explanation": "Joseph fled temptation literally, leaving his garment behind rather than sinning against God, even though it led to false accusations and prison."
+    },
+    "SCN_030": {
+      "theme": "Growth",
+      "challenge": "In the Parable of the Sower, seeds fall on rocky ground. What happens to the plants that grow from them?",
+      "options": [
+        "A. They are choked by thorns",
+        "B. They spring up quickly but wither because they have no root",
+        "C. They produce a hundredfold crop"
+      ],
+      "explanation": "Seeds on rocky ground represent those who receive the word with joy but fall away when trouble comes because they lack deep roots."
+    },
+    "SCN_031": {
+      "theme": "Prophetic Confrontation",
+      "challenge": "You are Elijah confronting the prophets of Baal on Mount Carmel. After the prophets fail, what dramatic action does Elijah take to demonstrate God's power?",
+      "options": [
+        "A. Calls down fire from heaven to consume the drenched sacrifice",
+        "B. Challenges them to a debate judged by the people",
+        "C. Prays for rain immediately to end the drought"
+      ],
+      "explanation": "Elijah prayed and God sent fire from heaven that consumed the drenched sacrifice, proving Yahweh's supremacy over Baal."
+    },
+    "SCN_032": {
+      "theme": "Healing and Humility",
+      "challenge": "Naaman, a commander, seeks healing for leprosy. Elisha instructs him to wash in the Jordan River seven times. How does Naaman respond initially and what does he ultimately do?",
+      "options": [
+        "A. Immediately obeys and is healed",
+        "B. Refuses angrily, then obeys and is healed",
+        "C. Offers a gift to Elisha instead of washing"
+      ],
+      "explanation": "Naaman was offended at first but humbled himself, washed seven times in the Jordan, and was healed."
+    },
+    "SCN_033": {
+      "theme": "Faith Under Fire",
+      "challenge": "Shadrach, Meshach, and Abednego refuse to bow to Nebuchadnezzar's image. What is the outcome when they are thrown into the fiery furnace?",
+      "options": [
+        "A. They are consumed and die",
+        "B. They are unharmed and a fourth figure appears with them",
+        "C. They bow under pressure but later repent"
+      ],
+      "explanation": "They were unharmed in the fire and a fourth figure (described as like a son of the gods) was seen with them, leading the king to praise God."
+    },
+    "SCN_034": {
+      "theme": "Loyalty and Redemption",
+      "challenge": "Ruth pledges loyalty to Naomi and later marries Boaz. What key action demonstrates Ruth's loyalty to Naomi at the story's start?",
+      "options": [
+        "A. She insists Naomi return to Moab alone",
+        "B. She accompanies Naomi to Bethlehem and adopts her people and God",
+        "C. She sends food back to Naomi from afar"
+      ],
+      "explanation": "Ruth refuses to leave Naomi, goes to Bethlehem with her, and adopts Naomi's people and God, showing steadfast loyalty."
+    },
+    "SCN_035": {
+      "theme": "Prayer and Promise",
+      "challenge": "Hannah prays for a son and vows to dedicate him to the Lord. How does God respond to her prayer?",
+      "options": [
+        "A. He ignores her because of her vow",
+        "B. He grants her a son, Samuel, whom she dedicates to the temple",
+        "C. He gives her wealth instead of a child"
+      ],
+      "explanation": "God answered Hannah's prayer; she bore Samuel and dedicated him to the Lord's service as she had vowed."
+    },
+    "SCN_036": {
+      "theme": "Calling and Obedience",
+      "challenge": "Young Samuel hears God's voice in the night. Who mentors him to recognize and respond to God's call?",
+      "options": [
+        "A. Eli the priest",
+        "B. Saul the king",
+        "C. David the shepherd"
+      ],
+      "explanation": "Eli instructs Samuel to respond to the Lord's call, helping him recognize and deliver God's message."
+    },
+    "SCN_037": {
+      "theme": "Conversion",
+      "challenge": "Saul encounters a blinding light on the road to Damascus. What immediate change follows this encounter?",
+      "options": [
+        "A. He becomes more zealous against Christians",
+        "B. He is blinded, led into Damascus, and later baptized as Paul",
+        "C. He is executed for his crimes"
+      ],
+      "explanation": "Saul was struck blind, led into Damascus, met Ananias who healed and baptized him, and he became Paul, an apostle to the Gentiles."
+    },
+    "SCN_038": {
+      "theme": "Provision",
+      "challenge": "Jesus feeds 5,000 with five loaves and two fish. What does this miracle primarily demonstrate about Jesus?",
+      "options": [
+        "A. His political power",
+        "B. His compassion and ability to provide abundantly",
+        "C. His desire to start a food distribution program"
+      ],
+      "explanation": "The feeding shows Jesus' compassion for the crowd and his power to provide abundantly from little."
+    },
+    "SCN_039": {
+      "theme": "Authority",
+      "challenge": "Jesus casts out an unclean spirit in Capernaum. How do the people react to his teaching and exorcism?",
+      "options": [
+        "A. They ignore him",
+        "B. They are amazed at his authority",
+        "C. They arrest him immediately"
+      ],
+      "explanation": "People were amazed because Jesus taught with authority and commanded unclean spirits, showing his unique power."
+    },
+    "SCN_040": {
+      "theme": "Wisdom in Leadership",
+      "challenge": "Nehemiah seeks permission to rebuild Jerusalem's walls. How does he approach the king to secure support?",
+      "options": [
+        "A. He demands the king's help publicly",
+        "B. He requests leave with a humble and strategic petition",
+        "C. He stages a rebellion to force action"
+      ],
+      "explanation": "Nehemiah approached Artaxerxes with a respectful petition, explaining Jerusalem's condition and requesting leave and resources, which the king granted."
+    },
+    "SCN_041": {
+      "theme": "Faith and Healing",
+      "challenge": "A synagogue leader asks Jesus to heal his daughter while a woman with chronic bleeding touches Jesus' cloak. What is notable about Jesus' response?",
+      "options": [
+        "A. He ignores the woman and heals the girl first",
+        "B. He stops and acknowledges the woman's faith before proceeding to the girl's healing",
+        "C. He refuses both because of ritual impurity"
+      ],
+      "explanation": "Jesus commended the woman's faith and then proceeded to raise the leader's daughter, showing attention to individual faith amid urgent needs."
+    },
+    "SCN_042": {
+      "theme": "Integrity",
+      "challenge": "Joseph resists Potiphar's wife's advances and flees, leaving his cloak behind. What consequence follows his act of integrity?",
+      "options": [
+        "A. He is promoted immediately",
+        "B. He is falsely accused and imprisoned",
+        "C. He returns home in shame"
+      ],
+      "explanation": "Joseph's refusal led to false accusation by Potiphar's wife and his imprisonment, yet God remained with him and later exalted him."
+    },
+    "SCN_043": {
+      "theme": "Repentance and Restoration",
+      "challenge": "After Nathan confronts David about Bathsheba and Uriah, how does David respond to his sin?",
+      "options": [
+        "A. He denies wrongdoing",
+        "B. He repents and confesses, though consequences follow",
+        "C. He blames Nathan for slander"
+      ],
+      "explanation": "David confessed his sin when confronted, repented, but still faced consequences for his actions as recorded by Nathan."
+    },
+    "SCN_044": {
+      "theme": "Perseverance",
+      "challenge": "Hebrews 11 lists many who lived by faith. Which pattern best summarizes the chapter's portrayal of faith?",
+      "options": [
+        "A. Faith guarantees earthly success",
+        "B. Faith trusts God's promises often without seeing their fulfillment",
+        "C. Faith is only for prophets"
+      ],
+      "explanation": "Hebrews 11 highlights people who trusted God's promises, often enduring hardship without seeing full fulfillment in their lifetimes."
+    },
+    "SCN_045": {
+      "theme": "Stewardship",
+      "challenge": "In the Parable of the Talents, what does the master do with the servant who hid his talent out of fear?",
+      "options": [
+        "A. Rewards him for safety",
+        "B. Rebukes him and gives his talent to the one with ten",
+        "C. Promotes him for caution"
+      ],
+      "explanation": "The master rebukes the fearful servant, takes away his talent, and gives it to the one who produced ten, teaching responsible stewardship."
+    },
+    "SCN_046": {
+      "theme": "Wisdom",
+      "challenge": "Proverbs urges trust in the Lord rather than leaning on one's own understanding. What practical posture does this encourage?",
+      "options": [
+        "A. Rely on personal insight alone",
+        "B. Acknowledge God in all ways and trust his guidance",
+        "C. Avoid making any plans"
+      ],
+      "explanation": "The passage calls for trusting God, acknowledging him in decisions, and allowing him to direct one's paths."
+    },
+    "SCN_047": {
+      "theme": "Courage",
+      "challenge": "Esther risks approaching the king unsummoned. What spiritual preparation does she call for before taking action?",
+      "options": [
+        "A. A public protest",
+        "B. A three-day fast by her people",
+        "C. A military uprising"
+      ],
+      "explanation": "Esther asked the Jews to fast for three days before she approached the king, combining courage with spiritual dependence."
+    },
+    "SCN_048": {
+      "theme": "Discipleship",
+      "challenge": "Jesus teaches about the cost of discipleship, including 'counting the cost.' What image does he use to illustrate careful planning?",
+      "options": [
+        "A. Building a tower and estimating the cost",
+        "B. Planting a vineyard",
+        "C. Sailing a ship without a compass"
+      ],
+      "explanation": "Jesus compares discipleship to building a tower and calculating the cost to finish it, emphasizing deliberate commitment."
+    },
+    "SCN_049": {
+      "theme": "Justice and Mercy",
+      "challenge": "Micah summarizes what God requires of his people. Which three actions does he list?",
+      "options": [
+        "A. Offer sacrifices, build altars, fast often",
+        "B. Do justice, love mercy, walk humbly with God",
+        "C. Accumulate wealth, judge others, enforce laws"
+      ],
+      "explanation": "Micah 6:8 calls believers to act justly, love mercy, and walk humbly with God as the heart of faithful living."
+    },
+    "SCN_050": {
+      "theme": "Forgiveness",
+      "challenge": "Peter asks Jesus how many times to forgive a brother. Jesus replies with a parable. What is the parable's main lesson?",
+      "options": [
+        "A. Forgive only seven times",
+        "B. Forgive repeatedly as God forgives you",
+        "C. Forgiveness is optional"
+      ],
+      "explanation": "Jesus teaches that forgiveness should be abundant, illustrating with a servant forgiven a great debt who then refuses to forgive another."
+    },
+    "SCN_051": {
+      "theme": "Obedience and Testing",
+      "challenge": "God provides manna for Israel in the wilderness. What instruction tested their obedience regarding gathering it?",
+      "options": [
+        "A. Gather as much as you want every day",
+        "B. Gather a daily portion and not keep it overnight except before Sabbath",
+        "C. Only the priests may gather manna"
+      ],
+      "explanation": "God instructed daily gathering and forbade hoarding, except a double portion before the Sabbath, testing trust in daily provision."
+    },
+    "SCN_052": {
+      "theme": "Witness",
+      "challenge": "Jesus tells the disciples they will receive power to be his witnesses. Where does he say their witness will begin and extend to?",
+      "options": [
+        "A. Only in Jerusalem",
+        "B. Jerusalem, Judea, Samaria, and to the ends of the earth",
+        "C. Only to the Gentiles"
+      ],
+      "explanation": "Jesus commissions the disciples to witness locally and globally: Jerusalem, Judea, Samaria, and the ends of the earth."
+    },
+    "SCN_053": {
+      "theme": "Humility and Service",
+      "challenge": "At the Last Supper Jesus washes his disciples' feet. What lesson does he give about leadership?",
+      "options": [
+        "A. Leaders should demand honor",
+        "B. True leaders serve others humbly",
+        "C. Foot washing is a required ritual"
+      ],
+      "explanation": "Jesus models servant leadership, teaching that greatness in his kingdom is shown through humble service."
+    },
+    "SCN_054": {
+      "theme": "Perseverance in Prayer",
+      "challenge": "Jesus tells the parable of the persistent widow. What point is he making about prayer?",
+      "options": [
+        "A. God answers only the first prayer",
+        "B. Persisting in prayer is encouraged because God hears and acts",
+        "C. Prayer is unnecessary"
+      ],
+      "explanation": "The parable encourages persistent prayer and trust that God will bring justice for his elect."
+    },
+    "SCN_055": {
+      "theme": "Repentance",
+      "challenge": "Jonah finally preaches to Nineveh and the city repents. How does God respond to their repentance?",
+      "options": [
+        "A. Destroys the city anyway",
+        "B. Relents and spares the city",
+        "C. Ignores their repentance"
+      ],
+      "explanation": "God saw their repentance and relented from the disaster he had threatened, showing mercy in response to genuine turning."
+    },
+    "SCN_056": {
+      "theme": "Faith and Sight",
+      "challenge": "Jesus heals a man born blind. How does the healed man's testimony affect the religious leaders?",
+      "options": [
+        "A. They celebrate his healing",
+        "B. They interrogate and ultimately reject Jesus' authority",
+        "C. They immediately believe and follow Jesus"
+      ],
+      "explanation": "The healed man testified to Jesus' work, but the Pharisees questioned and rejected the implications, revealing spiritual blindness."
+    },
+    "SCN_057": {
+      "theme": "Covenant Faithfulness",
+      "challenge": "God establishes a covenant with Abraham and changes his name. What sign does God give to Abraham to mark the covenant?",
+      "options": [
+        "A. A rainbow",
+        "B. Circumcision",
+        "C. A temple"
+      ],
+      "explanation": "God institutes circumcision as the sign of the covenant with Abraham and his descendants."
+    },
+    "SCN_058": {
+      "theme": "Suffering and Hope",
+      "challenge": "The psalmist describes the Lord as shepherd. Which image best captures the psalm's assurance amid danger?",
+      "options": [
+        "A. Walking through the valley of the shadow of death with fear",
+        "B. Walking through the valley of the shadow of death with God's presence",
+        "C. Avoiding all valleys"
+      ],
+      "explanation": "Psalm 23 assures believers that even in the darkest valleys God's presence comforts and protects them."
+    },
+    "SCN_059": {
+      "theme": "Witness and Risk",
+      "challenge": "Peter and John are arrested for preaching about Jesus' resurrection. How do they respond when commanded to stop?",
+      "options": [
+        "A. They stop preaching",
+        "B. They boldly continue, saying they must obey God rather than men",
+        "C. They flee the city"
+      ],
+      "explanation": "Peter and John boldly declared they must obey God, continuing to preach despite threats, demonstrating courageous witness."
+    },
+    "SCN_060": {
+      "theme": "Generosity",
+      "challenge": "Paul commends the Macedonian churches for their generosity despite poverty. What principle does he emphasize about giving?",
+      "options": [
+        "A. Give reluctantly under compulsion",
+        "B. Give cheerfully and according to ability",
+        "C. Only the wealthy should give"
+      ],
+      "explanation": "Paul teaches that giving should be voluntary, cheerful, and proportional to one's means, reflecting grace and partnership."
+    },
+    "SCN_061": {
+      "theme": "Idolatry",
+      "challenge": "While Moses is on Sinai, the people make a golden calf. What is Aaron's role in this incident?",
+      "options": [
+        "A. He refuses to participate",
+        "B. He fashions the calf and leads the people in revelry",
+        "C. He destroys the calf immediately"
+      ],
+      "explanation": "Aaron yielded to the people's pressure, made the golden calf, and led in idolatrous celebration, provoking God's anger."
+    },
+    "SCN_062": {
+      "theme": "Faith and Fear",
+      "challenge": "Jesus calms a storm while on a boat with his disciples. How do the disciples react after the miracle?",
+      "options": [
+        "A. They remain fearful and unbelieving",
+        "B. They marvel and ask who he is that even the winds obey him",
+        "C. They abandon Jesus"
+      ],
+      "explanation": "The disciples marvel at Jesus' authority over nature and question his identity, moving from fear to awe."
+    },
+    "SCN_063": {
+      "theme": "Repentance and Leadership",
+      "challenge": "King Josiah leads reforms after the Book of the Law is found. What is his response upon hearing the words of the law?",
+      "options": [
+        "A. He ignores it",
+        "B. He tears his clothes, seeks the Lord, and initiates reforms",
+        "C. He burns the book"
+      ],
+      "explanation": "Josiah humbled himself, sought God, and led national reforms to return to covenant faithfulness."
+    },
+    "SCN_064": {
+      "theme": "Hospitality",
+      "challenge": "Abraham shows hospitality to three visitors who announce Sarah will bear a son. What action demonstrates Abraham's hospitality?",
+      "options": [
+        "A. He ignores them",
+        "B. He runs to prepare a meal and serves them",
+        "C. He sends them away"
+      ],
+      "explanation": "Abraham hurried to prepare a meal and serve his guests, exemplifying generous hospitality that precedes the promise."
+    },
+    "SCN_065": {
+      "theme": "Faithfulness",
+      "challenge": "At twelve, Jesus stays behind in the temple, amazing teachers with his understanding. How do Mary and Joseph respond when they find him?",
+      "options": [
+        "A. They scold him harshly",
+        "B. Mary questions him, and Jesus speaks of being about his Father's business",
+        "C. They ignore him"
+      ],
+      "explanation": "Mary questioned Jesus; he replied that he must be about his Father's business, indicating early awareness of his mission."
+    },
+    "SCN_066": {
+      "theme": "Justice",
+      "challenge": "God rejects Israel's empty worship. What does he desire instead of ritual?",
+      "options": [
+        "A. More sacrifices",
+        "B. Justice and righteousness to flow like a river",
+        "C. Isolation from other nations"
+      ],
+      "explanation": "Amos emphasizes that God values justice and righteousness over mere ritual observance."
+    },
+    "SCN_067": {
+      "theme": "Obedience and Trust",
+      "challenge": "Joshua follows God's unusual battle plan for Jericho. What was the key element of the strategy?",
+      "options": [
+        "A. A surprise night attack",
+        "B. Marching around the city for seven days with priests and trumpets",
+        "C. Building siege engines"
+      ],
+      "explanation": "Israel marched around Jericho for seven days as instructed; on the seventh day the walls fell after the shout and trumpet blast."
+    },
+    "SCN_068": {
+      "theme": "Humility",
+      "challenge": "Paul points to Christ's humility as the model for believers. Which two actions of Christ does he highlight?",
+      "options": [
+        "A. His wealth and power",
+        "B. His emptying himself and obedience to death on a cross",
+        "C. His political reforms"
+      ],
+      "explanation": "Paul highlights Christ's self-emptying (kenosis) and obedience even to death as the supreme example of humility."
+    },
+    "SCN_069": {
+      "theme": "Providence",
+      "challenge": "Joseph tells his brothers that what they intended for harm, God intended for what purpose?",
+      "options": [
+        "A. To punish them",
+        "B. To preserve many lives and bring about good",
+        "C. To end the family line"
+      ],
+      "explanation": "Joseph interprets his suffering as part of God's providential plan to save many lives during famine."
+    },
+    "SCN_070": {
+      "theme": "Faith and Works",
+      "challenge": "James argues that faith without works is dead. Which example does he use to illustrate faith shown by actions?",
+      "options": [
+        "A. Abraham offering Isaac",
+        "B. Moses building the tabernacle",
+        "C. David writing psalms"
+      ],
+      "explanation": "James cites Abraham's willingness to offer Isaac as evidence that faith is demonstrated and completed by works."
+    },
+    "SCN_071": {
+      "theme": "Compassion",
+      "challenge": "Jesus raises a widow's son at Nain. What is the crowd's reaction to this miracle?",
+      "options": [
+        "A. They ignore it",
+        "B. They glorify God and recognize a great prophet has appeared",
+        "C. They accuse Jesus of sorcery"
+      ],
+      "explanation": "The crowd praised God and acknowledged that a great prophet had arisen among them, and Jesus' fame spread."
+    },
+    "SCN_072": {
+      "theme": "Repentance",
+      "challenge": "God promises to heal the land if people humble themselves. What fourfold response does he require?",
+      "options": [
+        "A. Fast, build altars, sacrifice, and sing",
+        "B. Humble themselves, pray, seek God's face, and turn from wicked ways",
+        "C. Gather armies and fight"
+      ],
+      "explanation": "God calls for humility, prayer, seeking him, and repentance as the path to restoration."
+    },
+    "SCN_073": {
+      "theme": "Leadership and Wisdom",
+      "challenge": "Solomon asks God for wisdom rather than long life or riches. How does God respond?",
+      "options": [
+        "A. Denies his request",
+        "B. Grants wisdom and also gives riches and honor",
+        "C. Gives only riches"
+      ],
+      "explanation": "God grants Solomon exceptional wisdom and also adds riches and honor because he asked for discernment to govern well."
+    },
+    "SCN_074": {
+      "theme": "Faithfulness",
+      "challenge": "Several women supported Jesus and the disciples out of their resources. What does this detail highlight about Jesus' ministry?",
+      "options": [
+        "A. It was funded and supported by faithful followers, including women",
+        "B. It had no supporters",
+        "C. Only men supported the ministry"
+      ],
+      "explanation": "Luke notes women like Mary Magdalene and Joanna who provided for Jesus' ministry, underscoring inclusive support and discipleship."
+    },
+    "SCN_075": {
+      "theme": "Courage",
+      "challenge": "Paul and Silas are imprisoned and sing praises; an earthquake frees them. What effect does this have on the jailer?",
+      "options": [
+        "A. He kills himself",
+        "B. He fears, asks how to be saved, and is baptized with his household",
+        "C. He ignores them"
+      ],
+      "explanation": "The jailer, seeing their faith, asks how to be saved; Paul shares the gospel and the jailer and his household are baptized."
+    },
+    "SCN_076": {
+      "theme": "Obedience",
+      "challenge": "Peter encourages believers to respond to suffering with a certain posture. What does he advise?",
+      "options": [
+        "A. Seek revenge",
+        "B. Always be ready to give a defense with gentleness and respect",
+        "C. Hide and avoid all conflict"
+      ],
+      "explanation": "Peter urges readiness to explain one's hope, doing so with gentleness and respect even amid suffering."
+    },
+    "SCN_077": {
+      "theme": "Providence and Prayer",
+      "challenge": "During a drought, Elijah is fed by ravens and later by a widow. What does the widow's provision reveal about God's care?",
+      "options": [
+        "A. God only cares for prophets",
+        "B. God provides through unexpected means and honors faith",
+        "C. God withholds provision"
+      ],
+      "explanation": "God provided for Elijah through ravens and a poor widow, demonstrating provision through surprising channels and rewarding faith."
+    },
+    "SCN_078": {
+      "theme": "Repentance and Reform",
+      "challenge": "Jonah is angry when God spares Nineveh. What does God use to teach Jonah compassion?",
+      "options": [
+        "A. A parable about a shepherd",
+        "B. A plant that provides shade and then withers",
+        "C. A vision of the future"
+      ],
+      "explanation": "God causes a plant to grow and wither to show Jonah his misplaced anger and to teach compassion for people who repent."
+    },
+    "SCN_079": {
+      "theme": "Faith and Healing",
+      "challenge": "Friends lower a paralyzed man through a roof to reach Jesus. What does Jesus first say to the man?",
+      "options": [
+        "A. 'Stand up and walk immediately'",
+        "B. 'Your sins are forgiven'",
+        "C. 'Go home and rest'"
+      ],
+      "explanation": "Jesus first pronounces forgiveness of sins, prompting controversy, and then heals the man to demonstrate his authority to forgive."
+    },
+    "SCN_080": {
+      "theme": "Hope",
+      "challenge": "John describes a new heaven and new earth where God dwells with people. What is a key feature of this vision?",
+      "options": [
+        "A. Eternal separation from God",
+        "B. No more death, mourning, crying, or pain",
+        "C. Return to the old order"
+      ],
+      "explanation": "Revelation promises a renewed creation where suffering is ended and God dwells with his people, offering ultimate hope."
+    }
   }
 }

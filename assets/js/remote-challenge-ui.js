@@ -71,7 +71,7 @@ async function handleCreateRoom() {
   const hostName = document.getElementById('remote-host-name').value.trim();
   
   if (!hostName) {
-    showToast({ title: 'Name Required', msg: 'Please enter your name', type: 'error' });
+    showToast({ title: (window.getText ? window.getText('nameRequired') : 'Name Required'), msg: (window.getText ? window.getText('pleaseEnterName') : 'Please enter your name'), type: 'error' });
     return;
   }
   
@@ -113,12 +113,12 @@ async function handleJoinRoom() {
   const playerName = document.getElementById('remote-join-name').value.trim();
   
   if (!roomCode) {
-    showToast({ title: 'Room Code Required', msg: 'Please enter a room code', type: 'error' });
+    showToast({ title: (window.getText ? window.getText('roomCodeRequired') : 'Room Code Required'), msg: (window.getText ? window.getText('pleaseEnterRoomCode') : 'Please enter a room code'), type: 'error' });
     return;
   }
   
   if (!playerName) {
-    showToast({ title: 'Name Required', msg: 'Please enter your name', type: 'error' });
+    showToast({ title: (window.getText ? window.getText('nameRequired') : 'Name Required'), msg: (window.getText ? window.getText('pleaseEnterName') : 'Please enter your name'), type: 'error' });
     return;
   }
   
@@ -203,7 +203,7 @@ async function handleReadyHost() {
     document.getElementById('btn-ready-host').disabled = true;
   } catch (error) {
     console.error('Ready error:', error);
-    showToast({ title: 'Error', msg: 'Could not set ready status', type: 'error' });
+    showToast({ title: (window.getText ? window.getText('error') : 'Error'), msg: (window.getText ? window.getText('couldNotSetReady') : 'Could not set ready status'), type: 'error' });
   }
 }
 
@@ -214,7 +214,7 @@ async function handleReadyGuest() {
     document.getElementById('btn-ready-guest').disabled = true;
   } catch (error) {
     console.error('Ready error:', error);
-    showToast({ title: 'Error', msg: 'Could not set ready status', type: 'error' });
+    showToast({ title: (window.getText ? window.getText('error') : 'Error'), msg: (window.getText ? window.getText('couldNotSetReady') : 'Could not set ready status'), type: 'error' });
   }
 }
 
