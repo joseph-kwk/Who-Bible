@@ -1,33 +1,47 @@
 /* Footer Feedback Button Styling */
 .footer-feedback-btn {
-  background: none;
-  border: none;
+  background: rgba(251, 191, 36, 0.1);
+  border: 2px solid var(--accent-2, #fbbf24);
+  border-radius: 8px;
   color: var(--accent-2, #fbbf24);
-  text-decoration: underline;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 1.05em;
   font-family: inherit;
-  padding: 0.5em;
-  min-height: 44px; /* iOS minimum touch target */
-  min-width: 44px;
-  transition: color 0.2s;
+  padding: 0.85em 1.5em;
+  min-height: 48px;
+  min-width: 48px;
+  transition: all 0.2s;
   position: relative;
-  z-index: 10;
-  -webkit-tap-highlight-color: rgba(255, 183, 77, 0.3);
+  z-index: 1000 !important;
+  -webkit-tap-highlight-color: rgba(255, 183, 77, 0.5);
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
-  /* Ensure button is clickable */
-  pointer-events: auto;
+  pointer-events: auto !important;
+  display: inline-block;
+  margin: 0.5em auto;
 }
 .footer-feedback-btn:hover, .footer-feedback-btn:focus {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: var(--accent, #ff8a65);
   color: var(--accent, #ff8a65);
   outline: none;
-  text-decoration: underline wavy;
+  transform: scale(1.05);
 }
 .footer-feedback-btn:active {
-  background: rgba(255, 183, 77, 0.1);
-  border-radius: 4px;
+  background: rgba(255, 183, 77, 0.3);
+  transform: scale(0.98);
+}
+
+/* Mobile enhancements for even better touch targets */
+@media (max-width: 768px) {
+  .footer-feedback-btn {
+    padding: 1em 1.5em;
+    min-height: 52px;
+    font-size: 1.1em;
+  }
+}
 }
 /* Beta Badge */
 .beta-badge {
@@ -71,10 +85,20 @@
   align-items: center;
   justify-content: center;
   -webkit-overflow-scrolling: touch;
+  padding: 20px 0;
 }
 
 .feedback-modal.show {
   display: flex;
+  overflow-y: auto;
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 .feedback-content {
@@ -85,9 +109,12 @@
   border-radius: 16px;
   width: 96%;
   max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: 0 8px 32px 0 var(--shadow-2), 0 0 0 1px var(--border);
   animation: modalSlideIn 0.3s ease-out;
   position: relative;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Wider modal on desktop */
