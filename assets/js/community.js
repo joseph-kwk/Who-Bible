@@ -3,6 +3,14 @@
   let locationsInitialized = false;
   let conceptsInitialized = false;
 
+  // XSS Protection: Sanitize user-generated content
+  function sanitizeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
   // Profanity filter for usernames
   const PROFANITY_LIST = ['damn', 'hell', 'crap', 'stupid', 'idiot', 'dumb', 'hate', 'kill', 'die', 'sex', 'porn', 'xxx'];
   
@@ -30,14 +38,16 @@
 
   // Check if user has seen guidelines
   function checkGuidelines() {
-    const accepted = localStorage.getItem('who-bible-guidelines-accepted');
-    if (!accepted) {
-      setTimeout(() => {
+    try {
+      const accepted = localStorage.getItem('who-bible-guidelines-accepted');
+      if (!accepted) {
         const modal = document.getElementById('guidelines-modal');
         if (modal) {
           modal.style.display = 'flex';
         }
-      }, 500);
+      }
+    } catch (error) {
+      console.error('Error checking guidelines:', error);
     }
   }
   
@@ -220,17 +230,23 @@
 
   // Tabs
   const tabs = [
-    { btn: document.getElementById('tab-explore'), sec: document.getElementById('section-explore') },
-    { btn: document.getElementById('tab-live'), sec: document.getElementById('section-live') },
-    { btn: document.getElementById('tab-locations'), sec: document.getElementById('section-locations') },
-    { btn: document.getElementById('tab-concepts'), sec: document.getElementById('section-concepts') },
-    { btn: document.getElementById('tab-profile'), sec: document.getElementById('section-profile') },
-    { btn: document.getElementById('tab-guidelines'), sec: document.getElementById('section-guidelines') },
+    { btn: document.getElementById('tab-explore'), sec: document.getElementById('section-explore'), id: 'explore' },
+    { btn: document.getElementById('tab-live'), sec: document.getElementById('section-live'), id: 'live' },
+    { btn: document.getElementById('tab-locations'), sec: document.getElementById('section-locations'), id: 'locations' },
+    { btn: document.getElementById('tab-concepts'), sec: document.getElementById('section-concepts'), id: 'concepts' },
+    { btn: document.getElementById('tab-profile'), sec: document.getElementById('section-profile'), id: 'profile' },
+    { btn: document.getElementById('tab-guidelines'), sec: document.getElementById('section-guidelines'), id: 'guidelines' },
   ];
   function setActive(tab){
-    tabs.forEach(({btn,sec})=>{
+    tabs.forEach(({btn,sec,id})=>{
       if(!btn||!sec) return;
       const active = (btn===tab);
+      
+      // Cleanup Firebase listener when leaving Live tab
+      if (!active && id === 'live') {
+        cleanupLiveRoomsListener();
+      }
+      
       btn.classList.toggle('active', active);
       btn.setAttribute('aria-selected', active ? 'true':'false');
       sec.style.display = active ? 'block' : 'none';
@@ -341,7 +357,17 @@
         updateAvatarStyle();
         return; 
       }
-      const p = JSON.parse(txt);
+      
+      let p;
+      try {
+        p = JSON.parse(txt);
+      } catch (parseError) {
+        console.error('Profile data corrupted:', parseError);
+        showToast({ title: getText('error'), msg: 'Profile data corrupted, using defaults', type: 'warn', timeout: 2000 });
+        setAvatarText('WB'); 
+        updateAvatarStyle();
+        return;
+      }
       if(displayNameInput) displayNameInput.value = p.displayName || '';
       if(profileBioTextarea) profileBioTextarea.value = p.bio || '';
       setAvatarText(p.avatarText || generateAvatarText(p.displayName));
@@ -384,7 +410,21 @@
     try {
       // Get results from main app
       const resultsStr = localStorage.getItem('who-bible-results');
-      const results = resultsStr ? JSON.parse(resultsStr) : [];
+      let results = [];
+      
+      if (resultsStr) {
+        try {
+          results = JSON.parse(resultsStr);
+          if (!Array.isArray(results)) {
+            console.warn('Results data corrupted, resetting to empty array');
+            results = [];
+          }
+        } catch (parseError) {
+          console.error('Failed to parse results:', parseError);
+          showToast({ title: getText('error'), msg: 'Stats data corrupted', type: 'warn', timeout: 2000 });
+          results = [];
+        }
+      }
       
       const quizzesPlayed = results.length;
       const bestScore = results.length > 0 ? Math.max(...results.map(r => r.score || 0)) : 0;
@@ -548,6 +588,21 @@
   const liveRoomsList = document.getElementById('live-rooms-list');
   let currentRoomData = null;
   
+  // Cleanup function for Firebase listeners
+  function cleanupLiveRoomsListener() {
+    if (liveRoomsListener && typeof FirebaseConfig !== 'undefined' && FirebaseConfig.getDatabase) {
+      try {
+        const db = FirebaseConfig.getDatabase();
+        const roomsRef = db.ref('rooms');
+        roomsRef.off('value', liveRoomsListener);
+        liveRoomsListener = null;
+        console.log('✓ Firebase listener cleaned up');
+      } catch(error) {
+        console.error('Error cleaning up listener:', error);
+      }
+    }
+  }
+  
   // Helper to generate avatar color from name
   function getAvatarColor(name) {
     const colors = ['#ff8a65', '#ffb74d', '#81c784', '#64b5f6', '#ba68c8', '#4db6ac', '#f06292', '#ffd54f'];
@@ -584,6 +639,9 @@
     
     try {
       const db = FirebaseConfig.getDatabase();
+      if (!db) {
+        throw new Error('Database connection failed');
+      }
       const roomsRef = db.ref('rooms');
       
       // Listen for all active rooms with real-time updates
@@ -595,8 +653,15 @@
     } catch (error) {
       console.error('Firebase error:', error);
       if (liveRoomsList) {
-        liveRoomsList.innerHTML = `<div class="card"><div class="card-desc">${getText('errorLoadingRooms')}</div></div>`;
+        liveRoomsList.innerHTML = `
+          <div class="card" style="text-align: center; padding: 40px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+            <div class="card-title" style="color: var(--error);">${getText('errorLoadingRooms') || 'Error Loading Rooms'}</div>
+            <div class="card-desc" style="margin-top: 12px;">${sanitizeHTML(error.message) || 'Please try refreshing the page'}</div>
+          </div>
+        `;
       }
+      showToast({ title: getText('error'), msg: 'Failed to connect to live rooms', type: 'error' });
     }
   }
   
@@ -642,7 +707,7 @@
       card.style.cssText = 'cursor: pointer; transition: all 0.3s ease; border: 2px solid var(--border); position: relative; overflow: hidden;';
       card.dataset.roomCode = roomCode;
       
-      const hostName = room.host || 'Unknown Host';
+      const hostName = sanitizeHTML(room.host || 'Unknown Host');
       const players = room.players || {};
       const playerCount = Object.keys(players).length;
       const maxPlayers = room.settings?.maxPlayers || 8;
@@ -790,16 +855,20 @@
           const db = FirebaseConfig.getDatabase();
           const reportRef = db.ref('reports').push();
           reportRef.set({
-            roomCode: roomCode,
-            hostName: hostName,
-            reason: reason,
-            details: details || '',
+            roomCode: sanitizeHTML(roomCode),
+            hostName: sanitizeHTML(hostName),
+            reason: sanitizeHTML(reason),
+            details: sanitizeHTML(details || ''),
             timestamp: Date.now(),
-            reporter: localStorage.getItem('who-bible-profile-name') || 'Anonymous'
+            reporter: sanitizeHTML(localStorage.getItem('who-bible-profile-name') || 'Anonymous')
           });
+        } else {
+          throw new Error('Firebase not available');
         }
       } catch (error) {
         console.error('Report error:', error);
+        showToast({ title: getText('error'), msg: 'Failed to submit report. Please try again.', type: 'error' });
+        return;
       }
       
       document.getElementById('community-modal').style.display = 'none';
@@ -808,9 +877,9 @@
   }
   
   function viewRoomDetails(roomCode, room) {
-    const hostName = room.host?.name || 'Unknown';
+    const hostName = sanitizeHTML(room.host?.name || 'Unknown');
     const playerCount = room.players ? Object.keys(room.players).length : 0;
-    const statusText = room.status || 'waiting';
+    const statusText = sanitizeHTML(room.status || 'waiting');
     const settings = room.settings || {};
     
     const html = `
@@ -843,12 +912,7 @@
   
   // Cleanup on page unload
   window.addEventListener('beforeunload', () => {
-    if (liveRoomsListener && typeof FirebaseConfig !== 'undefined' && FirebaseConfig.getDatabase) {
-      try {
-        const db = FirebaseConfig.getDatabase();
-        db.ref('rooms').off('value', liveRoomsListener);
-      } catch(_) {}
-    }
+    cleanupLiveRoomsListener();
   });
 
   // ===== LOCATIONS TAB =====
@@ -920,9 +984,11 @@
   };
   
   async function initLocationsTab() {
+    if (locationsInitialized) return;
     locationsInitialized = true;
+    
     if (!window.LocationModule) {
-      showToast({ title: 'Loading...', msg: 'Locations module not loaded', type: 'warn' });
+      showToast({ title: getText('error'), msg: 'Locations module not loaded', type: 'error' });
       return;
     }
     
@@ -1285,14 +1351,17 @@
   let flashcardRevealed = false;
   
   async function initConceptsTab() {
+    if (conceptsInitialized) return;
     conceptsInitialized = true;
+    
     if (!window.ConceptModule) {
-      showToast({ title: 'Loading...', msg: 'Concepts module not loaded', type: 'warn' });
+      showToast({ title: getText('error'), msg: 'Concepts module not loaded', type: 'error' });
       return;
     }
     
-    // Render all concepts
-    renderConceptCards(window.ConceptModule.concepts);
+    try {
+      // Render all concepts
+      renderConceptCards(window.ConceptModule.concepts);
     
     // Setup search
     const conceptSearch = document.getElementById('concept-search');
@@ -1343,6 +1412,10 @@
     
     // Flashcard controls
     setupFlashcardControls();
+    } catch (error) {
+      console.error('Error initializing concepts:', error);
+      showToast({ title: getText('error'), msg: 'Failed to load concepts', type: 'error' });
+    }
   }
   
   function toggleFlashcardMode() {
@@ -1653,16 +1726,24 @@
 
   // Initialize modules on page load
   window.addEventListener('DOMContentLoaded', async () => {
-    initFeedback();
+    try {
+      initFeedback();
+    } catch (error) {
+      console.error('Failed to initialize feedback:', error);
+    }
+    
     // Load people data for stats
     try {
       const response = await fetch('assets/data/people.json');
       if (response.ok) {
         const people = await response.json();
         updateCommunityStats(people);
+      } else {
+        console.warn('Failed to fetch people data:', response.status);
       }
     } catch (e) {
-      console.warn('Could not load people data for stats', e);
+      console.error('Error loading people data for stats:', e);
+      showToast({ title: getText('error'), msg: 'Failed to load statistics', type: 'warn', timeout: 2000 });
     }
 
     if (window.LocationModule) {
