@@ -484,7 +484,8 @@
       </div>
       <div class="admin-header-right">
         <button id="btn-refresh" class="secondary">🔄 Refresh</button>
-        <button id="btn-export" class="secondary">📥 Export CSV</button>
+        <button id="btn-export-csv" class="secondary">📥 Export CSV</button>
+        <button id="btn-export-json" class="secondary">📦 Export JSON</button>
         <button id="btn-logout" class="danger">🚪 Logout</button>
       </div>
     </header>
@@ -579,8 +580,9 @@
     const emailInput = document.getElementById('admin-email');
     const passInput = document.getElementById('admin-password');
 
-      // Export CSV button
-      const btnExport = document.getElementById('btn-export');
+      // Export buttons
+      const btnExportCSV = document.getElementById('btn-export-csv');
+      const btnExportJSON = document.getElementById('btn-export-json');
       let lastFeedbackItems = [];
 
     // Auth state listener
@@ -781,15 +783,15 @@
     // Refresh
     document.getElementById('btn-refresh').addEventListener('click', loadFeedback);
 
-    // Export CSV
-    btnExport.addEventListener('click', () => {
+    // Export CSV - Enhanced version with all feedback details
+    btnExportCSV.addEventListener('click', () => {
       if (!lastFeedbackItems.length) {
         alert('📭 No feedback data available to export.');
         return;
       }
       try {
         const csvRows = [
-          'Date,Time,Rating,Modes Rating,Accuracy Rating,Scenarios Rating,Online Play Rating,Message,User Agent'
+          'Date,Time,Overall Rating,Modes Rating,Accuracy Rating,Scenarios Rating,Online Play Rating,Experience Description,Message,User Agent,URL'
         ];
         lastFeedbackItems.forEach(item => {
           const dt = new Date(item.timestamp);
@@ -803,17 +805,19 @@
             item.ratingAccuracy || '',
             item.ratingScenarios || '',
             item.ratingOnline || '',
+            `"${(item.experience || '').replace(/"/g, '""')}"`,
             `"${(item.message || '').replace(/"/g, '""')}"`,
-            `"${(item.userAgent || '').replace(/"/g, '""')}"`
+            `"${(item.userAgent || '').replace(/"/g, '""')}"`,
+            `"${(item.url || '').replace(/"/g, '""')}"`
           ];
           csvRows.push(row.join(','));
         });
-        const csvContent = csvRows.join('\n');
+        const csvContent = '\uFEFF' + csvRows.join('\n'); // UTF-8 BOM for Excel compatibility
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        const timestamp = new Date().toISOString().split('T')[0];
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
         a.download = `who-bible-feedback-${timestamp}.csv`;
         document.body.appendChild(a);
         a.click();
@@ -821,12 +825,127 @@
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
         }, 100);
-        console.log(`✅ Exported ${lastFeedbackItems.length} feedback items`);
+        console.log(`✅ Exported ${lastFeedbackItems.length} feedback items to CSV`);
+        alert(`✅ Successfully exported ${lastFeedbackItems.length} feedback entries to CSV.`);
       } catch (error) {
-        console.error('Export error:', error);
-        alert('❌ Export failed: ' + error.message);
+        console.error('CSV Export error:', error);
+        alert('❌ CSV Export failed: ' + error.message);
       }
     });
+
+    // Export JSON - Complete data export with all metadata
+    btnExportJSON.addEventListener('click', () => {
+      if (!lastFeedbackItems.length) {
+        alert('📭 No feedback data available to export.');
+        return;
+      }
+      try {
+        // Create a comprehensive export object
+        const exportData = {
+          exportDate: new Date().toISOString(),
+          totalFeedback: lastFeedbackItems.length,
+          feedback: lastFeedbackItems.map((item, index) => ({
+            id: index + 1,
+            timestamp: item.timestamp,
+            ratings: {
+              overall: item.rating || null,
+              modes: item.ratingModes || null,
+              accuracy: item.ratingAccuracy || null,
+              scenarios: item.ratingScenarios || null,
+              onlinePlay: item.ratingOnline || null
+            },
+            experience: item.experience || null,
+            message: item.message || null,
+            metadata: {
+              userAgent: item.userAgent || null,
+              url: item.url || null
+            }
+          })),
+          statistics: {
+            averageRating: calculateAverageRating(lastFeedbackItems),
+            ratingsBreakdown: getRatingsBreakdown(lastFeedbackItems),
+            dateRange: {
+              earliest: lastFeedbackItems.length ? new Date(Math.min(...lastFeedbackItems.map(i => new Date(i.timestamp)))).toISOString() : null,
+              latest: lastFeedbackItems.length ? new Date(Math.max(...lastFeedbackItems.map(i => new Date(i.timestamp)))).toISOString() : null
+            }
+          }
+        };
+
+        const jsonString = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T').join('_').slice(0, -5);
+        a.download = `who-bible-feedback-${timestamp}.json`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 100);
+        console.log(`✅ Exported ${lastFeedbackItems.length} feedback items to JSON`);
+        alert(`✅ Successfully exported ${lastFeedbackItems.length} feedback entries to JSON with statistics.`);
+      } catch (error) {
+        console.error('JSON Export error:', error);
+        alert('❌ JSON Export failed: ' + error.message);
+      }
+    });
+
+    // Helper functions for JSON export statistics
+    function calculateAverageRating(items) {
+      const ratings = items.filter(i => i.rating).map(i => i.rating);
+      return ratings.length ? (ratings.reduce((a,b)=>a+b,0) / ratings.length).toFixed(2) : null;
+    }
+
+    function getRatingsBreakdown(items) {
+      const breakdown = {
+        overall: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, unrated: 0 },
+        modes: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, unrated: 0 },
+        accuracy: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, unrated: 0 },
+        scenarios: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, unrated: 0 },
+        onlinePlay: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, unrated: 0 }
+      };
+      
+      items.forEach(item => {
+        // Overall rating
+        if (item.rating && item.rating >= 1 && item.rating <= 5) {
+          breakdown.overall[item.rating]++;
+        } else {
+          breakdown.overall.unrated++;
+        }
+        
+        // Modes rating
+        if (item.ratingModes && item.ratingModes >= 1 && item.ratingModes <= 5) {
+          breakdown.modes[item.ratingModes]++;
+        } else {
+          breakdown.modes.unrated++;
+        }
+        
+        // Accuracy rating
+        if (item.ratingAccuracy && item.ratingAccuracy >= 1 && item.ratingAccuracy <= 5) {
+          breakdown.accuracy[item.ratingAccuracy]++;
+        } else {
+          breakdown.accuracy.unrated++;
+        }
+        
+        // Scenarios rating
+        if (item.ratingScenarios && item.ratingScenarios >= 1 && item.ratingScenarios <= 5) {
+          breakdown.scenarios[item.ratingScenarios]++;
+        } else {
+          breakdown.scenarios.unrated++;
+        }
+        
+        // Online Play rating
+        if (item.ratingOnline && item.ratingOnline >= 1 && item.ratingOnline <= 5) {
+          breakdown.onlinePlay[item.ratingOnline]++;
+        } else {
+          breakdown.onlinePlay.unrated++;
+        }
+      });
+      
+      return breakdown;
+    }
 
     // Update Stats
     // Chart.js chart instances
