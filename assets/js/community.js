@@ -232,6 +232,7 @@
   const tabs = [
     { btn: document.getElementById('tab-explore'), sec: document.getElementById('section-explore'), id: 'explore' },
     { btn: document.getElementById('tab-live'), sec: document.getElementById('section-live'), id: 'live' },
+    { btn: document.getElementById('tab-discussions'), sec: document.getElementById('section-discussions'), id: 'discussions' },
     { btn: document.getElementById('tab-locations'), sec: document.getElementById('section-locations'), id: 'locations' },
     { btn: document.getElementById('tab-concepts'), sec: document.getElementById('section-concepts'), id: 'concepts' },
     { btn: document.getElementById('tab-profile'), sec: document.getElementById('section-profile'), id: 'profile' },

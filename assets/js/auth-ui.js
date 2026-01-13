@@ -505,8 +505,45 @@ function updateProfileDisplay(profile) {
     document.getElementById('profile-name').textContent = profile.displayName || 'Scholar';
     document.getElementById('profile-avatar').src = profile.photoURL || 'assets/images/default-avatar.png';
     
+    // Add language indicator
+    const profileHeader = document.querySelector('.profile-header');
+    if (profileHeader && profile.preferredLanguage) {
+        const existingIndicator = profileHeader.querySelector('.language-indicator');
+        if (existingIndicator) existingIndicator.remove();
+        
+        const languageIndicator = document.createElement('div');
+        languageIndicator.className = 'language-indicator';
+        languageIndicator.textContent = getLanguageFlag(profile.preferredLanguage);
+        languageIndicator.title = `Preferred language: ${getLanguageName(profile.preferredLanguage)}`;
+        profileHeader.appendChild(languageIndicator);
+    }
+    
     // Update level and XP from stats (would be loaded separately)
     // This is placeholder - actual stats loading happens in user-profile.js
+}
+
+/**
+ * Get language flag emoji
+ */
+function getLanguageFlag(langCode) {
+    const flags = {
+        'en': '🇬🇧',
+        'es': '🇪🇸',
+        'fr': '🇫🇷'
+    };
+    return flags[langCode] || '🌐';
+}
+
+/**
+ * Get language name
+ */
+function getLanguageName(langCode) {
+    const names = {
+        'en': 'English',
+        'es': 'Español',
+        'fr': 'Français'
+    };
+    return names[langCode] || langCode;
 }
 
 // Initialize on load

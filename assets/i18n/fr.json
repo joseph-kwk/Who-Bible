@@ -1283,6 +1283,25 @@
       "confirmRemove": "Êtes-vous sûr de vouloir retirer cet ami ?",
       "requestAccepted": "Demande d'ami acceptée !",
       "loginRequired": "Veuillez vous connecter pour voir les amis"
+    },
+    "discussions": {
+      "title": "Discussions Bibliques",
+      "subtitle": "Rejoignez une salle pour discuter de sujets bibliques avec la communauté",
+      "oldTestament": "Ancien Testament",
+      "newTestament": "Nouveau Testament",
+      "general": "Général et Communauté",
+      "backToRooms": "Retour aux Salles",
+      "messagePlaceholder": "Partagez vos pensées... (max 500 caractères)",
+      "send": "Envoyer",
+      "noMessages": "Pas encore de messages. Lancez la conversation !",
+      "confirmDelete": "Supprimer ce message ?",
+      "reportReason": "Pourquoi signalez-vous ce message ?",
+      "tooFast": "Veuillez attendre quelques secondes entre les messages",
+      "messageDeleted": "Message supprimé",
+      "messageReported": "Merci. Les modérateurs examineront cela.",
+      "loginRequiredToPost": "Veuillez vous connecter pour rejoindre les discussions",
+      "roomFull": "Cette salle est actuellement pleine",
+      "blocked": "Vous ne pouvez pas publier dans cette salle"
     }
   }
 }

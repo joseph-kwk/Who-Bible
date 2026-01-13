@@ -67,22 +67,43 @@ service cloud.firestore {
       );
     }
     
-    // Conversations and messages
-    match /conversations/{conversationId} {
-      allow read: if isAuthenticated() && 
-                     request.auth.uid in resource.data.participants;
-      allow write: if isAuthenticated() && 
-                      request.auth.uid in request.resource.data.participants;
+    // Discussion rooms (public community discussions)
+    match /discussion-rooms/{roomId} {
+      // Anyone can read room metadata
+      allow read: if isAuthenticated();
       
+      // Only system can write room metadata
+      allow write: if false;
+      
+      // Room messages
       match /messages/{messageId} {
-        allow read: if isAuthenticated() && 
-                       request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+        // Anyone can read messages (public discussions)
+        allow read: if isAuthenticated();
+        
+        // Users can create messages in rooms
         allow create: if isAuthenticated() && 
-                         request.auth.uid == request.resource.data.senderId;
-        allow update: if isAuthenticated() && 
-                         request.auth.uid == resource.data.recipientId; // For marking as read
-        allow delete: if false; // Messages cannot be deleted
+                         request.auth.uid == request.resource.data.userId;
+        
+        // Users can only delete their own messages (within time limit checked in code)
+        allow delete: if isAuthenticated() && 
+                         request.auth.uid == resource.data.userId;
+        
+        // Only system can update (for moderation)
+        allow update: if false;
+        
+        // Message likes subcollection
+        match /likes/{likeId} {
+          allow read: if isAuthenticated();
+          allow write: if isAuthenticated() && request.auth.uid == likeId;
+        }
       }
+    }
+    
+    // Reports for content moderation
+    match /reports/{reportId} {
+      allow create: if isAuthenticated() && 
+                       request.resource.data.reportedBy == request.auth.uid;
+      allow read, update, delete: if false; // Only admin console
     }
     
     // Users collection (public profiles for search)

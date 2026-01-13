@@ -349,6 +349,20 @@
     gap: 1rem;
     padding: 1.25rem;
     border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.language-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    cursor: help;
+    transition: transform 0.2s ease;
+}
+
+.language-indicator:hover {
+    transform: scale(1.2);
 }
 
 .profile-avatar {

@@ -1277,6 +1277,25 @@
       "confirmRemove": "Are you sure you want to remove this friend?",
       "requestAccepted": "Friend request accepted!",
       "loginRequired": "Please log in to view friends"
+    },
+    "discussions": {
+      "title": "Bible Discussions",
+      "subtitle": "Join a room to discuss Bible topics with the community",
+      "oldTestament": "Old Testament",
+      "newTestament": "New Testament",
+      "general": "General & Community",
+      "backToRooms": "Back to Rooms",
+      "messagePlaceholder": "Share your thoughts... (max 500 characters)",
+      "send": "Send",
+      "noMessages": "No messages yet. Start the conversation!",
+      "confirmDelete": "Delete this message?",
+      "reportReason": "Why are you reporting this message?",
+      "tooFast": "Please wait a few seconds between messages",
+      "messageDeleted": "Message deleted",
+      "messageReported": "Thank you. Moderators will review this.",
+      "loginRequiredToPost": "Please log in to join discussions",
+      "roomFull": "This room is currently full",
+      "blocked": "You cannot post in this room"
     }
   }
 }
