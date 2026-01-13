@@ -1,0 +1,479 @@
+/**
+ * Performance & Loading States CSS
+ * Phase 8: Performance & Polish
+ */
+
+/* ============================================================================
+   LOADING SPINNER
+   ============================================================================ */
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    gap: 1rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-state p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Small spinner variant */
+.spinner-small {
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+}
+
+/* Button spinner */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+/* ============================================================================
+   SKELETON SCREENS
+   ============================================================================ */
+
+.skeleton-list,
+.skeleton-card,
+.skeleton-profile {
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Skeleton List */
+.skeleton-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.skeleton-item {
+    height: 60px;
+    background: linear-gradient(
+        90deg,
+        var(--bg-2) 25%,
+        var(--bg-3) 50%,
+        var(--bg-2) 75%
+    );
+    background-size: 200% 100%;
+    border-radius: 8px;
+    animation: skeleton-shimmer 2s infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Skeleton Card */
+.skeleton-card {
+    padding: 1.5rem;
+    background: var(--card);
+    border-radius: 12px;
+    border: 2px solid var(--border);
+}
+
+.skeleton-header {
+    height: 24px;
+    width: 60%;
+    background: linear-gradient(
+        90deg,
+        var(--bg-2) 25%,
+        var(--bg-3) 50%,
+        var(--bg-2) 75%
+    );
+    background-size: 200% 100%;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    animation: skeleton-shimmer 2s infinite;
+}
+
+.skeleton-body {
+    height: 80px;
+    background: linear-gradient(
+        90deg,
+        var(--bg-2) 25%,
+        var(--bg-3) 50%,
+        var(--bg-2) 75%
+    );
+    background-size: 200% 100%;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    animation: skeleton-shimmer 2s infinite;
+}
+
+.skeleton-footer {
+    height: 16px;
+    width: 40%;
+    background: linear-gradient(
+        90deg,
+        var(--bg-2) 25%,
+        var(--bg-3) 50%,
+        var(--bg-2) 75%
+    );
+    background-size: 200% 100%;
+    border-radius: 4px;
+    animation: skeleton-shimmer 2s infinite;
+}
+
+/* Skeleton Profile */
+.skeleton-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+}
+
+.skeleton-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: linear-gradient(
+        90deg,
+        var(--bg-2) 25%,
+        var(--bg-3) 50%,
+        var(--bg-2) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 2s infinite;
+}
+
+.skeleton-name {
+    height: 24px;
+    width: 150px;
+    background: linear-gradient(
+        90deg,
+        var(--bg-2) 25%,
+        var(--bg-3) 50%,
+        var(--bg-2) 75%
+    );
+    background-size: 200% 100%;
+    border-radius: 4px;
+    animation: skeleton-shimmer 2s infinite;
+}
+
+.skeleton-stats {
+    height: 60px;
+    width: 200px;
+    background: linear-gradient(
+        90deg,
+        var(--bg-2) 25%,
+        var(--bg-3) 50%,
+        var(--bg-2) 75%
+    );
+    background-size: 200% 100%;
+    border-radius: 4px;
+    animation: skeleton-shimmer 2s infinite;
+}
+
+/* ============================================================================
+   ERROR TOASTS
+   ============================================================================ */
+
+.error-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 300px;
+    max-width: 500px;
+    background: var(--card);
+    border: 2px solid #ff6b6b;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px var(--shadow);
+    z-index: 10000;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.error-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+}
+
+.error-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.error-message {
+    flex: 1;
+    color: var(--text);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.error-close {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.error-close:hover {
+    background: var(--bg-2);
+    color: var(--text);
+}
+
+/* Success variant */
+.success-toast {
+    border-color: #51cf66;
+}
+
+.success-toast .error-icon {
+    color: #51cf66;
+}
+
+/* Warning variant */
+.warning-toast {
+    border-color: #ffd43b;
+}
+
+.warning-toast .error-icon {
+    color: #ffd43b;
+}
+
+/* Info variant */
+.info-toast {
+    border-color: var(--accent);
+}
+
+.info-toast .error-icon {
+    color: var(--accent);
+}
+
+/* ============================================================================
+   PROGRESS BARS
+   ============================================================================ */
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-2);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Indeterminate progress */
+.progress-indeterminate .progress-fill {
+    width: 30%;
+    animation: progress-slide 1.5s ease-in-out infinite;
+}
+
+@keyframes progress-slide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(400%); }
+}
+
+/* ============================================================================
+   EMPTY STATES
+   ============================================================================ */
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--muted);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-message {
+    font-size: 0.95rem;
+    max-width: 400px;
+    line-height: 1.5;
+}
+
+.empty-state-action {
+    margin-top: 1.5rem;
+}
+
+/* ============================================================================
+   DISABLED STATES
+   ============================================================================ */
+
+[disabled],
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+button[disabled],
+button.disabled {
+    background: var(--bg-2);
+    color: var(--muted);
+    border-color: var(--border);
+}
+
+/* ============================================================================
+   MOBILE OPTIMIZATIONS
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    .error-toast {
+        left: 10px;
+        right: 10px;
+        min-width: unset;
+        max-width: unset;
+        top: 10px;
+    }
+
+    .error-content {
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .error-icon {
+        font-size: 20px;
+    }
+
+    .error-message {
+        font-size: 0.9rem;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+    }
+
+    .loading-state {
+        padding: 2rem 1rem;
+    }
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .error-toast {
+        border-width: 3px;
+    }
+
+    .skeleton-item,
+    .skeleton-header,
+    .skeleton-body,
+    .skeleton-footer,
+    .skeleton-avatar,
+    .skeleton-name,
+    .skeleton-stats {
+        border: 2px solid var(--border);
+    }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+    .loading-state,
+    .error-toast,
+    .spinner,
+    .skeleton-list,
+    .skeleton-card,
+    .skeleton-profile {
+        display: none;
+    }
+}
