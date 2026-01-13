@@ -1,0 +1,93 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      // Users can only write to their own profile
+      allow write: if isAuthenticated() && isOwner(userId);
+      
+      // User data subcollection (stats, settings, etc.)
+      match /data/{document=**} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow write: if isAuthenticated() && isOwner(userId);
+      }
+      
+      // User game history
+      match /games/{gameId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow create: if isAuthenticated() && isOwner(userId);
+        allow update, delete: if false; // Games are immutable once created
+      }
+      
+      // User achievements
+      match /achievements/{achievementId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow write: if false; // Only Cloud Functions can award achievements
+      }
+      
+      // User friends
+      match /friends/{friendId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow write: if isAuthenticated() && isOwner(userId);
+      }
+    }
+    
+    // Leaderboards - read by all authenticated users, write only by Cloud Functions
+    match /leaderboards/{board}/{entry} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only Cloud Functions can update leaderboards
+    }
+    
+    // Challenges - existing rules maintained
+    match /challenges/{challengeId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        isOwner(resource.data.challenger) || 
+        isOwner(resource.data.opponent)
+      );
+      allow delete: if isAuthenticated() && isOwner(resource.data.challenger);
+    }
+    
+    // Rooms - existing rules maintained for community feature
+    match /rooms/{roomId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated() && isOwner(resource.data.hostId);
+    }
+    
+    // Feedback collection
+    match /feedback/{feedbackId} {
+      allow create: if true; // Anyone can submit feedback
+      allow read: if false; // Only admins via console
+      allow update, delete: if false;
+    }
+    
+    // Daily challenges - read by all, write by Cloud Functions only
+    match /daily-challenges/{date} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+    
+    // Notifications
+    match /notifications/{userId}/messages/{messageId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if false; // Only Cloud Functions send notifications
+      allow delete: if isAuthenticated() && isOwner(userId); // Users can dismiss
+    }
+  }
+}
