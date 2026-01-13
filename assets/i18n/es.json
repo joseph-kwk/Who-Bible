@@ -1251,7 +1251,38 @@
       "totalGames": "Juegos Totales",
       "avgAccuracy": "Precisión Promedio",
       "loginRequired": "Por favor inicia sesión para ver la clasificación",
-      "noEntries": "Aún no hay entradas"
+      "noEntries": "Aún no hay entradas",
+      "noFriends": "Aún no hay amigos",
+      "addFriendsHint": "¡Añade amigos para competir con ellos!"
+    },
+    "friends": {
+      "title": "Amigos",
+      "myFriends": "Mis Amigos",
+      "requests": "Solicitudes",
+      "findFriends": "Buscar Amigos",
+      "totalFriends": "Amigos",
+      "pendingRequests": "Solicitudes Pendientes",
+      "sentRequests": "Solicitudes Enviadas",
+      "searchPlaceholder": "Buscar usuarios por nombre...",
+      "search": "Buscar",
+      "noFriends": "Aún no hay amigos",
+      "searchHint": "Busca usuarios para añadir amigos",
+      "searchHint2": "Ingresa al menos 2 caracteres para buscar",
+      "noResults": "No se encontraron usuarios",
+      "noPendingRequests": "No hay solicitudes pendientes",
+      "noSentRequests": "No hay solicitudes enviadas",
+      "challenge": "Desafiar",
+      "message": "Mensaje",
+      "remove": "Eliminar Amigo",
+      "accept": "Aceptar",
+      "decline": "Rechazar",
+      "requestSent": "Solicitud Enviada",
+      "pending": "Pendiente...",
+      "addFriend": "Añadir Amigo",
+      "friends": "Amigos",
+      "confirmRemove": "¿Estás seguro de que quieres eliminar este amigo?",
+      "requestAccepted": "¡Solicitud de amistad aceptada!",
+      "loginRequired": "Por favor inicia sesión para ver amigos"
     }
   }
 }

@@ -1251,7 +1251,38 @@
       "totalGames": "Jeux Totaux",
       "avgAccuracy": "Précision Moyenne",
       "loginRequired": "Veuillez vous connecter pour voir le classement",
-      "noEntries": "Pas encore d'entrées"
+      "noEntries": "Pas encore d'entrées",
+      "noFriends": "Pas encore d'amis",
+      "addFriendsHint": "Ajoutez des amis pour rivaliser avec eux !"
+    },
+    "friends": {
+      "title": "Amis",
+      "myFriends": "Mes Amis",
+      "requests": "Demandes",
+      "findFriends": "Trouver des Amis",
+      "totalFriends": "Amis",
+      "pendingRequests": "Demandes en Attente",
+      "sentRequests": "Demandes Envoyées",
+      "searchPlaceholder": "Rechercher des utilisateurs par nom...",
+      "search": "Rechercher",
+      "noFriends": "Pas encore d'amis",
+      "searchHint": "Recherchez des utilisateurs pour ajouter des amis",
+      "searchHint2": "Entrez au moins 2 caractères pour rechercher",
+      "noResults": "Aucun utilisateur trouvé",
+      "noPendingRequests": "Aucune demande en attente",
+      "noSentRequests": "Aucune demande envoyée",
+      "challenge": "Défier",
+      "message": "Message",
+      "remove": "Retirer Ami",
+      "accept": "Accepter",
+      "decline": "Refuser",
+      "requestSent": "Demande Envoyée",
+      "pending": "En attente...",
+      "addFriend": "Ajouter Ami",
+      "friends": "Amis",
+      "confirmRemove": "Êtes-vous sûr de vouloir retirer cet ami ?",
+      "requestAccepted": "Demande d'ami acceptée !",
+      "loginRequired": "Veuillez vous connecter pour voir les amis"
     }
   }
 }

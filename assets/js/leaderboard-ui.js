@@ -15,6 +15,7 @@ import {
     CATEGORIES
 } from './leaderboard.js';
 import { getCurrentUser } from './auth.js';
+import { getFriendsList } from './friends.js';
 import { getText } from './translations.js';
 
 let leaderboardModal = null;
@@ -227,8 +228,21 @@ async function renderLeaderboard() {
         } else if (currentView === 'nearby') {
             entries = await getNearbyPlayers(user.uid, currentTimeframe, currentCategory, 10);
         } else if (currentView === 'friends') {
-            // TODO: Get friend UIDs
-            const friendUids = []; // Placeholder
+            // Get friend UIDs from friends list
+            const friends = await getFriendsList(user.uid);
+            const friendUids = friends.map(f => f.uid);
+            
+            if (friendUids.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <div class="empty-text">${getText('leaderboard.noFriends', {}, 'No friends yet')}</div>
+                        <div class="empty-hint">${getText('leaderboard.addFriendsHint', {}, 'Add friends to compete with them!')}</div>
+                    </div>
+                `;
+                return;
+            }
+            
             entries = await getFriendsLeaderboard(friendUids, currentCategory);
         }
 

@@ -43,6 +43,52 @@ service cloud.firestore {
         allow read: if isAuthenticated() && isOwner(userId);
         allow write: if isAuthenticated() && isOwner(userId);
       }
+      
+      // User blocked list
+      match /blocked/{blockedUserId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow write: if isAuthenticated() && isOwner(userId);
+      }
+    }
+    
+    // Friend requests
+    match /friend-requests/{requestId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.senderId ||
+        request.auth.uid == resource.data.recipientId
+      );
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.senderId;
+      allow update: if isAuthenticated() && 
+                       request.auth.uid == resource.data.recipientId;
+      allow delete: if isAuthenticated() && (
+        request.auth.uid == resource.data.senderId ||
+        request.auth.uid == resource.data.recipientId
+      );
+    }
+    
+    // Conversations and messages
+    match /conversations/{conversationId} {
+      allow read: if isAuthenticated() && 
+                     request.auth.uid in resource.data.participants;
+      allow write: if isAuthenticated() && 
+                      request.auth.uid in request.resource.data.participants;
+      
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() && 
+                       request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+        allow create: if isAuthenticated() && 
+                         request.auth.uid == request.resource.data.senderId;
+        allow update: if isAuthenticated() && 
+                         request.auth.uid == resource.data.recipientId; // For marking as read
+        allow delete: if false; // Messages cannot be deleted
+      }
+    }
+    
+    // Users collection (public profiles for search)
+    match /users/{userId} {
+      // Anyone can read basic profile info for search/discovery
+      allow read: if isAuthenticated();
     }
     
     // Leaderboards - read by all, authenticated users can update their own entries

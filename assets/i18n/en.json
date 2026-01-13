@@ -1245,7 +1245,38 @@
       "totalGames": "Total Games",
       "avgAccuracy": "Avg Accuracy",
       "loginRequired": "Please log in to view leaderboard",
-      "noEntries": "No entries yet"
+      "noEntries": "No entries yet",
+      "noFriends": "No friends yet",
+      "addFriendsHint": "Add friends to compete with them!"
+    },
+    "friends": {
+      "title": "Friends",
+      "myFriends": "My Friends",
+      "requests": "Requests",
+      "findFriends": "Find Friends",
+      "totalFriends": "Friends",
+      "pendingRequests": "Pending Requests",
+      "sentRequests": "Sent Requests",
+      "searchPlaceholder": "Search users by name...",
+      "search": "Search",
+      "noFriends": "No friends yet",
+      "searchHint": "Search for users to add friends",
+      "searchHint2": "Enter at least 2 characters to search",
+      "noResults": "No users found",
+      "noPendingRequests": "No pending requests",
+      "noSentRequests": "No sent requests",
+      "challenge": "Challenge",
+      "message": "Message",
+      "remove": "Remove Friend",
+      "accept": "Accept",
+      "decline": "Decline",
+      "requestSent": "Request Sent",
+      "pending": "Pending...",
+      "addFriend": "Add Friend",
+      "friends": "Friends",
+      "confirmRemove": "Are you sure you want to remove this friend?",
+      "requestAccepted": "Friend request accepted!",
+      "loginRequired": "Please log in to view friends"
     }
   }
 }
