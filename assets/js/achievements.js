@@ -211,9 +211,69 @@ export const ACHIEVEMENTS = {
         category: 'social',
         rarity: 'rare',
         xpReward: 150,
-        condition: (stats, gameData, history) => {
-            // Will check challenge wins when that data is available
-            return false; // Placeholder
+        condition: async (stats, gameData, history, challengeStats) => {
+            return challengeStats && challengeStats.wins >= 10;
+        }
+    },
+    'first_challenger': {
+        id: 'first_challenger',
+        name: 'First Challenger',
+        description: 'Send your first friend challenge',
+        icon: '🎯',
+        category: 'social',
+        rarity: 'common',
+        xpReward: 25,
+        condition: async (stats, gameData, history, challengeStats) => {
+            return challengeStats && challengeStats.total >= 1;
+        }
+    },
+    'challenge_champion': {
+        id: 'challenge_champion',
+        name: 'Challenge Champion',
+        description: 'Win 25 friend challenges',
+        icon: '🏆',
+        category: 'social',
+        rarity: 'epic',
+        xpReward: 300,
+        condition: async (stats, gameData, history, challengeStats) => {
+            return challengeStats && challengeStats.wins >= 25;
+        }
+    },
+    'undefeated': {
+        id: 'undefeated',
+        name: 'Undefeated',
+        description: 'Win 5 challenges in a row',
+        icon: '👑',
+        category: 'social',
+        rarity: 'epic',
+        xpReward: 250,
+        condition: async (stats, gameData, history, challengeStats) => {
+            // This would require tracking consecutive wins
+            return challengeStats && challengeStats.consecutiveWins >= 5;
+        }
+    },
+    'social_butterfly': {
+        id: 'social_butterfly',
+        name: 'Social Butterfly',
+        description: 'Challenge 10 different friends',
+        icon: '🦋',
+        category: 'social',
+        rarity: 'rare',
+        xpReward: 150,
+        condition: async (stats, gameData, history, challengeStats) => {
+            return challengeStats && challengeStats.uniqueOpponents >= 10;
+        }
+    },
+    'friendly_rival': {
+        id: 'friendly_rival',
+        name: 'Friendly Rival',
+        description: 'Complete 5 challenges with the same friend',
+        icon: '🤝',
+        category: 'social',
+        rarity: 'rare',
+        xpReward: 100,
+        condition: async (stats, gameData, history, challengeStats) => {
+            return challengeStats && challengeStats.mostChallengedCount >= 5;
         }
     },
 
@@ -310,7 +370,7 @@ export const ACHIEVEMENTS = {
 /**
  * Check and award achievements after a game
  */
-export async function checkAchievements(gameData, history = []) {
+export async function checkAchievements(gameData, history = [], challengeStats = null) {
     const user = getCurrentUser();
     if (!user) return [];
 
@@ -324,8 +384,9 @@ export async function checkAchievements(gameData, history = []) {
             // Skip if already earned
             if (userAchievements.some(a => a.id === id)) continue;
 
-            // Check condition
-            if (achievement.condition(stats, gameData, history)) {
+            // Check condition (support async conditions)
+            const earned = await achievement.condition(stats, gameData, history, challengeStats);
+            if (earned) {
                 await awardAchievement(user.uid, achievement);
                 newAchievements.push(achievement);
             }
