@@ -1197,6 +1197,55 @@
     "consistency": "Consistency",
     "activity": "Activity",
     "learning": "Learning",
-    "modes": "Modes"
+    "modes": "Modes",
+    "badges": {
+      "title": "Achievements",
+      "earned": "Earned",
+      "total": "Total",
+      "completion": "Completion",
+      "all": "All",
+      "locked": "Locked",
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary",
+      "earnedOn": "Earned",
+      "unlocked": "Achievement Unlocked!",
+      "loginRequired": "Please log in to view achievements",
+      "noEntries": "No achievements yet",
+      "category": {
+        "accuracy": "Accuracy",
+        "streaks": "Streaks",
+        "dedication": "Dedication",
+        "progression": "Progression",
+        "modes": "Modes",
+        "social": "Social",
+        "knowledge": "Knowledge",
+        "special": "Special"
+      }
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "timeframe": "Timeframe",
+      "category": "Category",
+      "view": "View",
+      "allTime": "All Time",
+      "monthly": "Monthly",
+      "weekly": "Weekly",
+      "daily": "Daily",
+      "level": "Level",
+      "accuracy": "Accuracy",
+      "streak": "Streak",
+      "games": "Games",
+      "global": "Global",
+      "nearby": "Nearby",
+      "friends": "Friends",
+      "players": "Players",
+      "totalXP": "Total XP",
+      "totalGames": "Total Games",
+      "avgAccuracy": "Avg Accuracy",
+      "loginRequired": "Please log in to view leaderboard",
+      "noEntries": "No entries yet"
+    }
   }
 }

@@ -1203,6 +1203,55 @@
     "consistency": "Consistencia",
     "activity": "Actividad",
     "learning": "Aprendizaje",
-    "modes": "Modos"
+    "modes": "Modos",
+    "badges": {
+      "title": "Logros",
+      "earned": "Obtenidos",
+      "total": "Total",
+      "completion": "Completado",
+      "all": "Todos",
+      "locked": "Bloqueados",
+      "common": "Común",
+      "rare": "Raro",
+      "epic": "Épico",
+      "legendary": "Legendario",
+      "earnedOn": "Obtenido",
+      "unlocked": "¡Logro Desbloqueado!",
+      "loginRequired": "Por favor inicia sesión para ver los logros",
+      "noEntries": "Aún no hay logros",
+      "category": {
+        "accuracy": "Precisión",
+        "streaks": "Rachas",
+        "dedication": "Dedicación",
+        "progression": "Progresión",
+        "modes": "Modos",
+        "social": "Social",
+        "knowledge": "Conocimiento",
+        "special": "Especial"
+      }
+    },
+    "leaderboard": {
+      "title": "Tabla de Clasificación",
+      "timeframe": "Período",
+      "category": "Categoría",
+      "view": "Vista",
+      "allTime": "Todo el Tiempo",
+      "monthly": "Mensual",
+      "weekly": "Semanal",
+      "daily": "Diario",
+      "level": "Nivel",
+      "accuracy": "Precisión",
+      "streak": "Racha",
+      "games": "Juegos",
+      "global": "Global",
+      "nearby": "Cercanos",
+      "friends": "Amigos",
+      "players": "Jugadores",
+      "totalXP": "XP Total",
+      "totalGames": "Juegos Totales",
+      "avgAccuracy": "Precisión Promedio",
+      "loginRequired": "Por favor inicia sesión para ver la clasificación",
+      "noEntries": "Aún no hay entradas"
+    }
   }
 }
