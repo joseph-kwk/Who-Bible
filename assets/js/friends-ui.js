@@ -284,9 +284,6 @@ function createFriendCard(friend) {
                 <button class="action-btn challenge-btn" data-uid="${friend.uid}" title="${getText('friends.challenge', {}, 'Challenge')}">
                     ⚔️
                 </button>
-                <button class="action-btn message-btn" data-uid="${friend.uid}" title="${getText('friends.message', {}, 'Message')}">
-                    💬
-                </button>
                 <button class="action-btn remove-btn" data-uid="${friend.uid}" title="${getText('friends.remove', {}, 'Remove Friend')}">
                     ❌
                 </button>
@@ -482,15 +479,6 @@ function attachFriendCardListeners() {
             const friendUid = e.currentTarget.dataset.uid;
             // TODO: Open challenge modal
             alert('Challenge feature coming soon!');
-        });
-    });
-
-    // Message buttons
-    document.querySelectorAll('.message-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const friendUid = e.currentTarget.dataset.uid;
-            // TODO: Open message modal
-            alert('Messaging feature coming soon!');
         });
     });
 
