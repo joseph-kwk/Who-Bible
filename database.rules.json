@@ -7,12 +7,90 @@
       ".read": "auth != null"
     },
     "rooms": {
-      ".read": true,
-      ".write": true
+      "$roomCode": {
+        ".read": true,
+        ".write": "!data.exists() || (data.child('status').val() !== 'completed' && data.child('status').val() !== 'finished')",
+        "host": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50"
+        },
+        "status": {
+          ".validate": "newData.val() === 'waiting' || newData.val() === 'active' || newData.val() === 'completed' || newData.val() === 'finished'"
+        },
+        "players": {
+          "$playerId": {
+            ".validate": "newData.hasChildren(['name', 'score'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 30"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000"
+            }
+          }
+        }
+      }
     },
     "challenges": {
       ".read": true,
       ".write": true
+    },
+    "classrooms": {
+      "$roomCode": {
+        ".read": true,
+        ".write": "!data.exists() || (data.child('status').val() !== 'finished' && data.child('status').val() !== 'ended')",
+        ".validate": "newData.hasChildren(['code', 'host', 'status', 'createdAt'])",
+        "code": {
+          ".validate": "newData.isString() && newData.val().length >= 5 && newData.val().length <= 20"
+        },
+        "host": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50"
+        },
+        "status": {
+          ".validate": "newData.val() === 'lobby' || newData.val() === 'active' || newData.val() === 'question' || newData.val() === 'results' || newData.val() === 'leaderboard' || newData.val() === 'finished' || newData.val() === 'ended'"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now + 60000"
+        },
+        "players": {
+          "$playerId": {
+            ".validate": "newData.hasChildren(['name', 'score'])",
+            "name": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 30"
+            },
+            "score": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000"
+            },
+            "joinedAt": {
+              ".validate": "newData.isNumber()"
+            }
+          }
+        },
+        "responses": {
+          "$playerId": {
+            "$questionIndex": {
+              ".write": "!data.exists()",
+              ".validate": "newData.hasChildren(['answer', 'correct', 'time'])",
+              "answer": {
+                ".validate": "newData.isString() && newData.val().length <= 200"
+              },
+              "correct": {
+                ".validate": "newData.isBoolean()"
+              },
+              "time": {
+                ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 300000"
+              }
+            }
+          }
+        },
+        "settings": {
+          ".validate": "newData.hasChildren(['numQuestions', 'timePerQuestion'])",
+          "numQuestions": {
+            ".validate": "newData.isNumber() && newData.val() >= 5 && newData.val() <= 30"
+          },
+          "timePerQuestion": {
+            ".validate": "newData.isNumber() && newData.val() >= 10 && newData.val() <= 60"
+          }
+        }
+      }
     }
   }
 }

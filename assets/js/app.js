@@ -2145,10 +2145,34 @@ window.showPlayerChangeModal = function() {
 
 // Classroom Mode - Join Prompt
 function promptClassroomJoin() {
+  // Rate limiting
+  if (window.RateLimiter && !window.RateLimiter.check('joinClassroom', 10)) {
+    showToast({ title: 'Error', msg: 'Too many join attempts. Please wait.', type: 'error' });
+    return;
+  }
+  
   const code = prompt('Enter Game PIN (e.g., FAITH-123):');
   if (!code) return;
   
+  // Validate room code
+  if (window.SecurityModule) {
+    const codeValidation = window.SecurityModule.validateRoomCode(code);
+    if (!codeValidation.valid) {
+      showToast({ title: 'Error', msg: codeValidation.error, type: 'error' });
+      return;
+    }
+  }
+  
   const name = prompt('Enter your name:') || 'Player';
+  
+  // Validate player name
+  if (window.SecurityModule) {
+    const nameValidation = window.SecurityModule.validatePlayerName(name);
+    if (!nameValidation.valid) {
+      showToast({ title: 'Error', msg: nameValidation.error, type: 'error' });
+      return;
+    }
+  }
   
   if (!window.FirebaseConfig || !window.FirebaseConfig.isAvailable()) {
     showToast({ title: 'Error', msg: 'Firebase not configured', type: 'error' });
@@ -2156,7 +2180,9 @@ function promptClassroomJoin() {
   }
   
   const database = window.FirebaseConfig.getDatabase();
-  const roomRef = database.ref('classrooms/' + code.toUpperCase());
+  const sanitizedCode = code.trim().toUpperCase();
+  const sanitizedName = window.SecurityModule ? window.SecurityModule.sanitizeHTML(name.trim()) : name.trim();
+  const roomRef = database.ref('classrooms/' + sanitizedCode);
   
   // Check if room exists
   roomRef.once('value').then(snapshot => {
@@ -2167,7 +2193,7 @@ function promptClassroomJoin() {
     
     const room = snapshot.val();
     
-    if (room.status !== 'lobby' && room.status !== 'playing') {
+    if (room.status !== 'lobby' && room.status !== 'active' && room.status !== 'question') {
       showToast({ title: 'Error', msg: 'Game has ended or not started.', type: 'error' });
       return;
     }
@@ -2175,16 +2201,19 @@ function promptClassroomJoin() {
     // Add player to room
     const playerId = 'player_' + Date.now();
     roomRef.child('players/' + playerId).set({
-      name: name,
+      name: sanitizedName,
       score: 0,
       correct: 0,
       joinedAt: Date.now()
     });
     
-    showToast({ title: 'Success!', msg: `Joined as ${name}. Follow instructions on screen!`, type: 'success', timeout: 8000 });
+    // Update last activity
+    roomRef.child('lastActivity').set(Date.now());
+    
+    showToast({ title: 'Success!', msg: `Joined as ${sanitizedName}. Follow instructions on screen!`, type: 'success', timeout: 8000 });
     
     // Listen for game state
-    startClassroomPlayerMode(code, playerId, roomRef);
+    startClassroomPlayerMode(sanitizedCode, playerId, roomRef);
   }).catch(error => {
     showToast({ title: 'Error', msg: 'Failed to join: ' + error.message, type: 'error' });
   });

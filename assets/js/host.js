@@ -51,11 +51,31 @@ async function init() {
     return;
   }
   
+  // Check security module loaded
+  if (!window.SecurityModule || !window.RateLimiter) {
+    showToast('Security module not loaded. Please refresh the page.', 'error');
+    console.error('[Host] Security module missing!');
+    return;
+  }
+  
   // Load people data
   await loadPeopleData();
   
   // Setup event listeners
   setupEventListeners();
+  
+  // Run data cleanup (remove games older than 24 hours)
+  const database = window.FirebaseConfig.getDatabase();
+  if (window.DataCleanup) {
+    console.log('[Host] Running data cleanup...');
+    window.DataCleanup.cleanupOldGames(database, 24)
+      .then(count => {
+        if (count > 0) {
+          console.log(`[Host] Cleaned up ${count} old games`);
+        }
+      })
+      .catch(err => console.error('[Host] Cleanup error:', err));
+  }
   
   // Check for room code in URL (rejoining)
   const urlParams = new URLSearchParams(window.location.search);
@@ -105,22 +125,45 @@ function setupEventListeners() {
 
 // Create Session
 async function createSession() {
+  // Rate limiting: Max 5 room creations per minute
+  if (!window.RateLimiter.check('createRoom', 5)) {
+    showToast('Too many attempts. Please wait a minute and try again.', 'error');
+    return;
+  }
+  
   const hostName = document.getElementById('host-name').value.trim() || 'Host';
   const difficulty = document.getElementById('quiz-difficulty').value;
   const numQuestions = parseInt(document.getElementById('quiz-questions').value);
   const timePerQuestion = parseInt(document.getElementById('quiz-timer').value);
   
-  if (numQuestions < 5 || numQuestions > 30) {
-    showToast('Number of questions must be between 5 and 30', 'error');
+  // Validate host name
+  const nameValidation = window.SecurityModule.validateHostName(hostName);
+  if (!nameValidation.valid) {
+    showToast(nameValidation.error, 'error');
     return;
   }
   
-  if (timePerQuestion < 10 || timePerQuestion > 60) {
-    showToast('Time per question must be between 10 and 60 seconds', 'error');
+  // Validate settings
+  const settingsValidation = window.SecurityModule.validateQuizSettings({
+    numQuestions,
+    timePerQuestion,
+    difficulty
+  });
+  
+  if (!settingsValidation.valid) {
+    showToast(settingsValidation.errors.join('. '), 'error');
     return;
   }
   
-  hostState.settings = { hostName, difficulty, numQuestions, timePerQuestion };
+  // Use sanitized values
+  const sanitizedSettings = settingsValidation.sanitized;
+  
+  hostState.settings = {
+    hostName: nameValidation.value,
+    difficulty: sanitizedSettings.difficulty,
+    numQuestions: sanitizedSettings.numQuestions,
+    timePerQuestion: sanitizedSettings.timePerQuestion
+  };
   
   // Generate room code
   hostState.roomCode = generateRoomCode();
@@ -131,14 +174,11 @@ async function createSession() {
   
   const roomData = {
     code: hostState.roomCode,
-    host: hostName,
+    host: window.SecurityModule.sanitizeHTML(nameValidation.value),
     status: 'lobby',
     createdAt: Date.now(),
-    settings: {
-      difficulty,
-      numQuestions,
-      timePerQuestion
-    },
+    lastActivity: Date.now(),
+    settings: sanitizedSettings,
     players: {},
     currentQuestion: -1,
     questions: null
@@ -192,10 +232,20 @@ function updatePlayersDisplay() {
   Object.entries(hostState.players).forEach(([id, player]) => {
     const card = document.createElement('div');
     card.className = 'player-card';
-    card.innerHTML = `
-      <div class="player-avatar">${player.name.charAt(0).toUpperCase()}</div>
-      <div class="player-name">${player.name}</div>
-    `;
+    
+    // Create avatar (safe - using first char only)
+    const avatar = document.createElement('div');
+    avatar.className = 'player-avatar';
+    const playerName = String(player.name || 'P');
+    avatar.textContent = playerName.charAt(0).toUpperCase();
+    
+    // Create name display (XSS-safe)
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'player-name';
+    nameDiv.textContent = playerName;
+    
+    card.appendChild(avatar);
+    card.appendChild(nameDiv);
     grid.appendChild(card);
   });
   
@@ -354,8 +404,16 @@ async function showQuestion(index) {
   document.getElementById('total-questions').textContent = hostState.questions.length;
   document.getElementById('question-type').textContent = getQuestionTypeLabel(question.type);
   document.getElementById('question-text').textContent = question.prompt;
-  document.getElementById('question-meta').innerHTML = question.verse ? 
-    `<span class="verse-ref">${question.verse}</span>` : '';
+  
+  // Update verse reference (XSS-safe)
+  const metaDiv = document.getElementById('question-meta');
+  metaDiv.innerHTML = ''; // Clear first
+  if (question.verse) {
+    const verseSpan = document.createElement('span');
+    verseSpan.className = 'verse-ref';
+    verseSpan.textContent = question.verse;
+    metaDiv.appendChild(verseSpan);
+  }
   
   // Update answers display
   const answersDiv = document.getElementById('answers-display');
@@ -366,11 +424,25 @@ async function showQuestion(index) {
   question.options.forEach((option, i) => {
     const card = document.createElement('div');
     card.className = `answer-card ${colors[i]}`;
-    card.innerHTML = `
-      <div class="answer-icon">${icons[i]}</div>
-      <div class="answer-text">${option}</div>
-      <div class="answer-count">0</div>
-    `;
+    
+    // Create icon (safe - from array)
+    const iconDiv = document.createElement('div');
+    iconDiv.className = 'answer-icon';
+    iconDiv.textContent = icons[i];
+    
+    // Create answer text (XSS-safe)
+    const textDiv = document.createElement('div');
+    textDiv.className = 'answer-text';
+    textDiv.textContent = option;
+    
+    // Create count (initialized to 0)
+    const countDiv = document.createElement('div');
+    countDiv.className = 'answer-count';
+    countDiv.textContent = '0';
+    
+    card.appendChild(iconDiv);
+    card.appendChild(textDiv);
+    card.appendChild(countDiv);
     answersDiv.appendChild(card);
   });
   

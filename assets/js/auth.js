@@ -28,6 +28,82 @@ import {
 let currentUser = null;
 let userProfile = null;
 
+// Login rate limiting
+const loginAttempts = new Map();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_LOGIN_ATTEMPTS = 5;
+
+/**
+ * Validate password strength
+ * Requirements: 8+ chars, uppercase, lowercase, number
+ */
+export function validatePasswordStrength(password) {
+  const requirements = {
+    length: password.length >= 8,
+    hasUpper: /[A-Z]/.test(password),
+    hasLower: /[a-z]/.test(password),
+    hasNumber: /\d/.test(password),
+    hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+  };
+  
+  const score = Object.values(requirements).filter(Boolean).length;
+  
+  return {
+    valid: requirements.length && requirements.hasUpper && requirements.hasLower && requirements.hasNumber,
+    score: score,
+    requirements: requirements,
+    strength: score < 3 ? 'weak' : score < 4 ? 'medium' : 'strong',
+    message: score < 4 ? 'Password must be at least 8 characters with uppercase, lowercase, and numbers' : 'Password strength: ' + (score < 4 ? 'medium' : 'strong')
+  };
+}
+
+/**
+ * Validate email format and reject disposable emails
+ */
+export function validateEmail(email) {
+  // RFC 5322 compliant regex (simplified)
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  
+  if (!email || !emailRegex.test(email)) {
+    return { valid: false, error: 'Invalid email format' };
+  }
+  
+  // Check for common disposable email domains
+  const disposableDomains = [
+    'tempmail.com', '10minutemail.com', 'guerrillamail.com',
+    'throwaway.email', 'mailinator.com', 'temp-mail.org'
+  ];
+  
+  const domain = email.split('@')[1]?.toLowerCase();
+  if (disposableDomains.includes(domain)) {
+    return { valid: false, error: 'Disposable email addresses are not allowed' };
+  }
+  
+  return { valid: true };
+}
+
+/**
+ * Sanitize display name
+ */
+function sanitizeDisplayName(name) {
+  if (!name) return '';
+  
+  // Remove HTML tags
+  const div = document.createElement('div');
+  div.textContent = name;
+  let safe = div.innerHTML;
+  
+  // Trim and limit length
+  safe = safe.trim().substring(0, 50);
+  
+  // Only allow alphanumeric, spaces, hyphens, underscores
+  if (!/^[a-zA-Z0-9\s_-]+$/.test(safe)) {
+    return '';
+  }
+  
+  return safe;
+}
+
 /**
  * Initialize authentication state listener
  */
@@ -54,12 +130,30 @@ export function initAuth() {
  */
 export async function registerUser(email, password, displayName, preferredLanguage = 'en') {
     try {
+        // Validate email
+        const emailValidation = validateEmail(email);
+        if (!emailValidation.valid) {
+            return { success: false, error: emailValidation.error };
+        }
+        
+        // Validate password strength
+        const passwordCheck = validatePasswordStrength(password);
+        if (!passwordCheck.valid) {
+            return { success: false, error: passwordCheck.message };
+        }
+        
+        // Sanitize display name
+        const safeName = sanitizeDisplayName(displayName);
+        if (!safeName || safeName.length < 2) {
+            return { success: false, error: 'Display name must be 2-50 characters and contain only letters, numbers, spaces, hyphens, or underscores' };
+        }
+        
         // Create authentication account
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
         // Update display name
-        await updateProfile(user, { displayName });
+        await updateProfile(user, { displayName: safeName });
 
         // Send verification email
         await sendEmailVerification(user);
@@ -84,7 +178,30 @@ export async function registerUser(email, password, displayName, preferredLangua
  */
 export async function loginUser(email, password) {
     try {
+        // Check rate limit for this email
+        const attempts = loginAttempts.get(email) || [];
+        const now = Date.now();
+        const recentAttempts = attempts.filter(t => now - t < RATE_LIMIT_WINDOW);
+        
+        if (recentAttempts.length >= MAX_LOGIN_ATTEMPTS) {
+            const oldestAttempt = recentAttempts[0];
+            const timeToWait = Math.ceil((RATE_LIMIT_WINDOW - (now - oldestAttempt)) / 1000);
+            return { 
+                success: false, 
+                error: `Too many login attempts. Please wait ${timeToWait} seconds before trying again.` 
+            };
+        }
+        
+        // Record this attempt
+        recentAttempts.push(now);
+        loginAttempts.set(email, recentAttempts);
+        
+        // Attempt login
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        
+        // Clear attempts on successful login
+        loginAttempts.delete(email);
+        
         return { success: true, user: userCredential.user };
     } catch (error) {
         console.error('Login error:', error);
@@ -321,16 +438,17 @@ function dispatchAuthEvent(type, user) {
 function getAuthErrorMessage(errorCode) {
     const errorMessages = {
         'auth/email-already-in-use': 'This email is already registered. Please sign in instead.',
-        'auth/invalid-email': 'Invalid email address.',
+        'auth/invalid-email': 'Invalid email address format.',
         'auth/operation-not-allowed': 'Email/password accounts are not enabled.',
-        'auth/weak-password': 'Password should be at least 6 characters.',
-        'auth/user-disabled': 'This account has been disabled.',
-        'auth/user-not-found': 'No account found with this email.',
-        'auth/wrong-password': 'Incorrect password.',
+        'auth/weak-password': 'Password is too weak. Please use a stronger password.',
+        'auth/user-disabled': 'This account has been disabled. Please contact support.',
+        // Prevent account enumeration - same message for both
+        'auth/user-not-found': 'Invalid email or password.',
+        'auth/wrong-password': 'Invalid email or password.',
         'auth/invalid-credential': 'Invalid email or password.',
-        'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
-        'auth/network-request-failed': 'Network error. Please check your connection.',
-        'auth/popup-closed-by-user': 'Sign-in popup was closed.',
+        'auth/too-many-requests': 'Too many failed attempts. Please try again later or reset your password.',
+        'auth/network-request-failed': 'Network error. Please check your internet connection.',
+        'auth/popup-closed-by-user': 'Sign-in popup was closed. Please try again.',
         'auth/cancelled-popup-request': 'Another popup is already open.'
     };
 
