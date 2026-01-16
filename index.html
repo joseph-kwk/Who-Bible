@@ -202,12 +202,18 @@
               <div class="remote-challenge-content">
                 <h3 id="remote-heading">Play Online with Friends</h3>
                 <p class="remote-challenge-desc">Challenge anyone, anywhere! Create a room, share the link, and compete in real-time.</p>
-                <button id="btn-remote-challenge" class="remote-challenge-btn" data-mode="remote" aria-describedby="remote-desc">
-                  <span class="remote-btn-icon">🎮</span>
-                  <span>Start Remote Challenge</span>
-                </button>
+                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                  <button id="btn-remote-challenge" class="remote-challenge-btn" data-mode="remote" aria-describedby="remote-desc" style="flex: 1;">
+                    <span class="remote-btn-icon">🎮</span>
+                    <span>Remote Challenge</span>
+                  </button>
+                  <button id="btn-classroom-mode" class="remote-challenge-btn" style="flex: 1; background: linear-gradient(135deg, #26890c, #4caf50);">
+                    <span class="remote-btn-icon">🏫</span>
+                    <span>Classroom Mode</span>
+                  </button>
+                </div>
                 <p class="remote-challenge-note" id="remote-desc">
-                  <span class="remote-status-icon">✓</span> No sign-up required • Instant matchmaking • Live scoring
+                  <span class="remote-status-icon">✓</span> No sign-up required • Kahoot-style gameplay • Live leaderboard
                 </p>
               </div>
             </div>

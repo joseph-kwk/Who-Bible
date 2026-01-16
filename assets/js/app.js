@@ -252,6 +252,7 @@ const btnSolo = document.getElementById('btn-solo');
 const btnTimed = document.getElementById('btn-timed');
 const btnChallenge = document.getElementById('btn-challenge');
 const btnRemoteChallenge = document.getElementById('btn-remote-challenge');
+const btnClassroomMode = document.getElementById('btn-classroom-mode');
 const btnStudy = document.getElementById('btn-study');
 const btnScenarios = document.getElementById('btn-scenarios');
 const difficultySel = document.getElementById('difficulty');
@@ -752,6 +753,22 @@ function attachHandlers(){
       window.RemoteChallengeUI.start();
     });
   }
+  
+  // Classroom Mode handler
+  if (btnClassroomMode) {
+    btnClassroomMode.addEventListener('click', () => {
+      // Check if user wants to host or join
+      const choice = confirm('Click OK to HOST (display on projector)\nClick Cancel to JOIN as a player');
+      if (choice) {
+        // Open host view in new tab/window
+        window.open('host.html', '_blank');
+      } else {
+        // Show join modal
+        promptClassroomJoin();
+      }
+    });
+  }
+  
   if (btnRemoteClose && window.RemoteChallengeUI) {
     btnRemoteClose.addEventListener('click', window.RemoteChallengeUI.hide);
   }
@@ -2125,6 +2142,164 @@ window.showPlayerChangeModal = function() {
     btnChangePlayer.click();
   }
 };
+
+// Classroom Mode - Join Prompt
+function promptClassroomJoin() {
+  const code = prompt('Enter Game PIN (e.g., FAITH-123):');
+  if (!code) return;
+  
+  const name = prompt('Enter your name:') || 'Player';
+  
+  if (!window.FirebaseConfig || !window.FirebaseConfig.isAvailable()) {
+    showToast({ title: 'Error', msg: 'Firebase not configured', type: 'error' });
+    return;
+  }
+  
+  const database = window.FirebaseConfig.getDatabase();
+  const roomRef = database.ref('classrooms/' + code.toUpperCase());
+  
+  // Check if room exists
+  roomRef.once('value').then(snapshot => {
+    if (!snapshot.exists()) {
+      showToast({ title: 'Error', msg: 'Room not found. Check the PIN.', type: 'error' });
+      return;
+    }
+    
+    const room = snapshot.val();
+    
+    if (room.status !== 'lobby' && room.status !== 'playing') {
+      showToast({ title: 'Error', msg: 'Game has ended or not started.', type: 'error' });
+      return;
+    }
+    
+    // Add player to room
+    const playerId = 'player_' + Date.now();
+    roomRef.child('players/' + playerId).set({
+      name: name,
+      score: 0,
+      correct: 0,
+      joinedAt: Date.now()
+    });
+    
+    showToast({ title: 'Success!', msg: `Joined as ${name}. Follow instructions on screen!`, type: 'success', timeout: 8000 });
+    
+    // Listen for game state
+    startClassroomPlayerMode(code, playerId, roomRef);
+  }).catch(error => {
+    showToast({ title: 'Error', msg: 'Failed to join: ' + error.message, type: 'error' });
+  });
+}
+
+// Classroom Player Mode
+function startClassroomPlayerMode(roomCode, playerId, roomRef) {
+  // Hide setup, show game area with modified UI
+  setupPanel.style.display = 'none';
+  gameArea.style.display = 'block';
+  
+  document.getElementById('game-title').textContent = `Room: ${roomCode}`;
+  
+  // Listen for current question
+  roomRef.child('currentQuestion').on('value', (snapshot) => {
+    const questionIndex = snapshot.val();
+    if (questionIndex !== null && questionIndex >= 0) {
+      loadClassroomQuestion(roomRef, questionIndex, playerId);
+    }
+  });
+  
+  // Listen for status
+  roomRef.child('status').on('value', (snapshot) => {
+    const status = snapshot.val();
+    if (status === 'finished') {
+      showToast({ title: 'Quiz Complete!', msg: 'Thanks for playing!', type: 'success' });
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    }
+  });
+}
+
+// Load classroom question for player
+function loadClassroomQuestion(roomRef, questionIndex, playerId) {
+  roomRef.child('questions').once('value').then(snapshot => {
+    const questions = snapshot.val();
+    if (!questions || !questions[questionIndex]) return;
+    
+    const question = questions[questionIndex];
+    
+    // Check if already answered
+    roomRef.child(`responses/${playerId}`).once('value').then(respSnapshot => {
+      const response = respSnapshot.val();
+      if (response && response.answer !== undefined) {
+        // Already answered - show waiting
+        showClassroomWaiting();
+        return;
+      }
+      
+      // Show question
+      displayClassroomQuestion(question, questionIndex, roomRef, playerId);
+    });
+  });
+}
+
+// Display classroom question for player
+function displayClassroomQuestion(question, questionIndex, roomRef, playerId) {
+  state.current = question;
+  state.qnum = questionIndex + 1;
+  
+  const qTextEl = document.getElementById('qtext');
+  qTextEl.textContent = question.prompt;
+  
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  
+  const icons = ['▲', '◆', '●', '■'];
+  const colors = ['#e21b3c', '#1368ce', '#ffa602', '#26890c'];
+  
+  question.options.forEach((option, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans classroom-answer';
+    btn.style.borderLeft = `6px solid ${colors[i]}`;
+    btn.innerHTML = `
+      <span style="font-size: 32px; margin-right: 12px;">${icons[i]}</span>
+      <span style="font-size: 20px; font-weight: 700;">${option}</span>
+    `;
+    
+    btn.addEventListener('click', () => {
+      const answerTime = Date.now();
+      const questionStartTime = state.questionStartTime || answerTime;
+      const timeTaken = (answerTime - questionStartTime) / 1000;
+      
+      // Submit answer
+      roomRef.child(`responses/${playerId}`).set({
+        answer: i,
+        timeTaken: timeTaken,
+        timestamp: answerTime
+      });
+      
+      // Show waiting
+      showClassroomWaiting();
+    });
+    
+    answersEl.appendChild(btn);
+  });
+  
+  // Record question start time
+  roomRef.child('questionStartTime').once('value').then(snapshot => {
+    state.questionStartTime = snapshot.val();
+  });
+}
+
+// Show waiting screen for classroom player
+function showClassroomWaiting() {
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = `
+    <div style="text-align: center; padding: 60px 20px; background: rgba(76, 175, 80, 0.1); border-radius: 16px;">
+      <div style="font-size: 64px; margin-bottom: 20px;">✓</div>
+      <h2 style="font-size: 32px; margin-bottom: 12px;">Answer Submitted!</h2>
+      <p style="font-size: 20px; color: var(--text-muted);">Waiting for other players...</p>
+    </div>
+  `;
+}
 
 // Re-localize dynamic pieces when language changes
 window.onWhoBibleLanguageChange = function(lang){

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Who-Bible - Host View (Classroom Mode)</title>
+  <meta name="description" content="Host view for Kahoot-style Bible quiz sessions">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="stylesheet" href="assets/css/host.css?v=20260116">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  
+  <!-- App Scripts -->
+  <script src="assets/js/firebase-config.js?v=20260116"></script>
+  <script src="assets/js/translations.js?v=20260116" defer></script>
+  <script src="assets/js/host.js?v=20260116" defer></script>
+</head>
+<body class="host-view">
+  
+  <!-- Setup Screen -->
+  <div id="setup-screen" class="screen active">
+    <div class="setup-container">
+      <div class="logo-header">
+        <img src="assets/images/logo.png" alt="Who-Bible Logo" class="logo">
+        <h1>Who-Bible</h1>
+        <p class="subtitle">Classroom Mode - Host View</p>
+      </div>
+      
+      <div class="setup-card">
+        <h2>Create Quiz Session</h2>
+        
+        <div class="form-group">
+          <label for="host-name">Your Name (Host)</label>
+          <input type="text" id="host-name" placeholder="Teacher, Pastor, etc." value="Host">
+        </div>
+        
+        <div class="form-group">
+          <label for="quiz-difficulty">Difficulty</label>
+          <select id="quiz-difficulty">
+            <option value="easy">Beginner (Common Figures)</option>
+            <option value="medium" selected>Intermediate (Mixed)</option>
+            <option value="hard">Expert (All Characters)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="quiz-questions">Number of Questions</label>
+          <input type="number" id="quiz-questions" min="5" max="30" value="10">
+        </div>
+        
+        <div class="form-group">
+          <label for="quiz-timer">Time per Question (seconds)</label>
+          <input type="number" id="quiz-timer" min="10" max="60" value="20">
+        </div>
+        
+        <button id="btn-create-session" class="btn-primary btn-large">
+          Create Session
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Lobby Screen -->
+  <div id="lobby-screen" class="screen">
+    <div class="lobby-container">
+      <div class="lobby-header">
+        <h1>Join at: <span id="join-url" class="join-url">who-bible.com</span></h1>
+        <div class="room-code-display">
+          <span class="label">Game PIN:</span>
+          <span id="room-code" class="room-code">HOLY-123</span>
+        </div>
+      </div>
+      
+      <div class="lobby-stats">
+        <div class="stat">
+          <span class="stat-value" id="player-count">0</span>
+          <span class="stat-label">Players</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="question-count">10</span>
+          <span class="stat-label">Questions</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="time-per-question">20s</span>
+          <span class="stat-label">Per Question</span>
+        </div>
+      </div>
+      
+      <div class="players-grid" id="players-grid">
+        <!-- Players will be added here dynamically -->
+      </div>
+      
+      <div class="lobby-footer">
+        <button id="btn-start-quiz" class="btn-success btn-large" disabled>
+          Start Quiz
+        </button>
+        <button id="btn-cancel-session" class="btn-secondary">
+          Cancel Session
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Question Screen -->
+  <div id="question-screen" class="screen">
+    <div class="question-container">
+      <div class="question-header">
+        <div class="question-number">
+          Question <span id="current-question-num">1</span> of <span id="total-questions">10</span>
+        </div>
+        <div class="timer-display">
+          <svg class="timer-circle" viewBox="0 0 100 100">
+            <circle class="timer-bg" cx="50" cy="50" r="45"></circle>
+            <circle class="timer-progress" cx="50" cy="50" r="45" id="timer-circle"></circle>
+          </svg>
+          <span class="timer-text" id="timer-text">20</span>
+        </div>
+      </div>
+      
+      <div class="question-content">
+        <div class="question-type" id="question-type">Multiple Choice</div>
+        <h2 class="question-text" id="question-text">Who was the father of Isaac?</h2>
+        <div class="question-meta" id="question-meta">
+          <span class="verse-ref">Genesis 21:3</span>
+        </div>
+      </div>
+      
+      <div class="answers-display" id="answers-display">
+        <div class="answer-card red">
+          <div class="answer-icon">▲</div>
+          <div class="answer-text">Abraham</div>
+          <div class="answer-count">0</div>
+        </div>
+        <div class="answer-card blue">
+          <div class="answer-icon">◆</div>
+          <div class="answer-text">Jacob</div>
+          <div class="answer-count">0</div>
+        </div>
+        <div class="answer-card yellow">
+          <div class="answer-icon">●</div>
+          <div class="answer-text">Isaac</div>
+          <div class="answer-count">0</div>
+        </div>
+        <div class="answer-card green">
+          <div class="answer-icon">■</div>
+          <div class="answer-text">Moses</div>
+          <div class="answer-count">0</div>
+        </div>
+      </div>
+      
+      <div class="response-status">
+        <span id="responses-count">0</span> of <span id="total-players">5</span> answered
+      </div>
+    </div>
+  </div>
+  
+  <!-- Results Screen -->
+  <div id="results-screen" class="screen">
+    <div class="results-container">
+      <div class="results-header">
+        <h2>Question Results</h2>
+      </div>
+      
+      <div class="correct-answer-display">
+        <div class="correct-icon">✓</div>
+        <p>The correct answer was:</p>
+        <h3 id="correct-answer-text">Abraham</h3>
+      </div>
+      
+      <div class="answer-breakdown" id="answer-breakdown">
+        <!-- Answer statistics will go here -->
+      </div>
+      
+      <div class="results-footer">
+        <button id="btn-show-leaderboard" class="btn-primary btn-large">
+          Show Leaderboard
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Leaderboard Screen -->
+  <div id="leaderboard-screen" class="screen">
+    <div class="leaderboard-container">
+      <div class="leaderboard-header">
+        <h2>🏆 Leaderboard</h2>
+        <p class="leaderboard-subtitle">After Question <span id="leaderboard-question-num">1</span></p>
+      </div>
+      
+      <div class="podium" id="podium">
+        <!-- Top 3 will be displayed as podium -->
+      </div>
+      
+      <div class="leaderboard-list" id="leaderboard-list">
+        <!-- Other players will be listed here -->
+      </div>
+      
+      <div class="leaderboard-footer">
+        <button id="btn-next-question" class="btn-success btn-large">
+          Next Question →
+        </button>
+        <button id="btn-end-quiz" class="btn-secondary">
+          End Quiz
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Final Results Screen -->
+  <div id="final-screen" class="screen">
+    <div class="final-container">
+      <div class="final-header">
+        <h1>🎉 Quiz Complete!</h1>
+        <p class="final-subtitle">Final Standings</p>
+      </div>
+      
+      <div class="final-podium" id="final-podium">
+        <!-- Top 3 final winners -->
+      </div>
+      
+      <div class="final-list" id="final-list">
+        <!-- All players ranked -->
+      </div>
+      
+      <div class="final-stats">
+        <div class="stat">
+          <span class="stat-value" id="final-players">5</span>
+          <span class="stat-label">Players</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="final-questions">10</span>
+          <span class="stat-label">Questions</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="final-accuracy">72%</span>
+          <span class="stat-label">Avg Accuracy</span>
+        </div>
+      </div>
+      
+      <div class="final-footer">
+        <button id="btn-new-session" class="btn-primary btn-large">
+          Start New Session
+        </button>
+        <button id="btn-exit" class="btn-secondary">
+          Exit to Main App
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Notifications -->
+  <div id="toast-container" aria-live="polite"></div>
+  
+</body>
+</html>
