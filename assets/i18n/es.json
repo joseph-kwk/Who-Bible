@@ -1405,6 +1405,71 @@
       "viewAchievements": "Ver Logros",
       "viewLeaderboard": "Clasificación"
     },
-    "minutes": "minutos"
+    "minutes": "minutos",
+    "guest": {
+      "badge": "Invitado",
+      "badgeTooltip": "Jugando como invitado - datos guardados solo en este dispositivo",
+      "deviceOnly": "Solo Dispositivo",
+      "deviceOnlyTooltip": "Tus datos se almacenan solo en este dispositivo. Crea una cuenta para guardar en todos los dispositivos.",
+      "welcome": {
+        "title": "Jugando como Invitado",
+        "message": "¡Acceso completo a todos los cuestionarios! Tus estadísticas se guardan solo en este dispositivo. Crea una cuenta para sincronizar en todos los dispositivos y unirte a las tablas de clasificación.",
+        "primaryButton": "¡Entendido!",
+        "secondaryButton": "Crear Cuenta"
+      },
+      "performance": {
+        "title": "¡Puntuación Impresionante!",
+        "subtitle": "¡Anotaste {score} puntos! 🎉",
+        "primaryButton": "Guardar Mi Progreso",
+        "secondaryButton": "Tal Vez Más Tarde"
+      },
+      "engagement": {
+        "title": "¡Estás en Racha!",
+        "subtitle": "¡Has jugado {games} partidas — eso es dedicación!",
+        "primaryButton": "Asegurar Mis Estadísticas",
+        "secondaryButton": "Continuar como Invitado"
+      },
+      "reminder": {
+        "title": "Recordatorio de Invitado",
+        "message": "Tu progreso solo se guarda en este dispositivo. Borrar los datos del navegador eliminará tus estadísticas. ¡Crea una cuenta gratuita para mantener todo seguro!",
+        "primaryButton": "Asegurar Mis Estadísticas",
+        "secondaryButton": "Continuar como Invitado"
+      },
+      "social": {
+        "title": "Cuenta Requerida",
+        "message": "¡Crea una cuenta gratuita para desbloquear {feature} y jugar con amigos!",
+        "primaryButton": "Crear Cuenta",
+        "secondaryButton": "Ahora No"
+      },
+      "benefits": {
+        "title": "Crear Cuenta para Desbloquear:",
+        "save": {
+          "title": "Progreso Permanente",
+          "description": "Nunca pierdas tus estadísticas, puntuaciones o logros"
+        },
+        "sync": {
+          "title": "Sincronización entre Dispositivos",
+          "description": "Juega en teléfono, tableta o computadora — el progreso te sigue"
+        },
+        "leaderboard": {
+          "title": "Tablas de Clasificación Globales",
+          "description": "Compite con jugadores de todo el mundo y sube en las clasificaciones"
+        },
+        "social": {
+          "title": "Desafiar Amigos",
+          "description": "Envía desafíos y juega con otros creyentes"
+        },
+        "badges": {
+          "title": "Ganar Insignias",
+          "description": "Desbloquea logros y muestra tu conocimiento bíblico"
+        }
+      },
+      "warning": {
+        "title": "Podrías Perder Tu Progreso:",
+        "clearBrowser": "Borrar datos/caché del navegador",
+        "switchDevice": "Cambiar a otro dispositivo o navegador",
+        "incognito": "Usar navegación privada/incógnito"
+      }
+    }
   }
 }

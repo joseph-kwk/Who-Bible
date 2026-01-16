@@ -1405,6 +1405,71 @@
       "viewAchievements": "Voir les Succès",
       "viewLeaderboard": "Classement"
     },
-    "minutes": "minutes"
+    "minutes": "minutes",
+    "guest": {
+      "badge": "Invité",
+      "badgeTooltip": "Jouant en tant qu'invité - données enregistrées uniquement sur cet appareil",
+      "deviceOnly": "Appareil Uniquement",
+      "deviceOnlyTooltip": "Vos données sont stockées uniquement sur cet appareil. Créez un compte pour sauvegarder sur tous les appareils.",
+      "welcome": {
+        "title": "Jouant en Tant qu'Invité",
+        "message": "Accès complet à tous les quiz ! Vos statistiques sont enregistrées uniquement sur cet appareil. Créez un compte pour synchroniser sur tous les appareils et rejoindre les classements.",
+        "primaryButton": "Compris !",
+        "secondaryButton": "Créer un Compte"
+      },
+      "performance": {
+        "title": "Score Impressionnant !",
+        "subtitle": "Vous avez marqué {score} points ! 🎉",
+        "primaryButton": "Sauvegarder Ma Progression",
+        "secondaryButton": "Peut-être Plus Tard"
+      },
+      "engagement": {
+        "title": "Vous êtes en Forme !",
+        "subtitle": "Vous avez joué {games} parties — c'est du dévouement !",
+        "primaryButton": "Sécuriser Mes Stats",
+        "secondaryButton": "Continuer en Invité"
+      },
+      "reminder": {
+        "title": "Rappel Invité",
+        "message": "Votre progression n'est enregistrée que sur cet appareil. Effacer les données du navigateur supprimera vos statistiques. Créez un compte gratuit pour tout garder en sécurité !",
+        "primaryButton": "Sécuriser Mes Stats",
+        "secondaryButton": "Continuer en Invité"
+      },
+      "social": {
+        "title": "Compte Requis",
+        "message": "Créez un compte gratuit pour débloquer {feature} et jouer avec des amis !",
+        "primaryButton": "Créer un Compte",
+        "secondaryButton": "Pas Maintenant"
+      },
+      "benefits": {
+        "title": "Créer un Compte pour Débloquer :",
+        "save": {
+          "title": "Progression Permanente",
+          "description": "Ne perdez jamais vos statistiques, scores ou réalisations"
+        },
+        "sync": {
+          "title": "Synchronisation Multi-Appareils",
+          "description": "Jouez sur téléphone, tablette ou ordinateur — la progression vous suit"
+        },
+        "leaderboard": {
+          "title": "Classements Mondiaux",
+          "description": "Affrontez des joueurs du monde entier et grimpez les rangs"
+        },
+        "social": {
+          "title": "Défier des Amis",
+          "description": "Envoyez des défis et jouez avec d'autres croyants"
+        },
+        "badges": {
+          "title": "Gagner des Badges",
+          "description": "Débloquez des réalisations et montrez vos connaissances bibliques"
+        }
+      },
+      "warning": {
+        "title": "Vous Pourriez Perdre Votre Progression :",
+        "clearBrowser": "Effacer les données/cache du navigateur",
+        "switchDevice": "Changer d'appareil ou de navigateur",
+        "incognito": "Utiliser la navigation privée/incognito"
+      }
+    }
   }
 }

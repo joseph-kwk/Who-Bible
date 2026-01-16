@@ -198,13 +198,17 @@ function displayPlayerInfo() {
   const welcomeEl = document.getElementById('welcome-message');
   if (welcomeEl) {
     const stats = state.currentPlayer.stats;
+    const isGuest = state.currentPlayer.isGuest;
+    const guestBadgeHtml = isGuest ? `<span class="player-badge guest" title="${getText('guest.badgeTooltip')}">👤 ${getText('guest.badge')}</span>` : `<span class="player-badge member" title="Registered member">✓ Member</span>`;
+    const deviceOnlyHtml = isGuest ? `<span class="device-only-badge" title="${getText('guest.deviceOnlyTooltip')}">📱 ${getText('guest.deviceOnly')}</span>` : '';
+    
     if (typeof getText === 'function') {
       welcomeEl.innerHTML = `
         <div style="text-align: center; padding: 20px;">
-          <h3>${getText('welcomePlayer', { name: state.currentPlayer.name })}</h3>
+          <h3>${getText('welcomePlayer', { name: state.currentPlayer.name })} ${guestBadgeHtml}</h3>
           <div style="display: flex; gap: 20px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
             <div><strong>${getText('gamesPlayed')}:</strong> ${stats.gamesPlayed}</div>
-            <div><strong>${getText('highScore')}:</strong> ${stats.highestScore}</div>
+            <div><strong>${getText('highScore')}:</strong> ${stats.highestScore} ${deviceOnlyHtml}</div>
             <div><strong>${getText('bestStreak')}:</strong> ${stats.bestStreak}</div>
             <div><strong>${getText('winRate')}:</strong> ${stats.winRate}%</div>
           </div>
@@ -214,10 +218,10 @@ function displayPlayerInfo() {
       // Fallback if getText not available yet
       welcomeEl.innerHTML = `
         <div style="text-align: center; padding: 20px;">
-          <h3>Welcome, ${state.currentPlayer.name}!</h3>
+          <h3>Welcome, ${state.currentPlayer.name}! ${guestBadgeHtml}</h3>
           <div style="display: flex; gap: 20px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
             <div><strong>Games:</strong> ${stats.gamesPlayed}</div>
-            <div><strong>High Score:</strong> ${stats.highestScore}</div>
+            <div><strong>High Score:</strong> ${stats.highestScore} ${deviceOnlyHtml}</div>
             <div><strong>Best Streak:</strong> ${stats.bestStreak}</div>
             <div><strong>Win Rate:</strong> ${stats.winRate}%</div>
           </div>
@@ -526,6 +530,21 @@ async function init(){
   // Check for first-time user
   checkFirstTimeUser();
   
+  // Initialize guest prompts system
+  if (window.GuestPrompts && typeof window.GuestPrompts.init === 'function') {
+    window.GuestPrompts.init();
+  }
+  
+  // Listen for account creation requests from guest prompts
+  document.addEventListener('showAccountCreation', (event) => {
+    if (event.detail && event.detail.source === 'guest-prompt') {
+      // Show player change modal to convert guest to registered player
+      if (btnChangePlayer) {
+        btnChangePlayer.click();
+      }
+    }
+  });
+  
   // Welcome toast (only if not first time, to avoid clutter)
   if (localStorage.getItem('who-bible-visited')) {
     showToast({ title: getText('brandTitle'), msg: getText('welcomeMessage'), type: 'info', timeout: 4000 });
@@ -722,7 +741,16 @@ function attachHandlers(){
   
   // Remote Challenge handlers
   if (btnRemoteChallenge && window.RemoteChallengeUI) {
-    btnRemoteChallenge.addEventListener('click', window.RemoteChallengeUI.start);
+    btnRemoteChallenge.addEventListener('click', () => {
+      // Check if user is guest and dispatch event
+      if (state.currentPlayer && state.currentPlayer.isGuest) {
+        document.dispatchEvent(new CustomEvent('socialFeatureAttempt', {
+          detail: { feature: 'Remote Challenge' }
+        }));
+        return;
+      }
+      window.RemoteChallengeUI.start();
+    });
   }
   if (btnRemoteClose && window.RemoteChallengeUI) {
     btnRemoteClose.addEventListener('click', window.RemoteChallengeUI.hide);
@@ -1421,7 +1449,18 @@ function endQuiz(){
   const correctAnswers = state.results.filter(r => r.correct).length;
   const totalQuestions = state.results.length;
   updatePlayerStats(state.score, state.streak, correctAnswers, totalQuestions, state.mode);
-    displayPlayerInfo();
+  displayPlayerInfo();
+  
+  // Dispatch game completed event for guest prompts
+  document.dispatchEvent(new CustomEvent('gameCompleted', {
+    detail: {
+      score: state.score,
+      streak: state.streak,
+      correct: correctAnswers,
+      total: totalQuestions,
+      mode: state.mode
+    }
+  }));
   
   // Complete remote challenge if in remote mode
   if(state.mode==='remote-challenge' && window.RemoteChallenge){
@@ -2079,6 +2118,13 @@ function initFeedback() {
 
 // Expose displayPlayerInfo globally so translations.js can call it
 window.displayPlayerInfo = displayPlayerInfo;
+
+// Expose showPlayerChangeModal for guest prompts
+window.showPlayerChangeModal = function() {
+  if (btnChangePlayer) {
+    btnChangePlayer.click();
+  }
+};
 
 // Re-localize dynamic pieces when language changes
 window.onWhoBibleLanguageChange = function(lang){
