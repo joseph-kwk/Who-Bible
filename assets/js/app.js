@@ -807,6 +807,57 @@ function attachHandlers(){
   if (btnPlayersClose) btnPlayersClose.addEventListener('click', hidePlayersModal);
   if (btnPlayersCancel) btnPlayersCancel.addEventListener('click', hidePlayersModal);
   if (btnPlayersStart) btnPlayersStart.addEventListener('click', startChallengeFromModal);
+  
+  // Challenge Mode - Save name buttons
+  const btnSaveP1Name = document.getElementById('btn-save-p1-name');
+  const btnSaveP2Name = document.getElementById('btn-save-p2-name');
+  if (btnSaveP1Name) {
+    btnSaveP1Name.addEventListener('click', () => {
+      const name = p1NameInput.value.trim();
+      if (!name) {
+        showToast({ title: 'Name Required', msg: 'Please enter Player 1 name', type: 'error' });
+        p1NameInput.focus();
+        return;
+      }
+      showToast({ title: 'Saved!', msg: `Player 1: ${name}`, type: 'success', timeout: 1500 });
+      // Flash effect
+      btnSaveP1Name.style.boxShadow = '0 0 0 2px var(--primary-color)';
+      setTimeout(() => { btnSaveP1Name.style.boxShadow = ''; }, 400);
+    });
+  }
+  if (btnSaveP2Name) {
+    btnSaveP2Name.addEventListener('click', () => {
+      const name = p2NameInput.value.trim();
+      if (!name) {
+        showToast({ title: 'Name Required', msg: 'Please enter Player 2 name', type: 'error' });
+        p2NameInput.focus();
+        return;
+      }
+      showToast({ title: 'Saved!', msg: `Player 2: ${name}`, type: 'success', timeout: 1500 });
+      // Flash effect
+      btnSaveP2Name.style.boxShadow = '0 0 0 2px var(--primary-color)';
+      setTimeout(() => { btnSaveP2Name.style.boxShadow = ''; }, 400);
+    });
+  }
+  
+  // Allow Enter key to save names in Challenge Mode
+  if (p1NameInput) {
+    p1NameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (btnSaveP1Name) btnSaveP1Name.click();
+      }
+    });
+  }
+  if (p2NameInput) {
+    p2NameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (btnSaveP2Name) btnSaveP2Name.click();
+      }
+    });
+  }
+
 
   // Click outside to close modals
   window.addEventListener('click', (e) => {
@@ -847,6 +898,34 @@ function attachHandlers(){
   }
   if (btnReadyGuest && window.RemoteChallengeUI) {
     btnReadyGuest.addEventListener('click', window.RemoteChallengeUI.readyGuest);
+  }
+  
+  // Remote Challenge - Save name buttons
+  const btnSaveHostName = document.getElementById('btn-save-host-name');
+  const btnSaveJoinName = document.getElementById('btn-save-join-name');
+  if (btnSaveHostName && window.RemoteChallengeUI) {
+    btnSaveHostName.addEventListener('click', window.RemoteChallengeUI.saveHostName);
+  }
+  if (btnSaveJoinName && window.RemoteChallengeUI) {
+    btnSaveJoinName.addEventListener('click', window.RemoteChallengeUI.saveJoinName);
+  }
+  
+  // Allow Enter key to save names in Remote Challenge
+  if (remoteHostNameInput && window.RemoteChallengeUI) {
+    remoteHostNameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.RemoteChallengeUI.saveHostName();
+      }
+    });
+  }
+  if (remoteJoinNameInput && window.RemoteChallengeUI) {
+    remoteJoinNameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.RemoteChallengeUI.saveJoinName();
+      }
+    });
   }
   
   // Keyboard navigation on answers
@@ -2151,6 +2230,143 @@ function promptClassroomJoin() {
     return;
   }
   
+  // Show the classroom join modal
+  const modal = document.getElementById('classroom-join-modal');
+  const pinInput = document.getElementById('classroom-pin-input');
+  const nameInput = document.getElementById('classroom-player-name');
+  const btnSave = document.getElementById('btn-classroom-join-save');
+  const btnCancel = document.getElementById('btn-classroom-join-cancel');
+  const btnClose = document.getElementById('btn-classroom-join-close');
+  
+  if (!modal || !pinInput || !nameInput) {
+    // Fallback to old prompt method
+    promptClassroomJoinLegacy();
+    return;
+  }
+  
+  // Pre-fill with player name if available
+  const currentName = state.currentPlayer ? state.currentPlayer.name : 'Player';
+  nameInput.value = currentName;
+  pinInput.value = '';
+  
+  modal.style.display = 'flex';
+  setTimeout(() => { pinInput.focus(); }, 100);
+  
+  // Handle Save button click
+  const handleSave = () => {
+    const code = pinInput.value.trim();
+    const name = nameInput.value.trim() || 'Player';
+    
+    if (!code) {
+      showToast({ title: 'Error', msg: 'Please enter a Game PIN', type: 'error' });
+      pinInput.focus();
+      return;
+    }
+    
+    // Validate room code
+    if (window.SecurityModule) {
+      const codeValidation = window.SecurityModule.validateRoomCode(code);
+      if (!codeValidation.valid) {
+        showToast({ title: 'Error', msg: codeValidation.error, type: 'error' });
+        return;
+      }
+    }
+    
+    // Validate player name
+    if (window.SecurityModule) {
+      const nameValidation = window.SecurityModule.validatePlayerName(name);
+      if (!nameValidation.valid) {
+        showToast({ title: 'Error', msg: nameValidation.error, type: 'error' });
+        return;
+      }
+    }
+    
+    if (!window.FirebaseConfig || !window.FirebaseConfig.isAvailable()) {
+      showToast({ title: 'Error', msg: 'Firebase not configured', type: 'error' });
+      modal.style.display = 'none';
+      return;
+    }
+    
+    const database = window.FirebaseConfig.getDatabase();
+    const sanitizedCode = code.toUpperCase();
+    const sanitizedName = window.SecurityModule ? window.SecurityModule.sanitizeHTML(name) : name;
+    const roomRef = database.ref('classrooms/' + sanitizedCode);
+    
+    // Check if room exists
+    roomRef.once('value').then(snapshot => {
+      if (!snapshot.exists()) {
+        showToast({ title: 'Error', msg: 'Room not found. Check the PIN.', type: 'error' });
+        return;
+      }
+      
+      const room = snapshot.val();
+      
+      if (room.status !== 'lobby' && room.status !== 'active' && room.status !== 'question') {
+        showToast({ title: 'Error', msg: 'Game has ended or not started.', type: 'error' });
+        return;
+      }
+      
+      // Add player to room
+      const playerId = 'player_' + Date.now();
+      roomRef.child('players/' + playerId).set({
+        name: sanitizedName,
+        score: 0,
+        correct: 0,
+        joinedAt: Date.now()
+      });
+      
+      // Update last activity
+      roomRef.child('lastActivity').set(Date.now());
+      
+      modal.style.display = 'none';
+      showToast({ title: 'Success!', msg: `Joined as ${sanitizedName}. Follow instructions on screen!`, type: 'success', timeout: 8000 });
+      
+      // Listen for game state
+      startClassroomPlayerMode(sanitizedCode, playerId, roomRef);
+    }).catch(error => {
+      showToast({ title: 'Error', msg: 'Failed to join: ' + error.message, type: 'error' });
+    });
+  };
+  
+  // Handle Cancel button
+  const handleCancel = () => {
+    modal.style.display = 'none';
+    cleanup();
+  };
+  
+  // Handle Enter key in inputs
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      // If on pin input and it's filled, move to name
+      if (e.target === pinInput && pinInput.value.trim()) {
+        nameInput.focus();
+      } else {
+        // Otherwise, submit
+        handleSave();
+      }
+    }
+  };
+  
+  // Setup event listeners
+  btnSave.addEventListener('click', handleSave);
+  btnCancel.addEventListener('click', handleCancel);
+  btnClose.addEventListener('click', handleCancel);
+  pinInput.addEventListener('keypress', handleKeyPress);
+  nameInput.addEventListener('keypress', handleKeyPress);
+  
+  // Cleanup function
+  const cleanup = () => {
+    btnSave.removeEventListener('click', handleSave);
+    btnCancel.removeEventListener('click', handleCancel);
+    btnClose.removeEventListener('click', handleCancel);
+    pinInput.removeEventListener('keypress', handleKeyPress);
+    nameInput.removeEventListener('keypress', handleKeyPress);
+  };
+}
+
+// Legacy fallback for classroom join using prompts
+function promptClassroomJoinLegacy() {
   const code = prompt('Enter Game PIN (e.g., FAITH-123):');
   if (!code) return;
   
