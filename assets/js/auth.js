@@ -13,7 +13,10 @@ import {
     onAuthStateChanged,
     GoogleAuthProvider,
     signInWithPopup,
-    updateProfile
+    updateProfile,
+    verifyBeforeUpdateEmail,
+    reauthenticateWithCredential,
+    EmailAuthProvider
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 import { 
@@ -32,6 +35,12 @@ let userProfile = null;
 const loginAttempts = new Map();
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
 const MAX_LOGIN_ATTEMPTS = 5;
+
+// Session timeout management
+let sessionTimeoutId = null;
+let lastActivityTime = Date.now();
+const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes of inactivity
+const SESSION_WARNING_TIME = 5 * 60 * 1000; // Warn 5 minutes before timeout
 
 /**
  * Validate password strength
@@ -116,10 +125,12 @@ export function initAuth() {
             await loadUserProfile(user.uid);
             await syncUserLanguage();
             await updateLastLogin();
+            startSessionTimeout(); // Start inactivity timer
             dispatchAuthEvent('login', user);
         } else {
             console.log('User signed out');
             userProfile = null;
+            stopSessionTimeout(); // Clear timer
             dispatchAuthEvent('logout', null);
         }
     });
@@ -240,7 +251,8 @@ export async function loginWithGoogle() {
 /**
  * Sign out current user
  */
-export async function logoutUser() {
+export astopSessionTimeout(); // Clear timer
+        sync function logoutUser() {
     try {
         await signOut(auth);
         return { success: true };
@@ -259,6 +271,105 @@ export async function resetPassword(email) {
         return { success: true };
     } catch (error) {
         console.error('Password reset error:', error);
+        return { success: false, error: getAuthErrorMessage(error.code) };
+    }
+}
+
+/**
+ * Update user email with verification
+ * Requires recent authentication (within 5 minutes)
+ */
+export async function updateUserEmail(newEmail, currentPassword) {
+    if (!currentUser) {
+        return { success: false, error: 'No user logged in' };
+    }
+
+    try {
+        // Validate new email
+        const emailValidation = validateEmail(newEmail);
+        if (!emailValidation.valid) {
+            return { success: false, error: emailValidation.error };
+        }
+
+        // Check if email is different
+        if (currentUser.email === newEmail) {
+            return { success: false, error: 'New email is the same as current email' };
+        }
+
+        // Re-authenticate user first (required for sensitive operations)
+        const credential = EmailAuthProvider.credential(
+            currentUser.email,
+            currentPassword
+        );
+        await reauthenticateWithCredential(currentUser, credential);
+
+        // Send verification to new email before updating
+        // User must click link in email to complete change
+        await verifyBeforeUpdateEmail(currentUser, newEmail);
+
+        return { 
+            success: true, 
+            message: 'Verification email sent to ' + newEmail + '. Please check your inbox and click the link to confirm the change.' 
+        };
+    } catch (error) {
+        console.error('Email update error:', error);
+        
+        // Handle specific errors
+        if (error.code === 'auth/wrong-password') {
+            return { success: false, error: 'Current password is incorrect' };
+        }
+        if (error.code === 'auth/email-already-in-use') {
+            return { success: false, error: 'This email is already in use by another account' };
+        }
+        if (error.code === 'auth/requires-recent-login') {
+            return { success: false, error: 'Please sign out and sign in again before changing your email' };
+        }
+        
+        return { success: false, error: getAuthErrorMessage(error.code) };
+    }
+}
+
+/**
+ * Change user password
+ * Requires current password for security
+ */
+export async function updateUserPassword(currentPassword, newPassword) {
+    if (!currentUser) {
+        return { success: false, error: 'No user logged in' };
+    }
+
+    try {
+        // Validate new password strength
+        const passwordCheck = validatePasswordStrength(newPassword);
+        if (!passwordCheck.valid) {
+            return { success: false, error: passwordCheck.message };
+        }
+
+        // Re-authenticate user first
+        const credential = EmailAuthProvider.credential(
+            currentUser.email,
+            currentPassword
+        );
+        await reauthenticateWithCredential(currentUser, credential);
+
+        // Update password using Firebase SDK method
+        const { updatePassword } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+        await updatePassword(currentUser, newPassword);
+
+        return { 
+            success: true, 
+            message: 'Password updated successfully' 
+        };
+    } catch (error) {
+        console.error('Password update error:', error);
+        
+        if (error.code === 'auth/wrong-password') {
+            return { success: false, error: 'Current password is incorrect' };
+        }
+        if (error.code === 'auth/requires-recent-login') {
+            return { success: false, error: 'Please sign out and sign in again before changing your password' };
+        }
+        
         return { success: false, error: getAuthErrorMessage(error.code) };
     }
 }
@@ -418,7 +529,122 @@ export function isAuthenticated() {
 
 /**
  * Check if user is guest (not authenticated)
+ 
+
+/**
+ * Start session timeout monitoring
+ * Logs user out after 30 minutes of inactivity
  */
+function startSessionTimeout() {
+    if (!currentUser) return;
+
+    // Reset activity time
+    lastActivityTime = Date.now();
+
+    // Clear existing timeout
+    stopSessionTimeout();
+
+    // Set up activity listeners
+    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    activityEvents.forEach(event => {
+        document.addEventListener(event, handleUserActivity, { passive: true });
+    });
+
+    // Check every minute
+    sessionTimeoutId = setInterval(checkSessionTimeout, 60000);
+}
+
+/**
+ * Stop session timeout monitoring
+ */
+function stopSessionTimeout() {
+    if (sessionTimeoutId) {
+        clearInterval(sessionTimeoutId);
+        sessionTimeoutId = null;
+    }
+
+    // Remove activity listeners
+    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    activityEvents.forEach(event => {
+        document.removeEventListener(event, handleUserActivity);
+    });
+}
+
+/**
+ * Handle user activity - reset timer
+ */
+function handleUserActivity() {
+    lastActivityTime = Date.now();
+}
+
+/**
+ * Check if session has timed out
+ */
+async function checkSessionTimeout() {
+    if (!currentUser) {
+        stopSessionTimeout();
+        return;
+    }
+
+    const inactiveTime = Date.now() - lastActivityTime;
+    
+    // Warn user 5 minutes before timeout
+    if (inactiveTime >= SESSION_TIMEOUT - SESSION_WARNING_TIME && 
+        inactiveTime < SESSION_TIMEOUT) {
+        showSessionWarning();
+    }
+    
+    // Logout if inactive for 30 minutes
+    if (inactiveTime >= SESSION_TIMEOUT) {
+        console.log('Session timed out due to inactivity');
+        await logoutUser();
+        
+        // Show message to user
+        dispatchAuthEvent('session-timeout', null);
+        
+        // Optional: Show a toast or modal
+        if (typeof window.showToast === 'function') {
+            window.showToast('You have been logged out due to inactivity', 'info');
+        }
+    }
+}
+
+/**
+ * Show warning that session will expire soon
+ */
+function showSessionWarning() {
+    dispatchAuthEvent('session-warning', {
+        remainingMinutes: Math.floor(SESSION_WARNING_TIME / 60000)
+    });
+    
+    // Optional: Show a toast
+    if (typeof window.showToast === 'function') {
+        window.showToast('Your session will expire in 5 minutes. Move your mouse to stay logged in.', 'warning');
+    }
+}
+
+/**
+ * Manually refresh session (extend timeout)
+ */
+export function refreshSession() {
+    if (currentUser) {
+        lastActivityTime = Date.now();
+        return { success: true, message: 'Session refreshed' };
+    }
+    return { success: false, error: 'No active session' };
+}
+
+/**
+ * Get remaining session time in minutes
+ */
+export function getSessionTimeRemaining() {
+    if (!currentUser) return 0;
+    
+    const inactiveTime = Date.now() - lastActivityTime;
+    const remainingTime = SESSION_TIMEOUT - inactiveTime;
+    
+    return Math.max(0, Math.floor(remainingTime / 60000));
+}*/
 export function isGuest() {
     return currentUser === null;
 }

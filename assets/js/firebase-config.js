@@ -1,8 +1,17 @@
-// Firebase Configuration for Who-Bible
-// Remote Challenge & Community Features
+/**
+ * Firebase Configuration for Who-Bible
+ * Supports both modular SDK (v10+) and compat SDK (v9)
+ * Used for: Authentication, Firestore, Realtime Database
+ */
+
+// Import Firebase modular SDK
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 // Firebase configuration
-// IMPORTANT: Replace these with your own Firebase project credentials
+// IMPORTANT: These are your production credentials
 // Get them from: https://console.firebase.google.com/
 const firebaseConfig = {
   apiKey: "AIzaSyB_3QdJKS4hbCq4I6PecRG8yI0RngMdd9c",
@@ -14,57 +23,56 @@ const firebaseConfig = {
   appId: "1:1034048891862:web:f2786d1cba8f3c0a8bd277"
 };
 
-// Firebase initialization status
-let firebaseInitialized = false;
-let database = null;
-
 // Initialize Firebase
-function initializeFirebase() {
-  if (firebaseInitialized) return true;
-  
-  // Check if Firebase is loaded
-  if (typeof firebase === 'undefined') {
-    console.warn('Firebase SDK not loaded. Remote features disabled.');
-    return false;
-  }
-  
-  // Check if config is set
-  if (firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
-    console.warn('Firebase not configured. Remote features disabled.');
-    return false;
-  }
-  
-  try {
-    // Initialize Firebase
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    
-    // Get database reference
-    database = firebase.database();
-    firebaseInitialized = true;
-    console.log('✓ Firebase initialized successfully');
-    return true;
-  } catch (error) {
-    console.error('Firebase initialization error:', error);
-    return false;
-  }
+let app;
+let auth;
+let db; // Firestore
+let realtimeDb; // Realtime Database
+
+try {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  realtimeDb = getDatabase(app);
+  console.log('✓ Firebase initialized successfully (modular SDK)');
+} catch (error) {
+  console.error('Firebase initialization error:', error);
 }
 
-// Check if Firebase is available and configured
-function isFirebaseAvailable() {
-  if (!firebaseInitialized) {
-    return initializeFirebase();
-  }
-  return true;
-}
+// Export Firebase instances for modular SDK (used by auth.js, etc.)
+export { auth, db, realtimeDb as database, app };
 
-// Export for use in other modules
+// Legacy support for compat SDK (used by remote-challenge.js)
+// This ensures backward compatibility with existing code
 if (typeof window !== 'undefined') {
-  window.FirebaseConfig = {
-    initialize: initializeFirebase,
-    isAvailable: isFirebaseAvailable,
-    getDatabase: () => database,
-    config: firebaseConfig
-  };
+  // Check if compat SDK is loaded
+  if (typeof firebase !== 'undefined') {
+    let compatInitialized = false;
+    let compatDatabase = null;
+
+    function initializeCompatFirebase() {
+      if (compatInitialized) return true;
+
+      try {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        compatDatabase = firebase.database();
+        compatInitialized = true;
+        console.log('✓ Firebase compat SDK initialized');
+        return true;
+      } catch (error) {
+        console.error('Firebase compat initialization error:', error);
+        return false;
+      }
+    }
+
+    // Export compat interface for legacy code
+    window.FirebaseConfig = {
+      initialize: initializeCompatFirebase,
+      isAvailable: () => compatInitialized || initializeCompatFirebase(),
+      getDatabase: () => compatDatabase,
+      config: firebaseConfig
+    };
+  }
 }

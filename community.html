@@ -10,11 +10,12 @@
   <link rel="stylesheet" href="assets/css/feedback-modal.css" />
   <link rel="stylesheet" href="assets/css/discussions.css" />
   
-  <!-- Firebase SDK -->
+  <!-- Firebase SDK (Compat for remote-challenge.js) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
-  <script src="assets/js/firebase-config.js"></script>
+  <!-- Firebase Config (Modular SDK) -->
+  <script type="module" src="assets/js/firebase-config.js?v=20260122"></script>
   <script src="assets/js/remote-challenge.js" defer></script>
   <script src="assets/js/scenarios.js" defer></script>
   <script src="assets/js/locations.js" defer></script>

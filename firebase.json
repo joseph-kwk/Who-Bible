@@ -12,6 +12,14 @@
       "test_*.js",
       "*.backup.*"
     ],
+    "redirects": [
+      {
+        "source": "**",
+        "destination": "https://your-app-name.web.app",
+        "type": 301
+      }
+    ],
+    "cleanUrls": true,
     "headers": [
       {
         "source": "**/*.@(js|css)",
