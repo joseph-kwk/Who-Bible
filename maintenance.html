@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Who-Bible - Maintenance Update</title>
+  <meta name="description" content="Who-Bible is currently being updated with new features." />
+  <link rel="icon" type="image/png" href="assets/images/logo.png" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .maintenance-container {
+      text-align: center;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 30px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #4dabf7;
+      font-weight: 700;
+    }
+    
+    .subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+      color: #74c0fc;
+    }
+    
+    .message {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      color: #c5c5c5;
+    }
+    
+    .features {
+      background: rgba(74, 171, 247, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      margin: 30px 0;
+      border-left: 4px solid #4dabf7;
+    }
+    
+    .features h2 {
+      color: #4dabf7;
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+    }
+    
+    .features ul {
+      list-style: none;
+      text-align: left;
+    }
+    
+    .features li {
+      padding: 8px 0;
+      padding-left: 30px;
+      position: relative;
+    }
+    
+    .features li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #51cf66;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    
+    .spinner {
+      margin: 30px auto;
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(74, 171, 247, 0.2);
+      border-top-color: #4dabf7;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    .eta {
+      font-size: 1rem;
+      color: #a0a0a0;
+      font-style: italic;
+    }
+    
+    .social {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .social p {
+      color: #a0a0a0;
+      margin-bottom: 10px;
+    }
+    
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .subtitle {
+        font-size: 1.2rem;
+      }
+      
+      .maintenance-container {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="maintenance-container">
+    <img src="assets/images/logo.png" alt="Who-Bible Logo" class="logo" />
+    
+    <h1>We're Updating!</h1>
+    
+    <p class="subtitle">🛠️ Maintenance in Progress</p>
+    
+    <div class="spinner"></div>
+    
+    <p class="message">
+      Who-Bible is currently being updated with exciting new features and improvements. 
+      We'll be back online shortly!
+    </p>
+    
+    <div class="features">
+      <h2>What's Coming:</h2>
+      <ul>
+        <li>Enhanced quiz features</li>
+        <li>Performance improvements</li>
+        <li>Bug fixes and refinements</li>
+        <li>Better mobile experience</li>
+      </ul>
+    </div>
+    
+    <p class="eta">Expected to be back online within a few hours</p>
+    
+    <div class="social">
+      <p>Thank you for your patience! 🙏</p>
+      <p style="color: #74c0fc; font-size: 0.9rem;">
+        Keep testing your Bible knowledge - we'll be ready soon!
+      </p>
+    </div>
+  </div>
+</body>
+</html>

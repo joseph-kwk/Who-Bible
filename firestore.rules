@@ -1,0 +1,190 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isAuthenticated() && isOwner(userId);
+      
+      // Users can create their own profile during signup
+      allow create: if isAuthenticated() && 
+                       isOwner(userId) &&
+                       request.resource.data.keys().hasAll(['displayName', 'email', 'createdAt']) &&
+                       request.resource.data.displayName is string &&
+                       request.resource.data.displayName.size() >= 1 &&
+                       request.resource.data.displayName.size() <= 50;
+      
+      // Users can update their own profile (but not uid or email)
+      allow update: if isAuthenticated() && 
+                       isOwner(userId) &&
+                       !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'email']);
+      
+      // Users cannot delete their profile (must use account deletion)
+      allow delete: if false;
+      
+      // User data subcollection (stats, settings, etc.)
+      match /data/{document=**} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow write: if isAuthenticated() && isOwner(userId);
+      }
+      
+      // User game history
+      match /games/{gameId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow create: if isAuthenticated() && isOwner(userId);
+        allow update, delete: if false; // Games are immutable once created
+      }
+      
+      // User achievements
+      match /achievements/{achievementId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow write: if false; // Only Cloud Functions can award achievements
+      }
+      
+      // User friends
+      match /friends/{friendId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow write: if isAuthenticated() && isOwner(userId);
+      }
+      
+      // User blocked list
+      match /blocked/{blockedUserId} {
+        allow read: if isAuthenticated() && isOwner(userId);
+        allow write: if isAuthenticated() && isOwner(userId);
+      }
+    }
+    
+    // Friend requests
+    match /friend-requests/{requestId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.senderId ||
+        request.auth.uid == resource.data.recipientId
+      );
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.senderId;
+      allow update: if isAuthenticated() && 
+                       request.auth.uid == resource.data.recipientId;
+      allow delete: if isAuthenticated() && (
+        request.auth.uid == resource.data.senderId ||
+        request.auth.uid == resource.data.recipientId
+      );
+    }
+    
+    // Global leaderboards (public read for rankings)
+    match /leaderboards/{leaderboardId} {
+      // Anyone authenticated can read leaderboards
+      allow read: if isAuthenticated();
+      
+      // Only Cloud Functions can write leaderboard data
+      allow write: if false;
+      
+      // Individual entries
+      match /entries/{entryId} {
+        allow read: if isAuthenticated();
+        allow write: if false; // Only Cloud Functions
+      }
+    }
+    
+    // Discussion rooms (public community discussions)
+    match /discussion-rooms/{roomId} {
+      // Anyone can read room metadata
+      allow read: if isAuthenticated();
+      
+      // Only system can write room metadata
+      allow write: if false;
+      
+      // Room messages
+      match /messages/{messageId} {
+        // Anyone can read messages (public discussions)
+        allow read: if isAuthenticated();
+        
+        // Users can create messages in rooms
+        allow create: if isAuthenticated() && 
+                         request.auth.uid == request.resource.data.userId;
+        
+        // Users can only delete their own messages (within time limit checked in code)
+        allow delete: if isAuthenticated() && 
+                         request.auth.uid == resource.data.userId;
+        
+        // Only system can update (for moderation)
+        allow update: if false;
+        
+        // Message likes subcollection
+        match /likes/{likeId} {
+          allow read: if isAuthenticated();
+          allow write: if isAuthenticated() && request.auth.uid == likeId;
+        }
+      }
+    }
+    
+    // Reports for content moderation
+    match /reports/{reportId} {
+      allow create: if isAuthenticated() && 
+                       request.resource.data.reportedBy == request.auth.uid;
+      allow read, update, delete: if false; // Only admin console
+    }
+    
+    // Users collection (public profiles for search)
+    match /users/{userId} {
+      // Anyone can read basic profile info for search/discovery
+      allow read: if isAuthenticated();
+    }
+    
+    // Leaderboards - read by all, authenticated users can update their own entries
+    match /leaderboards/{timeframe}/entries/{entryId} {
+      allow read: if true; // Public leaderboards for all to see
+      allow write: if isAuthenticated() && 
+                      request.resource.data.uid == request.auth.uid &&
+                      entryId.matches('.*' + request.auth.uid + '$'); // Entry ID must contain user's UID
+    }
+    
+    // Challenges - existing rules maintained
+    match /challenges/{challengeId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        isOwner(resource.data.challenger) || 
+        isOwner(resource.data.opponent)
+      );
+      allow delete: if isAuthenticated() && isOwner(resource.data.challenger);
+    }
+    
+    // Rooms - existing rules maintained for community feature
+    match /rooms/{roomId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated() && isOwner(resource.data.hostId);
+    }
+    
+    // Feedback collection
+    match /feedback/{feedbackId} {
+      allow create: if true; // Anyone can submit feedback
+      allow read: if false; // Only admins via console
+      allow update, delete: if false;
+    }
+    
+    // Daily challenges - read by all, write by Cloud Functions only
+    match /daily-challenges/{date} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+    
+    // Notifications
+    match /notifications/{userId}/messages/{messageId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if false; // Only Cloud Functions send notifications
+      allow delete: if isAuthenticated() && isOwner(userId); // Users can dismiss
+    }
+  }
+}

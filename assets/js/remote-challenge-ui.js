@@ -66,6 +66,81 @@ function startRemoteChallenge() {
   showRemoteModal();
 }
 
+// Save name handlers (for Save buttons next to inputs)
+function handleSaveHostName() {
+  const hostNameInput = document.getElementById('remote-host-name');
+  const hostName = hostNameInput.value.trim();
+  
+  if (!hostName) {
+    showToast({ 
+      title: 'Name Required', 
+      msg: 'Please enter your name', 
+      type: 'error' 
+    });
+    hostNameInput.focus();
+    return;
+  }
+  
+  // Validate player name
+  if (window.SecurityModule) {
+    const nameValidation = window.SecurityModule.validatePlayerName(hostName);
+    if (!nameValidation.valid) {
+      showToast({ title: 'Error', msg: nameValidation.error, type: 'error' });
+      return;
+    }
+  }
+  
+  showToast({ 
+    title: 'Name Saved!', 
+    msg: `Welcome, ${hostName}!`, 
+    type: 'success',
+    timeout: 1500
+  });
+  
+  // Flash the input to show it's saved
+  hostNameInput.style.boxShadow = '0 0 0 3px var(--primary-color)';
+  setTimeout(() => { 
+    hostNameInput.style.boxShadow = ''; 
+  }, 500);
+}
+
+function handleSaveJoinName() {
+  const joinNameInput = document.getElementById('remote-join-name');
+  const joinName = joinNameInput.value.trim();
+  
+  if (!joinName) {
+    showToast({ 
+      title: 'Name Required', 
+      msg: 'Please enter your name', 
+      type: 'error' 
+    });
+    joinNameInput.focus();
+    return;
+  }
+  
+  // Validate player name
+  if (window.SecurityModule) {
+    const nameValidation = window.SecurityModule.validatePlayerName(joinName);
+    if (!nameValidation.valid) {
+      showToast({ title: 'Error', msg: nameValidation.error, type: 'error' });
+      return;
+    }
+  }
+  
+  showToast({ 
+    title: 'Name Saved!', 
+    msg: `Welcome, ${joinName}!`, 
+    type: 'success',
+    timeout: 1500
+  });
+  
+  // Flash the input to show it's saved
+  joinNameInput.style.boxShadow = '0 0 0 3px var(--primary-color)';
+  setTimeout(() => { 
+    joinNameInput.style.boxShadow = ''; 
+  }, 500);
+}
+
 // Create room flow
 async function handleCreateRoom() {
   const hostName = document.getElementById('remote-host-name').value.trim();
@@ -488,6 +563,8 @@ if (typeof window !== 'undefined') {
     copyLink: handleCopyLink,
     shareLink: handleShareLink,
     readyHost: handleReadyHost,
-    readyGuest: handleReadyGuest
+    readyGuest: handleReadyGuest,
+    saveHostName: handleSaveHostName,
+    saveJoinName: handleSaveJoinName
   };
 }

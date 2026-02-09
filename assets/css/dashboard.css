@@ -1,0 +1,634 @@
+/**
+ * Analytics Dashboard Styles
+ */
+
+/* ========================
+   DASHBOARD MODAL
+   ======================== */
+
+.dashboard-modal .modal-content {
+    max-width: 1400px;
+    width: 95%;
+    max-height: 95vh;
+    padding: 0;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--border-color);
+    background: var(--card-bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.dashboard-header h2 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.dashboard-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.time-range-select {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.time-range-select:hover {
+    border-color: var(--primary-color);
+}
+
+.export-btn {
+    padding: 0.5rem 1rem;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.export-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.dashboard-body {
+    padding: 2rem;
+    overflow-y: auto;
+    max-height: calc(95vh - 80px);
+}
+
+.dashboard-body.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Loading State */
+.dashboard-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1rem;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ========================
+   DASHBOARD SECTIONS
+   ======================== */
+
+.dashboard-section {
+    margin-bottom: 3rem;
+}
+
+.dashboard-section h3 {
+    margin: 0 0 1.5rem 0;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+}
+
+.dashboard-section h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* ========================
+   STAT CARDS
+   ======================== */
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0.5rem 0;
+}
+
+.stat-label {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.stat-sublabel {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.stat-card.trend-up {
+    border-color: rgba(39, 174, 96, 0.3);
+}
+
+.stat-card.trend-down {
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+.level-card .level-progress {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+/* ========================
+   INSIGHTS
+   ======================== */
+
+#learning-insights {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.insight-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    transition: all 0.3s ease;
+}
+
+.insight-card:hover {
+    transform: translateX(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.insight-positive {
+    border-left: 4px solid #27ae60;
+}
+
+.insight-improvement {
+    border-left: 4px solid #f39c12;
+}
+
+.insight-motivational {
+    border-left: 4px solid #9b59b6;
+}
+
+.insight-insight {
+    border-left: 4px solid #3498db;
+}
+
+.insight-milestone {
+    border-left: 4px solid #e74c3c;
+}
+
+.insight-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.insight-content {
+    flex: 1;
+}
+
+.insight-category {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.insight-message {
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.empty-insights {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+/* ========================
+   CHARTS
+   ======================== */
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 2rem;
+}
+
+.chart-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.chart-card h4 {
+    margin-top: 0;
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* ========================
+   PERSONAL RECORDS
+   ======================== */
+
+.records-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.record-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(86, 156, 214, 0.05) 100%);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.record-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(86, 156, 214, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.record-card:hover::before {
+    opacity: 1;
+}
+
+.record-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(86, 156, 214, 0.2);
+}
+
+.record-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+.record-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin: 0.5rem 0;
+}
+
+.record-label {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.record-sublabel {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.record-date {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+/* ========================
+   MODE PERFORMANCE
+   ======================== */
+
+.mode-performance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.mode-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.mode-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.mode-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.mode-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.mode-games {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.mode-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.mode-stat {
+    text-align: center;
+}
+
+.mode-stat-label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.mode-stat-value {
+    display: block;
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.mode-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.mode-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    transition: width 0.5s ease;
+}
+
+.mode-chart-container {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.mode-chart-container canvas {
+    display: block;
+    margin: 0 auto;
+}
+
+/* ========================
+   EMPTY & ERROR STATES
+   ======================== */
+
+.empty-state,
+.error-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon,
+.error-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3,
+.error-state h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p,
+.error-state p {
+    color: var(--text-secondary);
+}
+
+/* ========================
+   RESPONSIVE
+   ======================== */
+
+@media (max-width: 1200px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-modal .modal-content {
+        width: 98%;
+        max-height: 98vh;
+        border-radius: 8px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .dashboard-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .dashboard-body {
+        padding: 1rem;
+    }
+
+    .stat-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .records-grid,
+    .mode-performance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-card canvas {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-header {
+        padding: 1rem;
+    }
+
+    .dashboard-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .time-range-select,
+    .export-btn {
+        width: 100%;
+    }
+
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .insight-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .mode-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================
+   ANIMATIONS
+   ======================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-card,
+.insight-card,
+.record-card,
+.mode-card,
+.chart-card {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.stat-card:nth-child(n) {
+    animation-delay: calc(0.05s * (n mod 8));
+}
+
+/* ========================
+   THEME SPECIFIC
+   ======================== */
+
+[data-theme="light"] {
+    --card-bg: #ffffff;
+    --border-color: #e0e0e0;
+    --input-bg: #f8f9fa;
+}
+
+[data-theme="dark"] {
+    --card-bg: #1e1e1e;
+    --border-color: #3a3a3a;
+    --input-bg: #2a2a2a;
+}

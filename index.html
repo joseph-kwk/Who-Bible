@@ -10,13 +10,22 @@
   <link rel="stylesheet" href="assets/css/styles.css?v=20260110c" />
   <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20260110c" />
   <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20260110c" />
+  <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20260116" />
+  <link rel="stylesheet" href="assets/css/auth.css?v=20260209" />
   
-  <!-- Firebase SDK -->
+  <!-- Firebase SDK (Compat for remote-challenge.js) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
+  <!-- Firebase Config (Modular SDK) -->
+  <script type="module" src="assets/js/firebase-config.js?v=20260122"></script>
+  
+  <!-- Authentication -->
+  <script type="module" src="assets/js/auth.js?v=20260209"></script>
+  <script type="module" src="assets/js/auth-ui.js?v=20260209"></script>
+  
   <!-- App Scripts -->
-  <script src="assets/js/firebase-config.js?v=20260110b"></script>
+  <script src="assets/js/security.js?v=20260116"></script>
   <script src="assets/js/remote-challenge.js?v=20260110b"></script>
   <script src="assets/js/remote-challenge-ui.js?v=20260110b"></script>
   <script src="assets/js/scenarios.js?v=20260110b" defer></script>
@@ -24,6 +33,7 @@
   <script src="assets/js/concepts.js?v=20260110b" defer></script>
   <script src="assets/js/relationships.js?v=20260110b" defer></script>
   <script src="assets/js/translations.js?v=20260110b" defer></script>
+  <script src="assets/js/guest-prompts.js?v=20260116" defer></script>
   <script src="assets/js/app.js?v=20260110b" defer></script>
 </head>
 <body>
@@ -79,6 +89,9 @@
             </div>
             <nav class="site-nav" aria-label="Site Navigation">
               <a id="nav-community" href="community.html" target="_blank" class="nav-link" rel="noopener">Community</a>
+              <button id="btn-auth-signin" class="nav-link auth-trigger" style="background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: inherit;" aria-label="Sign in or create account">
+                <span id="auth-button-text">Sign In</span>
+              </button>
               <button id="btn-share" class="icon-btn" title="Share" aria-label="Share this quiz">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M12 3v12"/>
@@ -107,9 +120,9 @@
           <section class="setup-section" aria-labelledby="player-heading">
             <h3 id="player-heading">Player</h3>
             <div class="player-controls">
-              <button id="btn-change-player" class="mode-btn" style="padding: 12px 20px; min-height: auto;">
-                <span id="current-player-name">Guest</span>
-                <div class="mode-desc" style="font-size: 12px; margin-top: 4px;">Click to change player</div>
+              <button id="btn-change-player" class="mode-btn" style="padding: 12px 16px; min-height: auto; max-width: 300px; margin: 0 auto;">
+                <span id="current-player-name" style="display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;">Guest</span>
+                <div class="mode-desc" style="font-size: 11px; margin-top: 4px;">Click to change</div>
               </button>
             </div>
           </section>
@@ -200,10 +213,16 @@
               <div class="remote-challenge-content">
                 <h3 id="remote-heading">Play Online with Friends</h3>
                 <p class="remote-challenge-desc">Challenge anyone, anywhere! Create a room, share the link, and compete in real-time.</p>
-                <button id="btn-remote-challenge" class="remote-challenge-btn" data-mode="remote" aria-describedby="remote-desc">
-                  <span class="remote-btn-icon">🎮</span>
-                  <span>Start Remote Challenge</span>
-                </button>
+                <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
+                  <button id="btn-remote-challenge" class="remote-challenge-btn" data-mode="remote" aria-describedby="remote-desc" style="flex: 1; min-width: 150px;">
+                    <span class="remote-btn-icon">🎮</span>
+                    <span>Start Remote Challenge</span>
+                  </button>
+                  <button id="btn-classroom-mode" class="remote-challenge-btn" style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #26890c, #4caf50);">
+                    <span class="remote-btn-icon">🏫</span>
+                    <span>Classroom Mode</span>
+                  </button>
+                </div>
                 <p class="remote-challenge-note" id="remote-desc">
                   <span class="remote-status-icon">✓</span> No sign-up required • Instant matchmaking • Live scoring
                 </p>
@@ -408,13 +427,19 @@
       <main class="modal-body">
         <div class="row">
           <label for="p1-name" id="p1-name-label">Player 1 name</label>
-          <input id="p1-name" type="text" placeholder="P1" aria-describedby="p1-help" />
-          <small id="p1-help" class="sr-only">Enter name for first player</small>
+          <div style="display: flex; gap: 8px;">
+            <input id="p1-name" type="text" placeholder="P1" aria-describedby="p1-help" style="flex: 1;" />
+            <button id="btn-save-p1-name" class="secondary" style="padding: 8px 16px;">Save</button>
+          </div>
+          <small id="p1-help" style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.25em; display: block;">Click <b>Save</b> to confirm Player 1's name</small>
         </div>
         <div class="row">
           <label for="p2-name" id="p2-name-label">Player 2 name</label>
-          <input id="p2-name" type="text" placeholder="P2" aria-describedby="p2-help" />
-          <small id="p2-help" class="sr-only">Enter name for second player</small>
+          <div style="display: flex; gap: 8px;">
+            <input id="p2-name" type="text" placeholder="P2" aria-describedby="p2-help" style="flex: 1;" />
+            <button id="btn-save-p2-name" class="secondary" style="padding: 8px 16px;">Save</button>
+          </div>
+          <small id="p2-help" style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.25em; display: block;">Click <b>Save</b> to confirm Player 2's name</small>
         </div>
       </main>
       <footer class="modal-footer">
@@ -459,7 +484,11 @@
         <div id="remote-step-create" style="display:none;">
           <div class="row">
             <label for="remote-host-name">Your Name</label>
-            <input id="remote-host-name" type="text" placeholder="Enter your name" maxlength="20" />
+            <div style="display: flex; gap: 8px;">
+              <input id="remote-host-name" type="text" placeholder="Enter your name" maxlength="20" style="flex: 1;" />
+              <button id="btn-save-host-name" class="secondary" style="padding: 8px 16px;">Save</button>
+            </div>
+            <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.25em;">Click <b>Save</b> to confirm your name, then create the room.</div>
           </div>
           <div style="text-align: center; margin-top: 16px;">
             <button id="btn-create-room-confirm" class="primary">Create Room & Get Link</button>
@@ -498,7 +527,11 @@
           </div>
           <div class="row">
             <label for="remote-join-name">Your Name</label>
-            <input id="remote-join-name" type="text" placeholder="Enter your name" maxlength="20" />
+            <div style="display: flex; gap: 8px;">
+              <input id="remote-join-name" type="text" placeholder="Enter your name" maxlength="20" style="flex: 1;" />
+              <button id="btn-save-join-name" class="secondary" style="padding: 8px 16px;">Save</button>
+            </div>
+            <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.25em;">Click <b>Save</b> to confirm your name before joining.</div>
           </div>
           <div style="text-align: center; margin-top: 16px;">
             <button id="btn-join-room-confirm" class="primary">Join Room</button>
@@ -524,6 +557,31 @@
       <footer class="modal-footer">
         <button id="btn-remote-back" style="display:none;">← Back</button>
         <button id="btn-remote-cancel">Cancel</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Classroom Join Modal -->
+  <div id="classroom-join-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="classroom-join-title" aria-modal="true">
+    <div class="modal" role="document">
+      <header class="modal-header">
+        <h2 id="classroom-join-title">🏫 Join Classroom Game</h2>
+        <button id="btn-classroom-join-close" aria-label="Close classroom join">✕</button>
+      </header>
+      <main class="modal-body">
+        <p style="margin-bottom: 1rem; color: var(--text-muted);">Enter the Game PIN from your teacher's screen and your name to join.</p>
+        <div class="row">
+          <label for="classroom-pin-input">Game PIN</label>
+          <input id="classroom-pin-input" type="text" placeholder="e.g., FAITH-123" style="text-transform: uppercase;" maxlength="20" />
+        </div>
+        <div class="row">
+          <label for="classroom-player-name">Your Name</label>
+          <input id="classroom-player-name" type="text" placeholder="Enter your name" maxlength="20" />
+        </div>
+      </main>
+      <footer class="modal-footer">
+        <button id="btn-classroom-join-save" class="primary" style="margin-right:0.5em;">Join Game</button>
+        <button id="btn-classroom-join-cancel">Cancel</button>
       </footer>
     </div>
   </div>

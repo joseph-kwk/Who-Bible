@@ -9,11 +9,19 @@
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
+  <!-- Security: Force HTTPS -->
+  <script>
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      location.replace(`https:${location.href.substring(location.protocol.length)}`);
+    }
+  </script>
+  
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/auth-security.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -580,10 +588,19 @@
     const emailInput = document.getElementById('admin-email');
     const passInput = document.getElementById('admin-password');
 
-      // Export buttons
-      const btnExportCSV = document.getElementById('btn-export-csv');
-      const btnExportJSON = document.getElementById('btn-export-json');
-      let lastFeedbackItems = [];
+    // Export buttons
+    const btnExportCSV = document.getElementById('btn-export-csv');
+    const btnExportJSON = document.getElementById('btn-export-json');
+    let lastFeedbackItems = [];
+
+    // Rate limiting for login attempts
+    let loginAttempts = 0;
+    let loginLocked = false;
+    let loginLockTimeout = null;
+    const MAX_LOGIN_ATTEMPTS = 5;
+
+    // Session timeout manager
+    let sessionTimeoutManager = null;
 
     // Auth state listener
     auth.onAuthStateChanged(user => {
@@ -591,9 +608,25 @@
         loginOverlay.classList.add('hidden');
         adminContent.classList.remove('hidden');
         loadFeedback();
+        
+        // Start session timeout monitoring
+        if (window.auth_SessionTimeoutManager) {
+          sessionTimeoutManager = new window.auth_SessionTimeoutManager(30);
+          sessionTimeoutManager.handleTimeout = () => {
+            auth.signOut();
+            alert('You have been logged out due to inactivity.');
+          };
+          sessionTimeoutManager.start();
+        }
       } else {
         loginOverlay.classList.remove('hidden');
         adminContent.classList.add('hidden');
+        
+        // Stop session timeout monitoring
+        if (sessionTimeoutManager) {
+          sessionTimeoutManager.stop();
+          sessionTimeoutManager = null;
+        }
       }
     });
 
@@ -619,17 +652,62 @@
 
     // Login button
     btnLogin.addEventListener('click', async () => {
+      // Check if locked
+      if (loginLocked) {
+        showError('Too many failed attempts. Please wait 1 minute.');
+        return;
+      }
+      
       const email = emailInput.value.trim();
       const pass = passInput.value.trim();
+      
       if (!email || !pass) {
         showError('Please enter email and password.');
         return;
       }
+      
       clearMessages();
+      btnLogin.disabled = true;
+      btnLogin.textContent = 'Signing in...';
+      
       try {
         await auth.signInWithEmailAndPassword(email, pass);
+        // Success - reset attempts
+        loginAttempts = 0;
+        if (loginLockTimeout) {
+          clearTimeout(loginLockTimeout);
+          loginLockTimeout = null;
+        }
       } catch (error) {
-        showError(error.message);
+        loginAttempts++;
+        
+        // Show better error messages (prevent account enumeration)
+        let errorMsg = error.message;
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+          errorMsg = 'Invalid email or password.';
+        } else if (error.code === 'auth/too-many-requests') {
+          errorMsg = 'Too many failed attempts. Please try again later or reset your password.';
+        }
+        
+        if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+          loginLocked = true;
+          loginAttempts = 0;
+          errorMsg = 'Too many failed attempts. Please wait 1 minute before trying again.';
+          
+          // Auto-unlock after 1 minute
+          loginLockTimeout = setTimeout(() => {
+            loginLocked = false;
+            clearMessages();
+          }, 60000);
+        } else {
+          const remaining = MAX_LOGIN_ATTEMPTS - loginAttempts;
+          errorMsg += ` (${remaining} ${remaining === 1 ? 'attempt' : 'attempts'} remaining)`;
+        }
+        
+        showError(errorMsg);
+      } finally {
+        btnLogin.disabled = false;
+        btnLogin.textContent = 'Sign In';
       }
     });
 

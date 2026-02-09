@@ -198,13 +198,17 @@ function displayPlayerInfo() {
   const welcomeEl = document.getElementById('welcome-message');
   if (welcomeEl) {
     const stats = state.currentPlayer.stats;
+    const isGuest = state.currentPlayer.isGuest;
+    const guestBadgeHtml = isGuest ? `<span class="player-badge guest" title="${getText('guest.badgeTooltip')}">👤 ${getText('guest.badge')}</span>` : `<span class="player-badge member" title="Registered member">✓ Member</span>`;
+    const deviceOnlyHtml = isGuest ? `<span class="device-only-badge" title="${getText('guest.deviceOnlyTooltip')}">📱 ${getText('guest.deviceOnly')}</span>` : '';
+    
     if (typeof getText === 'function') {
       welcomeEl.innerHTML = `
         <div style="text-align: center; padding: 20px;">
-          <h3>${getText('welcomePlayer', { name: state.currentPlayer.name })}</h3>
+          <h3>${getText('welcomePlayer', { name: state.currentPlayer.name })} ${guestBadgeHtml}</h3>
           <div style="display: flex; gap: 20px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
             <div><strong>${getText('gamesPlayed')}:</strong> ${stats.gamesPlayed}</div>
-            <div><strong>${getText('highScore')}:</strong> ${stats.highestScore}</div>
+            <div><strong>${getText('highScore')}:</strong> ${stats.highestScore} ${deviceOnlyHtml}</div>
             <div><strong>${getText('bestStreak')}:</strong> ${stats.bestStreak}</div>
             <div><strong>${getText('winRate')}:</strong> ${stats.winRate}%</div>
           </div>
@@ -214,10 +218,10 @@ function displayPlayerInfo() {
       // Fallback if getText not available yet
       welcomeEl.innerHTML = `
         <div style="text-align: center; padding: 20px;">
-          <h3>Welcome, ${state.currentPlayer.name}!</h3>
+          <h3>Welcome, ${state.currentPlayer.name}! ${guestBadgeHtml}</h3>
           <div style="display: flex; gap: 20px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
             <div><strong>Games:</strong> ${stats.gamesPlayed}</div>
-            <div><strong>High Score:</strong> ${stats.highestScore}</div>
+            <div><strong>High Score:</strong> ${stats.highestScore} ${deviceOnlyHtml}</div>
             <div><strong>Best Streak:</strong> ${stats.bestStreak}</div>
             <div><strong>Win Rate:</strong> ${stats.winRate}%</div>
           </div>
@@ -248,6 +252,7 @@ const btnSolo = document.getElementById('btn-solo');
 const btnTimed = document.getElementById('btn-timed');
 const btnChallenge = document.getElementById('btn-challenge');
 const btnRemoteChallenge = document.getElementById('btn-remote-challenge');
+const btnClassroomMode = document.getElementById('btn-classroom-mode');
 const btnStudy = document.getElementById('btn-study');
 const btnScenarios = document.getElementById('btn-scenarios');
 const difficultySel = document.getElementById('difficulty');
@@ -526,6 +531,21 @@ async function init(){
   // Check for first-time user
   checkFirstTimeUser();
   
+  // Initialize guest prompts system
+  if (window.GuestPrompts && typeof window.GuestPrompts.init === 'function') {
+    window.GuestPrompts.init();
+  }
+  
+  // Listen for account creation requests from guest prompts
+  document.addEventListener('showAccountCreation', (event) => {
+    if (event.detail && event.detail.source === 'guest-prompt') {
+      // Show player change modal to convert guest to registered player
+      if (btnChangePlayer) {
+        btnChangePlayer.click();
+      }
+    }
+  });
+  
   // Welcome toast (only if not first time, to avoid clutter)
   if (localStorage.getItem('who-bible-visited')) {
     showToast({ title: getText('brandTitle'), msg: getText('welcomeMessage'), type: 'info', timeout: 4000 });
@@ -722,8 +742,33 @@ function attachHandlers(){
   
   // Remote Challenge handlers
   if (btnRemoteChallenge && window.RemoteChallengeUI) {
-    btnRemoteChallenge.addEventListener('click', window.RemoteChallengeUI.start);
+    btnRemoteChallenge.addEventListener('click', () => {
+      // Check if user is guest and dispatch event
+      if (state.currentPlayer && state.currentPlayer.isGuest) {
+        document.dispatchEvent(new CustomEvent('socialFeatureAttempt', {
+          detail: { feature: 'Remote Challenge' }
+        }));
+        return;
+      }
+      window.RemoteChallengeUI.start();
+    });
   }
+  
+  // Classroom Mode handler
+  if (btnClassroomMode) {
+    btnClassroomMode.addEventListener('click', () => {
+      // Check if user wants to host or join
+      const choice = confirm('Click OK to HOST (display on projector)\nClick Cancel to JOIN as a player');
+      if (choice) {
+        // Open host view in new tab/window
+        window.open('host.html', '_blank');
+      } else {
+        // Show join modal
+        promptClassroomJoin();
+      }
+    });
+  }
+  
   if (btnRemoteClose && window.RemoteChallengeUI) {
     btnRemoteClose.addEventListener('click', window.RemoteChallengeUI.hide);
   }
@@ -762,6 +807,57 @@ function attachHandlers(){
   if (btnPlayersClose) btnPlayersClose.addEventListener('click', hidePlayersModal);
   if (btnPlayersCancel) btnPlayersCancel.addEventListener('click', hidePlayersModal);
   if (btnPlayersStart) btnPlayersStart.addEventListener('click', startChallengeFromModal);
+  
+  // Challenge Mode - Save name buttons
+  const btnSaveP1Name = document.getElementById('btn-save-p1-name');
+  const btnSaveP2Name = document.getElementById('btn-save-p2-name');
+  if (btnSaveP1Name) {
+    btnSaveP1Name.addEventListener('click', () => {
+      const name = p1NameInput.value.trim();
+      if (!name) {
+        showToast({ title: 'Name Required', msg: 'Please enter Player 1 name', type: 'error' });
+        p1NameInput.focus();
+        return;
+      }
+      showToast({ title: 'Saved!', msg: `Player 1: ${name}`, type: 'success', timeout: 1500 });
+      // Flash effect
+      btnSaveP1Name.style.boxShadow = '0 0 0 2px var(--primary-color)';
+      setTimeout(() => { btnSaveP1Name.style.boxShadow = ''; }, 400);
+    });
+  }
+  if (btnSaveP2Name) {
+    btnSaveP2Name.addEventListener('click', () => {
+      const name = p2NameInput.value.trim();
+      if (!name) {
+        showToast({ title: 'Name Required', msg: 'Please enter Player 2 name', type: 'error' });
+        p2NameInput.focus();
+        return;
+      }
+      showToast({ title: 'Saved!', msg: `Player 2: ${name}`, type: 'success', timeout: 1500 });
+      // Flash effect
+      btnSaveP2Name.style.boxShadow = '0 0 0 2px var(--primary-color)';
+      setTimeout(() => { btnSaveP2Name.style.boxShadow = ''; }, 400);
+    });
+  }
+  
+  // Allow Enter key to save names in Challenge Mode
+  if (p1NameInput) {
+    p1NameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (btnSaveP1Name) btnSaveP1Name.click();
+      }
+    });
+  }
+  if (p2NameInput) {
+    p2NameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (btnSaveP2Name) btnSaveP2Name.click();
+      }
+    });
+  }
+
 
   // Click outside to close modals
   window.addEventListener('click', (e) => {
@@ -802,6 +898,34 @@ function attachHandlers(){
   }
   if (btnReadyGuest && window.RemoteChallengeUI) {
     btnReadyGuest.addEventListener('click', window.RemoteChallengeUI.readyGuest);
+  }
+  
+  // Remote Challenge - Save name buttons
+  const btnSaveHostName = document.getElementById('btn-save-host-name');
+  const btnSaveJoinName = document.getElementById('btn-save-join-name');
+  if (btnSaveHostName && window.RemoteChallengeUI) {
+    btnSaveHostName.addEventListener('click', window.RemoteChallengeUI.saveHostName);
+  }
+  if (btnSaveJoinName && window.RemoteChallengeUI) {
+    btnSaveJoinName.addEventListener('click', window.RemoteChallengeUI.saveJoinName);
+  }
+  
+  // Allow Enter key to save names in Remote Challenge
+  if (remoteHostNameInput && window.RemoteChallengeUI) {
+    remoteHostNameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.RemoteChallengeUI.saveHostName();
+      }
+    });
+  }
+  if (remoteJoinNameInput && window.RemoteChallengeUI) {
+    remoteJoinNameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.RemoteChallengeUI.saveJoinName();
+      }
+    });
   }
   
   // Keyboard navigation on answers
@@ -1421,7 +1545,18 @@ function endQuiz(){
   const correctAnswers = state.results.filter(r => r.correct).length;
   const totalQuestions = state.results.length;
   updatePlayerStats(state.score, state.streak, correctAnswers, totalQuestions, state.mode);
-    displayPlayerInfo();
+  displayPlayerInfo();
+  
+  // Dispatch game completed event for guest prompts
+  document.dispatchEvent(new CustomEvent('gameCompleted', {
+    detail: {
+      score: state.score,
+      streak: state.streak,
+      correct: correctAnswers,
+      total: totalQuestions,
+      mode: state.mode
+    }
+  }));
   
   // Complete remote challenge if in remote mode
   if(state.mode==='remote-challenge' && window.RemoteChallenge){
@@ -2080,6 +2215,337 @@ function initFeedback() {
 // Expose displayPlayerInfo globally so translations.js can call it
 window.displayPlayerInfo = displayPlayerInfo;
 
+// Expose showPlayerChangeModal for guest prompts
+window.showPlayerChangeModal = function() {
+  if (btnChangePlayer) {
+    btnChangePlayer.click();
+  }
+};
+
+// Classroom Mode - Join Prompt
+function promptClassroomJoin() {
+  // Rate limiting
+  if (window.RateLimiter && !window.RateLimiter.check('joinClassroom', 10)) {
+    showToast({ title: 'Error', msg: 'Too many join attempts. Please wait.', type: 'error' });
+    return;
+  }
+  
+  // Show the classroom join modal
+  const modal = document.getElementById('classroom-join-modal');
+  const pinInput = document.getElementById('classroom-pin-input');
+  const nameInput = document.getElementById('classroom-player-name');
+  const btnSave = document.getElementById('btn-classroom-join-save');
+  const btnCancel = document.getElementById('btn-classroom-join-cancel');
+  const btnClose = document.getElementById('btn-classroom-join-close');
+  
+  if (!modal || !pinInput || !nameInput) {
+    // Fallback to old prompt method
+    promptClassroomJoinLegacy();
+    return;
+  }
+  
+  // Pre-fill with player name if available
+  const currentName = state.currentPlayer ? state.currentPlayer.name : 'Player';
+  nameInput.value = currentName;
+  pinInput.value = '';
+  
+  modal.style.display = 'flex';
+  setTimeout(() => { pinInput.focus(); }, 100);
+  
+  // Handle Save button click
+  const handleSave = () => {
+    const code = pinInput.value.trim();
+    const name = nameInput.value.trim() || 'Player';
+    
+    if (!code) {
+      showToast({ title: 'Error', msg: 'Please enter a Game PIN', type: 'error' });
+      pinInput.focus();
+      return;
+    }
+    
+    // Validate room code
+    if (window.SecurityModule) {
+      const codeValidation = window.SecurityModule.validateRoomCode(code);
+      if (!codeValidation.valid) {
+        showToast({ title: 'Error', msg: codeValidation.error, type: 'error' });
+        return;
+      }
+    }
+    
+    // Validate player name
+    if (window.SecurityModule) {
+      const nameValidation = window.SecurityModule.validatePlayerName(name);
+      if (!nameValidation.valid) {
+        showToast({ title: 'Error', msg: nameValidation.error, type: 'error' });
+        return;
+      }
+    }
+    
+    if (!window.FirebaseConfig || !window.FirebaseConfig.isAvailable()) {
+      showToast({ title: 'Error', msg: 'Firebase not configured', type: 'error' });
+      modal.style.display = 'none';
+      return;
+    }
+    
+    const database = window.FirebaseConfig.getDatabase();
+    const sanitizedCode = code.toUpperCase();
+    const sanitizedName = window.SecurityModule ? window.SecurityModule.sanitizeHTML(name) : name;
+    const roomRef = database.ref('classrooms/' + sanitizedCode);
+    
+    // Check if room exists
+    roomRef.once('value').then(snapshot => {
+      if (!snapshot.exists()) {
+        showToast({ title: 'Error', msg: 'Room not found. Check the PIN.', type: 'error' });
+        return;
+      }
+      
+      const room = snapshot.val();
+      
+      if (room.status !== 'lobby' && room.status !== 'active' && room.status !== 'question') {
+        showToast({ title: 'Error', msg: 'Game has ended or not started.', type: 'error' });
+        return;
+      }
+      
+      // Add player to room
+      const playerId = 'player_' + Date.now();
+      roomRef.child('players/' + playerId).set({
+        name: sanitizedName,
+        score: 0,
+        correct: 0,
+        joinedAt: Date.now()
+      });
+      
+      // Update last activity
+      roomRef.child('lastActivity').set(Date.now());
+      
+      modal.style.display = 'none';
+      showToast({ title: 'Success!', msg: `Joined as ${sanitizedName}. Follow instructions on screen!`, type: 'success', timeout: 8000 });
+      
+      // Listen for game state
+      startClassroomPlayerMode(sanitizedCode, playerId, roomRef);
+    }).catch(error => {
+      showToast({ title: 'Error', msg: 'Failed to join: ' + error.message, type: 'error' });
+    });
+  };
+  
+  // Handle Cancel button
+  const handleCancel = () => {
+    modal.style.display = 'none';
+    cleanup();
+  };
+  
+  // Handle Enter key in inputs
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      // If on pin input and it's filled, move to name
+      if (e.target === pinInput && pinInput.value.trim()) {
+        nameInput.focus();
+      } else {
+        // Otherwise, submit
+        handleSave();
+      }
+    }
+  };
+  
+  // Setup event listeners
+  btnSave.addEventListener('click', handleSave);
+  btnCancel.addEventListener('click', handleCancel);
+  btnClose.addEventListener('click', handleCancel);
+  pinInput.addEventListener('keypress', handleKeyPress);
+  nameInput.addEventListener('keypress', handleKeyPress);
+  
+  // Cleanup function
+  const cleanup = () => {
+    btnSave.removeEventListener('click', handleSave);
+    btnCancel.removeEventListener('click', handleCancel);
+    btnClose.removeEventListener('click', handleCancel);
+    pinInput.removeEventListener('keypress', handleKeyPress);
+    nameInput.removeEventListener('keypress', handleKeyPress);
+  };
+}
+
+// Legacy fallback for classroom join using prompts
+function promptClassroomJoinLegacy() {
+  const code = prompt('Enter Game PIN (e.g., FAITH-123):');
+  if (!code) return;
+  
+  // Validate room code
+  if (window.SecurityModule) {
+    const codeValidation = window.SecurityModule.validateRoomCode(code);
+    if (!codeValidation.valid) {
+      showToast({ title: 'Error', msg: codeValidation.error, type: 'error' });
+      return;
+    }
+  }
+  
+  const name = prompt('Enter your name:') || 'Player';
+  
+  // Validate player name
+  if (window.SecurityModule) {
+    const nameValidation = window.SecurityModule.validatePlayerName(name);
+    if (!nameValidation.valid) {
+      showToast({ title: 'Error', msg: nameValidation.error, type: 'error' });
+      return;
+    }
+  }
+  
+  if (!window.FirebaseConfig || !window.FirebaseConfig.isAvailable()) {
+    showToast({ title: 'Error', msg: 'Firebase not configured', type: 'error' });
+    return;
+  }
+  
+  const database = window.FirebaseConfig.getDatabase();
+  const sanitizedCode = code.trim().toUpperCase();
+  const sanitizedName = window.SecurityModule ? window.SecurityModule.sanitizeHTML(name.trim()) : name.trim();
+  const roomRef = database.ref('classrooms/' + sanitizedCode);
+  
+  // Check if room exists
+  roomRef.once('value').then(snapshot => {
+    if (!snapshot.exists()) {
+      showToast({ title: 'Error', msg: 'Room not found. Check the PIN.', type: 'error' });
+      return;
+    }
+    
+    const room = snapshot.val();
+    
+    if (room.status !== 'lobby' && room.status !== 'active' && room.status !== 'question') {
+      showToast({ title: 'Error', msg: 'Game has ended or not started.', type: 'error' });
+      return;
+    }
+    
+    // Add player to room
+    const playerId = 'player_' + Date.now();
+    roomRef.child('players/' + playerId).set({
+      name: sanitizedName,
+      score: 0,
+      correct: 0,
+      joinedAt: Date.now()
+    });
+    
+    // Update last activity
+    roomRef.child('lastActivity').set(Date.now());
+    
+    showToast({ title: 'Success!', msg: `Joined as ${sanitizedName}. Follow instructions on screen!`, type: 'success', timeout: 8000 });
+    
+    // Listen for game state
+    startClassroomPlayerMode(sanitizedCode, playerId, roomRef);
+  }).catch(error => {
+    showToast({ title: 'Error', msg: 'Failed to join: ' + error.message, type: 'error' });
+  });
+}
+
+// Classroom Player Mode
+function startClassroomPlayerMode(roomCode, playerId, roomRef) {
+  // Hide setup, show game area with modified UI
+  setupPanel.style.display = 'none';
+  gameArea.style.display = 'block';
+  
+  document.getElementById('game-title').textContent = `Room: ${roomCode}`;
+  
+  // Listen for current question
+  roomRef.child('currentQuestion').on('value', (snapshot) => {
+    const questionIndex = snapshot.val();
+    if (questionIndex !== null && questionIndex >= 0) {
+      loadClassroomQuestion(roomRef, questionIndex, playerId);
+    }
+  });
+  
+  // Listen for status
+  roomRef.child('status').on('value', (snapshot) => {
+    const status = snapshot.val();
+    if (status === 'finished') {
+      showToast({ title: 'Quiz Complete!', msg: 'Thanks for playing!', type: 'success' });
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    }
+  });
+}
+
+// Load classroom question for player
+function loadClassroomQuestion(roomRef, questionIndex, playerId) {
+  roomRef.child('questions').once('value').then(snapshot => {
+    const questions = snapshot.val();
+    if (!questions || !questions[questionIndex]) return;
+    
+    const question = questions[questionIndex];
+    
+    // Check if already answered
+    roomRef.child(`responses/${playerId}`).once('value').then(respSnapshot => {
+      const response = respSnapshot.val();
+      if (response && response.answer !== undefined) {
+        // Already answered - show waiting
+        showClassroomWaiting();
+        return;
+      }
+      
+      // Show question
+      displayClassroomQuestion(question, questionIndex, roomRef, playerId);
+    });
+  });
+}
+
+// Display classroom question for player
+function displayClassroomQuestion(question, questionIndex, roomRef, playerId) {
+  state.current = question;
+  state.qnum = questionIndex + 1;
+  
+  const qTextEl = document.getElementById('qtext');
+  qTextEl.textContent = question.prompt;
+  
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  
+  const icons = ['▲', '◆', '●', '■'];
+  const colors = ['#e21b3c', '#1368ce', '#ffa602', '#26890c'];
+  
+  question.options.forEach((option, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans classroom-answer';
+    btn.style.borderLeft = `6px solid ${colors[i]}`;
+    btn.innerHTML = `
+      <span style="font-size: 32px; margin-right: 12px;">${icons[i]}</span>
+      <span style="font-size: 20px; font-weight: 700;">${option}</span>
+    `;
+    
+    btn.addEventListener('click', () => {
+      const answerTime = Date.now();
+      const questionStartTime = state.questionStartTime || answerTime;
+      const timeTaken = (answerTime - questionStartTime) / 1000;
+      
+      // Submit answer
+      roomRef.child(`responses/${playerId}`).set({
+        answer: i,
+        timeTaken: timeTaken,
+        timestamp: answerTime
+      });
+      
+      // Show waiting
+      showClassroomWaiting();
+    });
+    
+    answersEl.appendChild(btn);
+  });
+  
+  // Record question start time
+  roomRef.child('questionStartTime').once('value').then(snapshot => {
+    state.questionStartTime = snapshot.val();
+  });
+}
+
+// Show waiting screen for classroom player
+function showClassroomWaiting() {
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = `
+    <div style="text-align: center; padding: 60px 20px; background: rgba(76, 175, 80, 0.1); border-radius: 16px;">
+      <div style="font-size: 64px; margin-bottom: 20px;">✓</div>
+      <h2 style="font-size: 32px; margin-bottom: 12px;">Answer Submitted!</h2>
+      <p style="font-size: 20px; color: var(--text-muted);">Waiting for other players...</p>
+    </div>
+  `;
+}
+
 // Re-localize dynamic pieces when language changes
 window.onWhoBibleLanguageChange = function(lang){
   try{
@@ -2102,6 +2568,27 @@ window.onWhoBibleLanguageChange = function(lang){
     }
   }catch(_){ /* non-fatal */ }
 };
+
+// Initialize authentication if available
+if (typeof window !== 'undefined') {
+  // Listen for auth state changes
+  document.addEventListener('auth-login', (e) => {
+    console.log('User logged in:', e.detail);
+    // Migrate guest data to authenticated user if needed
+    if (state.currentPlayer && state.currentPlayer.isGuest) {
+      // TODO: Migrate stats to cloud
+      console.log('Migrating guest stats to authenticated account');
+    }
+  });
+  
+  document.addEventListener('auth-logout', () => {
+    console.log('User logged out, reverting to guest');
+    // Revert to guest user
+    state.currentPlayer = createGuestPlayer();
+    savePlayer(state.currentPlayer);
+    displayPlayerInfo();
+  });
+}
 
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {
