@@ -16,8 +16,21 @@ service cloud.firestore {
       // Users can read their own profile
       allow read: if isAuthenticated() && isOwner(userId);
       
-      // Users can only write to their own profile
-      allow write: if isAuthenticated() && isOwner(userId);
+      // Users can create their own profile during signup
+      allow create: if isAuthenticated() && 
+                       isOwner(userId) &&
+                       request.resource.data.keys().hasAll(['displayName', 'email', 'createdAt']) &&
+                       request.resource.data.displayName is string &&
+                       request.resource.data.displayName.size() >= 1 &&
+                       request.resource.data.displayName.size() <= 50;
+      
+      // Users can update their own profile (but not uid or email)
+      allow update: if isAuthenticated() && 
+                       isOwner(userId) &&
+                       !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'email']);
+      
+      // Users cannot delete their profile (must use account deletion)
+      allow delete: if false;
       
       // User data subcollection (stats, settings, etc.)
       match /data/{document=**} {
@@ -65,6 +78,21 @@ service cloud.firestore {
         request.auth.uid == resource.data.senderId ||
         request.auth.uid == resource.data.recipientId
       );
+    }
+    
+    // Global leaderboards (public read for rankings)
+    match /leaderboards/{leaderboardId} {
+      // Anyone authenticated can read leaderboards
+      allow read: if isAuthenticated();
+      
+      // Only Cloud Functions can write leaderboard data
+      allow write: if false;
+      
+      // Individual entries
+      match /entries/{entryId} {
+        allow read: if isAuthenticated();
+        allow write: if false; // Only Cloud Functions
+      }
     }
     
     // Discussion rooms (public community discussions)

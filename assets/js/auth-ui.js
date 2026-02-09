@@ -190,6 +190,16 @@ function createAuthModals() {
  * Setup event listeners
  */
 function setupAuthListeners() {
+    // Header Sign In button
+    document.getElementById('btn-auth-signin')?.addEventListener('click', () => {
+        if (isAuthenticated()) {
+            // If already logged in, show profile dropdown (future feature)
+            showNotification('Already signed in!');
+        } else {
+            openAuthModal('login');
+        }
+    });
+    
     // Tab switching
     document.querySelectorAll('.auth-tab').forEach(tab => {
         tab.addEventListener('click', () => switchTab(tab.dataset.tab));
@@ -478,6 +488,28 @@ function updateUIForAuthState() {
     const user = getCurrentUser();
     const profile = getUserProfile();
     
+    // Update header Sign In button
+    const authButton = document.getElementById('btn-auth-signin');
+    const authButtonText = document.getElementById('auth-button-text');
+    
+    if (user && profile) {
+        // User is logged in - show their name
+        if (authButtonText) {
+            authButtonText.textContent = profile.displayName || 'My Account';
+        }
+        if (authButton) {
+            authButton.setAttribute('aria-label', 'View account');
+        }
+    } else {
+        // User is guest - show Sign In
+        if (authButtonText) {
+            authButtonText.textContent = 'Sign In';
+        }
+        if (authButton) {
+            authButton.setAttribute('aria-label', 'Sign in or create account');
+        }
+    }
+    
     // Update any UI elements that need to know about auth state
     const loginButtons = document.querySelectorAll('.show-auth-btn');
     const userButtons = document.querySelectorAll('.user-profile-btn');
@@ -544,6 +576,12 @@ function getLanguageName(langCode) {
         'fr': 'Français'
     };
     return names[langCode] || langCode;
+}
+
+// Export for use by guest prompts and other modules
+if (typeof window !== 'undefined') {
+    window.openAuthModal = openAuthModal;
+    window.closeAuthModal = closeAuthModal;
 }
 
 // Initialize on load

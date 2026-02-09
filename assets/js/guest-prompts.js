@@ -608,14 +608,19 @@ function closeFullModal() {
  * Trigger account creation flow
  */
 function triggerAccountCreation() {
-  // Dispatch event that app.js can listen to
-  document.dispatchEvent(new CustomEvent('showAccountCreation', {
-    detail: { source: 'guest-prompt', preserveStats: true }
-  }));
-  
-  // Or directly call player change if available
-  if (window.showPlayerChangeModal) {
-    window.showPlayerChangeModal();
+  // Open auth modal (auth-ui.js)
+  if (window.openAuthModal) {
+    window.openAuthModal('signup');
+  } else {
+    // Fallback: Dispatch event that app.js can listen to
+    document.dispatchEvent(new CustomEvent('showAccountCreation', {
+      detail: { source: 'guest-prompt', preserveStats: true }
+    }));
+    
+    // Or directly call player change if available
+    if (window.showPlayerChangeModal) {
+      window.showPlayerChangeModal();
+    }
   }
 }
 

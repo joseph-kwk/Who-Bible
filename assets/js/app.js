@@ -2569,6 +2569,27 @@ window.onWhoBibleLanguageChange = function(lang){
   }catch(_){ /* non-fatal */ }
 };
 
+// Initialize authentication if available
+if (typeof window !== 'undefined') {
+  // Listen for auth state changes
+  document.addEventListener('auth-login', (e) => {
+    console.log('User logged in:', e.detail);
+    // Migrate guest data to authenticated user if needed
+    if (state.currentPlayer && state.currentPlayer.isGuest) {
+      // TODO: Migrate stats to cloud
+      console.log('Migrating guest stats to authenticated account');
+    }
+  });
+  
+  document.addEventListener('auth-logout', () => {
+    console.log('User logged out, reverting to guest');
+    // Revert to guest user
+    state.currentPlayer = createGuestPlayer();
+    savePlayer(state.currentPlayer);
+    displayPlayerInfo();
+  });
+}
+
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
