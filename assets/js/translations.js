@@ -270,6 +270,11 @@ function getText(key, params = {}) {
   return text;
 }
 
+// Expose getText globally for modules
+if (typeof window !== 'undefined') {
+  window.getText = getText;
+}
+
 function updateAllText() {
   // Set document language attribute
   if (document && document.documentElement) {

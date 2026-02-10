@@ -2571,8 +2571,8 @@ window.onWhoBibleLanguageChange = function(lang){
 
 // Initialize authentication if available
 if (typeof window !== 'undefined') {
-  // Listen for auth state changes
-  document.addEventListener('auth-login', (e) => {
+  // Listen for auth state changes (corrected event names with colon)
+  document.addEventListener('auth:login', (e) => {
     console.log('User logged in:', e.detail);
     // Migrate guest data to authenticated user if needed
     if (state.currentPlayer && state.currentPlayer.isGuest) {
@@ -2581,7 +2581,7 @@ if (typeof window !== 'undefined') {
     }
   });
   
-  document.addEventListener('auth-logout', () => {
+  document.addEventListener('auth:logout', () => {
     console.log('User logged out, reverting to guest');
     // Revert to guest user
     state.currentPlayer = createGuestPlayer();

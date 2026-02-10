@@ -14,15 +14,18 @@ import {
     isAuthenticated 
 } from './auth.js';
 
-import { getText } from './translations.js';
+// Use global getText function from translations.js
+const getText = (key, params) => window.getText ? window.getText(key, params) : key;
 
 /**
  * Initialize authentication UI
  */
 export function initAuthUI() {
+    console.log('[Auth UI] Initializing authentication UI...');
     createAuthModals();
     setupAuthListeners();
     updateUIForAuthState();
+    console.log('[Auth UI] Authentication UI initialized successfully');
 }
 
 /**
@@ -31,9 +34,15 @@ export function initAuthUI() {
 function createAuthModals() {
     const modalHTML = `
         <!-- Login/Signup Modal -->
-        <div id="auth-modal" class="modal auth-modal" style="display: none;">
-            <div class="modal-content auth-modal-content">
+        <div id="auth-modal" class="auth-modal" style="display: none;">
+            <div class="auth-modal-content">
                 <span class="close-modal" id="close-auth-modal">&times;</span>
+                
+                <!-- Welcome Header -->
+                <div class="auth-welcome-header">
+                    <h1 class="auth-welcome-title">Welcome to Who-Bible</h1>
+                    <p class="auth-welcome-subtitle">Learn about Bible people through interactive quizzes</p>
+                </div>
                 
                 <!-- Tabs -->
                 <div class="auth-tabs">
@@ -191,14 +200,22 @@ function createAuthModals() {
  */
 function setupAuthListeners() {
     // Header Sign In button
-    document.getElementById('btn-auth-signin')?.addEventListener('click', () => {
-        if (isAuthenticated()) {
-            // If already logged in, show profile dropdown (future feature)
-            showNotification('Already signed in!');
-        } else {
-            openAuthModal('login');
-        }
-    });
+    const authButton = document.getElementById('btn-auth-signin');
+    if (authButton) {
+        console.log('[Auth UI] Sign-in button found, attaching listener');
+        authButton.addEventListener('click', () => {
+            console.log('[Auth UI] Sign-in button clicked');
+            if (isAuthenticated()) {
+                // If already logged in, show profile dropdown (future feature)
+                showNotification('Already signed in!');
+            } else {
+                console.log('[Auth UI] Opening auth modal');
+                showAuthModal('login');
+            }
+        });
+    } else {
+        console.error('[Auth UI] Sign-in button not found!');
+    }
     
     // Tab switching
     document.querySelectorAll('.auth-tab').forEach(tab => {
@@ -442,6 +459,13 @@ export function showAuthModal(tab = 'login') {
 }
 
 /**
+ * Alias for compatibility
+ */
+export function openAuthModal(tab = 'login') {
+    showAuthModal(tab);
+}
+
+/**
  * Close auth modal
  */
 function closeAuthModal() {
@@ -580,7 +604,8 @@ function getLanguageName(langCode) {
 
 // Export for use by guest prompts and other modules
 if (typeof window !== 'undefined') {
-    window.openAuthModal = openAuthModal;
+    window.openAuthModal = showAuthModal;  // Export as openAuthModal for compatibility
+    window.showAuthModal = showAuthModal;  // Also export with current name
     window.closeAuthModal = closeAuthModal;
 }
 
