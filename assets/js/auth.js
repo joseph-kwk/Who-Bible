@@ -251,8 +251,8 @@ export async function loginWithGoogle() {
 /**
  * Sign out current user
  */
-export astopSessionTimeout(); // Clear timer
-        sync function logoutUser() {
+export async function logoutUser() {
+    stopSessionTimeout(); // Clear timer
     try {
         await signOut(auth);
         return { success: true };
@@ -634,9 +634,9 @@ export function refreshSession() {
     return { success: false, error: 'No active session' };
 }
 
-/**
+/*
  * Get remaining session time in minutes
- */
+
 export function getSessionTimeRemaining() {
     if (!currentUser) return 0;
     
@@ -644,7 +644,8 @@ export function getSessionTimeRemaining() {
     const remainingTime = SESSION_TIMEOUT - inactiveTime;
     
     return Math.max(0, Math.floor(remainingTime / 60000));
-}*/
+}
+*/
 export function isGuest() {
     return currentUser === null;
 }

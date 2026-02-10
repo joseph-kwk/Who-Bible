@@ -79,237 +79,546 @@ const LocationModule = (function() {
     // Clear existing content
     container.innerHTML = '';
     
-    // Create SVG map of Middle East region
+    // Create SVG map with modern design
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', '0 0 1400 900');
-    svg.setAttribute('class', 'location-map');
+    svg.setAttribute('id', 'biblical-map');
     svg.style.width = '100%';
-    svg.style.height = '700px';
+    svg.style.height = '100%';
     svg.style.minHeight = '600px';
-    svg.style.borderRadius = '12px';
-    svg.style.overflow = 'hidden';
-    svg.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+    svg.style.background = 'linear-gradient(135deg, #1e3a5f 0%, #2c5f7c 50%, #1e3a5f 100%)';
+    svg.style.cursor = 'grab';
     
-    // Add clipping path to prevent overflow
-    const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-    clipPath.setAttribute('id', 'mapClip');
-    const clipRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    clipRect.setAttribute('x', '0');
-    clipRect.setAttribute('y', '0');
-    clipRect.setAttribute('width', '1400');
-    clipRect.setAttribute('height', '900');
-    clipPath.appendChild(clipRect);
+    // Zoom and pan state
+    let currentZoom = 1;
+    let currentPan = { x: 0, y: 0 };
+    let isDragging = false;
+    let startPoint = { x: 0, y: 0 };
+    
+    // Create main content group for transform
+    const mainGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    mainGroup.setAttribute('id', 'map-content');
     
     // Add definitions for gradients and filters
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
     
-    // Add clipPath to defs
-    defs.appendChild(clipPath);
-    
-    // Ocean gradient
-    const oceanGradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+    // Modern ocean gradient with depth effect
+    const oceanGradient = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
     oceanGradient.setAttribute('id', 'oceanGradient');
-    oceanGradient.setAttribute('x1', '0%');
-    oceanGradient.setAttribute('y1', '0%');
-    oceanGradient.setAttribute('x2', '0%');
-    oceanGradient.setAttribute('y2', '100%');
+    oceanGradient.setAttribute('cx', '30%');
+    oceanGradient.setAttribute('cy', '30%');
     oceanGradient.innerHTML = `
-      <stop offset="0%" style="stop-color:#2c5f7c;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#4a90b8;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#4a90b8;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3d7a9c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2c5f7c;stop-opacity:1" />
     `;
     defs.appendChild(oceanGradient);
     
-    // Land gradient
-    const landGradient = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
+    // Enhanced land gradient with terrain feel
+    const landGradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
     landGradient.setAttribute('id', 'landGradient');
-    landGradient.setAttribute('cx', '50%');
-    landGradient.setAttribute('cy', '50%');
+    landGradient.setAttribute('x1', '0%');
+    landGradient.setAttribute('y1', '0%');
+    landGradient.setAttribute('x2', '0%');
+    landGradient.setAttribute('y2', '100%');
     landGradient.innerHTML = `
-      <stop offset="0%" style="stop-color:#d4c5a0;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#e8dcc8;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#d4c5a0;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#b8a880;stop-opacity:1" />
     `;
     defs.appendChild(landGradient);
     
-    // Desert pattern
-    const desertPattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
-    desertPattern.setAttribute('id', 'desertPattern');
-    desertPattern.setAttribute('patternUnits', 'userSpaceOnUse');
-    desertPattern.setAttribute('width', '20');
-    desertPattern.setAttribute('height', '20');
-    desertPattern.innerHTML = `
-      <circle cx="2" cy="2" r="1" fill="#c9b896" opacity="0.3"/>
-      <circle cx="12" cy="12" r="1" fill="#c9b896" opacity="0.3"/>
-    `;
-    defs.appendChild(desertPattern);
-    
-    // Shadow filter for elevation
-    const shadow = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
-    shadow.setAttribute('id', 'landShadow');
-    shadow.innerHTML = `
-      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-      <feOffset dx="0" dy="2" result="offsetblur"/>
-      <feComponentTransfer>
-        <feFuncA type="linear" slope="0.3"/>
-      </feComponentTransfer>
+    // Glow effect for locations
+    const glow = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+    glow.setAttribute('id', 'glow');
+    glow.innerHTML = `
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
       <feMerge>
-        <feMergeNode/>
+        <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     `;
+    defs.appendChild(glow);
+    
+    // Shadow for 3D depth
+    const shadow = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+    shadow.setAttribute('id', 'shadow');
+    shadow.innerHTML = `
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+    `;
     defs.appendChild(shadow);
+    
+    // Add pattern for sandy texture
+    const sandPattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+    sandPattern.setAttribute('id', 'sandPattern');
+    sandPattern.setAttribute('width', '30');
+    sandPattern.setAttribute('height', '30');
+    sandPattern.setAttribute('patternUnits', 'userSpaceOnUse');
+    sandPattern.innerHTML = `
+      <circle cx="5" cy="5" r="1.5" fill="#d4b896" opacity="0.4"/>
+      <circle cx="18" cy="12" r="1" fill="#c9b088" opacity="0.3"/>
+      <circle cx="25" cy="22" r="1.2" fill="#dcc5a0" opacity="0.35"/>
+    `;
+    defs.appendChild(sandPattern);
     
     svg.appendChild(defs);
     
-    // Add ocean background
+    // Ocean background with texture
     const ocean = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     ocean.setAttribute('x', '0');
     ocean.setAttribute('y', '0');
     ocean.setAttribute('width', '1400');
     ocean.setAttribute('height', '900');
     ocean.setAttribute('fill', 'url(#oceanGradient)');
-    svg.appendChild(ocean);
+    mainGroup.appendChild(ocean);
     
-    // Draw realistic coastline and land masses
-    // Mediterranean Sea (western area)
-    const mediterranean = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    mediterranean.setAttribute('d', 'M 0 0 L 0 400 Q 50 380, 100 360 Q 150 340, 180 300 L 200 250 Q 220 200, 200 150 Q 180 100, 150 80 L 100 50 L 0 0 Z');
-    mediterranean.setAttribute('fill', '#3d7a9c');
-    mediterranean.setAttribute('opacity', '0.9');
-    svg.appendChild(mediterranean);
+    // Add wave pattern for ocean texture
+    for (let i = 0; i < 15; i++) {
+      const wave = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      const y = 50 + i * 60;
+      wave.setAttribute('d', `M 0 ${y} Q 100 ${y-10}, 200 ${y} T 400 ${y} T 600 ${y} T 800 ${y} T 1000 ${y} T 1200 ${y} T 1400 ${y}`);
+      wave.setAttribute('stroke', 'rgba(255,255,255,0.05)');
+      wave.setAttribute('stroke-width', '2');
+      wave.setAttribute('fill', 'none');
+      mainGroup.appendChild(wave);
+    }
     
-    // Main land mass (Middle East)
+    // Main land mass with improved topology
     const mainLand = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    // Realistic coastline following the eastern Mediterranean, Dead Sea region, and Persian Gulf area
     mainLand.setAttribute('d', `
-      M 200 80 
-      L 220 100 Q 240 120, 260 150 
-      L 280 200 Q 290 240, 300 280
-      L 320 340 Q 330 380, 340 420
-      L 360 480 Q 370 520, 380 550
-      L 400 580 L 450 600 L 550 620
-      L 650 630 Q 750 640, 850 640
-      L 950 630 L 1000 620 L 1000 0
-      L 200 0 Z
+      M 150 100 
+      L 200 80 Q 250 70, 300 90
+      L 350 110 Q 400 130, 450 150
+      L 500 170 Q 550 180, 600 170
+      L 700 160 Q 800 155, 900 160
+      L 1000 170 L 1100 180 L 1200 190
+      L 1300 200 L 1400 210 L 1400 900
+      L 0 900 L 0 300
+      Q 50 250, 100 200
+      L 150 150 Z
     `);
     mainLand.setAttribute('fill', 'url(#landGradient)');
     mainLand.setAttribute('stroke', '#9b8a6f');
-    mainLand.setAttribute('stroke-width', '2');
-    mainLand.setAttribute('filter', 'url(#landShadow)');
-    svg.appendChild(mainLand);
+    mainLand.setAttribute('stroke-width', '3');
+    mainLand.setAttribute('filter', 'url(#shadow)');
+    mainGroup.appendChild(mainLand);
     
-    // Add desert pattern overlay
-    const desertOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    desertOverlay.setAttribute('x', '500');
-    desertOverlay.setAttribute('y', '200');
-    desertOverlay.setAttribute('width', '500');
-    desertOverlay.setAttribute('height', '400');
-    desertOverlay.setAttribute('fill', 'url(#desertPattern)');
-    desertOverlay.setAttribute('opacity', '0.4');
-    svg.appendChild(desertOverlay);
+    // Add desert sand texture overlay
+    const desertRegion = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    desertRegion.setAttribute('x', '600');
+    desertRegion.setAttribute('y', '250');
+    desertRegion.setAttribute('width', '600');
+    desertRegion.setAttribute('height', '400');
+    desertRegion.setAttribute('fill', 'url(#sandPattern)');
+    desertRegion.setAttribute('opacity', '0.3');
+    mainGroup.appendChild(desertRegion);
     
-    // Dead Sea
+    // Mediterranean coastline detail
+    const coastDetail = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    coastDetail.setAttribute('d', 'M 200 80 Q 220 100, 240 120 L 260 150 Q 270 180, 280 200 L 290 230');
+    coastDetail.setAttribute('stroke', '#3d7a9c');
+    coastDetail.setAttribute('stroke-width', '4');
+    coastDetail.setAttribute('fill', 'none');
+    coastDetail.setAttribute('opacity', '0.6');
+    mainGroup.appendChild(coastDetail);
+    
+    // Add major cities/locations with enhanced markers
+    const cities = [
+      { name: 'Jerusalem', x: 350, y: 300, size: 'large', icon: '⭐' },
+      { name: 'Bethlehem', x: 345, y: 310, size: 'medium', icon: '🌟' },
+      { name: 'Nazareth', x: 365, y: 230, size: 'medium', icon: '🏠' },
+      { name: 'Jericho', x: 358, y: 315, size: 'small', icon: '🏛️' },
+      { name: 'Capernaum', x: 375, y: 245, size: 'small', icon: '🎣' },
+      { name: 'Damascus', x: 420, y: 140, size: 'large', icon: '🏙️' },
+      { name: 'Caesarea', x: 330, y: 260, size: 'medium', icon: '⚓' },
+      { name: 'Beersheba', x: 335, y: 410, size: 'small', icon: '🌴' }
+    ];
+    
+    cities.forEach(city => {
+      const cityGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      cityGroup.setAttribute('class', 'city-marker');
+      cityGroup.style.cursor = 'pointer';
+      
+      // City marker circle
+      const markerSize = city.size === 'large' ? 10 : city.size === 'medium' ? 7 : 5;
+      const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      marker.setAttribute('cx', city.x);
+      marker.setAttribute('cy', city.y);
+      marker.setAttribute('r', markerSize);
+      marker.setAttribute('fill', '#ff8a65');
+      marker.setAttribute('stroke', 'white');
+      marker.setAttribute('stroke-width', '2');
+      marker.setAttribute('filter', 'url(#glow)');
+      cityGroup.appendChild(marker);
+      
+      // Pulsing rings
+      const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      pulse.setAttribute('cx', city.x);
+      pulse.setAttribute('cy', city.y);
+      pulse.setAttribute('r', markerSize + 3);
+      pulse.setAttribute('fill', 'none');
+      pulse.setAttribute('stroke', '#ff8a65');
+      pulse.setAttribute('stroke-width', '2');
+      pulse.setAttribute('opacity', '0.6');
+      pulse.innerHTML = '<animate attributeName="r" from="' + (markerSize + 3) + '" to="' + (markerSize + 15) + '" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="2s" repeatCount="indefinite"/>';
+      cityGroup.appendChild(pulse);
+      
+      // City icon
+      const iconText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      iconText.setAttribute('x', city.x);
+      iconText.setAttribute('y', city.y - markerSize - 8);
+      iconText.setAttribute('text-anchor', 'middle');
+      iconText.setAttribute('font-size', '18');
+      iconText.textContent = city.icon;
+      cityGroup.appendChild(iconText);
+      
+      // City label with background
+      const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const textWidth = city.name.length * 6;
+      labelBg.setAttribute('x', city.x - textWidth/2 - 6);
+      labelBg.setAttribute('y', city.y + markerSize + 12);
+      labelBg.setAttribute('width', textWidth + 12);
+      labelBg.setAttribute('height', '20');
+      labelBg.setAttribute('rx', '4');
+      labelBg.setAttribute('fill', 'rgba(0,0,0,0.75)');
+      cityGroup.appendChild(labelBg);
+      
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', city.x);
+      label.setAttribute('y', city.y + markerSize + 26);
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('font-size', '12');
+      label.setAttribute('font-weight', 'bold');
+      label.setAttribute('fill', 'white');
+      label.textContent = city.name;
+      cityGroup.appendChild(label);
+      
+      mainGroup.appendChild(cityGroup);
+    });
+    
+    // Dead Sea with realistic shape
+    const deadSeaGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     const deadSea = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
     deadSea.setAttribute('cx', '360');
-    deadSea.setAttribute('cy', '340');
-    deadSea.setAttribute('rx', '15');
-    deadSea.setAttribute('ry', '45');
-    deadSea.setAttribute('fill', '#2c5f7c');
-    deadSea.setAttribute('stroke', '#1e4d66');
-    deadSea.setAttribute('stroke-width', '1');
-    deadSea.setAttribute('opacity', '0.9');
-    svg.appendChild(deadSea);
+    deadSea.setAttribute('cy', '360');
+    deadSea.setAttribute('rx', '20');
+    deadSea.setAttribute('ry', '55');
+    deadSea.setAttribute('fill', '#1e4d66');
+    deadSea.setAttribute('stroke', '#4a90b8');
+    deadSea.setAttribute('stroke-width', '2');
+    deadSea.setAttribute('filter', 'url(#shadow)');
+    deadSeaGroup.appendChild(deadSea);
+    
+    // Dead Sea label
+    const deadSeaLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    deadSeaLabel.setAttribute('x', '395');
+    deadSeaLabel.setAttribute('y', '365');
+    deadSeaLabel.setAttribute('fill', 'white');
+    deadSeaLabel.setAttribute('font-size', '12');
+    deadSeaLabel.setAttribute('font-weight', 'bold');
+    deadSeaLabel.setAttribute('text-anchor', 'start');
+    deadSeaLabel.textContent = 'Dead Sea';
+    deadSeaGroup.appendChild(deadSeaLabel);
+    mainGroup.appendChild(deadSeaGroup);
     
     // Sea of Galilee
+    const galileeGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     const galileeSea = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-    galileeSea.setAttribute('cx', '360');
-    galileeSea.setAttribute('cy', '240');
-    galileeSea.setAttribute('rx', '12');
-    galileeSea.setAttribute('ry', '18');
+    galileeSea.setAttribute('cx', '370');
+    galileeSea.setAttribute('cy', '250');
+    galileeSea.setAttribute('rx', '18');
+    galileeSea.setAttribute('ry', '24');
     galileeSea.setAttribute('fill', '#4a90b8');
     galileeSea.setAttribute('stroke', '#3d7a9c');
-    galileeSea.setAttribute('stroke-width', '1');
-    galileeSea.setAttribute('opacity', '0.9');
-    svg.appendChild(galileeSea);
+    galileeSea.setAttribute('stroke-width', '2');
+    galileeSea.setAttribute('filter', 'url(#shadow)');
+    galileeGroup.appendChild(galileeSea);
     
-    // Jordan River (connecting Galilee to Dead Sea)
+    const galileeLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    galileeLabel.setAttribute('x', '395');
+    galileeLabel.setAttribute('y', '255');
+    galileeLabel.setAttribute('fill', 'white');
+    galileeLabel.setAttribute('font-size', '12');
+    galileeLabel.setAttribute('font-weight', 'bold');
+    galileeLabel.setAttribute('text-anchor', 'start');
+    galileeLabel.textContent = 'Sea of Galilee';
+    galileeGroup.appendChild(galileeLabel);
+    mainGroup.appendChild(galileeGroup);
+    
+    // Jordan River with flowing effect
     const jordanRiver = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    jordanRiver.setAttribute('d', 'M 360 258 Q 365 280, 362 300 Q 358 320, 360 340');
+    jordanRiver.setAttribute('d', 'M 370 274 Q 375 290, 372 310 Q 368 330, 365 350');
     jordanRiver.setAttribute('stroke', '#5aa9d6');
-    jordanRiver.setAttribute('stroke-width', '3');
+    jordanRiver.setAttribute('stroke-width', '4');
     jordanRiver.setAttribute('fill', 'none');
-    jordanRiver.setAttribute('opacity', '0.7');
-    svg.appendChild(jordanRiver);
+    jordanRiver.setAttribute('stroke-linecap', 'round');
+    jordanRiver.setAttribute('opacity', '0.8');
+    jordanRiver.setAttribute('filter', 'url(#glow)');
     
-    // Mountain ranges (subtle shading)
-    const mountains1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    mountains1.setAttribute('d', 'M 250 150 Q 300 140, 350 160 Q 400 180, 450 170 Q 500 160, 550 180');
-    mountains1.setAttribute('stroke', '#9b8a6f');
-    mountains1.setAttribute('stroke-width', '8');
-    mountains1.setAttribute('fill', 'none');
-    mountains1.setAttribute('opacity', '0.3');
-    svg.appendChild(mountains1);
+    // Add river label
+    const riverLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    riverLabel.setAttribute('x', '345');
+    riverLabel.setAttribute('y', '310');
+    riverLabel.setAttribute('fill', 'white');
+    riverLabel.setAttribute('font-size', '11');
+    riverLabel.setAttribute('font-style', 'italic');
+    riverLabel.setAttribute('transform', 'rotate(-10, 345, 310)');
+    riverLabel.textContent = 'Jordan River';
+    mainGroup.appendChild(jordanRiver);
+    mainGroup.appendChild(riverLabel);
     
-    const mountains2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    mountains2.setAttribute('d', 'M 300 400 Q 350 390, 400 410 Q 450 430, 500 420');
-    mountains2.setAttribute('stroke', '#9b8a6f');
-    mountains2.setAttribute('stroke-width', '8');
-    mountains2.setAttribute('fill', 'none');
-    mountains2.setAttribute('opacity', '0.3');
-    svg.appendChild(mountains2);
+    // Mountain ranges with shading
+    const mountainsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    mountainsGroup.setAttribute('opacity', '0.25');
     
-    // Add subtle coordinate grid
-    const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    gridGroup.setAttribute('opacity', '0.15');
-    
-    for (let i = 140; i < 1400; i += 140) {
-      const vLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      vLine.setAttribute('x1', i);
-      vLine.setAttribute('y1', '0');
-      vLine.setAttribute('x2', i);
-      vLine.setAttribute('y2', '900');
-      vLine.setAttribute('stroke', '#000');
-      vLine.setAttribute('stroke-width', '0.5');
-      gridGroup.appendChild(vLine);
+    for (let i = 0; i < 8; i++) {
+      const mountain = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      const x = 450 + i * 80;
+      const y = 300 + Math.sin(i) * 50;
+      mountain.setAttribute('d', `M ${x} ${y} L ${x-15} ${y+30} L ${x+15} ${y+30} Z`);
+      mountain.setAttribute('fill', '#8b7a5f');
+      mountain.setAttribute('stroke', '#6b5a4f');
+      mountain.setAttribute('stroke-width', '1');
+      mountainsGroup.appendChild(mountain);
     }
+    mainGroup.appendChild(mountainsGroup);
     
-    for (let i = 140; i < 900; i += 140) {
-      const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      hLine.setAttribute('x1', '0');
-      hLine.setAttribute('y1', i);
-      hLine.setAttribute('x2', '1400');
-      hLine.setAttribute('y2', i);
-      hLine.setAttribute('stroke', '#000');
-      hLine.setAttribute('stroke-width', '0.5');
-      gridGroup.appendChild(hLine);
-    }
-    
-    svg.appendChild(gridGroup);
-    
-    // Add compass rose
+    // Add modern compass rose
     const compass = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    compass.setAttribute('transform', 'translate(1260, 70)');
+    compass.setAttribute('transform', 'translate(1300, 80)');
     compass.innerHTML = `
-      <circle cx="0" cy="0" r="42" fill="rgba(255,255,255,0.9)" stroke="#333" stroke-width="2"/>
-      <path d="M 0 -35 L -7 0 L 0 -21 L 7 0 Z" fill="#c44" stroke="#333" stroke-width="1"/>
-      <path d="M 0 35 L -7 0 L 0 21 L 7 0 Z" fill="#fff" stroke="#333" stroke-width="1"/>
-      <text x="0" y="-45" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">N</text>
+      <circle cx="0" cy="0" r="50" fill="rgba(255,255,255,0.95)" stroke="var(--accent)" stroke-width="3" filter="url(#shadow)"/>
+      <path d="M 0 -40 L -8 -5 L 0 -25 L 8 -5 Z" fill="#e63946" stroke="#333" stroke-width="1.5"/>
+      <path d="M 0 40 L -8 5 L 0 25 L 8 5 Z" fill="#f1faee" stroke="#333" stroke-width="1.5"/>
+      <path d="M -40 0 L -5 -8 L -25 0 L -5 8 Z" fill="#f1faee" stroke="#333" stroke-width="1.5"/>
+      <path d="M 40 0 L 5 -8 L 25 0 L 5 8 Z" fill="#f1faee" stroke="#333" stroke-width="1.5"/>
+      <circle cx="0" cy="0" r="6" fill="var(--accent)" stroke="white" stroke-width="2"/>
+      <text x="0" y="-55" text-anchor="middle" font-size="20" font-weight="bold" fill="white" filter="url(#shadow)">N</text>
+      <text x="0" y="72" text-anchor="middle" font-size="14" font-weight="bold" fill="white">S</text>
+      <text x="-58" y="5" text-anchor="middle" font-size="14" font-weight="bold" fill="white">W</text>
+      <text x="58" y="5" text-anchor="middle" font-size="14" font-weight="bold" fill="white">E</text>
     `;
+    // Compass is fixed, not in mainGroup
     svg.appendChild(compass);
     
-    // Add scale bar
-    const scale = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    scale.setAttribute('transform', 'translate(70, 820)');
-    scale.innerHTML = `
-      <line x1="0" y1="0" x2="140" y2="0" stroke="#333" stroke-width="3"/>
-      <line x1="0" y1="-7" x2="0" y2="7" stroke="#333" stroke-width="3"/>
-      <line x1="140" y1="-7" x2="140" y2="7" stroke="#333" stroke-width="3"/>
-      <text x="70" y="-14" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">200 km</text>
+    // Add decorative title
+    const titleGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const titleBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    titleBg.setAttribute('x', '20');
+    titleBg.setAttribute('y', '20');
+    titleBg.setAttribute('width', '350');
+    titleBg.setAttribute('height', '80');
+    titleBg.setAttribute('rx', '12');
+    titleBg.setAttribute('fill', 'rgba(255,255,255,0.95)');
+    titleBg.setAttribute('filter', 'url(#shadow)');
+    titleGroup.appendChild(titleBg);
+    
+    const titleText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    titleText.setAttribute('x', '195');
+    titleText.setAttribute('y', '55');
+    titleText.setAttribute('text-anchor', 'middle');
+    titleText.setAttribute('font-size', '24');
+    titleText.setAttribute('font-weight', 'bold');
+    titleText.setAttribute('fill', 'var(--accent)');
+    titleText.textContent = '🗺️ Biblical Lands';
+    titleGroup.appendChild(titleText);
+    
+    const subtitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    subtitle.setAttribute('x', '195');
+    subtitle.setAttribute('y', '80');
+    subtitle.setAttribute('text-anchor', 'middle');
+    subtitle.setAttribute('font-size', '14');
+    subtitle.setAttribute('fill', '#666');
+    subtitle.textContent = 'Ancient Middle East Region';
+    titleGroup.appendChild(subtitle);
+    // Title is fixed, not in mainGroup
+    svg.appendChild(titleGroup);
+    
+    // Create groups for dynamic content
+    const journeyPaths = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    journeyPaths.setAttribute('id', 'journey-paths');
+    mainGroup.appendChild(journeyPaths);
+    
+    const locationMarkers = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    locationMarkers.setAttribute('id', 'location-markers');
+    mainGroup.appendChild(locationMarkers);
+    
+    // Add mainGroup to SVG
+    svg.appendChild(mainGroup);
+    
+    // Add zoom controls UI
+    const controlsDiv = document.createElement('div');
+    controlsDiv.style.cssText = `
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
     `;
-    svg.appendChild(scale);
+    
+    const createButton = (text, title) => {
+      const btn = document.createElement('button');
+      btn.innerHTML = text;
+      btn.title = title;
+      btn.style.cssText = `
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.95);
+        border: 2px solid var(--accent);
+        color: var(--accent);
+        font-size: 22px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      `;
+      btn.onmouseenter = () => {
+        btn.style.background = 'var(--accent)';
+        btn.style.color = 'white';
+        btn.style.transform = 'scale(1.1)';
+      };
+      btn.onmouseleave = () => {
+        btn.style.background = 'rgba(255, 255, 255, 0.95)';
+        btn.style.color = 'var(--accent)';
+        btn.style.transform = 'scale(1)';
+      };
+      return btn;
+    };
+    
+    const zoomInBtn = createButton('+', 'Zoom In');
+    const zoomOutBtn = createButton('−', 'Zoom Out');
+    const resetBtn = createButton('⟲', 'Reset View');
+    
+    controlsDiv.appendChild(zoomInBtn);
+    controlsDiv.appendChild(zoomOutBtn);
+    controlsDiv.appendChild(resetBtn);
+    container.appendChild(controlsDiv);
+    
+    // Zoom and pan functions
+    const updateTransform = () => {
+      mainGroup.setAttribute('transform', `translate(${currentPan.x}, ${currentPan.y}) scale(${currentZoom})`);
+    };
+    
+    const zoom = (factor) => {
+      const newZoom = Math.max(0.5, Math.min(3, currentZoom * factor));
+      currentZoom = newZoom;
+      updateTransform();
+    };
+    
+    const resetView = () => {
+      currentZoom = 1;
+      currentPan = { x: 0, y: 0 };
+      updateTransform();
+    };
+    
+    // Event listeners for controls
+    zoomInBtn.addEventListener('click', () => zoom(1.2));
+    zoomOutBtn.addEventListener('click', () => zoom(0.8));
+    resetBtn.addEventListener('click', resetView);
+    
+    // Mouse wheel zoom
+    svg.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.1 : 0.9;
+      zoom(factor);
+    });
+    
+    // Pan with mouse drag
+    svg.addEventListener('mousedown', (e) => {
+      if (e.target === svg || e.target.closest('#map-content')) {
+        isDragging = true;
+        startPoint = { x: e.clientX - currentPan.x, y: e.clientY - currentPan.y };
+        svg.style.cursor = 'grabbing';
+      }
+    });
+    
+    svg.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        currentPan.x = e.clientX - startPoint.x;
+        currentPan.y = e.clientY - startPoint.y;
+        updateTransform();
+      }
+    });
+    
+    svg.addEventListener('mouseup', () => {
+      isDragging = false;
+      svg.style.cursor = 'grab';
+    });
+    
+    svg.addEventListener('mouseleave', () => {
+      isDragging = false;
+      svg.style.cursor = 'grab';
+    });
+    
+    // Touch support for mobile
+    let touchStartDist = 0;
+    let touchStartPan = { x: 0, y: 0 };
+    
+    svg.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        // Pinch zoom start
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        touchStartDist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+      } else if (e.touches.length === 1) {
+        // Pan start
+        isDragging = true;
+        const touch = e.touches[0];
+        startPoint = { x: touch.clientX - currentPan.x, y: touch.clientY - currentPan.y };
+      }
+    });
+    
+    svg.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (e.touches.length === 2 && touchStartDist > 0) {
+        // Pinch zoom
+        const touch1 = e.touches[0];
+        const touch2 = e.touches[1];
+        const dist = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
+        const factor = dist / touchStartDist;
+        zoom(factor);
+        touchStartDist = dist;
+      } else if (e.touches.length === 1 && isDragging) {
+        // Pan
+        const touch = e.touches[0];
+        currentPan.x = touch.clientX - startPoint.x;
+        currentPan.y = touch.clientY - startPoint.y;
+        updateTransform();
+      }
+    });
+    
+    svg.addEventListener('touchend', () => {
+      isDragging = false;
+      touchStartDist = 0;
+    });
+    
+    // Tooltip
+    const tooltip = document.createElement('div');
+    tooltip.id = 'map-tooltip';
+    tooltip.style.cssText = `
+      position: absolute;
+      display: none;
+      background: rgba(0,0,0,0.9);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 1000;
+      max-width: 250px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    `;
+    tooltip.innerHTML = '<div id="tooltip-title" style="font-weight: bold; margin-bottom: 4px;"></div><div id="tooltip-desc" style="font-size: 12px; opacity: 0.9;"></div>';
+    container.appendChild(tooltip);
     
     container.appendChild(svg);
-    map = { svg, container, markers: [] };
-    return map;
+    return svg;
   }
 
   // Convert lat/lon to SVG coordinates with accurate projection

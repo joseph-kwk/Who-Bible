@@ -9,30 +9,39 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/feedback-modal.css" />
   <link rel="stylesheet" href="assets/css/discussions.css" />
+  <link rel="stylesheet" href="assets/css/auth.css" />
+  <link rel="stylesheet" href="assets/css/guest-prompts.css" />
   
   <!-- Firebase SDK (Compat for remote-challenge.js) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
   <!-- Firebase Config (Modular SDK) -->
-  <script type="module" src="assets/js/firebase-config.js?v=20260122"></script>
-  <script src="assets/js/remote-challenge.js" defer></script>
-  <script src="assets/js/scenarios.js" defer></script>
-  <script src="assets/js/locations.js" defer></script>
-  <script src="assets/js/concepts.js" defer></script>
-  <script src="assets/js/translations.js" defer></script>
+  <script type="module" src="assets/js/firebase-config.js?v=20260209b"></script>
+  <script type="module" src="assets/js/auth.js?v=20260209b"></script>
+  <script type="module" src="assets/js/auth-ui.js?v=20260209b"></script>
+  <script type="module" src="assets/js/guest-prompts.js?v=20260209b"></script>
+  <script src="assets/js/remote-challenge.js?v=20260209c" defer></script>
+  <script src="assets/js/scenarios.js?v=20260209c" defer></script>
+  <script src="assets/js/locations.js?v=20260209c" defer></script>
+  <script src="assets/js/concepts.js?v=20260209c" defer></script>
+  <script src="assets/js/translations.js?v=20260209c" defer></script>
   <script type="module">
     // Import and initialize discussions
-    import { initDiscussionsUI } from './assets/js/community-discussions-ui.js';
+    import { initDiscussionsUI } from './assets/js/community-discussions-ui.js?v=20260209c';
     
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initDiscussionsUI);
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('Initializing discussions UI...');
+        initDiscussionsUI();
+      });
     } else {
+      console.log('DOM already loaded, initializing discussions UI...');
       initDiscussionsUI();
     }
   </script>
-  <script src="assets/js/community.js" defer></script>
+  <script src="assets/js/community.js?v=20260209b" defer></script>
   <style>main{padding-top:16px}</style>
   <noscript><style>.requires-js{display:none}</style></noscript>
   <meta name="robots" content="noindex" />
@@ -58,6 +67,9 @@
           </div>
           <nav class="site-nav" aria-label="Site">
             <a id="nav-community" href="community.html" class="nav-link active" aria-current="page">Community</a>
+            <button id="btn-auth-signin" class="nav-link auth-trigger" style="background: none; border: none; cursor: pointer; font-family: inherit; font-size: inherit; color: inherit;" aria-label="Sign in or create account">
+              <span id="auth-button-text">Sign In</span>
+            </button>
             <button id="btn-share" class="icon-btn" title="Share" aria-label="Share">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M12 3v12"/>
@@ -88,7 +100,64 @@
       </div>
     </header>
 
-    <!-- Community Guidelines Modal -->\n    <div id=\"guidelines-modal\" style=\"display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;\">\n      <div style=\"background: var(--bg); border-radius: 12px; max-width: 600px; max-height: 80vh; overflow-y: auto; padding: 32px; margin: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);\">\n        <div style=\"text-align: center; margin-bottom: 24px;\">\n          <h2 style=\"color: var(--accent); margin-bottom: 8px;\">📖 Community Guidelines</h2>\n          <p style=\"color: var(--muted); font-size: 14px;\">Growing in faith, together</p>\n        </div>\n\n        <div style=\"margin-bottom: 24px;\">\n          <h3 style=\"color: var(--accent); font-size: 18px; margin-bottom: 12px;\">✨ Our Purpose</h3>\n          <p style=\"line-height: 1.6; color: var(--text);\">This community exists to help you <strong>grow in knowing the Bible and God</strong> while having fun! We're here to learn together, encourage one another, and celebrate our journey in faith.</p>\n        </div>\n\n        <div style=\"margin-bottom: 24px;\">\n          <h3 style=\"color: var(--accent); font-size: 18px; margin-bottom: 12px;\">💖 Our Values</h3>\n          <ul style=\"line-height: 1.8; color: var(--text); padding-left: 20px;\">\n            <li><strong>Biblical Truth:</strong> All content must be scripturally accurate</li>\n            <li><strong>Respect:</strong> Treat everyone with Christ-like love and kindness</li>\n            <li><strong>Encouragement:</strong> Build others up in their faith journey</li>\n            <li><strong>Fun:</strong> Enjoy learning and growing together</li>\n            <li><strong>Unity:</strong> Focus on what unites us, not what divides</li>\n          </ul>\n        </div>\n\n        <div style=\"margin-bottom: 24px;\">\n          <h3 style=\"color: #ff6b6b; font-size: 18px; margin-bottom: 12px;\">🚫 Not Allowed</h3>\n          <ul style=\"line-height: 1.8; color: var(--text); padding-left: 20px;\">\n            <li><strong>Harassment or bullying</strong> of any kind</li>\n            <li><strong>Profanity or inappropriate content</strong></li>\n            <li><strong>False teaching</strong> or misrepresenting Scripture</li>\n            <li><strong>Spam or self-promotion</strong></li>\n            <li><strong>Cheating</strong> (sharing answers, score manipulation)</li>\n            <li><strong>Denominational attacks</strong> or divisive arguments</li>\n            <li><strong>Offensive usernames</strong> or impersonation</li>\n            <li><strong>Sharing personal info</strong> (addresses, phone numbers)</li>\n          </ul>\n        </div>\n\n        <div style=\"margin-bottom: 24px;\">\n          <h3 style=\"color: var(--accent); font-size: 18px; margin-bottom: 12px;\">🛡️ Safety First</h3>\n          <ul style=\"line-height: 1.8; color: var(--text); padding-left: 20px;\">\n            <li>All interactions are family-friendly (ages 10+)</li>\n            <li>Report inappropriate behavior immediately</li>\n            <li>Block users who make you uncomfortable</li>\n            <li>Never share personal information publicly</li>\n          </ul>\n        </div>\n\n        <div style=\"padding: 16px; background: var(--bg-2); border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 24px;\">\n          <p style=\"margin: 0; font-size: 14px; color: var(--text);\"><strong>\"Let your conversation be always full of grace, seasoned with salt, so that you may know how to answer everyone.\"</strong> - Colossians 4:6</p>\n        </div>\n\n        <div style=\"display: flex; gap: 12px; justify-content: center;\">\n          <button id=\"accept-guidelines-btn\" style=\"padding: 12px 32px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;\">I Agree</button>\n          <button onclick=\"window.location.href='index.html'\" style=\"padding: 12px 32px; background: var(--bg-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 16px;\">Go Back</button>\n        </div>\n      </div>\n    </div>
+    <!-- Community Guidelines Modal -->
+    <div id="guidelines-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+      <div style="background: var(--bg); border-radius: 12px; max-width: 600px; max-height: 80vh; overflow-y: auto; padding: 32px; margin: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h2 style="color: var(--accent); margin-bottom: 8px;">📖 Community Guidelines</h2>
+          <p style="color: var(--muted); font-size: 14px;">Growing in faith, together</p>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <h3 style="color: var(--accent); font-size: 18px; margin-bottom: 12px;">✨ Our Purpose</h3>
+          <p style="line-height: 1.6; color: var(--text);">This community exists to help you <strong>grow in knowing the Bible and God</strong> while having fun! We're here to learn together, encourage one another, and celebrate our journey in faith.</p>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <h3 style="color: var(--accent); font-size: 18px; margin-bottom: 12px;">💖 Our Values</h3>
+          <ul style="line-height: 1.8; color: var(--text); padding-left: 20px;">
+            <li><strong>Biblical Truth:</strong> All content must be scripturally accurate</li>
+            <li><strong>Respect:</strong> Treat everyone with Christ-like love and kindness</li>
+            <li><strong>Encouragement:</strong> Build others up in their faith journey</li>
+            <li><strong>Fun:</strong> Enjoy learning and growing together</li>
+            <li><strong>Unity:</strong> Focus on what unites us, not what divides</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <h3 style="color: #ff6b6b; font-size: 18px; margin-bottom: 12px;">🚫 Not Allowed</h3>
+          <ul style="line-height: 1.8; color: var(--text); padding-left: 20px;">
+            <li><strong>Harassment or bullying</strong> of any kind</li>
+            <li><strong>Profanity or inappropriate content</strong></li>
+            <li><strong>False teaching</strong> or misrepresenting Scripture</li>
+            <li><strong>Spam or self-promotion</strong></li>
+            <li><strong>Cheating</strong> (sharing answers, score manipulation)</li>
+            <li><strong>Denominational attacks</strong> or divisive arguments</li>
+            <li><strong>Offensive usernames</strong> or impersonation</li>
+            <li><strong>Sharing personal info</strong> (addresses, phone numbers)</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <h3 style="color: var(--accent); font-size: 18px; margin-bottom: 12px;">🛡️ Safety First</h3>
+          <ul style="line-height: 1.8; color: var(--text); padding-left: 20px;">
+            <li>All interactions are family-friendly (ages 10+)</li>
+            <li>Report inappropriate behavior immediately</li>
+            <li>Block users who make you uncomfortable</li>
+            <li>Never share personal information publicly</li>
+          </ul>
+        </div>
+
+        <div style="padding: 16px; background: var(--bg-2); border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 24px;">
+          <p style="margin: 0; font-size: 14px; color: var(--text);"><strong>"Let your conversation be always full of grace, seasoned with salt, so that you may know how to answer everyone."</strong> - Colossians 4:6</p>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <button id="accept-guidelines-btn" style="padding: 12px 32px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px;">I Agree</button>
+          <button onclick="window.location.href='index.html'" style="padding: 12px 32px; background: var(--bg-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 16px;">Go Back</button>
+        </div>
+      </div>
+    </div>
 
     <main class="requires-js">
       <div class="community-panel" style="display:flex">
@@ -167,7 +236,13 @@
             
             <!-- Discussions Section -->
             <section id="section-discussions" class="community-section" role="tabpanel" style="display:none">
-              <!-- Discussion rooms will be rendered by community-discussions-ui.js -->
+              <div class="discussions-loading" style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">💬</div>
+                <h3 style="color: var(--accent); margin-bottom: 12px;">Community Discussions</h3>
+                <p style="color: var(--muted); margin-bottom: 24px;">Engage with fellow believers in meaningful Bible discussions</p>
+                <div class="loading-spinner" style="margin: 20px auto; width: 40px; height: 40px; border: 4px solid var(--border); border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="color: var(--muted); font-size: 14px;">Loading discussion rooms...</p>
+              </div>
             </section>
             
             <!-- Locations Section -->
@@ -183,10 +258,12 @@
               </div>
               
               <!-- Map Container -->
-              <div id="locations-map-container" role="img" aria-label="Interactive map of biblical locations" style="width: 100%; height: 500px; margin-bottom: 24px; background: var(--bg-2); border: 2px solid var(--border); border-radius: 12px; overflow: hidden; position: relative;">
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--muted);">
-                  <div style="font-size: 48px; margin-bottom: 12px;">🗺️</div>
-                  <div>Map loading...</div>
+              <div id="locations-map-container" role="img" aria-label="Interactive map of biblical locations" style="width: 100%; min-height: 600px; height: 70vh; margin-bottom: 24px; background: linear-gradient(135deg, #1e3a5f 0%, #2c5f7c 100%); border: 3px solid var(--accent); border-radius: 16px; overflow: hidden; position: relative; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+                  <div style="font-size: 64px; margin-bottom: 20px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));">🗺️</div>
+                  <h3 style="color: white; font-size: 24px; margin-bottom: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Interactive Biblical Map</h3>
+                  <div style="margin: 20px auto; width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                  <p style="color: rgba(255,255,255,0.8); font-size: 16px;">Loading ancient locations...</p>
                 </div>
               </div>
               
@@ -369,12 +446,77 @@
               </div>
             </section>
             <section id="section-guidelines" class="community-section" role="tabpanel" style="display:none">
-              <h3 id="guidelines-title">Guidelines</h3>
-              <ul id="guidelines-list">
-                <li>Be respectful and kind.</li>
-                <li>Stay on topic and avoid spoilers without warning.</li>
-                <li>Report inappropriate content.</li>
-              </ul>
+              <div style="display: grid; gap: 20px; max-width: 800px; margin: 0 auto;">
+                
+                <div class="card" style="padding: 24px;">
+                  <div style="text-align: center; font-size: 48px; margin-bottom: 16px;">✨</div>
+                  <h3 style="color: var(--accent); margin-bottom: 12px; text-align: center;">Our Purpose</h3>
+                  <p style="text-align: center; line-height: 1.8;">This community exists to help you <strong>grow in knowing the Bible and God</strong> while having fun! We're here to learn together, encourage one another, and celebrate our journey in faith.</p>
+                </div>
+
+                <div class="card" style="padding: 24px;">
+                  <h3 style="color: var(--accent); margin-bottom: 16px;">💖 Core Values</h3>
+                  <div style="display: grid; gap: 12px;">
+                    <div style="padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);">
+                      <strong>Biblical Truth:</strong> All content must be scripturally accurate
+                    </div>
+                    <div style="padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);">
+                      <strong>Respect:</strong> Treat everyone with Christ-like love and kindness
+                    </div>
+                    <div style="padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);">
+                      <strong>Encouragement:</strong> Build others up in their faith journey
+                    </div>
+                    <div style="padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);">
+                      <strong>Fun:</strong> Enjoy learning and growing together
+                    </div>
+                    <div style="padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);">
+                      <strong>Unity:</strong> Focus on what unites us, not what divides
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card" style="padding: 24px; border: 2px solid #ff6b6b;">
+                  <h3 style="color: #ff6b6b; margin-bottom: 16px;">🚫 Prohibited Behaviors</h3>
+                  <ul style="line-height: 2; padding-left: 20px;">
+                    <li>Harassment, bullying, or hateful speech</li>
+                    <li>Profanity or inappropriate content</li>
+                    <li>False teaching or misrepresenting Scripture</li>
+                    <li>Spam, advertising, or self-promotion</li>
+                    <li>Cheating (sharing answers, score manipulation)</li>
+                    <li>Denominational attacks or divisive arguments</li>
+                    <li>Offensive usernames or impersonation</li>
+                    <li>Sharing personal information publicly</li>
+                  </ul>
+                </div>
+
+                <div class="card" style="padding: 24px; background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-3) 100%);">
+                  <h3 style="color: var(--accent); margin-bottom: 16px;">🛡️ Safety & Privacy</h3>
+                  <ul style="line-height: 2; padding-left: 20px;">
+                    <li><strong>Family-Friendly:</strong> Content appropriate for ages 10+</li>
+                    <li><strong>Report System:</strong> Report inappropriate behavior immediately</li>
+                    <li><strong>Block Feature:</strong> Block users who make you uncomfortable</li>
+                    <li><strong>Privacy:</strong> Never share personal contact information</li>
+                    <li><strong>Parental Guidance:</strong> Minors should use with adult supervision</li>
+                  </ul>
+                </div>
+
+                <div class="card" style="padding: 24px; text-align: center; border: 2px solid var(--accent);">
+                  <p style="font-size: 16px; line-height: 1.8; margin-bottom: 16px;"><strong>"Let your conversation be always full of grace, seasoned with salt, so that you may know how to answer everyone."</strong></p>
+                  <p style="color: var(--muted);">- Colossians 4:6</p>
+                </div>
+
+                <div class="card" style="padding: 24px;">
+                  <h3 style="color: var(--accent); margin-bottom: 16px;">⚠️ Consequences</h3>
+                  <p style="margin-bottom: 12px;">Violations may result in:</p>
+                  <ol style="line-height: 2; padding-left: 20px;">
+                    <li><strong>Warning:</strong> First-time minor offenses</li>
+                    <li><strong>Temporary Suspension:</strong> Repeated or moderate violations</li>
+                    <li><strong>Permanent Ban:</strong> Severe or repeated serious violations</li>
+                  </ol>
+                  <p style="margin-top: 16px; padding: 12px; background: var(--bg-2); border-radius: 8px; font-size: 14px;">We believe in grace and restoration. Contact admin if you have questions or concerns.</p>
+                </div>
+
+              </div>
             </section>
           </div>
         </div>
@@ -536,8 +678,7 @@
     </div>
   </div>
 
-  <!-- Guidelines Section Content (hidden by default) -->
-  <section id=\"section-guidelines\" class=\"community-section\" style=\"display: none;\" role=\"tabpanel\">\n    <div style=\"display: grid; gap: 20px; max-width: 800px; margin: 0 auto;\">\n      \n      <div class=\"card\" style=\"padding: 24px;\">\n        <div style=\"text-align: center; font-size: 48px; margin-bottom: 16px;\">✨</div>\n        <h3 style=\"color: var(--accent); margin-bottom: 12px; text-align: center;\">Our Purpose</h3>\n        <p style=\"text-align: center; line-height: 1.8;\">This community exists to help you <strong>grow in knowing the Bible and God</strong> while having fun! We're here to learn together, encourage one another, and celebrate our journey in faith.</p>\n      </div>\n\n      <div class=\"card\" style=\"padding: 24px;\">\n        <h3 style=\"color: var(--accent); margin-bottom: 16px;\">💖 Core Values</h3>\n        <div style=\"display: grid; gap: 12px;\">\n          <div style=\"padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);\">\n            <strong>Biblical Truth:</strong> All content must be scripturally accurate\n          </div>\n          <div style=\"padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);\">\n            <strong>Respect:</strong> Treat everyone with Christ-like love and kindness\n          </div>\n          <div style=\"padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);\">\n            <strong>Encouragement:</strong> Build others up in their faith journey\n          </div>\n          <div style=\"padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);\">\n            <strong>Fun:</strong> Enjoy learning and growing together\n          </div>\n          <div style=\"padding: 12px; background: var(--bg-2); border-radius: 8px; border-left: 3px solid var(--accent);\">\n            <strong>Unity:</strong> Focus on what unites us, not what divides\n          </div>\n        </div>\n      </div>\n\n      <div class=\"card\" style=\"padding: 24px; border: 2px solid #ff6b6b;\">\n        <h3 style=\"color: #ff6b6b; margin-bottom: 16px;\">🚫 Prohibited Behaviors</h3>\n        <ul style=\"line-height: 2; padding-left: 20px;\">\n          <li>Harassment, bullying, or hateful speech</li>\n          <li>Profanity or inappropriate content</li>\n          <li>False teaching or misrepresenting Scripture</li>\n          <li>Spam, advertising, or self-promotion</li>\n          <li>Cheating (sharing answers, score manipulation)</li>\n          <li>Denominational attacks or divisive arguments</li>\n          <li>Offensive usernames or impersonation</li>\n          <li>Sharing personal information publicly</li>\n        </ul>\n      </div>\n\n      <div class=\"card\" style=\"padding: 24px; background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-3) 100%);\">\n        <h3 style=\"color: var(--accent); margin-bottom: 16px;\">🛡️ Safety & Privacy</h3>\n        <ul style=\"line-height: 2; padding-left: 20px;\">\n          <li><strong>Family-Friendly:</strong> Content appropriate for ages 10+</li>\n          <li><strong>Report System:</strong> Report inappropriate behavior immediately</li>\n          <li><strong>Block Feature:</strong> Block users who make you uncomfortable</li>\n          <li><strong>Privacy:</strong> Never share personal contact information</li>\n          <li><strong>Parental Guidance:</strong> Minors should use with adult supervision</li>\n        </ul>\n      </div>\n\n      <div class=\"card\" style=\"padding: 24px; text-align: center; border: 2px solid var(--accent);\">\n        <p style=\"font-size: 16px; line-height: 1.8; margin-bottom: 16px;\"><strong>\"Let your conversation be always full of grace, seasoned with salt, so that you may know how to answer everyone.\"</strong></p>\n        <p style=\"color: var(--muted);\">- Colossians 4:6</p>\n      </div>\n\n      <div class=\"card\" style=\"padding: 24px;\">\n        <h3 style=\"color: var(--accent); margin-bottom: 16px;\">⚠️ Consequences</h3>\n        <p style=\"margin-bottom: 12px;\">Violations may result in:</p>\n        <ol style=\"line-height: 2; padding-left: 20px;\">\n          <li><strong>Warning:</strong> First-time minor offenses</li>\n          <li><strong>Temporary Suspension:</strong> Repeated or moderate violations</li>\n          <li><strong>Permanent Ban:</strong> Severe or repeated serious violations</li>\n        </ol>\n        <p style=\"margin-top: 16px; padding: 12px; background: var(--bg-2); border-radius: 8px; font-size: 14px;\">We believe in grace and restoration. Contact admin if you have questions or concerns.</p>\n      </div>\n\n    </div>\n  </section>
+
 
 </body>
 </html>

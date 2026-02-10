@@ -1756,6 +1756,12 @@
       await window.ConceptModule.init();
       console.log('✓ Concepts loaded:', window.ConceptModule.concepts.length);
     }
+
+    // Initialize authentication UI
+    if (window.initAuthUI && typeof window.initAuthUI === 'function') {
+      window.initAuthUI();
+      console.log('✓ Authentication UI initialized');
+    }
   });
 
   function updateCommunityStats(people) {

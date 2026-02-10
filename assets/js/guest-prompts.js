@@ -29,7 +29,7 @@ const PROMPT_TRIGGERS = {
 /**
  * Initialize guest prompts system
  */
-export function initGuestPrompts() {
+function initGuestPrompts() {
   loadGuestSession();
   
   // Listen for game completions
@@ -627,7 +627,7 @@ function triggerAccountCreation() {
 /**
  * Add guest badge to player name display
  */
-export function addGuestBadge(element, playerName) {
+function addGuestBadge(element, playerName) {
   if (!isGuestUser()) return;
   
   const getText = window.getText || ((key) => key);
@@ -642,7 +642,7 @@ export function addGuestBadge(element, playerName) {
 /**
  * Add device-only indicator
  */
-export function addDeviceOnlyIndicator(element) {
+function addDeviceOnlyIndicator(element) {
   if (!isGuestUser()) return;
   
   const getText = window.getText || ((key) => key);
@@ -657,14 +657,14 @@ export function addDeviceOnlyIndicator(element) {
 /**
  * Get guest session info (for debugging)
  */
-export function getGuestSessionInfo() {
+function getGuestSessionInfo() {
   return { ...guestSession };
 }
 
 /**
  * Reset guest session (for testing)
  */
-export function resetGuestSession() {
+function resetGuestSession() {
   Object.keys(guestSession).forEach(key => {
     if (typeof guestSession[key] === 'number') guestSession[key] = 0;
     if (typeof guestSession[key] === 'boolean') guestSession[key] = false;
