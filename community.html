@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Who-Bible — Community</title>
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/feedback-modal.css" />
-  <link rel="stylesheet" href="assets/css/discussions.css" />
   <link rel="stylesheet" href="assets/css/auth.css" />
   <link rel="stylesheet" href="assets/css/guest-prompts.css" />
   
@@ -23,24 +25,9 @@
   <script type="module" src="assets/js/guest-prompts.js?v=20260209b"></script>
   <script src="assets/js/remote-challenge.js?v=20260209c" defer></script>
   <script src="assets/js/scenarios.js?v=20260209c" defer></script>
-  <script src="assets/js/locations.js?v=20260209c" defer></script>
   <script src="assets/js/concepts.js?v=20260209c" defer></script>
+  <script src="assets/js/content-filter.js?v=20260222" defer></script>
   <script src="assets/js/translations.js?v=20260209c" defer></script>
-  <script type="module">
-    // Import and initialize discussions
-    import { initDiscussionsUI } from './assets/js/community-discussions-ui.js?v=20260209c';
-    
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        console.log('Initializing discussions UI...');
-        initDiscussionsUI();
-      });
-    } else {
-      console.log('DOM already loaded, initializing discussions UI...');
-      initDiscussionsUI();
-    }
-  </script>
   <script src="assets/js/community.js?v=20260209b" defer></script>
   <style>main{padding-top:16px}</style>
   <noscript><style>.requires-js{display:none}</style></noscript>
@@ -173,8 +160,6 @@
           <div class="community-tabs" role="tablist">
             <button id="tab-explore" class="tab-btn active" role="tab" aria-selected="true">Explore</button>
             <button id="tab-live" class="tab-btn" role="tab" aria-selected="false">Live</button>
-            <button id="tab-discussions" class="tab-btn" role="tab" aria-selected="false" aria-controls="section-discussions">💬 Discussions</button>
-            <button id="tab-locations" class="tab-btn" role="tab" aria-selected="false" aria-controls="section-locations" aria-label="Biblical Places - Explore locations with interactive map">Places</button>
             <button id="tab-concepts" class="tab-btn" role="tab" aria-selected="false" aria-controls="section-concepts" aria-label="Learn - Biblical concepts glossary">Learn</button>
             <button id="tab-profile" class="tab-btn" role="tab" aria-selected="false">Profile</button>
             <button id="tab-guidelines" class="tab-btn" role="tab" aria-selected="false">Guidelines</button>
@@ -238,74 +223,6 @@
               <div id="live-rooms-list" class="cards" style="margin-bottom:24px"></div>
             </section>
             
-            <!-- Discussions Section -->
-            <section id="section-discussions" class="community-section" role="tabpanel" style="display:none">
-              <div class="discussions-loading" style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 48px; margin-bottom: 16px;">💬</div>
-                <h3 style="color: var(--accent); margin-bottom: 12px;">Community Discussions</h3>
-                <p style="color: var(--muted); margin-bottom: 24px;">Engage with fellow believers in meaningful Bible discussions</p>
-                <div class="loading-spinner" style="margin: 20px auto; width: 40px; height: 40px; border: 4px solid var(--border); border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                <p style="color: var(--muted); font-size: 14px;">Loading discussion rooms...</p>
-              </div>
-            </section>
-            
-            <!-- Locations Section -->
-            <section id="section-locations" class="community-section" role="tabpanel" style="display:none">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-                <div>
-                  <h3 style="margin: 0;">Biblical Places</h3>
-                  <p class="muted" style="margin: 4px 0 0 0;">Explore key locations with an interactive map</p>
-                </div>
-                <button id="btn-location-quiz" style="padding: 10px 20px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;">
-                  🎯 Location Quiz
-                </button>
-              </div>
-              
-              <!-- Map Container -->
-              <div id="locations-map-container" role="img" aria-label="Interactive map of biblical locations" style="width: 100%; min-height: 600px; height: 70vh; margin-bottom: 24px; background: linear-gradient(135deg, #1e3a5f 0%, #2c5f7c 100%); border: 3px solid var(--accent); border-radius: 16px; overflow: hidden; position: relative; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
-                  <div style="font-size: 64px; margin-bottom: 20px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));">🗺️</div>
-                  <h3 style="color: white; font-size: 24px; margin-bottom: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Interactive Biblical Map</h3>
-                  <div style="margin: 20px auto; width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                  <p style="color: rgba(255,255,255,0.8); font-size: 16px;">Loading ancient locations...</p>
-                </div>
-              </div>
-              
-              <!-- Journey Paths Selector -->
-              <div style="margin-bottom: 24px; padding: 16px; background: var(--glass); border-radius: 12px; border: 2px solid var(--border);">
-                <div style="font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                  🛤️ Biblical Journeys
-                </div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <button class="journey-btn" data-journey="exodus" style="padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">📜 Exodus Route</button>
-                  <button class="journey-btn" data-journey="paul" style="padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">⛵ Paul's Journeys</button>
-                  <button class="journey-btn" data-journey="jesus" style="padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">✝️ Jesus' Ministry</button>
-                  <button class="journey-btn" data-journey="abraham" style="padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">🌟 Abraham's Journey</button>
-                  <button id="btn-clear-journey" style="padding: 8px 16px; border-radius: 20px; border: 2px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s;">✕ Clear</button>
-                </div>
-              </div>
-              
-              <!-- Filter Controls -->
-              <div style="display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap;">
-                <select id="testament-filter-locations" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
-                  <option value="">All Testaments</option>
-                  <option value="OT">Old Testament</option>
-                  <option value="NT">New Testament</option>
-                  <option value="OT & NT">Both</option>
-                </select>
-                <select id="importance-filter-locations" style="flex: 1; min-width: 150px; padding: 10px; border: 2px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
-                  <option value="0">All Importance</option>
-                  <option value="8">High (8+)</option>
-                  <option value="9">Very High (9+)</option>
-                  <option value="10">Critical (10)</option>
-                </select>
-                <button id="btn-reset-map" style="padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Reset Map</button>
-              </div>
-              
-              <!-- Location Cards -->
-              <div id="locations-list" class="locations-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;"></div>
-            </section>
-            
             <!-- Concepts/Glossary Section -->
             <section id="section-concepts" class="community-section" role="tabpanel" style="display:none">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
@@ -366,9 +283,12 @@
                     <div id="avatar-preview" class="avatar" aria-label="Avatar" role="img" style="width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 3px solid var(--bg);">WB</div>
                     <div id="avatar-icon" style="position: absolute; bottom: -4px; right: -4px; width: 32px; height: 32px; background: var(--card); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid var(--bg); box-shadow: 0 2px 6px rgba(0,0,0,0.2);">📖</div>
                   </div>
-                  <div style="flex: 1;">
-                    <button id="btn-generate-avatar" class="small-btn" type="button" style="margin-bottom: 8px; padding: 8px 16px; border-radius: 6px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600; font-size: 14px;">🎨 Change Avatar Style</button>
+                  <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                    <button id="btn-choose-emoji" class="small-btn" type="button" style="width: 100%; padding: 8px 16px; border-radius: 6px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">🎭 Choose Avatar Emoji</button>
+                    <button id="btn-generate-avatar" class="small-btn" type="button" style="width: 100%; padding: 8px 16px; border-radius: 6px; background: var(--accent); color: white; border: none; cursor: pointer; font-weight: 600; font-size: 14px;">🎲 Random Avatar</button>
+                    <button id="btn-use-initials" class="small-btn" type="button" style="width: 100%; padding: 8px 16px; border-radius: 6px; background: var(--bg-2); color: var(--text); border: 2px solid var(--border); cursor: pointer; font-weight: 600; font-size: 14px;">✏️ Use My Initials</button>
                     <div style="display: flex; gap: 8px; margin-top: 8px;">
+                      <span style="font-size: 12px; color: var(--muted); margin-right: 4px;">Badge:</span>
                       <button class="avatar-icon-btn" data-icon="📖" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); cursor: pointer; font-size: 16px; transition: all 0.2s;" title="Book">📖</button>
                       <button class="avatar-icon-btn" data-icon="✝️" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); cursor: pointer; font-size: 16px; transition: all 0.2s;" title="Cross">✝️</button>
                       <button class="avatar-icon-btn" data-icon="🕊️" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-2); cursor: pointer; font-size: 16px; transition: all 0.2s;" title="Dove">🕊️</button>
@@ -378,15 +298,17 @@
                     </div>
                   </div>
                 </div>
-                
                 <!-- Basic Info -->
                 <div class="row" style="margin-bottom: 16px;">
                   <label for="display-name" id="profile-name-label" style="display: block; margin-bottom: 6px; font-weight: 600;">Display name</label>
-                  <input id="display-name" type="text" placeholder="Your name" style="width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 16px;" />
+                  <input id="display-name" type="text" placeholder="Your name" maxlength="20" style="width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 16px;" />
+                  <small style="color: var(--muted); font-size: 12px; margin-top: 4px; display: block;">2-20 characters, letters only</small>
                 </div>
                 <div class="row" style="margin-bottom: 24px;">
                   <label for="profile-bio" style="display: block; margin-bottom: 6px; font-weight: 600;">Bio (optional)</label>
-                  <textarea id="profile-bio" rows="3" placeholder="Tell us about yourself..." style="width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 16px; resize: vertical; font-family: inherit;"></textarea>
+                  <textarea id="profile-bio" rows="3" placeholder="Tell us about yourself..." maxlength="200" style="width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 16px; resize: vertical; font-family: inherit;"></textarea>
+                  <small style="color: var(--muted); font-size: 12px; margin-top: 4px; display: block;">Max 200 characters. No personal contact info please.</small>
+
                 </div>
                 
                 <!-- Stats Overview -->
@@ -531,7 +453,7 @@
         <div class="footer-top">
           <div class="footer-brand">
             <img src="assets/images/logo.png" alt="Who-Bible Logo" class="footer-logo" />
-            <div class="footer-title">Who-Bible <span class="beta-badge" title="Beta - still in development">BETA</span></div>
+            <div class="footer-title">Who-Bible</div>
           </div>
           <!-- No community link on this page -->
         </div>
@@ -560,7 +482,7 @@
   <div id="feedback-modal" class="feedback-modal" style="display:none" role="dialog" aria-labelledby="feedback-title" aria-modal="true">
     <div class="feedback-content">
       <header class="feedback-header">
-        <h2 id="feedback-title"><img src="assets/images/logo.png" alt="Who-Bible Logo" style="height:1.5em;vertical-align:middle;margin-right:0.5em;" /><span>We'd love your feedback!</span> <span class="beta-badge" title="Beta - still in development">BETA</span></h2>
+        <h2 id="feedback-title"><img src="assets/images/logo.png" alt="Who-Bible Logo" style="height:1.5em;vertical-align:middle;margin-right:0.5em;" /><span>We'd love your feedback!</span></h2>
         <button id="btn-feedback-close" class="close-feedback" aria-label="Close feedback">✕</button>
       </header>
       <main class="feedback-body">
@@ -577,16 +499,58 @@
           </div>
         </div>
 
+        <div class="feedback-form-group">
+          <label for="feedback-experience">How do you feel about the app overall?</label>
+          <textarea id="feedback-experience" rows="2" placeholder="Tell us about your experience with Who-Bible..."></textarea>
+        </div>
+
         <div class="feedback-grid">
           <div class="feedback-form-group">
-            <label for="rating-modes">Game Modes</label>
-            <select id="rating-modes">
-              <option value="" disabled selected>Select rating...</option>
-              <option value="5">Excellent</option>
-              <option value="4">Good</option>
-              <option value="3">Average</option>
-              <option value="2">Poor</option>
-              <option value="1">Terrible</option>
+            <label for="rating-solo">Solo Mode</label>
+            <select id="rating-solo">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+              <option value="0">Haven't Tried</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-timed">Timed Mode</label>
+            <select id="rating-timed">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+              <option value="0">Haven't Tried</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-challenge">Challenge Mode</label>
+            <select id="rating-challenge">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+              <option value="0">Haven't Tried</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-study">Study Mode</label>
+            <select id="rating-study">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+              <option value="0">Haven't Tried</option>
             </select>
           </div>
           <div class="feedback-form-group">
@@ -601,14 +565,27 @@
             </select>
           </div>
           <div class="feedback-form-group">
-            <label for="rating-scenarios">Scenarios</label>
+            <label for="rating-scenarios">Scenarios Mode</label>
             <select id="rating-scenarios">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+              <option value="0">Haven't Tried</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-online">Playing Online with Friends</label>
+            <select id="rating-online">
               <option value="" disabled selected>Select rating...</option>
-              <option value="5">Engaging</option>
-              <option value="4">Good</option>
-              <option value="3">Okay</option>
-              <option value="2">Boring</option>
-              <option value="1">Confusing</option>
+              <option value="5">Amazing!</option>
+              <option value="4">Works Great</option>
+              <option value="3">Works OK</option>
+              <option value="2">Had Issues</option>
+              <option value="1">Didn't Work</option>
+              <option value="0">Haven't Tried</option>
             </select>
           </div>
         </div>
@@ -682,7 +659,39 @@
     </div>
   </div>
 
+  <!-- Emoji Picker Modal -->
+  <div id="emoji-picker-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+    <div style="background: var(--card); border-radius: 16px; max-width: 600px; width: 90%; max-height: 80vh; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4); border: 2px solid var(--border);">
+      <!-- Header -->
+      <div style="padding: 20px; border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; color: var(--text); font-size: 20px;">🎭 Choose Your Avatar Emoji</h3>
+        <button id="btn-emoji-close" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s;" title="Close">×</button>
+      </div>
+      
+      <!-- Category Tabs -->
+      <div style="padding: 16px; border-bottom: 2px solid var(--border); display: flex; gap: 8px; overflow-x: auto;">
+        <button class="emoji-category-tab active" data-category="all" style="padding: 8px 16px; border-radius: 8px; border: 2px solid var(--border); background: var(--accent); color: white; cursor: pointer; font-weight: 600; font-size: 14px; white-space: nowrap; transition: all 0.2s;">All</button>
+        <button class="emoji-category-tab" data-category="biblical" style="padding: 8px 16px; border-radius: 8px; border: 2px solid var(--border); background: var(--bg-2); color: var(--text); cursor: pointer; font-weight: 600; font-size: 14px; white-space: nowrap; transition: all 0.2s;">📖 Biblical</button>
+        <button class="emoji-category-tab" data-category="nature" style="padding: 8px 16px; border-radius: 8px; border: 2px solid var(--border); background: var(--bg-2); color: var(--text); cursor: pointer; font-weight: 600; font-size: 14px; white-space: nowrap; transition: all 0.2s;">🌿 Nature</button>
+        <button class="emoji-category-tab" data-category="virtues" style="padding: 8px 16px; border-radius: 8px; border: 2px solid var(--border); background: var(--bg-2); color: var(--text); cursor: pointer; font-weight: 600; font-size: 14px; white-space: nowrap; transition: all 0.2s;">✨ Virtues</button>
+        <button class="emoji-category-tab" data-category="people" style="padding: 8px 16px; border-radius: 8px; border: 2px solid var(--border); background: var(--bg-2); color: var(--text); cursor: pointer; font-weight: 600; font-size: 14px; white-space: nowrap; transition: all 0.2s;">👥 People</button>
+        <button class="emoji-category-tab" data-category="objects" style="padding: 8px 16px; border-radius: 8px; border: 2px solid var(--border); background: var(--bg-2); color: var(--text); cursor: pointer; font-weight: 600; font-size: 14px; white-space: nowrap; transition: all 0.2s;">📜 Objects</button>
+      </div>
+      
+      <!-- Emoji Grid -->
+      <div id="emoji-grid" style="padding: 20px; max-height: 400px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 8px;">
+        <!-- Emojis will be populated by JavaScript -->
+      </div>
+      
+      <!-- Footer -->
+      <div style="padding: 16px; border-top: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <button id="btn-random-emoji" style="padding: 8px 16px; border-radius: 8px; border: 2px solid var(--border); background: var(--bg-2); color: var(--text); cursor: pointer; font-weight: 600; font-size: 14px;">🎲 Random</button>
+        <span style="font-size: 12px; color: var(--muted);">Click any emoji to select it</span>
+      </div>
+    </div>
+  </div>
 
 
 </body>
+```
 </html>

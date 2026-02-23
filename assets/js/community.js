@@ -14,24 +14,46 @@
   // Profanity filter for usernames
   const PROFANITY_LIST = ['damn', 'hell', 'crap', 'stupid', 'idiot', 'dumb', 'hate', 'kill', 'die', 'sex', 'porn', 'xxx'];
   
-  function containsProfanity(text) {
-    if (!text) return false;
-    const lower = text.toLowerCase();
-    return PROFANITY_LIST.some(word => lower.includes(word));
-  }
-  
+  // Username validation using ContentFilter
   function validateUsername(username) {
+    if (window.ContentFilter && window.ContentFilter.validateContent) {
+      return window.ContentFilter.validateContent(username, {
+        type: 'username',
+        minLength: 2,
+        maxLength: 20,
+        allowUrls: false,
+        allowEmails: false
+      });
+    }
+    
+    // Fallback validation if ContentFilter isn't loaded
     if (!username || username.trim().length < 2) {
       return { valid: false, error: 'Username must be at least 2 characters' };
     }
     if (username.length > 20) {
       return { valid: false, error: 'Username must be 20 characters or less' };
     }
-    if (containsProfanity(username)) {
-      return { valid: false, error: 'Username contains inappropriate language' };
+    if (!/^[a-zA-Z][a-zA-Z0-9\s_-]*$/.test(username)) {
+      return { valid: false, error: 'Username must start with a letter and contain only letters, numbers, spaces, hyphens and underscores' };
     }
-    if (!/^[a-zA-Z0-9\s_-]+$/.test(username)) {
-      return { valid: false, error: 'Username can only contain letters, numbers, spaces, hyphens and underscores' };
+    return { valid: true };
+  }
+  
+  // Bio validation using ContentFilter
+  function validateBio(bio) {
+    if (window.ContentFilter && window.ContentFilter.validateContent) {
+      return window.ContentFilter.validateContent(bio, {
+        type: 'bio',
+        minLength: 0,
+        maxLength: 200,
+        allowUrls: false,
+        allowEmails: false
+      });
+    }
+    
+    // Fallback validation if ContentFilter isn't loaded
+    if (bio && bio.length > 200) {
+      return { valid: false, error: 'Bio must be 200 characters or less' };
     }
     return { valid: true };
   }
@@ -232,8 +254,6 @@
   const tabs = [
     { btn: document.getElementById('tab-explore'), sec: document.getElementById('section-explore'), id: 'explore' },
     { btn: document.getElementById('tab-live'), sec: document.getElementById('section-live'), id: 'live' },
-    { btn: document.getElementById('tab-discussions'), sec: document.getElementById('section-discussions'), id: 'discussions' },
-    { btn: document.getElementById('tab-locations'), sec: document.getElementById('section-locations'), id: 'locations' },
     { btn: document.getElementById('tab-concepts'), sec: document.getElementById('section-concepts'), id: 'concepts' },
     { btn: document.getElementById('tab-profile'), sec: document.getElementById('section-profile'), id: 'profile' },
     { btn: document.getElementById('tab-guidelines'), sec: document.getElementById('section-guidelines'), id: 'guidelines' },
@@ -270,8 +290,86 @@
     '#a1887f', '#90a4ae', '#ff7043', '#ffa726'
   ];
   
+  // Enhanced Avatar Emoji System - 60+ biblically-themed emojis
+  const AVATAR_EMOJIS = {
+    biblical: [
+      { emoji: '👑', name: 'Crown (King/Queen)' },
+      { emoji: '⚔️', name: 'Sword (Warrior)' },
+      { emoji: '📖', name: 'Book (Scholar)' },
+      { emoji: '🕊️', name: 'Dove (Peace)' },
+      { emoji: '⛪', name: 'Church' },
+      { emoji: '✝️', name: 'Cross' },
+      { emoji: '🙏', name: 'Prayer' },
+      { emoji: '👤', name: 'Person' },
+      { emoji: '👥', name: 'People' },
+      { emoji: '🌟', name: 'Star' },
+      { emoji: '🕎', name: 'Menorah' },
+      { emoji: '🏺', name: 'Vessel' }
+    ],
+    nature: [
+      { emoji: '🌊', name: 'Water' },
+      { emoji: '🔥', name: 'Fire' },
+      { emoji: '🌈', name: 'Rainbow' },
+      { emoji: '🦁', name: 'Lion' },
+      { emoji: '🐑', name: 'Sheep' },
+      { emoji: '🐟', name: 'Fish' },
+      { emoji: '🌾', name: 'Wheat' },
+      { emoji: '🌴', name: 'Palm' },
+      { emoji: '🏔️', name: 'Mountain' },
+      { emoji: '⛅', name: 'Clouds' },
+      { emoji: '🌙', name: 'Moon' },
+      { emoji: '☀️', name: 'Sun' }
+    ],
+    virtues: [
+      { emoji: '❤️', name: 'Love' },
+      { emoji: '😊', name: 'Joy' },
+      { emoji: '☮️', name: 'Peace' },
+      { emoji: '💫', name: 'Hope' },
+      { emoji: '💎', name: 'Precious' },
+      { emoji: '✨', name: 'Glory' },
+      { emoji: '🎯', name: 'Purpose' },
+      { emoji: '🏆', name: 'Victory' },
+      { emoji: '🛡️', name: 'Faith' },
+      { emoji: '⚡', name: 'Power' },
+      { emoji: '🎁', name: 'Gift' },
+      { emoji: '🕯️', name: 'Light' }
+    ],
+    people: [
+      { emoji: '👨', name: 'Man' },
+      { emoji: '👩', name: 'Woman' },
+      { emoji: '👧', name: 'Girl' },
+      { emoji: '👦', name: 'Boy' },
+      { emoji: '👴', name: 'Elder Man' },
+      { emoji: '👵', name: 'Elder Woman' },
+      { emoji: '🧔', name: 'Bearded Man' },
+      { emoji: '👨‍🦳', name: 'Wise Man' },
+      { emoji: '👩‍🦳', name: 'Wise Woman' },
+      { emoji: '🧑‍🦱', name: 'Curly Hair' },
+      { emoji: '👨‍🦰', name: 'Red Hair Man' },
+      { emoji: '👩‍🦰', name: 'Red Hair Woman' }
+    ],
+    objects: [
+      { emoji: '📜', name: 'Scroll' },
+      { emoji: '🗝️', name: 'Key' },
+      { emoji: '🚪', name: 'Door' },
+      { emoji: '⚓', name: 'Anchor' },
+      { emoji: '📿', name: 'Beads' },
+      { emoji: '🎺', name: 'Trumpet' },
+      { emoji: '🪨', name: 'Stone' },
+      { emoji: '🌿', name: 'Olive Branch' },
+      { emoji: '🍞', name: 'Bread' },
+      { emoji: '🍷', name: 'Wine' },
+      { emoji: '🏛️', name: 'Temple' },
+      { emoji: '🕊', name: 'Spirit' }
+    ]
+  };
+  
+  // Flatten all emojis for easy access
+  const ALL_AVATAR_EMOJIS = Object.values(AVATAR_EMOJIS).flat().map(e => e.emoji);
+  
   let currentAvatarColorIndex = 0;
   let currentAvatarIcon = '📖';
+  let currentAvatarEmoji = null; // null = use initials, otherwise use emoji
   
   function initialsFromName(name){
     const parts = (name||'').trim().split(/[\s-]+/).filter(Boolean);
@@ -287,12 +385,28 @@
   }
   
   function setAvatarText(txt){ 
-    if(avatarPreview) avatarPreview.textContent = (txt||'WB'); 
+    if(avatarPreview) {
+      // If we have a selected emoji, use it; otherwise use initials
+      const displayText = currentAvatarEmoji || txt || 'WB';
+      avatarPreview.textContent = displayText;
+      // Adjust font size based on content
+      if (currentAvatarEmoji) {
+        avatarPreview.style.fontSize = '48px'; // Larger for emoji
+      } else {
+        avatarPreview.style.fontSize = '28px'; // Original size for initials
+      }
+    }
   }
   
   function updateAvatarStyle() {
     if (avatarPreview) {
       avatarPreview.style.background = avatarColors[currentAvatarColorIndex];
+      // Update text size if emoji is selected
+      if (currentAvatarEmoji) {
+        avatarPreview.style.fontSize = '48px';
+      } else {
+        avatarPreview.style.fontSize = '28px';
+      }
     }
     if (avatarIcon) {
       avatarIcon.textContent = currentAvatarIcon;
@@ -352,9 +466,21 @@
   
   function loadProfile(){
     try{
+      // SYNC WITH MAIN APP: Try to load name from who-bible-player first
+      let playerName = '';
+      try {
+        const playerData = localStorage.getItem('who-bible-player');
+        if (playerData) {
+          const player = JSON.parse(playerData);
+          playerName = player.name || '';
+        }
+      } catch(_) {}
+      
       const txt = localStorage.getItem('communityProfile');
       if(!txt) { 
-        setAvatarText('WB'); 
+        // No profile yet, but use player name if available
+        if (displayNameInput && playerName) displayNameInput.value = playerName;
+        setAvatarText(playerName ? generateAvatarText(playerName) : 'WB'); 
         updateAvatarStyle();
         return; 
       }
@@ -369,9 +495,14 @@
         updateAvatarStyle();
         return;
       }
-      if(displayNameInput) displayNameInput.value = p.displayName || '';
+      
+      // SYNC: Prefer player name from main app over profile displayName
+      const syncedName = playerName || p.displayName || '';
+      
+      if(displayNameInput) displayNameInput.value = syncedName;
       if(profileBioTextarea) profileBioTextarea.value = p.bio || '';
-      setAvatarText(p.avatarText || generateAvatarText(p.displayName));
+      currentAvatarEmoji = p.avatarEmoji || null; // Restore emoji selection
+      setAvatarText(p.avatarText || generateAvatarText(syncedName));
       currentAvatarColorIndex = p.avatarColorIndex || 0;
       currentAvatarIcon = p.avatarIcon || '📖';
       updateAvatarStyle();
@@ -383,25 +514,46 @@
   
   function saveProfile(){
     const name = displayNameInput?.value?.trim() || '';
+    const bio = profileBioTextarea?.value?.trim() || '';
     
     // Validate username
-    const validation = validateUsername(name);
-    if (!validation.valid) {
-      showToast({ title: `❌ ${getText('invalidUsername')}`, msg: validation.error, type: 'error', timeout: 3000 });
+    const nameValidation = validateUsername(name);
+    if (!nameValidation.valid) {
+      showToast({ title: `❌ ${getText('invalidUsername')}`, msg: nameValidation.error, type: 'error', timeout: 3000 });
       return false;
+    }
+    
+    // Validate bio
+    if (bio) {
+      const bioValidation = validateBio(bio);
+      if (!bioValidation.valid) {
+        showToast({ title: '❌ Invalid Bio', msg: bioValidation.error, type: 'error', timeout: 3000 });
+        return false;
+      }
     }
     
     const profile = {
       displayName: name,
-      bio: profileBioTextarea?.value?.trim() || '',
+      bio: bio,
       avatarText: avatarPreview?.textContent || 'WB',
       avatarColorIndex: currentAvatarColorIndex,
       avatarIcon: currentAvatarIcon,
+      avatarEmoji: currentAvatarEmoji, // Save selected emoji
       locale: (localStorage.getItem('who-bible-language')||'en')
     };
     try{ 
       localStorage.setItem('communityProfile', JSON.stringify(profile)); 
       localStorage.setItem('who-bible-profile-name', name); // For reports
+      
+      // SYNC WITH MAIN APP: Update the player name in who-bible-player too
+      const playerData = localStorage.getItem('who-bible-player');
+      if (playerData) {
+        try {
+          const player = JSON.parse(playerData);
+          player.name = name; // Update the player name
+          localStorage.setItem('who-bible-player', JSON.stringify(player));
+        } catch(_) {}
+      }
     }catch(_){/* ignore */}
     return true;
   }
@@ -409,51 +561,29 @@
   function loadUserStats() {
     // Load stats from localStorage (from main app)
     try {
-      // Get results from main app
-      const resultsStr = localStorage.getItem('who-bible-results');
-      let results = [];
+      // Get player data from main app (NEW: correct source)
+      const playerStr = localStorage.getItem('who-bible-player');
+      let player = null;
+      let stats = null;
       
-      if (resultsStr) {
+      if (playerStr) {
         try {
-          results = JSON.parse(resultsStr);
-          if (!Array.isArray(results)) {
-            console.warn('Results data corrupted, resetting to empty array');
-            results = [];
-          }
+          player = JSON.parse(playerStr);
+          stats = player?.stats || null;
         } catch (parseError) {
-          console.error('Failed to parse results:', parseError);
-          showToast({ title: getText('error'), msg: 'Stats data corrupted', type: 'warn', timeout: 2000 });
-          results = [];
+          console.error('Failed to parse player data:', parseError);
+          stats = null;
         }
       }
       
-      const quizzesPlayed = results.length;
-      const bestScore = results.length > 0 ? Math.max(...results.map(r => r.score || 0)) : 0;
-      const bestStreak = results.length > 0 ? Math.max(...results.map(r => r.streak || 0)) : 0;
+      // If player stats exist, use them; otherwise default to 0
+      const quizzesPlayed = stats?.gamesPlayed || 0;
+      const bestScore = stats?.highestScore || 0;
+      const bestStreak = stats?.bestStreak || 0;
+      const accuracy = stats?.winRate || 0; // winRate is accuracy percentage
       
-      // Calculate accuracy
-      let totalQuestions = 0;
-      let correctAnswers = 0;
-      results.forEach(r => {
-        if (r.score !== undefined && r.qtotal !== undefined) {
-          totalQuestions += r.qtotal;
-          correctAnswers += r.score;
-        }
-      });
-      const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
-      
-      // Count perfect games
-      const perfectGames = results.filter(r => r.score === r.qtotal && r.qtotal > 0).length;
-      
-      // Find favorite mode
-      const modeCounts = {};
-      results.forEach(r => {
-        const mode = r.mode || 'classic';
-        modeCounts[mode] = (modeCounts[mode] || 0) + 1;
-      });
-      const favoriteMode = Object.keys(modeCounts).length > 0 
-        ? Object.entries(modeCounts).sort((a, b) => b[1] - a[1])[0][0] 
-        : null;
+      // Find favorite mode from stats
+      const favoriteMode = stats?.favoriteMode || null;
       
       // Update UI
       const quizzesEl = document.getElementById('user-quizzes-played');
@@ -466,14 +596,8 @@
       if (streakEl) streakEl.textContent = bestStreak;
       if (accuracyEl) accuracyEl.textContent = accuracy + '%';
       
-      // Learning progress
-      const peopleMastered = new Set();
-      results.forEach(r => {
-        if (r.correctPeople) {
-          r.correctPeople.forEach(person => peopleMastered.add(person));
-        }
-      });
-      const masteredCount = peopleMastered.size;
+      // Learning progress (set to default for now as we don't track individual people)
+      const masteredCount = 0;
       const masteredEl = document.getElementById('people-mastered');
       const progressBar = document.getElementById('people-progress-bar');
       if (masteredEl) masteredEl.textContent = `${masteredCount} / 73`;
@@ -483,42 +607,37 @@
       const favModeEl = document.getElementById('favorite-mode');
       if (favModeEl && favoriteMode) {
         const modeNames = {
-          classic: '🎯 Classic Mode',
+          solo: '🎯 Solo Mode',
           timed: '⏱️ Timed Mode',
+          challenge: '🤝 Challenge Mode',
           'remote-challenge': '🌐 Remote Challenge',
+          scenarios: '🎭 Scenarios Mode',
           study: '📚 Study Mode'
         };
         favModeEl.textContent = modeNames[favoriteMode] || favoriteMode;
+      } else if (favModeEl) {
+        favModeEl.textContent = 'Play more to discover!';
       }
       
-      // Weak areas (people frequently missed)
-      const mistakes = {};
-      results.forEach(r => {
-        if (r.incorrectPeople) {
-          r.incorrectPeople.forEach(person => {
-            mistakes[person] = (mistakes[person] || 0) + 1;
-          });
-        }
-      });
-      const weakAreas = Object.entries(mistakes)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([person]) => person);
-      
+      // Weak areas (placeholder since we don't track individual people in new stats)
       const weakAreasEl = document.getElementById('weak-areas');
-      if (weakAreasEl && weakAreas.length > 0) {
-        weakAreasEl.innerHTML = `<strong>Review:</strong> ${weakAreas.join(', ')}`;
+      if (weakAreasEl) {
+        if (quizzesPlayed > 0) {
+          weakAreasEl.innerHTML = 'Keep playing to improve!';
+        } else {
+          weakAreasEl.innerHTML = 'Complete more quizzes for personalized suggestions';
+        }
       }
       
       // Render achievements
-      const stats = {
+      const achievementStats = {
         quizzes: quizzesPlayed,
         bestScore,
         bestStreak,
         accuracy,
-        perfectGames
+        perfectGames: 0 // Not tracked in new system yet
       };
-      renderAchievements(stats);
+      renderAchievements(achievementStats);
       
     } catch(e) {
       console.error('Error loading stats:', e);
@@ -530,10 +649,26 @@
   loadProfile();
   loadUserStats();
   
-  // Avatar color cycle button
+  // Avatar color cycle button (NOW: Generate Random Avatar - emoji + color)
   btnGenerateAvatar?.addEventListener('click', ()=>{ 
-    currentAvatarColorIndex = (currentAvatarColorIndex + 1) % avatarColors.length;
+    // Pick a random emoji from all available emojis
+    const randomEmoji = ALL_AVATAR_EMOJIS[Math.floor(Math.random() * ALL_AVATAR_EMOJIS.length)];
+    currentAvatarEmoji = randomEmoji;
+    
+    // Pick a random color
+    currentAvatarColorIndex = Math.floor(Math.random() * avatarColors.length);
+    
+    // Update the avatar display
+    setAvatarText(randomEmoji);
     updateAvatarStyle();
+    
+    // Show feedback toast
+    showToast({ 
+      title: '✨ Avatar Generated!', 
+      msg: `New random avatar: ${randomEmoji}`, 
+      type: 'success', 
+      timeout: 1500 
+    });
   });
   
   // Avatar icon selection buttons
@@ -581,6 +716,142 @@
       }
     }
   });
+
+  // ===== Emoji Picker System =====
+  const emojiPickerModal = document.getElementById('emoji-picker-modal');
+  const emojiGrid = document.getElementById('emoji-grid');
+  const btnChooseEmoji = document.getElementById('btn-choose-emoji');
+  const btnEmojiClose = document.getElementById('btn-emoji-close');
+  const btnRandomEmoji = document.getElementById('btn-random-emoji');
+  const btnUseInitials = document.getElementById('btn-use-initials');
+  
+  let currentEmojiCategory = 'all';
+  
+  // Populate emoji grid based on category
+  function populateEmojiGrid(category = 'all') {
+    if (!emojiGrid) return;
+    
+    emojiGrid.innerHTML = '';
+    
+    let emojisToShow = [];
+    if (category === 'all') {
+      emojisToShow = Object.values(AVATAR_EMOJIS).flat();
+    } else if (AVATAR_EMOJIS[category]) {
+      emojisToShow = AVATAR_EMOJIS[category];
+    }
+    
+    emojisToShow.forEach(emojiObj => {
+      const btn = document.createElement('button');
+      btn.className = 'emoji-option';
+      btn.textContent = emojiObj.emoji;
+      btn.title = emojiObj.name;
+      btn.style.cssText = `
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        border: 2px solid var(--border);
+        background: var(--bg-2);
+        cursor: pointer;
+        font-size: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      `;
+      
+      // Highlight if currently selected
+      if (currentAvatarEmoji === emojiObj.emoji) {
+        btn.style.borderColor = 'var(--accent)';
+        btn.style.background = 'var(--accent-2)';
+        btn.style.transform = 'scale(1.05)';
+      }
+      
+      // Hover effect
+      btn.addEventListener('mouseenter', () => {
+        btn.style.borderColor = 'var(--accent)';
+        btn.style.transform = 'scale(1.1)';
+        btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+      });
+      btn.addEventListener('mouseleave', () => {
+        if (currentAvatarEmoji !== emojiObj.emoji) {
+          btn.style.borderColor = 'var(--border)';
+          btn.style.transform = 'scale(1)';
+          btn.style.boxShadow = 'none';
+        }
+      });
+      
+      // Click to select
+      btn.addEventListener('click', () => {
+        currentAvatarEmoji = emojiObj.emoji;
+        setAvatarText(emojiObj.emoji);
+        updateAvatarStyle();
+        showToast({ title: '✅ Avatar Updated', msg: `Selected ${emojiObj.name}`, type: 'success', timeout: 1500 });
+        emojiPickerModal.style.display = 'none';
+      });
+      
+      emojiGrid.appendChild(btn);
+    });
+  }
+  
+  // Open emoji picker
+  btnChooseEmoji?.addEventListener('click', () => {
+    if (emojiPickerModal) {
+      emojiPickerModal.style.display = 'flex';
+      populateEmojiGrid(currentEmojiCategory);
+    }
+  });
+  
+  // Close emoji picker
+  btnEmojiClose?.addEventListener('click', () => {
+    if (emojiPickerModal) emojiPickerModal.style.display = 'none';
+  });
+  
+  // Close on backdrop click
+  emojiPickerModal?.addEventListener('click', (e) => {
+    if (e.target === emojiPickerModal) {
+      emojiPickerModal.style.display = 'none';
+    }
+  });
+  
+  // Category tabs
+  document.querySelectorAll('.emoji-category-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const category = tab.dataset.category;
+      currentEmojiCategory = category;
+      
+      // Update tab styles
+      document.querySelectorAll('.emoji-category-tab').forEach(t => {
+        t.style.background = 'var(--bg-2)';
+        t.style.color = 'var(--text)';
+      });
+      tab.style.background = 'var(--accent)';
+      tab.style.color = 'white';
+      
+      // Repopulate grid
+      populateEmojiGrid(category);
+    });
+  });
+  
+  // Random emoji button
+  btnRandomEmoji?.addEventListener('click', () => {
+    const randomEmoji = ALL_AVATAR_EMOJIS[Math.floor(Math.random() * ALL_AVATAR_EMOJIS.length)];
+    currentAvatarEmoji = randomEmoji;
+    setAvatarText(randomEmoji);
+    updateAvatarStyle();
+    showToast({ title: '🎲 Random Avatar', msg: 'Feeling lucky!', type: 'success', timeout: 1500 });
+    emojiPickerModal.style.display = 'none';
+  });
+  
+  // Use initials button
+  btnUseInitials?.addEventListener('click', () => {
+    currentAvatarEmoji = null;
+    const name = displayNameInput?.value?.trim() || '';
+    setAvatarText(generateAvatarText(name));
+    updateAvatarStyle();
+    showToast({ title: '✏️ Using Initials', msg: 'Avatar reset to initials', type: 'success', timeout: 1500 });
+  });
+  // ===== End Emoji Picker System =====
+
 
   // =========================
   // Firebase Live Rooms Integration
@@ -736,10 +1007,12 @@
       let avatarsHTML = '<div style=\"display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px;\">';
       Object.entries(players).slice(0, 6).forEach(([key, player]) => {
         if (player && player.name) {
-          const initials = getInitials(player.name);
+          // Check if player has emoji avatar, otherwise use initials
+          let displayContent = player.avatarEmoji || getInitials(player.name);
+          const fontSize = player.avatarEmoji ? '18px' : '11px';
           const bgColor = getAvatarColor(player.name);
           avatarsHTML += `
-            <div style=\"width: 32px; height: 32px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.2);\" title=\"${player.name}\">${initials}</div>
+            <div style=\"width: 32px; height: 32px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; align-items: center; justify-content: center; font-size: ${fontSize}; font-weight: bold; border: 2px solid var(--bg); box-shadow: 0 2px 4px rgba(0,0,0,0.2);\" title=\"${player.name}\">${displayContent}</div>
           `;
         }
       });
@@ -850,6 +1123,21 @@
         return;
       }
       
+      // Validate report details content
+      if (details && window.ContentFilter) {
+        const validation = window.ContentFilter.validateContent(details, {
+          type: 'report',
+          minLength: 0,
+          maxLength: 500,
+          allowUrls: false,
+          allowEmails: false
+        });
+        if (!validation.valid) {
+          showToast({ title: '❌ Invalid Details', msg: validation.error, type: 'error', timeout: 3000 });
+          return;
+        }
+      }
+      
       // Save report to Firebase (admin can review)
       try {
         if (typeof FirebaseConfig !== 'undefined' && FirebaseConfig.isFirebaseAvailable && FirebaseConfig.isFirebaseAvailable()) {
@@ -916,7 +1204,8 @@
     cleanupLiveRoomsListener();
   });
 
-  // ===== LOCATIONS TAB =====
+  // ===== LOCATIONS TAB ===== (DISABLED - Feature temporarily removed)
+  /*
   // locationsInitialized is defined at top of scope
   let locationsMap = null;
   let currentJourney = null;
@@ -1344,6 +1633,8 @@
     
     openCommunityModal(location.location_name, html);
   }
+  */
+  // ===== END LOCATIONS TAB =====
 
   // ===== CONCEPTS TAB =====
   let flashcardMode = false;
@@ -1625,12 +1916,6 @@
   }
 
   // Initialize new tabs when clicked
-  document.getElementById('tab-locations')?.addEventListener('click', () => {
-    if (!locationsInitialized) {
-      initLocationsTab();
-    }
-  });
-  
   document.getElementById('tab-concepts')?.addEventListener('click', () => {
     if (!conceptsInitialized) {
       initConceptsTab();
@@ -1656,9 +1941,17 @@
       // Reset form
       selectedRating = 0;
       ratingBtns.forEach(b => b.classList.remove('selected'));
-      document.getElementById('feedback-message').value = '';
-      document.getElementById('feedback-email').value = '';
-      document.getElementById('feedback-type').value = 'general';
+      const msgEl = document.getElementById('feedback-message');
+      if (msgEl) msgEl.value = '';
+      const expEl = document.getElementById('feedback-experience');
+      if (expEl) expEl.value = '';
+      
+      // Reset rating selects
+      const selects = ['rating-solo', 'rating-timed', 'rating-challenge', 'rating-study', 'rating-accuracy', 'rating-scenarios', 'rating-online'];
+      selects.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.selectedIndex = 0;
+      });
     });
 
     // Close Modal
@@ -1681,13 +1974,35 @@
     // Submit
     if(btnSubmit) {
       btnSubmit.addEventListener('click', async () => {
-        const type = document.getElementById('feedback-type').value;
         const message = document.getElementById('feedback-message').value.trim();
-        const email = document.getElementById('feedback-email').value.trim();
+        const experience = document.getElementById('feedback-experience')?.value.trim();
+        
+        const ratingSolo = document.getElementById('rating-solo')?.value;
+        const ratingTimed = document.getElementById('rating-timed')?.value;
+        const ratingChallenge = document.getElementById('rating-challenge')?.value;
+        const ratingStudy = document.getElementById('rating-study')?.value;
+        const ratingAccuracy = document.getElementById('rating-accuracy')?.value;
+        const ratingScenarios = document.getElementById('rating-scenarios')?.value;
+        const ratingOnline = document.getElementById('rating-online')?.value;
 
-        if (!message && selectedRating === 0) {
-          showToast({ title: 'Feedback', msg: 'Please provide a rating or a message.', type: 'warn' });
+        if (!message && !experience && selectedRating === 0 && !ratingSolo && !ratingTimed && !ratingChallenge && !ratingStudy && !ratingAccuracy && !ratingScenarios && !ratingOnline) {
+          showToast({ title: getText('feedback'), msg: getText('feedbackPrompt'), type: 'warn' });
           return;
+        }
+        
+        // Validate feedback message content
+        if (message && window.ContentFilter) {
+          const validation = window.ContentFilter.validateContent(message, {
+            type: 'feedback',
+            minLength: 0,
+            maxLength: 1000,
+            allowUrls: false,
+            allowEmails: true
+          });
+          if (!validation.valid) {
+            showToast({ title: '❌ Invalid Feedback', msg: validation.error, type: 'error', timeout: 3000 });
+            return;
+          }
         }
 
         btnSubmit.disabled = true;
@@ -1695,9 +2010,15 @@
 
         const feedbackData = {
           rating: selectedRating,
-          type,
+          experience: experience || null,
+          ratingSolo: ratingSolo || null,
+          ratingTimed: ratingTimed || null,
+          ratingChallenge: ratingChallenge || null,
+          ratingStudy: ratingStudy || null,
+          ratingAccuracy: ratingAccuracy || null,
+          ratingScenarios: ratingScenarios || null,
+          ratingOnline: ratingOnline || null,
           message,
-          email,
           timestamp: new Date().toISOString(),
           userAgent: navigator.userAgent,
           url: window.location.href
@@ -1829,6 +2150,13 @@
         return;
       }
       
+      // Validate player name
+      const nameValidation = validateUsername(playerName);
+      if (!nameValidation.valid) {
+        showToast({ title: '❌ Invalid Name', msg: nameValidation.error, type: 'error', timeout: 3000 });
+        return;
+      }
+      
       if (!currentRoomData) return;
       
       btnJoinConfirm.disabled = true;
@@ -1888,6 +2216,13 @@
       
       if (!hostName) {
         showToast({ title: getText('error'), msg: getText('pleaseEnterName'), type: 'warn' });
+        return;
+      }
+      
+      // Validate host name
+      const nameValidation = validateUsername(hostName);
+      if (!nameValidation.valid) {
+        showToast({ title: '❌ Invalid Name', msg: nameValidation.error, type: 'error', timeout: 3000 });
         return;
       }
       

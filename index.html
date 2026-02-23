@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Who-Bible - Bible People Quiz Challenge</title>
   <meta name="description" content="Learn about Bible people through interactive quizzes. Test your knowledge of biblical characters, their deeds, ages, mothers, and occupations with verse references." />
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
@@ -10,6 +13,7 @@
   <link rel="stylesheet" href="assets/css/styles.css?v=20260110c" />
   <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20260110c" />
   <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20260110c" />
+  <link rel="stylesheet" href="assets/css/report-modal.css?v=20260222" />
   <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20260116" />
   <link rel="stylesheet" href="assets/css/auth.css?v=20260209" />
   
@@ -32,6 +36,8 @@
   <script src="assets/js/locations.js?v=20260110b" defer></script>
   <script src="assets/js/concepts.js?v=20260110b" defer></script>
   <script src="assets/js/relationships.js?v=20260110b" defer></script>
+  <script src="assets/js/content-filter.js?v=20260222" defer></script>
+  <script src="assets/js/reports.js?v=20260222" defer></script>
   <script src="assets/js/translations.js?v=20260110b" defer></script>
   <script src="assets/js/guest-prompts.js?v=20260116" defer></script>
   <script src="assets/js/app.js?v=20260110b" defer></script>
@@ -262,8 +268,8 @@
               <span id="qnum" class="stat-value">1</span>/<span id="qtotal" class="stat-value">10</span>
             </div>
             <div id="challenge-status" class="challenge-status" style="display:none">
-              <div>Player <span id="current-player">1</span>'s Turn</div>
-              <div>P1: <span id="p1-score">0</span> | P2: <span id="p2-score">0</span></div>
+              <div><span id="current-player-turn-name" style="font-weight: 600; color: var(--accent);">Player 1</span>'s Turn</div>
+              <div><span id="p1-name" style="font-weight: 600;">P1</span>: <span id="p1-score">0</span> | <span id="p2-name" style="font-weight: 600;">P2</span>: <span id="p2-score">0</span></div>
             </div>
           </div>
           
@@ -388,7 +394,7 @@
         </div>
         
         <div class="footer-nav">
-          <a id="footer-community" href="community.html" class="footer-link coming-soon" rel="noopener">Community</a>
+          <a id="footer-community" href="community.html" class="footer-link coming-soon" target="_blank" rel="noopener">Community</a>
         </div>
         
         <div class="footer-bottom">
@@ -654,10 +660,6 @@
       <main class="modal-body welcome-body">
         <div class="welcome-hero-icon">📖</div>
         <p class="welcome-intro">We're so glad you're here to explore the Bible with us!</p>
-          <div class="welcome-beta-box" style="background:#fbbf24; color:#222; border-radius:6px; padding:0.75rem 1rem; margin:1rem 0; font-size:1rem; font-weight:500;">
-            <span style="font-weight:bold;">BETA:</span> This app is still in development. Your feedback is always appreciated!<br>
-            <span style="font-size:0.97em; color:#444;">Explore the game to learn more about the Bible.</span>
-          </div>
         
         <div class="welcome-tip-box">
           <div class="tip-icon">💡</div>
@@ -702,14 +704,51 @@
 
         <div class="feedback-grid">
           <div class="feedback-form-group">
-            <label for="rating-modes">Game Modes</label>
-            <select id="rating-modes">
-              <option value="" disabled selected>Select rating...</option>
-              <option value="5">Excellent</option>
-              <option value="4">Good</option>
-              <option value="3">Average</option>
-              <option value="2">Poor</option>
-              <option value="1">Terrible</option>
+            <label for="rating-solo">Solo Mode</label>
+            <select id="rating-solo">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+              <option value="0">Haven't Tried</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-timed">Timed Mode</label>
+            <select id="rating-timed">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+              <option value="0">Haven't Tried</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-challenge">Challenge Mode</label>
+            <select id="rating-challenge">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+              <option value="0">Haven't Tried</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-study">Study Mode</label>
+            <select id="rating-study">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+              <option value="0">Haven't Tried</option>
             </select>
           </div>
           <div class="feedback-form-group">
@@ -724,14 +763,15 @@
             </select>
           </div>
           <div class="feedback-form-group">
-            <label for="rating-scenarios">Scenarios</label>
+            <label for="rating-scenarios">Scenarios Mode</label>
             <select id="rating-scenarios">
-              <option value="" disabled selected>Select rating...</option>
-              <option value="5">Engaging</option>
-              <option value="4">Good</option>
-              <option value="3">Okay</option>
-              <option value="2">Boring</option>
-              <option value="1">Confusing</option>
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐</option>
+              <option value="4">⭐⭐⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="1">⭐</option>
+              <option value="0">Haven't Tried</option>
             </select>
           </div>
           <div class="feedback-form-group">
@@ -756,6 +796,112 @@
       <footer class="feedback-footer">
         <button id="btn-feedback-cancel" class="btn-cancel">Maybe Later</button>
         <button id="btn-feedback-submit" class="btn-submit">Send Feedback</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Report Modal -->
+  <div id="report-modal" class="report-modal" role="dialog" aria-labelledby="report-title" aria-modal="true">
+    <div class="report-content">
+      <header class="report-header">
+        <h2 id="report-title">🚩 Report an Issue</h2>
+        <button id="btn-report-close" class="close-report" aria-label="Close report">✕</button>
+      </header>
+      <main class="report-body">
+        <p class="report-intro">Help us improve Who-Bible by reporting questions or content that may be incorrect, misleading, or poorly worded. Your feedback helps everyone learn more accurately!</p>
+        
+        <div class="question-context">
+          <div class="label">Question:</div>
+          <div class="text" id="report-context-question">Loading...</div>
+        </div>
+
+        <div class="report-section">
+          <label>What's the issue?</label>
+          <div class="report-types">
+            <button class="report-type-btn" data-type="wrong-answer">
+              <span class="icon">❌</span>
+              <span>Answer is incorrect</span>
+            </button>
+            <button class="report-type-btn" data-type="wrong-question">
+              <span class="icon">❓</span>
+              <span>Question is wrong or misleading</span>
+            </button>
+            <button class="report-type-btn" data-type="poor-wording">
+              <span class="icon">📝</span>
+              <span>Poorly worded / confusing</span>
+            </button>
+            <button class="report-type-btn" data-type="biblical-accuracy">
+              <span class="icon">📚</span>
+              <span>Biblical accuracy concern</span>
+            </button>
+            <button class="report-type-btn" data-type="other">
+              <span class="icon">💡</span>
+              <span>Other issue or suggestion</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="report-form-group">
+          <label for="report-details">Additional Details (Optional)</label>
+          <textarea id="report-details" rows="4" placeholder="Please provide any additional context or suggestions to help us understand the issue better..."></textarea>
+        </div>
+      </main>
+      <footer class="report-footer">
+        <button id="btn-report-cancel" class="btn-report-cancel">Cancel</button>
+        <button id="btn-report-submit" class="btn-report-submit">📤 Submit Report</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Report Modal -->
+  <div id="report-modal" class="report-modal" role="dialog" aria-labelledby="report-title" aria-modal="true">
+    <div class="report-content">
+      <header class="report-header">
+        <h2 id="report-title">🚩 Report an Issue</h2>
+        <button id="btn-report-close" class="close-report" aria-label="Close report">✕</button>
+      </header>
+      <main class="report-body">
+        <p class="report-intro">Help us improve Who-Bible by reporting questions or content that may be incorrect, misleading, or poorly worded. Your feedback helps everyone learn more accurately!</p>
+        
+        <div class="question-context">
+          <div class="label">Question:</div>
+          <div class="text" id="report-context-question">Loading...</div>
+        </div>
+
+        <div class="report-section">
+          <label>What's the issue?</label>
+          <div class="report-types">
+            <button class="report-type-btn" data-type="wrong-answer">
+              <span class="icon">❌</span>
+              <span>Answer is incorrect</span>
+            </button>
+            <button class="report-type-btn" data-type="wrong-question">
+              <span class="icon">❓</span>
+              <span>Question is wrong or misleading</span>
+            </button>
+            <button class="report-type-btn" data-type="poor-wording">
+              <span class="icon">📝</span>
+              <span>Poorly worded / confusing</span>
+            </button>
+            <button class="report-type-btn" data-type="biblical-accuracy">
+              <span class="icon">📚</span>
+              <span>Biblical accuracy concern</span>
+            </button>
+            <button class="report-type-btn" data-type="other">
+              <span class="icon">💡</span>
+              <span>Other issue or suggestion</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="report-form-group">
+          <label for="report-details">Additional Details (Optional)</label>
+          <textarea id="report-details" rows="4" placeholder="Please provide any additional context or suggestions to help us understand the issue better..."></textarea>
+        </div>
+      </main>
+      <footer class="report-footer">
+        <button id="btn-report-cancel" class="btn-report-cancel">Cancel</button>
+        <button id="btn-report-submit" class="btn-report-submit">📤 Submit Report</button>
       </footer>
     </div>
   </div>

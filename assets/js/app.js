@@ -161,6 +161,18 @@ function promptForPlayerName() {
         }
         state.currentPlayer = newPlayer;
         savePlayer(newPlayer);
+        
+        // SYNC WITH COMMUNITY PROFILE: Update displayName in communityProfile too
+        try {
+          const profileData = localStorage.getItem('communityProfile');
+          if (profileData) {
+            const profile = JSON.parse(profileData);
+            profile.displayName = name;
+            localStorage.setItem('communityProfile', JSON.stringify(profile));
+          }
+          localStorage.setItem('who-bible-profile-name', name); // For reports
+        } catch(_) {}
+        
         showToast({ title: getText('welcome') || 'Welcome', msg: `${getText('welcomePlayer') || 'Welcome'}, ${newPlayer.name}!`, type: 'success', timeout: 2000 });
         resolve(newPlayer);
       } else {
@@ -280,7 +292,10 @@ const btnPause = document.getElementById('btn-pause');
 const timerEl = document.getElementById('timer');
 // timeRemainingEl is fetched dynamically to avoid stale references if DOM is updated
 const challengeStatusEl = document.getElementById('challenge-status');
-const currentPlayerEl = document.getElementById('current-player');
+const currentPlayerEl = document.getElementById('current-player'); // Legacy - kept for compatibility
+const currentPlayerTurnNameEl = document.getElementById('current-player-turn-name');
+const p1NameEl = document.getElementById('p1-name');
+const p2NameEl = document.getElementById('p2-name');
 const p1ScoreEl = document.getElementById('p1-score');
 const p2ScoreEl = document.getElementById('p2-score');
 const progressBarEl = document.getElementById('progress-bar');
@@ -1062,9 +1077,14 @@ function startChallengeFromModal(){
     { name: name2, score: 0 } 
   ];
   state.currentPlayerIndex = 0;
-  currentPlayerEl.textContent = '1';
-  p1ScoreEl.textContent = '0';
-  p2ScoreEl.textContent = '0';
+  
+  // Update UI with actual player names
+  if (currentPlayerEl) currentPlayerEl.textContent = '1';
+  if (currentPlayerTurnNameEl) currentPlayerTurnNameEl.textContent = name1;
+  if (p1NameEl) p1NameEl.textContent = name1;
+  if (p2NameEl) p2NameEl.textContent = name2;
+  if (p1ScoreEl) p1ScoreEl.textContent = '0';
+  if (p2ScoreEl) p2ScoreEl.textContent = '0';
   
   // Ensure timer is stopped for challenge mode
   stopTimer();
@@ -1515,12 +1535,26 @@ function handleAnswer(choice,q, el){
   // For challenge mode, alternate player each question
   if(state.mode==='challenge'){
     state.currentPlayerIndex = (state.currentPlayerIndex + 1) % 2;
-    currentPlayerEl.textContent = String(state.currentPlayerIndex + 1);
-    const nextName = state.players[state.currentPlayerIndex].name;
-    showToast({ title: getText('challengeTurn', { player: nextName }), msg: getText('challengeTurnMsg', { player: nextName }), type: 'info', timeout: 1200 });
+    const nextPlayer = state.players[state.currentPlayerIndex];
+    
+    // Update both legacy number and actual name
+    if (currentPlayerEl) currentPlayerEl.textContent = String(state.currentPlayerIndex + 1);
+    if (currentPlayerTurnNameEl) currentPlayerTurnNameEl.textContent = nextPlayer.name;
+    
+    showToast({ title: getText('challengeTurn', { player: nextPlayer.name }), msg: getText('challengeTurnMsg', { player: nextPlayer.name }), type: 'info', timeout: 1200 });
   }
-
-  btnNext.disabled = false;
+const [p1, p2] = state.players;
+  if (p1ScoreEl) p1ScoreEl.textContent = String(p1.score);
+  if (p2ScoreEl) p2ScoreEl.textContent = String(p2.score);
+  
+  // Update current player turn display
+  const currentPlayer = state.players[state.currentPlayerIndex];
+  if (currentPlayerTurnNameEl) {
+    currentPlayerTurnNameEl.textContent = currentPlayer.name;
+  }
+  if (currentPlayerEl) {
+    currentPlayerEl.textContent = String(state.currentPlayerIndex + 1); // Legacy compatibility
+  }
 }
 
 function updateChallengeScores(){
@@ -2085,7 +2119,7 @@ function initFeedback() {
     if (msgEl) msgEl.value = '';
     
     // Reset new selects
-    const selects = ['rating-modes', 'rating-accuracy', 'rating-scenarios'];
+    const selects = ['rating-solo', 'rating-timed', 'rating-challenge', 'rating-study', 'rating-accuracy', 'rating-scenarios', 'rating-online'];
     selects.forEach(id => {
       const el = document.getElementById(id);
       if(el) el.selectedIndex = 0;
@@ -2159,12 +2193,15 @@ function initFeedback() {
       const message = document.getElementById('feedback-message').value.trim();
       const experience = document.getElementById('feedback-experience')?.value.trim();
       
-      const ratingModes = document.getElementById('rating-modes')?.value;
+      const ratingSolo = document.getElementById('rating-solo')?.value;
+      const ratingTimed = document.getElementById('rating-timed')?.value;
+      const ratingChallenge = document.getElementById('rating-challenge')?.value;
+      const ratingStudy = document.getElementById('rating-study')?.value;
       const ratingAccuracy = document.getElementById('rating-accuracy')?.value;
       const ratingScenarios = document.getElementById('rating-scenarios')?.value;
       const ratingOnline = document.getElementById('rating-online')?.value;
 
-      if (!message && !experience && selectedRating === 0 && !ratingModes && !ratingAccuracy && !ratingScenarios && !ratingOnline) {
+      if (!message && !experience && selectedRating === 0 && !ratingSolo && !ratingTimed && !ratingChallenge && !ratingStudy && !ratingAccuracy && !ratingScenarios && !ratingOnline) {
         showToast({ title: getText('feedback'), msg: getText('feedbackPrompt'), type: 'warn' });
         return;
       }
@@ -2175,7 +2212,10 @@ function initFeedback() {
       const feedbackData = {
         rating: selectedRating,
         experience: experience || null,
-        ratingModes: ratingModes || null,
+        ratingSolo: ratingSolo || null,
+        ratingTimed: ratingTimed || null,
+        ratingChallenge: ratingChallenge || null,
+        ratingStudy: ratingStudy || null,
         ratingAccuracy: ratingAccuracy || null,
         ratingScenarios: ratingScenarios || null,
         ratingOnline: ratingOnline || null,

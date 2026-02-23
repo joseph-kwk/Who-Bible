@@ -433,10 +433,12 @@ function updateAllText() {
     const t = document.getElementById('time-remaining')?.textContent || '0';
     timerLabelEl.innerHTML = `${getText('time')}: <span id="time-remaining">${t}</span>s`;
   }
-  const challengePlayerLabel = document.querySelector('#challenge-status .small:nth-child(1)');
+  const challengePlayerLabel = document.querySelector('#challenge-status > div:first-child');
   if (challengePlayerLabel) {
-    const cp = document.getElementById('current-player')?.textContent || '1';
-    challengePlayerLabel.innerHTML = `${getText('player')}: <span id="current-player">${cp}</span>`;
+    // Get current player name from the span
+    const turnNameEl = document.getElementById('current-player-turn-name');
+    const playerName = turnNameEl?.textContent || 'Player 1';
+    challengePlayerLabel.innerHTML = `<span id="current-player-turn-name" style="font-weight: 600; color: var(--accent);">${playerName}</span>'s ${getText('turn') || 'Turn'}`;
   }
   
   // Update people count
@@ -590,17 +592,16 @@ function updateAllText() {
   const feedbackMessage = document.getElementById('feedback-message');
   if (feedbackMessage) feedbackMessage.placeholder = getText('feedbackPlaceholder');
   
-  // Update feedback select options - Game Modes
-  const ratingModes = document.getElementById('rating-modes');
-  if (ratingModes) {
-    const options = ratingModes.querySelectorAll('option');
-    if (options[0]) options[0].textContent = getText('feedbackSelectRating');
-    if (options[1]) options[1].textContent = getText('feedbackExcellent');
-    if (options[2]) options[2].textContent = getText('feedbackGood');
-    if (options[3]) options[3].textContent = getText('feedbackAverage');
-    if (options[4]) options[4].textContent = getText('feedbackPoor');
-    if (options[5]) options[5].textContent = getText('feedbackTerrible');
-  }
+  // Update feedback select options for game modes (all use star ratings)
+  const modeSelects = ['rating-solo', 'rating-timed', 'rating-challenge', 'rating-study', 'rating-scenarios'];
+  modeSelects.forEach(id => {
+    const select = document.getElementById(id);
+    if (select && select.options[0]) {
+      select.options[0].textContent = getText('feedbackRateIt');
+      // Star ratings don't need translation
+      if (select.options[6]) select.options[6].textContent = getText('feedbackHaventTried');
+    }
+  });
   
   // Update feedback select options - Question Accuracy
   const ratingAccuracy = document.getElementById('rating-accuracy');

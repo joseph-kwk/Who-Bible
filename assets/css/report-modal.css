@@ -1,0 +1,258 @@
+/* Report Modal Styles */
+.report-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.report-modal.show {
+  display: flex;
+}
+
+.report-content {
+  background: var(--card);
+  border-radius: 16px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--border);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 16px;
+  border-bottom: 2px solid var(--border);
+}
+
+.report-header h2 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.close-report {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.close-report:hover {
+  background: var(--bg-2);
+  color: var(--text);
+}
+
+.report-body {
+  padding: 24px;
+}
+
+.report-intro {
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.report-section {
+  margin-bottom: 20px;
+}
+
+.report-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.report-types {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.report-type-btn {
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.report-type-btn:hover {
+  background: var(--bg-2);
+  border-color: var(--accent);
+}
+
+.report-type-btn.selected {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.3);
+}
+
+.report-type-btn .icon {
+  font-size: 20px;
+}
+
+.report-form-group {
+  margin-bottom: 20px;
+}
+
+.report-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.report-form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.report-form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.report-footer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 2px solid var(--border);
+  background: var(--bg-2);
+  border-radius: 0 0 16px 16px;
+}
+
+.report-footer button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+.btn-report-submit {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-report-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-report-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-report-cancel {
+  background: var(--bg);
+  color: var(--text);
+  border: 2px solid var(--border);
+}
+
+.btn-report-cancel:hover {
+  background: var(--bg-3);
+}
+
+.question-context {
+  background: var(--bg-2);
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid var(--accent);
+  margin-bottom: 20px;
+}
+
+.question-context .label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.question-context .text {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .report-content {
+    max-width: 95%;
+    max-height: 90vh;
+  }
+  
+  .report-header,
+  .report-body {
+    padding: 20px 16px;
+  }
+  
+  .report-footer {
+    flex-direction: column;
+    padding: 16px;
+  }
+  
+  .report-footer button {
+    width: 100%;
+  }
+}

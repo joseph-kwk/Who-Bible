@@ -574,6 +574,47 @@
         </table>
       </div>
     </div>
+
+    <!-- Reports Section -->
+    <div class="table-container" style="margin-top: 32px;">
+      <div class="table-header">
+        <h3>🚩 Content Reports</h3>
+        <div class="filter-controls">
+          <select id="report-status-filter">
+            <option value="">All Reports</option>
+            <option value="pending">🕐 Pending</option>
+            <option value="reviewed">✓ Reviewed</option>
+            <option value="resolved">✅ Resolved</option>
+            <option value="dismissed">❌ Dismissed</option>
+          </select>
+          <select id="report-type-filter">
+            <option value="">All Types</option>
+            <option value="wrong-answer">❌ Wrong Answer</option>
+            <option value="wrong-question">❓ Wrong Question</option>
+            <option value="poor-wording">📝 Poor Wording</option>
+            <option value="biblical-accuracy">📚 Biblical Accuracy</option>
+            <option value="other">💡 Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="feedback-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Question</th>
+              <th>Details</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reports-list">
+            <tr><td colspan="6" class="loading" style="text-align:center">Loading reports...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1112,6 +1153,193 @@
       chartAccuracy = makeOrUpdateChart(document.getElementById('chart-accuracy'), accuracy, 'Accuracy', chartAccuracy);
       chartScenarios = makeOrUpdateChart(document.getElementById('chart-scenarios'), scenarios, 'Scenarios', chartScenarios);
     }
+
+    // ===== REPORTS MANAGEMENT =====
+    let allReports = [];
+
+    async function loadReports() {
+      try {
+        const reportsList = document.getElementById('reports-list');
+        reportsList.innerHTML = '<tr><td colspan="6" class="loading" style="text-align:center">Loading reports...</td></tr>';
+
+        // Try loading from Firebase
+        const reportsSnap = await database.ref('reports').once('value');
+        allReports = [];
+        
+        if (reportsSnap.exists()) {
+          reportsSnap.forEach(snap => {
+            allReports.push({ id: snap.key, ...snap.val() });
+          });
+        }
+
+        // Also check localStorage for fallback reports
+        try {
+          const localReports = JSON.parse(localStorage.getItem('who-bible-reports') || '[]');
+          localReports.forEach(report => {
+            if (!allReports.find(r => r.id === report.id)) {
+              allReports.push(report);
+            }
+          });
+        } catch (e) {
+          console.warn('Could not load local reports:', e);
+        }
+
+        // Sort by timestamp (newest first)
+        allReports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        renderReports(allReports);
+        
+        // Setup filter listeners
+        document.getElementById('report-status-filter')?.addEventListener('change', filterReports);
+        document.getElementById('report-type-filter')?.addEventListener('change', filterReports);
+      } catch (error) {
+        console.error('Error loading reports:', error);
+        document.getElementById('reports-list').innerHTML = 
+          '<tr><td colspan="6" style="text-align:center; color: var(--error)">Error loading reports</td></tr>';
+      }
+    }
+
+    function filterReports() {
+      const statusFilter = document.getElementById('report-status-filter')?.value || '';
+      const typeFilter = document.getElementById('report-type-filter')?.value || '';
+      
+      let filtered = allReports;
+      
+      if (statusFilter) {
+        filtered = filtered.filter(r => r.status === statusFilter);
+      }
+      
+      if (typeFilter) {
+        filtered = filtered.filter(r => r.type === typeFilter);
+      }
+      
+      renderReports(filtered);
+    }
+
+    function renderReports(reports) {
+      const reportsList = document.getElementById('reports-list');
+      
+      if (reports.length === 0) {
+        reportsList.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--muted)">No reports found</td></tr>';
+        return;
+      }
+
+      const typeIcons = {
+        'wrong-answer': '❌',
+        'wrong-question': '❓',
+        'poor-wording': '📝',
+        'biblical-accuracy': '📚',
+        'other': '💡'
+      };
+
+      const statusBadges = {
+        'pending': '<span style="padding: 4px 8px; background: #ffc107; color: #000; border-radius: 4px; font-size: 11px; font-weight: 600;">🕐 PENDING</span>',
+        'reviewed': '<span style="padding: 4px 8px; background: #17a2b8; color: #fff; border-radius: 4px; font-size: 11px; font-weight: 600;">👀 REVIEWED</span>',
+        'resolved': '<span style="padding: 4px 8px; background: #28a745; color: #fff; border-radius: 4px; font-size: 11px; font-weight: 600;">✅ RESOLVED</span>',
+        'dismissed': '<span style="padding: 4px 8px; background: #6c757d; color: #fff; border-radius: 4px; font-size: 11px; font-weight: 600;">❌ DISMISSED</span>'
+      };
+
+      reportsList.innerHTML = reports.map(report => {
+        const date = new Date(report.timestamp).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        const icon = typeIcons[report.type] || '📋';
+        const status = report.status || 'pending';
+        const badge = statusBadges[status] || statusBadges.pending;
+        const question = report.context?.question || 'No context';
+        const details = report.details || '<em style="color: var(--muted)">No additional details</em>';
+        
+        return `
+          <tr>
+            <td style="white-space: nowrap">${date}</td>
+            <td style="text-align: center; font-size: 18px;" title="${report.typeLabel || report.type}">${icon}</td>
+            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;" title="${question}">${question}</td>
+            <td style="max-width: 250px;">${details}</td>
+            <td>${badge}</td>
+            <td style="white-space: nowrap">
+              ${status === 'pending' ? `
+                <button onclick="updateReportStatus('${report.id}', 'reviewed')" style="padding: 4px 8px; margin: 0 2px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">Review</button>
+                <button onclick="updateReportStatus('${report.id}', 'resolved')" style="padding: 4px 8px; margin: 0 2px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">Resolve</button>
+                <button onclick="updateReportStatus('${report.id}', 'dismissed')" style="padding: 4px 8px; margin: 0 2px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">Dismiss</button>
+              ` : `
+                <button onclick="viewReportDetails('${report.id}')" style="padding: 4px 8px; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">View</button>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function updateReportStatus(reportId, newStatus) {
+      try {
+        // Update in Firebase
+        await database.ref(`reports/${reportId}/status`).set(newStatus);
+        
+        // Update local array
+        const report = allReports.find(r => r.id === reportId);
+        if (report) {
+          report.status = newStatus;
+        }
+        
+        // Re-render
+        filterReports();
+        
+        alert(`Report marked as ${newStatus}`);
+      } catch (error) {
+        console.error('Error updating report:', error);
+        alert('Failed to update report status');
+      }
+    }
+
+    function viewReportDetails(reportId) {
+      const report = allReports.find(r => r.id === reportId);
+      if (!report) return;
+      
+      const details = `
+Report ID: ${reportId}
+Type: ${report.typeLabel || report.type}
+Status: ${report.status || 'pending'}
+Date: ${new Date(report.timestamp).toLocaleString()}
+
+Question:
+${report.context?.question || 'N/A'}
+
+Details:
+${report.details || 'No additional details provided'}
+
+Answer Choices:
+${report.context?.answers?.join('\n') || 'N/A'}
+      `.trim();
+      
+      alert(details);
+    }
+
+    // Make functions globally accessible
+    window.updateReportStatus = updateReportStatus;
+    window.viewReportDetails = viewReportDetails;
+
+    // Load reports when authenticated
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // ... existing auth code ...
+        // Add reports loading
+        setTimeout(() => loadReports(), 1000);
+      }
+    });
+  </script>
+
+  <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px; background: var(--bg, #0a0e27); border-top: 2px solid var(--border, #1f2235); text-align: center; font-size: 12px; color: var(--muted, #8892b0); z-index: 100;">
+    <p style="margin: 0;">© <span id="admin-footer-year"></span> Who-Bible Admin | <a href="index.html" style="color: var(--accent, #64ffda); text-decoration: none;">Return to Main App</a></p>
+  </footer>
+  
+  <script>
+    // Set current year in footer
+    const adminFooterYear = document.getElementById('admin-footer-year');
+    if (adminFooterYear) adminFooterYear.textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
