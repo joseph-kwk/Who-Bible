@@ -2105,13 +2105,22 @@ function initFeedback() {
   }
 
   let selectedRating = 0;
+  let scrollPosition = 0; // Store scroll position
 
   // Open Modal
   const openFeedback = () => {
     console.log('[Feedback] Opening feedback modal...');
+    // Save current scroll position before locking
+    scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // Show modal
     modal.style.display = 'flex';
     modal.classList.add('show');
-    document.body.classList.add('modal-open'); // Prevent body scroll
+    
+    // Lock body scroll and maintain position
+    document.body.classList.add('modal-open');
+    document.body.style.top = `-${scrollPosition}px`;
+    
     // Reset form
     selectedRating = 0;
     ratingBtns.forEach(b => b.classList.remove('selected'));
@@ -2119,7 +2128,7 @@ function initFeedback() {
     if (msgEl) msgEl.value = '';
     
     // Reset new selects
-    const selects = ['rating-solo', 'rating-timed', 'rating-challenge', 'rating-study', 'rating-accuracy', 'rating-scenarios', 'rating-online'];
+    const selects = ['rating-solo', 'rating-timed', 'rating-challenge', 'rating-study', 'rating-accuracy', 'rating-scenarios', 'rating-online', 'rating-classroom'];
     selects.forEach(id => {
       const el = document.getElementById(id);
       if(el) el.selectedIndex = 0;
@@ -2167,7 +2176,14 @@ function initFeedback() {
   // Close Modal
   const close = () => {
     modal.classList.remove('show');
-    document.body.classList.remove('modal-open'); // Restore body scroll
+    
+    // Restore body scroll
+    document.body.classList.remove('modal-open');
+    document.body.style.top = '';
+    
+    // Restore scroll position
+    window.scrollTo(0, scrollPosition);
+    
     setTimeout(() => {
       modal.style.display = 'none';
     }, 300); // Wait for animation
@@ -2200,8 +2216,9 @@ function initFeedback() {
       const ratingAccuracy = document.getElementById('rating-accuracy')?.value;
       const ratingScenarios = document.getElementById('rating-scenarios')?.value;
       const ratingOnline = document.getElementById('rating-online')?.value;
+      const ratingClassroom = document.getElementById('rating-classroom')?.value;
 
-      if (!message && !experience && selectedRating === 0 && !ratingSolo && !ratingTimed && !ratingChallenge && !ratingStudy && !ratingAccuracy && !ratingScenarios && !ratingOnline) {
+      if (!message && !experience && selectedRating === 0 && !ratingSolo && !ratingTimed && !ratingChallenge && !ratingStudy && !ratingAccuracy && !ratingScenarios && !ratingOnline && !ratingClassroom) {
         showToast({ title: getText('feedback'), msg: getText('feedbackPrompt'), type: 'warn' });
         return;
       }
@@ -2219,6 +2236,7 @@ function initFeedback() {
         ratingAccuracy: ratingAccuracy || null,
         ratingScenarios: ratingScenarios || null,
         ratingOnline: ratingOnline || null,
+        ratingClassroom: ratingClassroom || null,
         message,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,

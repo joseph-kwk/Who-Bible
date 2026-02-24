@@ -210,6 +210,38 @@ const DEFAULT_EN = {
   haveFunLearning: "Have fun learning & growing!",
   letsPlay: "Let's Play!",
   feedbackLove: "We'd love your feedback!",
+  feedbackIntro: "Help us improve Who-Bible by sharing your thoughts.",
+  feedbackOverallExp: "Overall Experience",
+  feedbackOverallQuestion: "How do you feel about the app overall?",
+  feedbackOverallPlaceholder: "Tell us about your experience with Who-Bible...",
+  feedbackGameModes: "Game Modes",
+  feedbackQuestionAccuracy: "Question Accuracy",
+  feedbackScenarios: "Scenarios",
+  feedbackPlayingOnline: "Playing Online with Friends",
+  feedbackCommentsSuggestions: "Comments / Suggestions",
+  feedbackPlaceholder: "Any specific feedback?",
+  feedbackMaybeLater: "Maybe Later",
+  feedbackSelectRating: "Select rating...",
+  feedbackRateIt: "Rate it...",
+  feedbackExcellent: "Excellent",
+  feedbackGood: "Good",
+  feedbackAverage: "Average",
+  feedbackPoor: "Poor",
+  feedbackTerrible: "Terrible",
+  feedbackAccurate: "Accurate",
+  feedbackMostlyAccurate: "Mostly Accurate",
+  feedbackOkay: "Okay",
+  feedbackInaccurate: "Inaccurate",
+  feedbackVeryInaccurate: "Very Inaccurate",
+  feedbackEngaging: "Engaging",
+  feedbackBoring: "Boring",
+  feedbackConfusing: "Confusing",
+  feedbackAmazing: "Amazing!",
+  feedbackWorksGreat: "Works Great",
+  feedbackWorksOK: "Works OK",
+  feedbackHadIssues: "Had Issues",
+  feedbackDidntWork: "Didn't Work",
+  feedbackHaventTried: "Haven't Tried",
   genderFilter: "Gender",
   allGenders: "All",
   male: "Male",
@@ -567,83 +599,63 @@ function updateAllText() {
 
   // Update Feedback Modal title
   const feedbackTitle = document.getElementById('feedback-title');
-  if (feedbackTitle) feedbackTitle.textContent = getText('feedbackLove');
-  
-  // Update Feedback Modal content
+  if (feedbackTitle) {
+    // Preserve logo if present (community.html has a logo in the title)
+    const logoImg = feedbackTitle.querySelector('img');
+    const titleSpan = feedbackTitle.querySelector('span');
+    if (titleSpan) {
+      titleSpan.textContent = getText('feedbackLove');
+    } else if (!logoImg) {
+      feedbackTitle.textContent = getText('feedbackLove');
+    }
+  }
+
+  // Update Feedback Modal content using specific selectors (NOT index-based)
   const feedbackIntro = document.querySelector('.feedback-intro');
   if (feedbackIntro) feedbackIntro.textContent = getText('feedbackIntro');
-  
-  // Update feedback section labels
+
+  // Update "Overall Experience" section label (first .feedback-section label)
   const feedbackSections = document.querySelectorAll('.feedback-section label');
   if (feedbackSections[0]) feedbackSections[0].textContent = getText('feedbackOverallExp');
-  
-  const feedbackFormGroups = document.querySelectorAll('.feedback-form-group label');
-  if (feedbackFormGroups[0]) feedbackFormGroups[0].textContent = getText('feedbackOverallQuestion');
-  if (feedbackFormGroups[1]) feedbackFormGroups[1].textContent = getText('feedbackGameModes');
-  if (feedbackFormGroups[2]) feedbackFormGroups[2].textContent = getText('feedbackQuestionAccuracy');
-  if (feedbackFormGroups[3]) feedbackFormGroups[3].textContent = getText('feedbackScenarios');
-  if (feedbackFormGroups[4]) feedbackFormGroups[4].textContent = getText('feedbackPlayingOnline');
-  if (feedbackFormGroups[5]) feedbackFormGroups[5].textContent = getText('feedbackCommentsSuggestions');
-  
+
+  // Update only the specific labels that have translation keys — use label[for="id"] selectors
+  const labelExperience = document.querySelector('label[for="feedback-experience"]');
+  if (labelExperience) labelExperience.textContent = getText('feedbackOverallQuestion');
+
+  const labelMessage = document.querySelector('label[for="feedback-message"]');
+  if (labelMessage) labelMessage.textContent = getText('feedbackCommentsSuggestions');
+
   // Update feedback textarea placeholders
   const feedbackExperience = document.getElementById('feedback-experience');
   if (feedbackExperience) feedbackExperience.placeholder = getText('feedbackOverallPlaceholder');
-  
+
   const feedbackMessage = document.getElementById('feedback-message');
   if (feedbackMessage) feedbackMessage.placeholder = getText('feedbackPlaceholder');
-  
-  // Update feedback select options for game modes (all use star ratings)
-  const modeSelects = ['rating-solo', 'rating-timed', 'rating-challenge', 'rating-study', 'rating-scenarios'];
+
+  // Update first option (placeholder) for all star-rating game mode selects
+  const modeSelects = ['rating-solo', 'rating-timed', 'rating-challenge', 'rating-study', 'rating-scenarios', 'rating-online', 'rating-classroom'];
   modeSelects.forEach(id => {
     const select = document.getElementById(id);
     if (select && select.options[0]) {
       select.options[0].textContent = getText('feedbackRateIt');
-      // Star ratings don't need translation
-      if (select.options[6]) select.options[6].textContent = getText('feedbackHaventTried');
+      // "Haven't Tried" is last option
+      const lastOption = select.options[select.options.length - 1];
+      if (lastOption && lastOption.value === '0') {
+        lastOption.textContent = getText('feedbackHaventTried');
+      }
     }
   });
-  
-  // Update feedback select options - Question Accuracy
+
+  // Update feedback select - Question Accuracy (different scale)
   const ratingAccuracy = document.getElementById('rating-accuracy');
-  if (ratingAccuracy) {
-    const options = ratingAccuracy.querySelectorAll('option');
-    if (options[0]) options[0].textContent = getText('feedbackSelectRating');
-    if (options[1]) options[1].textContent = getText('feedbackAccurate');
-    if (options[2]) options[2].textContent = getText('feedbackMostlyAccurate');
-    if (options[3]) options[3].textContent = getText('feedbackOkay');
-    if (options[4]) options[4].textContent = getText('feedbackInaccurate');
-    if (options[5]) options[5].textContent = getText('feedbackVeryInaccurate');
+  if (ratingAccuracy && ratingAccuracy.options[0]) {
+    ratingAccuracy.options[0].textContent = getText('feedbackRateIt');
   }
-  
-  // Update feedback select options - Scenarios
-  const ratingScenarios = document.getElementById('rating-scenarios');
-  if (ratingScenarios) {
-    const options = ratingScenarios.querySelectorAll('option');
-    if (options[0]) options[0].textContent = getText('feedbackSelectRating');
-    if (options[1]) options[1].textContent = getText('feedbackEngaging');
-    if (options[2]) options[2].textContent = getText('feedbackGood');
-    if (options[3]) options[3].textContent = getText('feedbackOkay');
-    if (options[4]) options[4].textContent = getText('feedbackBoring');
-    if (options[5]) options[5].textContent = getText('feedbackConfusing');
-  }
-  
-  // Update feedback select options - Online Play
-  const ratingOnline = document.getElementById('rating-online');
-  if (ratingOnline) {
-    const options = ratingOnline.querySelectorAll('option');
-    if (options[0]) options[0].textContent = getText('feedbackSelectRating');
-    if (options[1]) options[1].textContent = getText('feedbackAmazing');
-    if (options[2]) options[2].textContent = getText('feedbackWorksGreat');
-    if (options[3]) options[3].textContent = getText('feedbackWorksOK');
-    if (options[4]) options[4].textContent = getText('feedbackHadIssues');
-    if (options[5]) options[5].textContent = getText('feedbackDidntWork');
-    if (options[6]) options[6].textContent = getText('feedbackHaventTried');
-  }
-  
+
   // Update feedback buttons
   const btnFeedbackCancel = document.getElementById('btn-feedback-cancel');
   if (btnFeedbackCancel) btnFeedbackCancel.textContent = getText('feedbackMaybeLater');
-  
+
   const btnFeedbackSubmit = document.getElementById('btn-feedback-submit');
   if (btnFeedbackSubmit) btnFeedbackSubmit.textContent = getText('sendFeedback');
 

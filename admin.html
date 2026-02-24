@@ -563,7 +563,7 @@
             <tr>
               <th>Date</th>
               <th>Rating</th>
-              <th>Details</th>
+              <th style="min-width: 200px;">Game Mode Ratings</th>
               <th>Message</th>
               <th>Actions</th>
             </tr>
@@ -816,20 +816,30 @@
         const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
         const ratingClass = `rating-${item.rating || 0}`;
         const ratingLabel = item.rating ? `${item.rating} ★` : 'N/A';
+        
+        // Build detailed ratings display
         let details = [];
-        if(item.ratingModes) details.push(`🎮 ${item.ratingModes}/5`);
-        if(item.ratingAccuracy) details.push(`✓ ${item.ratingAccuracy}/5`);
-        if(item.ratingScenarios) details.push(`📖 ${item.ratingScenarios}/5`);
-        if(item.ratingOnline) details.push(`👥 ${item.ratingOnline}/5`);
+        if(item.ratingSolo) details.push(`Solo: ${item.ratingSolo}⭐`);
+        if(item.ratingTimed) details.push(`Timed: ${item.ratingTimed}⭐`);
+        if(item.ratingChallenge) details.push(`Challenge: ${item.ratingChallenge}⭐`);
+        if(item.ratingStudy) details.push(`Study: ${item.ratingStudy}⭐`);
+        if(item.ratingScenarios) details.push(`Scenarios: ${item.ratingScenarios}⭐`);
+        if(item.ratingOnline) details.push(`Remote: ${item.ratingOnline}⭐`);
+        if(item.ratingClassroom) details.push(`Classroom: ${item.ratingClassroom}⭐`);
+        if(item.ratingAccuracy) details.push(`Accuracy: ${item.ratingAccuracy}⭐`);
+        
         const safeMessage = item.message ? item.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
-        const truncatedMsg = safeMessage.length > 150 ? safeMessage.substring(0, 150) + '...' : safeMessage;
+        const safeExperience = item.experience ? item.experience.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+        const fullMessage = [safeExperience, safeMessage].filter(Boolean).join(' | ');
+        const truncatedMsg = fullMessage.length > 150 ? fullMessage.substring(0, 150) + '...' : fullMessage;
+        
         const trash = `<button class="delete-btn" data-key="${item._key}" title="Delete this feedback" aria-label="Delete"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="9" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="13" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="3" y="6" width="14" height="2" rx="1" fill="#ef4444"/><rect x="7" y="2" width="6" height="2" rx="1" fill="#ef4444"/></svg></button>`;
         return `
           <tr>
             <td class="timestamp">${dateStr}</td>
             <td><span class="rating-badge ${ratingClass}">${ratingLabel}</span></td>
-            <td>
-              ${details.length ? `<div class="detail-row">${details.join(' • ')}</div>` : '<span style="color:var(--muted)">—</span>'}
+            <td style="font-size: 0.85em; line-height: 1.4;">
+              ${details.length ? details.join('<br>') : '<span style="color:var(--muted)">—</span>'}
             </td>
             <td style="max-width: 400px;">${truncatedMsg || '<span style="color:var(--muted)">No message provided</span>'}</td>
             <td>${trash}</td>

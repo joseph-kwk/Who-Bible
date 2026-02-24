@@ -8,14 +8,17 @@
   <meta http-equiv="Expires" content="0" />
   <title>Who-Bible - Bible People Quiz Challenge</title>
   <meta name="description" content="Learn about Bible people through interactive quizzes. Test your knowledge of biblical characters, their deeds, ages, mothers, and occupations with verse references." />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260110c" />
-  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20260110c" />
-  <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20260110c" />
-  <link rel="stylesheet" href="assets/css/report-modal.css?v=20260222" />
-  <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20260116" />
-  <link rel="stylesheet" href="assets/css/auth.css?v=20260209" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260224152030" />
+  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20260224152030" />
+  <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20260224154500" />
+  <link rel="stylesheet" href="assets/css/report-modal.css?v=20260224152030" />
+  <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20260224152030" />
+  <link rel="stylesheet" href="assets/css/auth.css?v=20260224152030" />
   
   <!-- Firebase SDK (Compat for remote-challenge.js) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -34,13 +37,13 @@
   <script src="assets/js/remote-challenge-ui.js?v=20260110b"></script>
   <script src="assets/js/scenarios.js?v=20260110b" defer></script>
   <script src="assets/js/locations.js?v=20260110b" defer></script>
-  <script src="assets/js/concepts.js?v=20260110b" defer></script>
-  <script src="assets/js/relationships.js?v=20260110b" defer></script>
-  <script src="assets/js/content-filter.js?v=20260222" defer></script>
-  <script src="assets/js/reports.js?v=20260222" defer></script>
-  <script src="assets/js/translations.js?v=20260110b" defer></script>
-  <script src="assets/js/guest-prompts.js?v=20260116" defer></script>
-  <script src="assets/js/app.js?v=20260110b" defer></script>
+  <script src="assets/js/concepts.js?v=20260224151039" defer></script>
+  <script src="assets/js/relationships.js?v=20260224151039" defer></script>
+  <script src="assets/js/content-filter.js?v=20260224151039" defer></script>
+  <script src="assets/js/reports.js?v=20260224151039" defer></script>
+  <script src="assets/js/translations.js?v=20260224154000" defer></script>
+  <script src="assets/js/guest-prompts.js?v=20260224151039" defer></script>
+  <script src="assets/js/app.js?v=20260224151039" defer></script>
 </head>
 <body>
   <!-- Skip to main content link for keyboard navigation -->
@@ -702,88 +705,107 @@
           <textarea id="feedback-experience" rows="2" placeholder="Tell us about your experience with Who-Bible..."></textarea>
         </div>
 
+        <div class="feedback-section">
+          <label style="color: var(--accent-2); font-size: 1.1rem; margin-bottom: 1rem; display: block; text-align: center;">📊 Rate Each Game Mode</label>
+          <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            Help us improve by rating the modes you've tried
+          </p>
+        </div>
+
         <div class="feedback-grid">
           <div class="feedback-form-group">
-            <label for="rating-solo">Solo Mode</label>
+            <label for="rating-solo">🎯 Solo Mode (Classic)</label>
             <select id="rating-solo">
               <option value="" disabled selected>Rate it...</option>
-              <option value="5">⭐⭐⭐⭐⭐</option>
-              <option value="4">⭐⭐⭐⭐</option>
-              <option value="3">⭐⭐⭐</option>
-              <option value="2">⭐⭐</option>
-              <option value="1">⭐</option>
+              <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+              <option value="4">⭐⭐⭐⭐ Good</option>
+              <option value="3">⭐⭐⭐ Okay</option>
+              <option value="2">⭐⭐ Needs Work</option>
+              <option value="1">⭐ Poor</option>
               <option value="0">Haven't Tried</option>
             </select>
           </div>
           <div class="feedback-form-group">
-            <label for="rating-timed">Timed Mode</label>
+            <label for="rating-timed">⏱️ Timed Mode</label>
             <select id="rating-timed">
               <option value="" disabled selected>Rate it...</option>
-              <option value="5">⭐⭐⭐⭐⭐</option>
-              <option value="4">⭐⭐⭐⭐</option>
-              <option value="3">⭐⭐⭐</option>
-              <option value="2">⭐⭐</option>
-              <option value="1">⭐</option>
+              <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+              <option value="4">⭐⭐⭐⭐ Good</option>
+              <option value="3">⭐⭐⭐ Okay</option>
+              <option value="2">⭐⭐ Needs Work</option>
+              <option value="1">⭐ Poor</option>
               <option value="0">Haven't Tried</option>
             </select>
           </div>
           <div class="feedback-form-group">
-            <label for="rating-challenge">Challenge Mode</label>
+            <label for="rating-challenge">⚔️ Challenge Mode (2-Player)</label>
             <select id="rating-challenge">
               <option value="" disabled selected>Rate it...</option>
-              <option value="5">⭐⭐⭐⭐⭐</option>
-              <option value="4">⭐⭐⭐⭐</option>
-              <option value="3">⭐⭐⭐</option>
-              <option value="2">⭐⭐</option>
-              <option value="1">⭐</option>
+              <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+              <option value="4">⭐⭐⭐⭐ Good</option>
+              <option value="3">⭐⭐⭐ Okay</option>
+              <option value="2">⭐⭐ Needs Work</option>
+              <option value="1">⭐ Poor</option>
               <option value="0">Haven't Tried</option>
             </select>
           </div>
           <div class="feedback-form-group">
-            <label for="rating-study">Study Mode</label>
+            <label for="rating-study">🔍 Study Mode</label>
             <select id="rating-study">
               <option value="" disabled selected>Rate it...</option>
-              <option value="5">⭐⭐⭐⭐⭐</option>
-              <option value="4">⭐⭐⭐⭐</option>
-              <option value="3">⭐⭐⭐</option>
-              <option value="2">⭐⭐</option>
-              <option value="1">⭐</option>
+              <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+              <option value="4">⭐⭐⭐⭐ Good</option>
+              <option value="3">⭐⭐⭐ Okay</option>
+              <option value="2">⭐⭐ Needs Work</option>
+              <option value="1">⭐ Poor</option>
               <option value="0">Haven't Tried</option>
             </select>
           </div>
           <div class="feedback-form-group">
-            <label for="rating-accuracy">Question Accuracy</label>
-            <select id="rating-accuracy">
-              <option value="" disabled selected>Select rating...</option>
-              <option value="5">Accurate</option>
-              <option value="4">Mostly Accurate</option>
-              <option value="3">Okay</option>
-              <option value="2">Inaccurate</option>
-              <option value="1">Very Inaccurate</option>
-            </select>
-          </div>
-          <div class="feedback-form-group">
-            <label for="rating-scenarios">Scenarios Mode</label>
+            <label for="rating-scenarios">🎭 Scenarios Mode</label>
             <select id="rating-scenarios">
               <option value="" disabled selected>Rate it...</option>
-              <option value="5">⭐⭐⭐⭐⭐</option>
-              <option value="4">⭐⭐⭐⭐</option>
-              <option value="3">⭐⭐⭐</option>
-              <option value="2">⭐⭐</option>
-              <option value="1">⭐</option>
+              <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+              <option value="4">⭐⭐⭐⭐ Good</option>
+              <option value="3">⭐⭐⭐ Okay</option>
+              <option value="2">⭐⭐ Needs Work</option>
+              <option value="1">⭐ Poor</option>
               <option value="0">Haven't Tried</option>
             </select>
           </div>
           <div class="feedback-form-group">
-            <label for="rating-online">Playing Online with Friends</label>
+            <label for="rating-online">🌐 Remote Challenge</label>
             <select id="rating-online">
-              <option value="" disabled selected>Select rating...</option>
-              <option value="5">Amazing!</option>
-              <option value="4">Works Great</option>
-              <option value="3">Works OK</option>
-              <option value="2">Had Issues</option>
-              <option value="1">Didn't Work</option>
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+              <option value="4">⭐⭐⭐⭐ Good</option>
+              <option value="3">⭐⭐⭐ Okay</option>
+              <option value="2">⭐⭐ Needs Work</option>
+              <option value="1">⭐ Poor</option>
               <option value="0">Haven't Tried</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-classroom">🏫 Classroom Mode</label>
+            <select id="rating-classroom">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+              <option value="4">⭐⭐⭐⭐ Good</option>
+              <option value="3">⭐⭐⭐ Okay</option>
+              <option value="2">⭐⭐ Needs Work</option>
+              <option value="1">⭐ Poor</option>
+              <option value="0">Haven't Tried</option>
+            </select>
+          </div>
+          <div class="feedback-form-group">
+            <label for="rating-accuracy">✓ Question Accuracy</label>
+            <select id="rating-accuracy">
+              <option value="" disabled selected>Rate it...</option>
+              <option value="5">⭐⭐⭐⭐⭐ Very Accurate</option>
+              <option value="4">⭐⭐⭐⭐ Mostly Accurate</option>
+              <option value="3">⭐⭐⭐ Okay</option>
+              <option value="2">⭐⭐ Some Errors</option>
+              <option value="1">⭐ Many Errors</option>
             </select>
           </div>
         </div>
