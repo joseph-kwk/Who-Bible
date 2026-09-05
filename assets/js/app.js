@@ -1105,28 +1105,89 @@ function attachHandlers(){
   } else {
     console.log('btnTheme not found!'); // Debug
   }
-  // Share
-  if (btnShare) {
-    btnShare.addEventListener('click', async ()=>{
-      const shareData = {
-        title: 'Who-Bible',
-        text: getText('brandDesc'),
-        url: location.href
+  // ── Rich Share Helper ──────────────────────────────────────────
+  function buildShareData(score = null, playerName = null) {
+    const url = 'https://who-bible.web.app';
+    const name = playerName || (state.currentPlayer && state.currentPlayer.name) || 'A player';
+    if (score !== null) {
+      const scoreMsg = score >= 80 ? '🏆 Crushing it!' : score >= 50 ? '📖 Solid knowledge!' : '✝️ Keep studying!';
+      return {
+        title: 'Who-Bible — Bible People Quiz',
+        text: `${scoreMsg} ${name} just scored ${score} points on Who-Bible — the ultimate Bible people challenge! Can you beat it? 📜✨`,
+        url
       };
-      if (navigator.share) {
-        try { await navigator.share(shareData); } catch(_){}
-      } else {
-        try {
-          await navigator.clipboard.writeText(`${shareData.title} — ${shareData.url}`);
-          showToast({ title: getText('exportSuccess'), msg: getText('exportMsg'), type: 'success', timeout: 1500 });
-        } catch(_) {
-          showToast({ title: getText('importError'), msg: 'Clipboard unavailable', type: 'error', timeout: 1500 });
-        }
-      }
+    }
+    return {
+      title: 'Who-Bible — Bible People Quiz',
+      text: `🔥 Test your Scripture knowledge on Who-Bible! 170+ biblical characters, real-time multiplayer, and daily challenges. How well do you know the Bible? 📜✨`,
+      url
+    };
+  }
+
+  async function doShare(shareData) {
+    if (navigator.share) {
+      try { await navigator.share(shareData); return true; } catch(_){}
+    }
+    try {
+      await navigator.clipboard.writeText(`${shareData.text}\n\n👉 ${shareData.url}`);
+      showToast({ title: '🔗 Link Copied!', msg: 'Share link copied to clipboard', type: 'success', timeout: 2500 });
+      return true;
+    } catch(_) {
+      showToast({ title: '⚠️ Copy Failed', msg: 'Please copy the link manually', type: 'error', timeout: 2500 });
+    }
+    return false;
+  }
+
+  // Header Share button
+  if (btnShare) {
+    btnShare.addEventListener('click', async () => {
+      const currentScore = state.score || null;
+      const sd = buildShareData(currentScore);
+      await doShare(sd);
     });
   }
+
+  // Footer Share button
+  const btnShareFooter = document.getElementById('btn-share-footer');
+  if (btnShareFooter) {
+    btnShareFooter.addEventListener('click', async () => {
+      const sd = buildShareData(state.score || null);
+      await doShare(sd);
+    });
+  }
+
+  // Twitter/X share
+  const btnShareTwitter = document.getElementById('btn-share-twitter');
+  if (btnShareTwitter) {
+    btnShareTwitter.addEventListener('click', () => {
+      const sd = buildShareData(state.score || null);
+      const text = encodeURIComponent(`${sd.text}\n\n${sd.url}`);
+      window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank', 'noopener,noreferrer');
+    });
+  }
+
+  // WhatsApp share
+  const btnShareWhatsapp = document.getElementById('btn-share-whatsapp');
+  if (btnShareWhatsapp) {
+    btnShareWhatsapp.addEventListener('click', () => {
+      const sd = buildShareData(state.score || null);
+      const text = encodeURIComponent(`${sd.text}\n\n${sd.url}`);
+      window.open(`https://wa.me/?text=${text}`, '_blank', 'noopener,noreferrer');
+    });
+  }
+
+  // Facebook share
+  const btnShareFacebook = document.getElementById('btn-share-facebook');
+  if (btnShareFacebook) {
+    btnShareFacebook.addEventListener('click', () => {
+      const url = encodeURIComponent('https://who-bible.web.app');
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'noopener,noreferrer');
+    });
+  }
+
   // Community placeholder behavior
   // Community opens in a new tab via anchor href
+
   
   // Remote Challenge handlers
   if (btnRemoteChallenge && window.RemoteChallengeUI) {
@@ -1758,6 +1819,17 @@ function quitQuiz(){
 // =========================
 // Questions
 // =========================
+// Helper: returns false for placeholder/empty content that would make bad questions
+function isValidContent(val) {
+  if (!val) return false;
+  const s = String(val).trim().toLowerCase();
+  const invalid = [
+    'to be researched', 'unknown', 'n/a', 'tbd', 'none', '', 'null', 'undefined',
+    'to be added', 'not specified', 'varies', 'various', 'see notes'
+  ];
+  return !invalid.includes(s) && s.length > 2;
+}
+
 function pickQuestionSet(count, difficulty, peoplePool = null){
   const types = ['whoDid','whoMother','occupation','age','event'];
   let pool = filterPeopleByDifficulty(peoplePool || state.people, difficulty);
@@ -1776,34 +1848,38 @@ function pickQuestionSet(count, difficulty, peoplePool = null){
   for(const person of selected){
     const t = types[Math.floor(Math.random()*types.length)];
     if(t==='whoDid'){
-      const rawEvent = person.notable_events?.[0] || getText('fallbackEvent');
-      // Store raw token to allow re-localization on language change
+      const rawEvent = person.notable_events?.find(e => isValidContent(e)) || null;
+      if (!rawEvent) continue; // Skip if no valid event
       const event = translateEvent(rawEvent);
       questions.push({type:'whoDid',prompt:getText('questionWhoDid', {event}),answer:person.name,ref:person.verses, raw:{ event: rawEvent }});
     }else if(t==='whoMother'){
-      if(person.mother) questions.push({type:'whoMother',prompt:getText('questionWhoMother', {name: person.name}),answer:person.mother,ref:person.verses, raw:{ name: person.name }});
+      if(person.mother && isValidContent(person.mother)) questions.push({type:'whoMother',prompt:getText('questionWhoMother', {name: person.name}),answer:person.mother,ref:person.verses, raw:{ name: person.name }});
     }else if(t==='occupation'){
-      if(person.occupation) questions.push({type:'occupation',prompt:getText('questionOccupation', {name: person.name}),answer:person.occupation,ref:person.verses, raw:{ occupation: person.occupation, name: person.name }});
+      if(person.occupation && isValidContent(person.occupation)) questions.push({type:'occupation',prompt:getText('questionOccupation', {name: person.name}),answer:person.occupation,ref:person.verses, raw:{ occupation: person.occupation, name: person.name }});
     }else if(t==='age'){
-      if(person.age_notes) questions.push({type:'age',prompt:getText('questionAge', {name: person.name}),answer:person.age_notes,ref:person.verses, raw:{ name: person.name, age: person.age_notes }});
+      if(person.age_notes && isValidContent(person.age_notes)) questions.push({type:'age',prompt:getText('questionAge', {name: person.name}),answer:person.age_notes,ref:person.verses, raw:{ name: person.name, age: person.age_notes }});
     }else if(t==='event'){
       if(person.notable_events && person.notable_events.length>0) {
-        const rawEvent = person.notable_events[0];
-        const event = translateEvent(rawEvent);
-        questions.push({type:'event',prompt:getText('questionEvent', {event}),answer:person.name,ref:person.verses, raw:{ event: rawEvent }});
+        const rawEvent = person.notable_events.find(e => isValidContent(e));
+        if(rawEvent) {
+          const event = translateEvent(rawEvent);
+          questions.push({type:'event',prompt:getText('questionEvent', {event}),answer:person.name,ref:person.verses, raw:{ event: rawEvent }});
+        }
       }
     }
   }
-  // ensure we have at least count questions; fill with simple ones
+  // ensure we have at least count questions; fill with simple ones (validated)
   let i = 0;
   while(questions.length < count && i < state.people.length){
     const p = state.people[i++];
-    const rawEvent = p.notable_events?.[0] || getText('fallbackEvent');
+    const rawEvent = p.notable_events?.find(e => isValidContent(e)) || null;
+    if (!rawEvent) continue;
     const event = translateEvent(rawEvent);
     questions.push({type:'whoDid',prompt:getText('questionWhoDid', {event}),answer:p.name,ref:p.verses});
   }
   return questions.slice(0, count);
 }
+
 
 function filterPeopleByDifficulty(people, difficulty){
   if(difficulty==='easy'){

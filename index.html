@@ -13,37 +13,37 @@
   <meta http-equiv="Expires" content="0" />
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260905001" />
-  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20260905001" />
-  <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20260905001" />
-  <link rel="stylesheet" href="assets/css/report-modal.css?v=20260905001" />
-  <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20260905001" />
-  <link rel="stylesheet" href="assets/css/auth.css?v=20260905001" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260905002" />
+  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20260905002" />
+  <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20260905002" />
+  <link rel="stylesheet" href="assets/css/report-modal.css?v=20260905002" />
+  <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20260905002" />
+  <link rel="stylesheet" href="assets/css/auth.css?v=20260905002" />
   
   <!-- Firebase SDK (Compat for remote-challenge.js) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
   <!-- Firebase Config (Modular SDK) -->
-  <script type="module" src="assets/js/firebase-config.js?v=20260905001"></script>
+  <script type="module" src="assets/js/firebase-config.js?v=20260905002"></script>
   
   <!-- Authentication -->
-  <script type="module" src="assets/js/auth.js?v=20260905001"></script>
-  <script type="module" src="assets/js/auth-ui.js?v=20260905001"></script>
+  <script type="module" src="assets/js/auth.js?v=20260905002"></script>
+  <script type="module" src="assets/js/auth-ui.js?v=20260905002"></script>
   
   <!-- App Scripts -->
-  <script src="assets/js/security.js?v=20260905001"></script>
-  <script src="assets/js/remote-challenge.js?v=20260905001"></script>
-  <script src="assets/js/remote-challenge-ui.js?v=20260905001"></script>
-  <script src="assets/js/scenarios.js?v=20260905001" defer></script>
-  <script src="assets/js/locations.js?v=20260905001" defer></script>
-  <script src="assets/js/concepts.js?v=20260905001" defer></script>
-  <script src="assets/js/relationships.js?v=20260905001" defer></script>
-  <script src="assets/js/content-filter.js?v=20260905001" defer></script>
-  <script src="assets/js/reports.js?v=20260905001" defer></script>
-  <script src="assets/js/translations.js?v=20260905001" defer></script>
-  <script src="assets/js/guest-prompts.js?v=20260905001" defer></script>
-  <script src="assets/js/app.js?v=20260905001" defer></script>
+  <script src="assets/js/security.js?v=20260905002"></script>
+  <script src="assets/js/remote-challenge.js?v=20260905002"></script>
+  <script src="assets/js/remote-challenge-ui.js?v=20260905002"></script>
+  <script src="assets/js/scenarios.js?v=20260905002" defer></script>
+  <script src="assets/js/locations.js?v=20260905002" defer></script>
+  <script src="assets/js/concepts.js?v=20260905002" defer></script>
+  <script src="assets/js/relationships.js?v=20260905002" defer></script>
+  <script src="assets/js/content-filter.js?v=20260905002" defer></script>
+  <script src="assets/js/reports.js?v=20260905002" defer></script>
+  <script src="assets/js/translations.js?v=20260905002" defer></script>
+  <script src="assets/js/guest-prompts.js?v=20260905002" defer></script>
+  <script src="assets/js/app.js?v=20260905002" defer></script>
 </head>
 <body>
   <!-- Skip to main content link for keyboard navigation -->
@@ -101,7 +101,8 @@
               </select>
             </div>
             <nav class="site-nav" aria-label="Site Navigation">
-              <a id="nav-community" href="community.html" target="_blank" class="nav-link" rel="noopener">Community</a>
+              <!-- Community hidden for now -->
+              <a id="nav-community" href="community.html" target="_blank" class="nav-link" rel="noopener" style="display:none;">Community</a>
               <button id="btn-auth-signin" class="auth-signin-btn" aria-label="Sign in or create account" style="display: none;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -109,12 +110,9 @@
                 </svg>
                 <span id="auth-button-text">Sign In</span>
               </button>
-              <button id="btn-share" class="icon-btn" title="Share" aria-label="Share this quiz">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M12 3v12"/>
-                  <path d="M8 7l4-4 4 4"/>
-                  <path d="M5 13v5a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-5"/>
-                </svg>
+              <button id="btn-share" class="share-header-btn" title="Share Who-Bible" aria-label="Share this quiz">
+                <span class="share-btn-icon">🔗</span>
+                <span class="share-btn-text">Share</span>
               </button>
             </nav>
           </div>
@@ -488,19 +486,59 @@
 
     </main>
     <footer class="footer">
+      <!-- Footer glow orbs -->
+      <div class="footer-orb footer-orb-1"></div>
+      <div class="footer-orb footer-orb-2"></div>
+      
       <div class="footer-content">
-        <div class="footer-brand">
-          <img src="assets/images/logo.png" alt="Who-Bible Logo" class="footer-logo" />
-          <div class="footer-title">Who-Bible</div>
+        <!-- Top row: Brand + Scripture verse -->
+        <div class="footer-top-row">
+          <div class="footer-brand">
+            <div class="footer-logo-wrap">
+              <img src="assets/images/logo.png" alt="Who-Bible Logo" class="footer-logo" />
+              <div class="footer-logo-glow"></div>
+            </div>
+            <div class="footer-brand-info">
+              <div class="footer-title">Who-Bible</div>
+              <div class="footer-tagline">Scripture Mastery Through Play</div>
+            </div>
+          </div>
+
+          <div class="footer-verse">
+            <span class="footer-verse-mark">❝</span>
+            <blockquote class="footer-verse-text">Your word is a lamp to my feet and a light to my path.</blockquote>
+            <cite class="footer-verse-ref">— Psalm 119:105</cite>
+          </div>
         </div>
-        
-        <div class="footer-nav">
-          <a id="footer-community" href="community.html" class="footer-link coming-soon" target="_blank" rel="noopener">Community</a>
+
+        <!-- Middle: Quick Actions -->
+        <div class="footer-actions-row">
+          <button id="btn-feedback" class="footer-action-btn feedback-btn" type="button">
+            <span>💬</span>
+            <span>Send Feedback</span>
+          </button>
+          <button id="btn-share-footer" class="footer-action-btn share-btn-footer" type="button">
+            <span>🚀</span>
+            <span>Share with Friends</span>
+          </button>
+          <!-- Community hidden for now -->
+          <a id="footer-community" href="community.html" class="footer-action-btn community-btn" target="_blank" rel="noopener" style="display:none;">🌐 Community</a>
         </div>
-        
+
+        <!-- Bottom: Copyright + share icons -->
         <div class="footer-bottom">
-          <p>© <span id="footer-year"></span> Who-Bible</p>
-          <button id="btn-feedback" class="footer-feedback-btn" type="button">Feedback</button>
+          <p class="footer-copy">© <span id="footer-year"></span> Who-Bible · Crafted with ✝️ for Scripture learners everywhere</p>
+          <div class="footer-social-row">
+            <button class="footer-social-btn" id="btn-share-twitter" title="Share on X (Twitter)" aria-label="Share on X">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.261 5.632L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+            </button>
+            <button class="footer-social-btn" id="btn-share-whatsapp" title="Share on WhatsApp" aria-label="Share on WhatsApp">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </button>
+            <button class="footer-social-btn" id="btn-share-facebook" title="Share on Facebook" aria-label="Share on Facebook">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </button>
+          </div>
         </div>
       </div>
     </footer>
