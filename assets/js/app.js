@@ -206,49 +206,323 @@ function getPlayerStats() {
 
 function displayPlayerInfo() {
   if (!state.currentPlayer) return;
-  
   const welcomeEl = document.getElementById('welcome-message');
   if (welcomeEl) {
-    const stats = state.currentPlayer.stats;
-    const isGuest = state.currentPlayer.isGuest;
-    const guestBadgeHtml = isGuest ? `<span class="player-badge guest" title="${getText('guest.badgeTooltip')}">👤 ${getText('guest.badge')}</span>` : `<span class="player-badge member" title="Registered member">✓ Member</span>`;
-    const deviceOnlyHtml = isGuest ? `<span class="device-only-badge" title="${getText('guest.deviceOnlyTooltip')}">📱 ${getText('guest.deviceOnly')}</span>` : '';
-    
-    if (typeof getText === 'function') {
-      welcomeEl.innerHTML = `
-        <div style="text-align: center; padding: 20px;">
-          <h3>${getText('welcomePlayer', { name: state.currentPlayer.name })} ${guestBadgeHtml}</h3>
-          <div style="display: flex; gap: 20px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
-            <div><strong>${getText('gamesPlayed')}:</strong> ${stats.gamesPlayed}</div>
-            <div><strong>${getText('highScore')}:</strong> ${stats.highestScore} ${deviceOnlyHtml}</div>
-            <div><strong>${getText('bestStreak')}:</strong> ${stats.bestStreak}</div>
-            <div><strong>${getText('winRate')}:</strong> ${stats.winRate}%</div>
-          </div>
-        </div>
-      `;
-    } else {
-      // Fallback if getText not available yet
-      welcomeEl.innerHTML = `
-        <div style="text-align: center; padding: 20px;">
-          <h3>Welcome, ${state.currentPlayer.name}! ${guestBadgeHtml}</h3>
-          <div style="display: flex; gap: 20px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
-            <div><strong>Games:</strong> ${stats.gamesPlayed}</div>
-            <div><strong>High Score:</strong> ${stats.highestScore} ${deviceOnlyHtml}</div>
-            <div><strong>Best Streak:</strong> ${stats.bestStreak}</div>
-            <div><strong>Win Rate:</strong> ${stats.winRate}%</div>
-          </div>
-        </div>
-      `;
-    }
+    welcomeEl.innerHTML = '';
+    welcomeEl.style.display = 'none';
   }
   updatePlayerDisplayName();
 }
 
+function computePlayerRank(stats) {
+  if (!stats) return { rank: 'Scripture Seeker', level: 1, icon: '🕊️', xpPercent: 20 };
+  const totalXP = (stats.highestScore || 0) * 2 + (stats.gamesPlayed || 0) * 25 + (stats.bestStreak || 0) * 15;
+  
+  if (totalXP >= 1000) return { rank: 'Master Theologian', level: 5, icon: '👑', xpPercent: 100, totalXP };
+  if (totalXP >= 600) return { rank: 'Biblical Sage', level: 4, icon: '🛡️', xpPercent: Math.min(100, Math.round(((totalXP - 600) / 400) * 100)), totalXP };
+  if (totalXP >= 300) return { rank: 'Faith Scholar', level: 3, icon: '📖', xpPercent: Math.min(100, Math.round(((totalXP - 300) / 300) * 100)), totalXP };
+  if (totalXP >= 100) return { rank: 'Bible Explorer', level: 2, icon: '🌟', xpPercent: Math.min(100, Math.round(((totalXP - 100) / 200) * 100)), totalXP };
+  return { rank: 'Scripture Seeker', level: 1, icon: '🕊️', xpPercent: Math.min(100, Math.round((totalXP / 100) * 100)), totalXP };
+}
+
 function updatePlayerDisplayName() {
+  if (!state.currentPlayer) return;
   const playerNameEl = document.getElementById('current-player-name');
-  if (playerNameEl && state.currentPlayer) {
-    playerNameEl.textContent = state.currentPlayer.name;
+  const avatarIconEl = document.getElementById('player-avatar-icon');
+  const rankDisplayEl = document.getElementById('player-rank-display');
+  const xpFillEl = document.getElementById('player-xp-fill');
+
+  const name = state.currentPlayer.name || 'Guest';
+  const avatar = state.currentPlayer.avatar || '👑';
+  const rankInfo = computePlayerRank(state.currentPlayer.stats);
+
+  if (playerNameEl) playerNameEl.textContent = name;
+  if (avatarIconEl) avatarIconEl.textContent = avatar;
+  if (rankDisplayEl) rankDisplayEl.textContent = `${rankInfo.icon} ${rankInfo.rank}`;
+  if (xpFillEl) xpFillEl.style.width = `${Math.max(15, rankInfo.xpPercent)}%`;
+}
+
+function triggerScorePop(points = 10) {
+  const popEl = document.getElementById('score-pop');
+  if (popEl) {
+    popEl.textContent = `+${points}`;
+    popEl.classList.remove('pop-active');
+    void popEl.offsetWidth; // Trigger reflow
+    popEl.classList.add('pop-active');
   }
+}
+
+function updateStreakHUD(streak) {
+  const streakEl = document.getElementById('streak');
+  const streakChip = document.getElementById('streak-chip');
+  const flameIcon = document.getElementById('streak-flame');
+  if (streakEl) streakEl.textContent = streak;
+  if (streakChip && flameIcon) {
+    if (streak >= 3) {
+      streakChip.classList.add('flame-active');
+      flameIcon.classList.add('flame-pulsing');
+    } else {
+      streakChip.classList.remove('flame-active');
+      flameIcon.classList.remove('flame-pulsing');
+    }
+  }
+}
+
+// =========================
+// Web Audio Sound FX Engine
+// =========================
+const SoundFX = {
+  ctx: null,
+  enabled: true,
+
+  init() {
+    try {
+      const saved = localStorage.getItem('who-bible-sound-enabled');
+      if (saved !== null) {
+        this.enabled = saved === 'true';
+      }
+    } catch (_) {}
+    this.updateToggleIcon();
+  },
+
+  getContext() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    return this.ctx;
+  },
+
+  toggle() {
+    this.enabled = !this.enabled;
+    try {
+      localStorage.setItem('who-bible-sound-enabled', String(this.enabled));
+    } catch (_) {}
+    this.updateToggleIcon();
+    if (this.enabled) {
+      this.playCorrect();
+    }
+    return this.enabled;
+  },
+
+  updateToggleIcon() {
+    const iconEl = document.getElementById('sound-icon');
+    const btn = document.getElementById('btn-sound-toggle');
+    if (iconEl) iconEl.textContent = this.enabled ? '🔊' : '🔇';
+    if (btn) {
+      btn.setAttribute('title', this.enabled ? 'Sound FX: On (Click to Mute)' : 'Sound FX: Muted (Click to Unmute)');
+      btn.setAttribute('aria-label', this.enabled ? 'Mute sound effects' : 'Unmute sound effects');
+    }
+  },
+
+  playCorrect() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        gain.gain.setValueAtTime(0.001, now + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.2, now + idx * 0.08 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.28);
+      });
+    } catch (_) {}
+  },
+
+  playWrong() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(165, now);
+      osc.frequency.exponentialRampToValueAtTime(110, now + 0.28);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } catch (_) {}
+  },
+
+  playStreak() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const notes = [440, 554.37, 659.25, 880, 1108.73];
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+        gain.gain.setValueAtTime(0.001, now + idx * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.18, now + idx * 0.05 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.05);
+        osc.stop(now + idx * 0.05 + 0.2);
+      });
+    } catch (_) {}
+  },
+
+  playTick() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } catch (_) {}
+  },
+
+  playFanfare() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const chords = [
+        { freqs: [523.25, 659.25, 783.99], time: 0, dur: 0.22 },
+        { freqs: [587.33, 698.46, 880.00], time: 0.24, dur: 0.22 },
+        { freqs: [659.25, 783.99, 987.77], time: 0.48, dur: 0.25 },
+        { freqs: [523.25, 659.25, 783.99, 1046.50], time: 0.74, dur: 0.7 }
+      ];
+      chords.forEach(c => {
+        c.freqs.forEach(freq => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + c.time);
+          gain.gain.setValueAtTime(0.001, now + c.time);
+          gain.gain.exponentialRampToValueAtTime(0.12, now + c.time + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + c.time + c.dur);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + c.time);
+          osc.stop(now + c.time + c.dur + 0.05);
+        });
+      });
+    } catch (_) {}
+  },
+
+  playClick() {
+    if (!this.enabled) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, now);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } catch (_) {}
+  }
+};
+window.SoundFX = SoundFX;
+
+// =========================
+// Daily Scripture Challenge
+// =========================
+function getDailyFigure() {
+  const list = (state.people && state.people.length > 0) ? state.people : DEFAULT_PEOPLE_DATA;
+  if (!list || list.length === 0) return null;
+  const today = new Date();
+  const startOfYear = new Date(today.getFullYear(), 0, 0);
+  const diff = today - startOfYear;
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dayOfYear = Math.floor(diff / oneDay);
+  const index = Math.abs(dayOfYear) % list.length;
+  return list[index];
+}
+
+function updateDailyChallengeCard() {
+  const person = getDailyFigure();
+  if (!person) return;
+  const nameEl = document.getElementById('daily-figure-name');
+  const descEl = document.getElementById('daily-figure-desc');
+  const avatarEl = document.getElementById('daily-figure-avatar');
+  const dateEl = document.getElementById('daily-date-str');
+  
+  const options = { month: 'short', day: 'numeric' };
+  const dateStr = new Date().toLocaleDateString(undefined, options);
+  if (dateEl) dateEl.textContent = `Daily Scripture • ${dateStr}`;
+  if (nameEl) nameEl.textContent = person.name;
+  if (avatarEl) avatarEl.textContent = getPersonIcon(person);
+  if (descEl) {
+    const rawEvent = (person.notable_events && person.notable_events.length > 0)
+      ? person.notable_events[0]
+      : (person.occupation || 'Notable figure in scripture');
+    descEl.textContent = `${rawEvent}. Test your knowledge with today's 5-question speed trial!`;
+  }
+}
+
+function startDailyChallenge() {
+  if (!state.people || state.people.length === 0) {
+    showToast({ title: 'Loading...', msg: 'Please wait a moment for data to load', type: 'info' });
+    return;
+  }
+  SoundFX.playClick();
+  showGame();
+  gameTitle.textContent = 'Daily Scripture Challenge';
+  state.mode = 'daily';
+  afterRef.innerText = '';
+  state.score = 0;
+  state.streak = 0;
+  state.qnum = 0;
+  state.results = [];
+  state.paused = false;
+
+  const dailyPerson = getDailyFigure();
+  const pool = [dailyPerson, ...state.people.filter(p => p.name !== dailyPerson.name)];
+  state.questions = pickQuestionSet(5, 'medium', pool);
+  state.qtotal = state.questions.length;
+  qtotalEl.innerText = state.qtotal;
+  scoreEl.innerText = state.score;
+  streakEl.innerText = state.streak;
+  btnNext.disabled = true;
+  quizEl.style.display = 'block';
+  timerEl.style.display = 'none';
+  if (btnPause) btnPause.style.display = 'none';
+  challengeStatusEl.style.display = 'none';
+  stopTimer();
+  nextQuestion();
+  showToast({ title: 'Daily Challenge Started!', msg: `5 Questions • Featured: ${dailyPerson.name}`, type: 'success', timeout: 2200 });
 }
 
 // =========================
@@ -425,6 +699,7 @@ function translateAnswerForQuestionType(qType, value){
 // =========================
 async function init(){
   console.log('Initializing app...');
+  SoundFX.init();
   attachHandlers(); // Attach listeners immediately
   initFeedback(); // Initialize feedback system
   
@@ -473,6 +748,8 @@ async function init(){
   }
   
   state.people = loadPeopleDataFromLocalStorage() || DEFAULT_PEOPLE_DATA.slice();
+  updateDailyChallengeCard();
+  renderPeopleList();
   
   // Initialize relationship graph
   if (window.RelationshipSystem) {
@@ -503,15 +780,25 @@ async function init(){
       btnRemoteChallenge.style.display = 'block';
       console.log('✓ Remote Challenge enabled (Firebase configured)');
       
-      // Check if there's a room code in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const pinFromUrl = urlParams.get('pin');
       const roomCodeFromUrl = window.RemoteChallenge?.getRoomCodeFromUrl();
-      if (roomCodeFromUrl) {
-        // Auto-open join flow
+      
+      if (pinFromUrl) {
+        // Auto-open Classroom join modal
         setTimeout(() => {
-          showRemoteModal();
-          showRemoteStep('join');
-          remoteRoomCodeInput.value = roomCodeFromUrl;
-        }, 500);
+          promptClassroomJoin(pinFromUrl);
+        }, 300);
+      } else if (roomCodeFromUrl) {
+        // Auto-open Remote Challenge join flow
+        setTimeout(() => {
+          if (window.RemoteChallengeUI) {
+            window.RemoteChallengeUI.show();
+            window.RemoteChallengeUI.showStep('join');
+            const input = document.getElementById('remote-room-code-input');
+            if (input) input.value = roomCodeFromUrl;
+          }
+        }, 300);
       }
     } else {
       console.log('ℹ Remote Challenge disabled (Firebase not configured)');
@@ -622,76 +909,161 @@ function attachHandlers(){
     homeLink.addEventListener('click', (e)=>{ e.preventDefault(); showSetup(); });
   }
   
-  // Player management
+  // Player management & Profile modal
   const btnChangePlayer = document.getElementById('btn-change-player');
-  if (btnChangePlayer) {
-    btnChangePlayer.addEventListener('click', async ()=>{
-      const newPlayer = await promptForPlayerName();
-      if (newPlayer) {
-        displayPlayerInfo();
-        updatePlayerDisplayName();
-      }
+  const playerProfileCard = document.getElementById('player-profile-card');
+  const profileModal = document.getElementById('profile-modal');
+  const btnProfileClose = document.getElementById('btn-profile-close');
+  const btnCancelProfile = document.getElementById('btn-cancel-profile');
+  const btnSaveProfile = document.getElementById('btn-save-profile');
+  const profileNameInput = document.getElementById('profile-name-input');
+  const avatarGrid = document.getElementById('avatar-grid');
+
+  let selectedAvatar = (state.currentPlayer && state.currentPlayer.avatar) || '👑';
+
+  const openProfileModal = () => {
+    if (!profileModal) return;
+    if (state.currentPlayer) {
+      if (profileNameInput) profileNameInput.value = state.currentPlayer.name || 'Guest';
+      selectedAvatar = state.currentPlayer.avatar || '👑';
+    }
+    // Highlight selected avatar
+    if (avatarGrid) {
+      avatarGrid.querySelectorAll('.avatar-option').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.avatar === selectedAvatar);
+      });
+    }
+    // Update stats display in modal
+    if (state.currentPlayer && state.currentPlayer.stats) {
+      const stats = state.currentPlayer.stats;
+      const rankInfo = computePlayerRank(stats);
+      const gamesEl = document.getElementById('p-stat-games');
+      const streakEl = document.getElementById('p-stat-streak');
+      const accEl = document.getElementById('p-stat-accuracy');
+      const rankEl = document.getElementById('p-stat-rank');
+      if (gamesEl) gamesEl.textContent = stats.gamesPlayed || 0;
+      if (streakEl) streakEl.textContent = stats.bestStreak || 0;
+      if (accEl) accEl.textContent = `${stats.winRate || 0}%`;
+      if (rankEl) rankEl.textContent = rankInfo.rank;
+    }
+    profileModal.style.display = 'flex';
+    setModalScrollLock(true);
+  };
+
+  const closeProfileModal = () => {
+    if (profileModal) profileModal.style.display = 'none';
+    setModalScrollLock(false);
+  };
+
+  if (avatarGrid) {
+    avatarGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('.avatar-option');
+      if (!btn) return;
+      selectedAvatar = btn.dataset.avatar;
+      avatarGrid.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
     });
+  }
+
+  if (btnSaveProfile) {
+    btnSaveProfile.addEventListener('click', () => {
+      const name = (profileNameInput ? profileNameInput.value.trim() : '') || 'Guest';
+      if (!state.currentPlayer) {
+        state.currentPlayer = createGuestPlayer(name);
+      } else {
+        state.currentPlayer.name = name;
+      }
+      state.currentPlayer.avatar = selectedAvatar;
+      savePlayer(state.currentPlayer);
+      try {
+        localStorage.setItem('who-bible-profile-name', name);
+        localStorage.setItem('who-bible-profile-avatar', selectedAvatar);
+      } catch (_) {}
+      updatePlayerDisplayName();
+      closeProfileModal();
+      showToast({ title: 'Profile Updated', msg: `Welcome, ${name}!`, type: 'success', timeout: 2000 });
+    });
+  }
+
+  if (btnProfileClose) btnProfileClose.addEventListener('click', closeProfileModal);
+  if (btnCancelProfile) btnCancelProfile.addEventListener('click', closeProfileModal);
+  if (btnChangePlayer) btnChangePlayer.addEventListener('click', openProfileModal);
+  if (playerProfileCard) playerProfileCard.addEventListener('click', openProfileModal);
+  
+  // Sound toggle button
+  const btnSoundToggle = document.getElementById('btn-sound-toggle');
+  if (btnSoundToggle) {
+    btnSoundToggle.addEventListener('click', () => {
+      SoundFX.toggle();
+    });
+  }
+
+  // Daily challenge button
+  const btnStartDaily = document.getElementById('btn-start-daily');
+  if (btnStartDaily) {
+    btnStartDaily.addEventListener('click', startDailyChallenge);
   }
   
   // Mode buttons
-  btnSolo.addEventListener('click', startSolo);
-  btnTimed.addEventListener('click', startTimed);
-  btnChallenge.addEventListener('click', startChallenge);
-  btnStudy.addEventListener('click', startStudy);
-  if (btnScenarios) {
-    btnScenarios.addEventListener('click', startScenarios);
-  }
+  if (btnSolo) btnSolo.addEventListener('click', () => { SoundFX.playClick(); startSolo(); });
+  if (btnTimed) btnTimed.addEventListener('click', () => { SoundFX.playClick(); startTimed(); });
+  if (btnChallenge) btnChallenge.addEventListener('click', () => { SoundFX.playClick(); startChallenge(); });
+  if (btnStudy) btnStudy.addEventListener('click', () => { SoundFX.playClick(); startStudy(); });
+  if (btnScenarios) btnScenarios.addEventListener('click', () => { SoundFX.playClick(); startScenarios(); });
   
   // Navigation
-  btnBackToSetup.addEventListener('click', showSetup);
-  btnBackFromStudy.addEventListener('click', showSetup);
+  if (btnBackToSetup) btnBackToSetup.addEventListener('click', () => { SoundFX.playClick(); showSetup(); });
+  if (btnBackFromStudy) btnBackFromStudy.addEventListener('click', () => { SoundFX.playClick(); showSetup(); });
   // Community moved to separate page
   
   // Game controls
-  btnNext.addEventListener('click', () => {
-    if (state.mode === 'scenarios') {
-      nextScenarioQuestion();
-    } else {
-      nextQuestion();
-    }
-  });
-  btnQuit.addEventListener('click', quitQuiz);
-  btnPause.addEventListener('click', togglePause);
+  if (btnNext) {
+    btnNext.addEventListener('click', () => {
+      SoundFX.playClick();
+      if (state.mode === 'scenarios') {
+        nextScenarioQuestion();
+      } else {
+        nextQuestion();
+      }
+    });
+  }
+  if (btnQuit) btnQuit.addEventListener('click', () => { SoundFX.playClick(); quitQuiz(); });
+  if (btnPause) btnPause.addEventListener('click', () => { SoundFX.playClick(); togglePause(); });
   
   // Study controls
-  searchPerson.addEventListener('input', e=>renderPeopleList(e.target.value));
-  sortSelect.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
-  filterMother.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
-  filterOccupation.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
-  filterAge.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
-  btnShuffleList.addEventListener('click', ()=>{ shuffle(state.people); renderPeopleList(searchPerson.value); });
-  btnExpandAll.addEventListener('click', ()=>toggleAllDetails(true));
-  btnCollapseAll.addEventListener('click', ()=>toggleAllDetails(false));
+  if (searchPerson) searchPerson.addEventListener('input', e=>renderPeopleList(e.target.value));
+  if (sortSelect) sortSelect.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
+  if (filterMother) filterMother.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
+  if (filterOccupation) filterOccupation.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
+  if (filterAge) filterAge.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
+  if (btnShuffleList) btnShuffleList.addEventListener('click', ()=>{ shuffle(state.people); renderPeopleList(searchPerson ? searchPerson.value : ''); SoundFX.playClick(); });
+  if (btnExpandAll) btnExpandAll.addEventListener('click', ()=>toggleAllDetails(true));
+  if (btnCollapseAll) btnCollapseAll.addEventListener('click', ()=>toggleAllDetails(false));
   
   // Testament and gender filters
   const testamentFilter = document.getElementById('testament-filter');
   const genderFilter = document.getElementById('gender-filter');
   if (testamentFilter) {
-    testamentFilter.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+    testamentFilter.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
   }
   if (genderFilter) {
-    genderFilter.addEventListener('change', ()=>renderPeopleList(searchPerson.value));
+    genderFilter.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
   }
   
   // Data management
   if (btnExport) btnExport.addEventListener('click', exportJson);
-  if (btnImport) btnImport.addEventListener('click', ()=>fileInput.click());
+  if (btnImport) btnImport.addEventListener('click', ()=>fileInput?.click());
   if (btnResetData) btnResetData.addEventListener('click', resetData);
   if (fileInput) fileInput.addEventListener('change', handleImportFile);
   
   // Settings persistence
-  difficultySel.addEventListener('change', saveSettingsFromUI);
-  numQuestionsInput.addEventListener('change', saveSettingsFromUI);
-  timeLimitInput.addEventListener('change', saveSettingsFromUI);
+  if (difficultySel) difficultySel.addEventListener('change', saveSettingsFromUI);
+  if (numQuestionsInput) numQuestionsInput.addEventListener('change', saveSettingsFromUI);
+  if (timeLimitInput) timeLimitInput.addEventListener('change', saveSettingsFromUI);
   
   // Language selector
-  languageSelect.addEventListener('change', (e) => {
+  if (languageSelect) {
+    languageSelect.addEventListener('change', (e) => {
     const lang = e.target.value;
     // Persist preferred language as part of settings as well
     const settings = loadSettings() || {};
@@ -713,6 +1085,7 @@ function attachHandlers(){
       });
     }
   });
+  }
   
   // Theme toggle: cycle between day and night
   if (btnTheme) {
@@ -758,13 +1131,6 @@ function attachHandlers(){
   // Remote Challenge handlers
   if (btnRemoteChallenge && window.RemoteChallengeUI) {
     btnRemoteChallenge.addEventListener('click', () => {
-      // Check if user is guest and dispatch event
-      if (state.currentPlayer && state.currentPlayer.isGuest) {
-        document.dispatchEvent(new CustomEvent('socialFeatureAttempt', {
-          detail: { feature: 'Remote Challenge' }
-        }));
-        return;
-      }
       window.RemoteChallengeUI.start();
     });
   }
@@ -772,15 +1138,15 @@ function attachHandlers(){
   // Classroom Mode handler
   if (btnClassroomMode) {
     btnClassroomMode.addEventListener('click', () => {
-      // Check if user wants to host or join
-      const choice = confirm('Click OK to HOST (display on projector)\nClick Cancel to JOIN as a player');
-      if (choice) {
-        // Open host view in new tab/window
-        window.open('host.html', '_blank');
-      } else {
-        // Show join modal
-        promptClassroomJoin();
-      }
+      promptClassroomJoin();
+    });
+  }
+  
+  // Quick Host Classroom button (if present)
+  const btnHostClassroom = document.getElementById('btn-host-classroom');
+  if (btnHostClassroom) {
+    btnHostClassroom.addEventListener('click', () => {
+      window.open('host.html', '_blank');
     });
   }
   
@@ -887,9 +1253,26 @@ function attachHandlers(){
     }
   });
 
-  // Keyboard accessibility for modals (Escape key)
+  // Global keyboard shortcuts for fluid playability & accessibility
   window.addEventListener('keydown', (e) => {
+    const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+
+    // Escape always closes any active dialog/modal
     if (e.key === 'Escape') {
+      const reportModal = document.getElementById('report-modal');
+      if (reportModal && reportModal.classList.contains('show')) {
+        reportModal.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+      const feedbackModal = document.getElementById('feedback-modal');
+      if (feedbackModal && feedbackModal.classList.contains('show')) {
+        feedbackModal.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+      const profileModal = document.getElementById('profile-modal');
+      if (profileModal && profileModal.style.display === 'flex') profileModal.style.display = 'none';
+      const welcomeModal = document.getElementById('welcome-modal');
+      if (welcomeModal && welcomeModal.style.display === 'flex') welcomeModal.style.display = 'none';
       if (modalEl && modalEl.style.display === 'flex') hideSummaryModal();
       if (playersModal && playersModal.style.display === 'flex') hidePlayersModal();
       if (remoteModal && remoteModal.style.display === 'flex') {
@@ -897,6 +1280,54 @@ function attachHandlers(){
           window.RemoteChallengeUI.hide();
         } else {
           remoteModal.style.display = 'none';
+        }
+      }
+      return;
+    }
+
+    // Do not intercept keystrokes if typing inside text fields
+    if (isTyping) return;
+
+    // Toggle SoundFX Mute with 'm'
+    if (e.key === 'm' || e.key === 'M') {
+      if (window.SoundFX && typeof window.SoundFX.toggle === 'function') {
+        window.SoundFX.toggle();
+      }
+      return;
+    }
+
+    // Toggle Theme with 't'
+    if (e.key === 't' || e.key === 'T') {
+      if (btnTheme) btnTheme.click();
+      return;
+    }
+
+    // In-game play controls when Game Area is active
+    const gameArea = document.getElementById('game-area');
+    const isGameActive = gameArea && gameArea.style.display !== 'none';
+
+    if (isGameActive) {
+      // 1, 2, 3, 4 for answer selection
+      if (['1', '2', '3', '4'].includes(e.key)) {
+        const choiceIdx = parseInt(e.key, 10);
+        const choiceEl = document.getElementById(`choice-${choiceIdx}`);
+        if (choiceEl && !choiceEl.classList.contains('disabled')) {
+          e.preventDefault();
+          choiceEl.click();
+        }
+      }
+      // Space or Enter to proceed to next question
+      else if (e.key === 'Enter' || e.key === ' ') {
+        if (btnNext && !btnNext.disabled && btnNext.offsetParent !== null) {
+          e.preventDefault();
+          btnNext.click();
+        }
+      }
+      // 'p' or 'P' to pause/resume in timed mode
+      else if (e.key === 'p' || e.key === 'P') {
+        if (btnPause && btnPause.style.display !== 'none') {
+          e.preventDefault();
+          btnPause.click();
         }
       }
     }
@@ -1225,11 +1656,21 @@ function answerScenarioQuestion(selected){
   if (isCorrect) {
     state.score += 10;
     state.streak++;
+    triggerScorePop(10);
+    updateStreakHUD(state.streak);
+    if (state.streak >= 3) {
+      SoundFX.playStreak();
+    } else {
+      SoundFX.playCorrect();
+    }
     scoreEl.innerText = state.score;
     streakEl.innerText = state.streak;
     showToast({ title: getText('correct') || 'Correct!', msg: '', type: 'success', timeout: 1000 });
   } else {
     state.streak = 0;
+    updateStreakHUD(0);
+    SoundFX.playWrong();
+    scoreEl.innerText = state.score;
     streakEl.innerText = state.streak;
     showToast({ title: getText('wrongAnswer') || getText('wrong'), msg: '', type: 'error', timeout: 1000 });
   }
@@ -1419,6 +1860,13 @@ function renderQuestion(q){
   answersEl.setAttribute('aria-activedescendant','');
   answersEl.setAttribute('aria-label', getText('answersLabel'));
   
+  // Trigger smooth question appearance animation
+  qText.classList.remove('question-animating');
+  answersEl.classList.remove('question-animating');
+  void qText.offsetWidth; // force reflow
+  qText.classList.add('question-animating');
+  answersEl.classList.add('question-animating');
+
   // Use pre-generated choices if available (for remote challenge consistency)
   let choices;
   if (q.choices && Array.isArray(q.choices)) {
@@ -1437,7 +1885,18 @@ function renderQuestion(q){
     div.id = `choice-${idx+1}`;
     div.setAttribute('role','option');
     div.setAttribute('aria-selected','false');
-    div.innerText = choiceObj.display;
+
+    const keySpan = document.createElement('span');
+    keySpan.className = 'choice-key';
+    keySpan.setAttribute('aria-hidden', 'true');
+    keySpan.textContent = `${idx + 1}`;
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'choice-text';
+    textSpan.textContent = choiceObj.display;
+
+    div.appendChild(keySpan);
+    div.appendChild(textSpan);
     div.dataset.value = choiceObj.original;
     div.addEventListener('click',()=>handleAnswer(choiceObj.original,q,div));
     answersEl.appendChild(div);
@@ -1451,15 +1910,54 @@ function makeChoices(q){
   const set = new Set([q.answer]);
   const distractors = getDistractors(q);
   for(const d of distractors){
-    set.add(d);
+    if (d && normalize(d) !== normalize(q.answer)) {
+      set.add(d);
+    }
     if(set.size>=4) break;
   }
-  // Fallback to names if not enough
-  const names = state.people.map(p=>p.name);
-  while(set.size<4){
-    const pick = names[Math.floor(Math.random()*names.length)];
-    set.add(pick);
+  
+  // Biblical category fallback pools to avoid mismatching names with roles/ages/mothers
+  const fallbackPools = {
+    occupation: [
+      'Prophet', 'Priest', 'King', 'Judge of Israel', 'Shepherd', 
+      'Fisherman', 'Scribe', 'Carpenter', 'Tentmaker', 
+      'Tax Collector', 'Warrior / Military Commander', 'Cupbearer', 'Apostle'
+    ],
+    age: [
+      'Lived 120 years', 'Lived 175 years', 'Lived 969 years', 'Lived 930 years', 
+      'Died around age 33', 'Lived 110 years', 'Lived 147 years', 'Lived 180 years',
+      'Lived to an advanced age and died in peace'
+    ],
+    whoMother: [
+      'Sarah', 'Rebekah', 'Rachel', 'Leah', 'Hannah', 
+      'Elizabeth', 'Mary', 'Jochebed', 'Bathsheba', 'Ruth', 'Eve'
+    ],
+    default: state.people.map(p => p.name)
+  };
+
+  const pool = fallbackPools[q.type] || fallbackPools.default;
+  const shuffledPool = pool.slice();
+  shuffle(shuffledPool);
+
+  for (const item of shuffledPool) {
+    if (set.size >= 4) break;
+    if (item && normalize(item) !== normalize(q.answer)) {
+      set.add(item);
+    }
   }
+
+  // Safety net if still under 4
+  if (set.size < 4 && q.type !== 'whoDid' && q.type !== 'event') {
+    const defaultPool = fallbackPools.default.slice();
+    shuffle(defaultPool);
+    for (const name of defaultPool) {
+      if (set.size >= 4) break;
+      if (name && normalize(name) !== normalize(q.answer)) {
+        set.add(name);
+      }
+    }
+  }
+
   const arr = Array.from(set).map(original=>({ original, display: translateAnswerForQuestionType(q.type, original) }));
   shuffle(arr);
   return arr;
@@ -1498,6 +1996,13 @@ function handleAnswer(choice,q, el){
   if(correct){
     state.score += 10;
     state.streak += 1;
+    triggerScorePop(10);
+    updateStreakHUD(state.streak);
+    if (state.streak >= 3) {
+      SoundFX.playStreak();
+    } else {
+      SoundFX.playCorrect();
+    }
   afterRef.innerText = `${getText('correctAnswer')} — ${getText('references')}: ` + (q.ref||[]).join(', ');
     if(state.mode==='challenge'){
       state.players[state.currentPlayerIndex].score += 10;
@@ -1510,6 +2015,8 @@ function handleAnswer(choice,q, el){
     showToast({ title: getText('correctAnswer'), msg: getText('correctMsg'), type: 'success', timeout: 1500 });
   }else{
     state.streak = 0;
+    updateStreakHUD(0);
+    SoundFX.playWrong();
   afterRef.innerText = `${getText('wrongAnswer')}. ${getText('correctLabel')}: ${translateAnswerForQuestionType(q.type, q.answer)}. ${getText('references')}: ${(q.ref||[]).join(', ')}`;
   // Remote challenge: sync score to Firebase
     if(state.mode==='remote-challenge' && window.RemoteChallenge){
@@ -1520,6 +2027,7 @@ function handleAnswer(choice,q, el){
 
   scoreEl.innerText = state.score;
   streakEl.innerText = state.streak;
+  btnNext.disabled = false;
 
   // Record result
   state.results.push({ 
@@ -1639,8 +2147,12 @@ function startTimer(seconds){
     timerEl.classList.remove('warn','danger');
     if(state.timerSecondsRemaining <= 5) timerEl.classList.add('danger');
     else if(state.timerSecondsRemaining <= 15) timerEl.classList.add('warn');
+    if(state.timerSecondsRemaining <= 10 && state.timerSecondsRemaining > 0) {
+      SoundFX.playTick();
+    }
     if(state.timerSecondsRemaining <= 0){
       stopTimer();
+      SoundFX.playWrong();
       showToast({ title: getText('timeUp'), msg: getText('timeUpMsg'), type: 'warn', timeout: 2000 });
       endQuiz();
     }
@@ -1686,44 +2198,50 @@ function togglePause(){
 // =========================
 // Study/Lookup
 // =========================
-function renderPeopleList(filter){
-  peopleList.innerHTML='';
-  let arr = state.people.filter(p=>!filter || p.name.toLowerCase().includes(filter.toLowerCase()));
+function getPersonIcon(p) {
+  if (!p) return '📖';
+  const occ = (p.occupation || '').toLowerCase();
   
-  // Apply existing filters
-  if(filterMother?.checked) arr = arr.filter(p=>!!p.mother);
-  if(filterOccupation?.checked) arr = arr.filter(p=>!!p.occupation);
-  if(filterAge?.checked) arr = arr.filter(p=>!!p.age_notes);
+  if (occ.includes('king') || occ.includes('queen') || occ.includes('pharaoh') || occ.includes('ruler')) return '👑';
+  if (occ.includes('prophet') || occ.includes('seer') || occ.includes('prophetess')) return '📜'; // Holy scroll
+  if (occ.includes('priest') || occ.includes('levite') || occ.includes('high priest')) return '🕯️'; // Sacred Light
+  if (occ.includes('apostle') || occ.includes('disciple') || occ.includes('evangelist')) return '⛵'; // Gospel Herald / Galilean boat
+  if (occ.includes('judge') || occ.includes('lawgiver')) return '⚖️'; // Scales of Justice
+  if (occ.includes('warrior') || occ.includes('commander') || occ.includes('captain')) return '🛡️'; // Shield of Faith
+  if (occ.includes('shepherd')) return '🐑';
+  if (occ.includes('carpenter') || occ.includes('builder') || occ.includes('artisan')) return '📐';
+  if (occ.includes('patriarch') || occ.includes('matriarch')) return '🏛️';
+  return '📖'; // Scripture Scroll/Book
+}
+
+function renderPeopleList(filterText = '') {
+  if (!peopleList) return;
+  peopleList.innerHTML = '';
   
-  // Apply testament filter (from setup panel if available)
-  const testamentFilter = document.getElementById('testament-filter');
-  if (testamentFilter && testamentFilter.value !== 'all') {
-    arr = arr.filter(p => p.testament === testamentFilter.value);
+  let arr = state.people.slice();
+  const q = normalize(filterText);
+  if (q) {
+    arr = arr.filter(p => 
+      normalize(p.name).includes(q) || 
+      (p.aliases && p.aliases.some(a => normalize(a).includes(q))) ||
+      normalize(p.occupation || '').includes(q)
+    );
   }
   
-  // Apply gender filter (from setup panel if available)
-  const genderFilter = document.getElementById('gender-filter');
-  if (genderFilter && genderFilter.value !== 'all') {
-    arr = arr.filter(p => p.gender === genderFilter.value);
+  if (filterOccupation?.checked) arr = arr.filter(p => !!p.occupation);
+  if (filterAge?.checked) arr = arr.filter(p => !!p.age_notes);
+  if (filterMother?.checked) arr = arr.filter(p => !!p.mother || !!p.father);
+  
+  if (sortSelect) {
+    if (sortSelect.value === 'name-asc') arr.sort((a, b) => a.name.localeCompare(b.name));
+    if (sortSelect.value === 'name-desc') arr.sort((a, b) => b.name.localeCompare(a.name));
   }
-  if(sortSelect){
-    if(sortSelect.value==='name-asc') arr.sort((a,b)=>a.name.localeCompare(b.name));
-    if(sortSelect.value==='name-desc') arr.sort((a,b)=>b.name.localeCompare(a.name));
-  }
-  if(peopleCountEl) peopleCountEl.textContent = String(arr.length);
-  for(const p of arr){
+  if (peopleCountEl) peopleCountEl.textContent = String(arr.length);
+  for (const p of arr) {
     const item = document.createElement('div');
     item.className = 'person-card';
     
-    // Determine icon based on occupation/role
-    let icon = '👤';
-    const occ = (p.occupation || '').toLowerCase();
-    if(occ.includes('king') || occ.includes('queen') || occ.includes('pharaoh')) icon = '👑';
-    else if(occ.includes('prophet') || occ.includes('seer')) icon = '🔮';
-    else if(occ.includes('priest')) icon = '⛪';
-    else if(occ.includes('apostle') || occ.includes('disciple') || occ.includes('evangelist')) icon = '✝️';
-    else if(occ.includes('judge')) icon = '⚖️';
-    else if(occ.includes('warrior') || occ.includes('commander')) icon = '⚔️';
+    const icon = getPersonIcon(p);
     
     item.innerHTML = `
       <div class="card-header">
@@ -1749,7 +2267,7 @@ function showPersonDetails(p){
   const body = document.getElementById('person-modal-body');
   if(!modal || !title || !body) return;
   
-  title.textContent = p.name;
+  title.innerHTML = `<span style="margin-right: 8px;">${getPersonIcon(p)}</span>${p.name}`;
   
   const aliasLabel = getText('aliases');
   const motherLabel = getText('filterMother');
@@ -1940,28 +2458,35 @@ function updateProgress(){
   progressBarEl.style.width = pct + '%';
 }
 
+function setModalScrollLock(locked) {
+  if (locked) {
+    document.body.classList.add('modal-open');
+    document.documentElement.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+  } else {
+    document.body.classList.remove('modal-open');
+    document.documentElement.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+  }
+}
+
 // Theme
 function applyTheme(theme){
-  console.log('applyTheme called with:', theme); // Debug
   state.theme = theme;
-  // Remove all theme classes first
   document.body.classList.remove('day', 'night');
+  const btnThemeToggle = document.getElementById('btn-theme-toggle');
   
-  // Apply the new theme
   if(theme === 'day') {
     document.body.classList.add('day');
-    console.log('Applied day theme'); // Debug
+    if(btnTheme) btnTheme.setAttribute('title', 'Theme: Ancient Bronze Dusk (Press T)');
+    if(btnThemeToggle) btnThemeToggle.textContent = '🏺';
   } else {
-    // Default to night theme - no class needed (root variables are night by default)
-    theme = 'night'; // Normalize to night if invalid theme
-    console.log('Applied night theme'); // Debug
-  }
-  
-  // Update theme toggle button tooltip
-  if (typeof getText === 'function') {
-    const themeKey = theme === 'day' ? 'themeDay' : 'themeNight';
-    const keyText = getText(themeKey) || (theme === 'day' ? 'Day' : 'Night');
-    if(btnTheme) btnTheme.setAttribute('title', `Toggle theme — ${keyText}`);
+    theme = 'night';
+    document.body.classList.add('night');
+    if(btnTheme) btnTheme.setAttribute('title', 'Theme: Celestial Midnight (Press T)');
+    if(btnThemeToggle) btnThemeToggle.textContent = '🌙';
   }
 }
 
@@ -1986,50 +2511,138 @@ function loadSettings(){
 // Summary modal
 function showSummaryModal(){
   if(!modalEl) return;
-  // Prevent background scrolling
   document.body.style.overflow = 'hidden';
   
   const total = state.results.length;
   const correct = state.results.filter(r=>r.correct).length;
   const accuracy = total ? Math.round((correct/total)*100) : 0;
+  const xpEarned = correct * 10 + (state.streak * 5);
   
-  let headerHtml = getText('summaryStats', { score: correct, total: total, percentage: accuracy, streak: state.streak });
+  if (accuracy >= 70) {
+    SoundFX.playFanfare();
+  } else {
+    SoundFX.playCorrect();
+  }
   
-  // Add winner info for challenge modes
+  // Update victory banner
+  const headlineEl = document.getElementById('summary-headline');
+  const subtextEl = document.getElementById('summary-subtext');
+  const badgeIconEl = document.getElementById('summary-badge-icon');
+  
+  if (accuracy >= 90) {
+    if (badgeIconEl) badgeIconEl.textContent = '👑';
+    if (headlineEl) headlineEl.textContent = 'Masterful Knowledge!';
+    if (subtextEl) subtextEl.textContent = 'You answered almost every question flawlessly.';
+  } else if (accuracy >= 70) {
+    if (badgeIconEl) badgeIconEl.textContent = '🌟';
+    if (headlineEl) headlineEl.textContent = 'Great Performance!';
+    if (subtextEl) subtextEl.textContent = 'Strong grasp of scripture and biblical accounts.';
+  } else {
+    if (badgeIconEl) badgeIconEl.textContent = '📖';
+    if (headlineEl) headlineEl.textContent = 'Challenge Completed!';
+    if (subtextEl) subtextEl.textContent = 'Every round builds your scripture knowledge deeper.';
+  }
+
+  // Versus / 2-Player banner if applicable
+  let versusBannerHtml = '';
   if (state.mode === 'challenge' || state.mode === 'remote-challenge') {
     const [p1, p2] = state.players;
-    const winnerName = p1.score > p2.score ? p1.name : (p2.score > p1.score ? p2.name : 'Tie');
-    const winnerText = p1.score === p2.score ? (getText('tieGame') || 'Tie Game') : `${getText('winner') || 'Winner'}: ${winnerName}`;
-    
-    headerHtml = `
-      <div style="margin-bottom: 16px; font-size: 1.2em; color: var(--accent); text-align: center;">
-        <strong>${winnerText}</strong><br>
-        <small>${p1.name}: ${p1.score} vs ${p2.name}: ${p2.score}</small>
+    const isTie = p1.score === p2.score;
+    const winnerName = p1.score > p2.score ? p1.name : p2.name;
+    const winnerText = isTie ? '🤝 Tie Match!' : `🏆 Winner: ${winnerName}!`;
+    versusBannerHtml = `
+      <div class="summary-versus-card">
+        <div class="versus-result-title">${winnerText}</div>
+        <div class="versus-score-row">
+          <span>${p1.name}: <strong>${p1.score}</strong></span>
+          <span class="vs-dot">•</span>
+          <span>${p2.name}: <strong>${p2.score}</strong></span>
+        </div>
       </div>
-      ${headerHtml}
     `;
   }
   
-  summaryStatsEl.innerHTML = headerHtml;
-  summaryListEl.innerHTML = '';
-  state.results.forEach(r=>{
-    const div = document.createElement('div');
-    div.className = 'summary-item ' + (r.correct?'correct':'incorrect');
-    div.innerHTML = `
-      <div><strong>${getText('questionLabelShort')}:</strong> ${r.prompt}</div>
-      <div><strong>${getText('yourAnswer')}:</strong> ${r.chosenDisplay}</div>
-      <div><strong>${getText('correctLabel')}:</strong> ${r.correctDisplay}</div>
-      <div class="ref"><strong>${getText('references')}:</strong> ${(r.ref||[]).join(', ')}</div>
-      ${r.explanation ? `<div class="summary-explanation" style="margin-top:8px; font-style:italic; color:var(--text-2);">${r.explanation}</div>` : ''}
+  // Render stats grid
+  if (summaryStatsEl) {
+    summaryStatsEl.innerHTML = `
+      ${versusBannerHtml}
+      <div class="summary-stat-box">
+        <span class="s-stat-num">${accuracy}%</span>
+        <span class="s-stat-label">Accuracy</span>
+      </div>
+      <div class="summary-stat-box">
+        <span class="s-stat-num">${correct}/${total}</span>
+        <span class="s-stat-label">Correct</span>
+      </div>
+      <div class="summary-stat-box">
+        <span class="s-stat-num">${state.score}</span>
+        <span class="s-stat-label">Points</span>
+      </div>
+      <div class="summary-stat-box">
+        <span class="s-stat-num">+${xpEarned}</span>
+        <span class="s-stat-label">XP Earned</span>
+      </div>
     `;
-    summaryListEl.appendChild(div);
-  });
+  }
+
+  // Render question breakdown list
+  if (summaryListEl) {
+    summaryListEl.innerHTML = '';
+    state.results.forEach((r, idx) => {
+      const div = document.createElement('div');
+      div.className = 'summary-review-card ' + (r.correct ? 'is-correct' : 'is-wrong');
+      const statusIcon = r.correct ? '✅' : '❌';
+      const versesFormatted = (r.ref && r.ref.length > 0) 
+        ? r.ref.map(v => `<span class="verse-badge">${v}</span>`).join(' ')
+        : '<span class="verse-badge">Biblical Canon</span>';
+
+      div.innerHTML = `
+        <div class="review-card-header">
+          <span class="review-q-num">Q${idx + 1}</span>
+          <span class="review-status-icon">${statusIcon}</span>
+          <div class="review-prompt">${r.prompt}</div>
+        </div>
+        <div class="review-card-body">
+          <div class="review-answer-row">
+            <span class="review-ans-label">Your Choice:</span>
+            <span class="review-ans-val ${r.correct ? 'ans-correct-val' : 'ans-wrong-val'}">${r.chosenDisplay || r.chosen}</span>
+          </div>
+          ${!r.correct ? `
+            <div class="review-answer-row">
+              <span class="review-ans-label">Correct:</span>
+              <span class="review-ans-val ans-correct-val">${r.correctDisplay || r.correctAnswer}</span>
+            </div>
+          ` : ''}
+          <div class="review-verse-row">
+            <span class="review-verse-label">Scripture Reference:</span>
+            <div class="review-verse-list">${versesFormatted}</div>
+          </div>
+          ${r.explanation ? `<div class="review-explanation">${r.explanation}</div>` : ''}
+        </div>
+      `;
+      summaryListEl.appendChild(div);
+    });
+  }
+
+  // Share results button
+  const btnShareSummary = document.getElementById('btn-share-summary');
+  if (btnShareSummary) {
+    btnShareSummary.onclick = async () => {
+      const shareText = `🏆 Who-Bible Trivia Match: I scored ${state.score} pts with ${accuracy}% accuracy! Play along: ${window.location.origin}`;
+      if (navigator.share) {
+        try { await navigator.share({ title: 'Who-Bible Score', text: shareText }); } catch (_) {}
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareText);
+        showToast({ title: 'Copied to Clipboard!', msg: 'Share your score with friends', type: 'success', timeout: 2000 });
+      }
+    };
+  }
+
   modalEl.style.display = 'flex';
 }
 
 function hideSummaryModal(){
   if(modalEl) modalEl.style.display = 'none';
-  // Restore background scrolling
   document.body.style.overflow = '';
 }
 
@@ -2110,22 +2723,16 @@ function initFeedback() {
   // Open Modal
   const openFeedback = () => {
     console.log('[Feedback] Opening feedback modal...');
-    // Save current scroll position before locking
-    scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-    
-    // Show modal
-    modal.style.display = 'flex';
     modal.classList.add('show');
-    
-    // Lock body scroll and maintain position
-    document.body.classList.add('modal-open');
-    document.body.style.top = `-${scrollPosition}px`;
+    document.body.style.overflow = 'hidden';
     
     // Reset form
     selectedRating = 0;
     ratingBtns.forEach(b => b.classList.remove('selected'));
     const msgEl = document.getElementById('feedback-message');
     if (msgEl) msgEl.value = '';
+    const expEl = document.getElementById('feedback-experience');
+    if (expEl) expEl.value = '';
     
     // Reset new selects
     const selects = ['rating-solo', 'rating-timed', 'rating-challenge', 'rating-study', 'rating-accuracy', 'rating-scenarios', 'rating-online', 'rating-classroom'];
@@ -2140,53 +2747,18 @@ function initFeedback() {
   console.log('[Feedback] Button element found:', btnOpen);
   
   if(btnOpen && !btnOpen._feedbackInitialized) {
-    // Remove any existing listeners first
-    const newBtn = btnOpen.cloneNode(true);
-    btnOpen.parentNode.replaceChild(newBtn, btnOpen);
-    
-    // Add both touch and click handlers for maximum compatibility
-    newBtn.addEventListener('touchend', (e) => {
+    btnOpen.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log('[Feedback] TOUCHEND - opening modal');
-      openFeedback();
-    }, { passive: false });
-    
-    newBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('[Feedback] CLICK - opening modal');
       openFeedback();
     });
-    
-    // Also try direct onclick as absolute fallback
-    newBtn.onclick = function() {
-      openFeedback();
-    };
-    
-    // Mark as initialized
-    newBtn._feedbackInitialized = true;
-    console.log('[Feedback] Event handlers attached successfully');
-  } else if (!btnOpen) {
-    console.error('[Feedback] Button not found in DOM!');
-  } else {
-    console.log('[Feedback] Button already initialized');
+    btnOpen._feedbackInitialized = true;
   }
 
   // Close Modal
   const close = () => {
     modal.classList.remove('show');
-    
-    // Restore body scroll
-    document.body.classList.remove('modal-open');
-    document.body.style.top = '';
-    
-    // Restore scroll position
-    window.scrollTo(0, scrollPosition);
-    
-    setTimeout(() => {
-      modal.style.display = 'none';
-    }, 300); // Wait for animation
+    document.body.style.overflow = '';
   };
   if(btnClose) btnClose.addEventListener('click', close);
   if(btnCancel) btnCancel.addEventListener('click', close);
@@ -2197,7 +2769,7 @@ function initFeedback() {
   // Rating Selection
   ratingBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      selectedRating = parseInt(btn.dataset.rating);
+      selectedRating = parseInt(btn.dataset.rating, 10);
       ratingBtns.forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
     });
@@ -2206,8 +2778,8 @@ function initFeedback() {
   // Submit
   if(btnSubmit) {
     btnSubmit.addEventListener('click', async () => {
-      const message = document.getElementById('feedback-message').value.trim();
-      const experience = document.getElementById('feedback-experience')?.value.trim();
+      const message = document.getElementById('feedback-message')?.value.trim() || '';
+      const experience = document.getElementById('feedback-experience')?.value.trim() || '';
       
       const ratingSolo = document.getElementById('rating-solo')?.value;
       const ratingTimed = document.getElementById('rating-timed')?.value;
@@ -2224,7 +2796,7 @@ function initFeedback() {
       }
 
       btnSubmit.disabled = true;
-      btnSubmit.textContent = getText('sendingFeedback');
+      btnSubmit.textContent = getText('sendingFeedback') || 'Submitting...';
 
       const feedbackData = {
         rating: selectedRating,
@@ -2247,12 +2819,17 @@ function initFeedback() {
         if (typeof database !== 'undefined' && database) {
           await database.ref('feedback').push(feedbackData);
           showToast({ title: getText('thankYou'), msg: getText('feedbackReceived'), type: 'success' });
-          // Mark as given so we don't prompt again automatically
+          localStorage.setItem('who-bible-feedback-prompted', 'true');
+        } else if (typeof firebase !== 'undefined' && firebase.database) {
+          await firebase.database().ref('feedback').push(feedbackData);
+          showToast({ title: getText('thankYou'), msg: getText('feedbackReceived'), type: 'success' });
           localStorage.setItem('who-bible-feedback-prompted', 'true');
         } else {
-          // Fallback if Firebase not loaded
-          console.log('Feedback (simulated):', feedbackData);
-          showToast({ title: getText('thankYou'), msg: getText('feedbackSimulated'), type: 'success' });
+          // Fallback to localStorage
+          const savedFeedback = JSON.parse(localStorage.getItem('who-bible-feedback') || '[]');
+          savedFeedback.push(feedbackData);
+          localStorage.setItem('who-bible-feedback', JSON.stringify(savedFeedback));
+          showToast({ title: getText('thankYou') || 'Thank You!', msg: getText('feedbackReceived') || 'Your feedback has been saved.', type: 'success' });
         }
         close();
       } catch (error) {
@@ -2260,7 +2837,7 @@ function initFeedback() {
         showToast({ title: getText('feedbackError'), msg: getText('feedbackErrorMsg'), type: 'error' });
       } finally {
         btnSubmit.disabled = false;
-        btnSubmit.textContent = getText('sendFeedback');
+        btnSubmit.textContent = getText('sendFeedback') || 'Send Feedback';
       }
     });
   }
@@ -2281,7 +2858,7 @@ window.showPlayerChangeModal = function() {
 };
 
 // Classroom Mode - Join Prompt
-function promptClassroomJoin() {
+function promptClassroomJoin(initialPin = '') {
   // Rate limiting
   if (window.RateLimiter && !window.RateLimiter.check('joinClassroom', 10)) {
     showToast({ title: 'Error', msg: 'Too many join attempts. Please wait.', type: 'error' });
@@ -2305,10 +2882,16 @@ function promptClassroomJoin() {
   // Pre-fill with player name if available
   const currentName = state.currentPlayer ? state.currentPlayer.name : 'Player';
   nameInput.value = currentName;
-  pinInput.value = '';
+  pinInput.value = initialPin ? initialPin.toUpperCase() : '';
   
   modal.style.display = 'flex';
-  setTimeout(() => { pinInput.focus(); }, 100);
+  setTimeout(() => { 
+    if (initialPin) {
+      nameInput.focus();
+    } else {
+      pinInput.focus();
+    }
+  }, 100);
   
   // Handle Save button click
   const handleSave = () => {
@@ -2316,27 +2899,9 @@ function promptClassroomJoin() {
     const name = nameInput.value.trim() || 'Player';
     
     if (!code) {
-      showToast({ title: 'Error', msg: 'Please enter a Game PIN', type: 'error' });
+      showToast({ title: 'PIN Required', msg: 'Please enter a Game PIN', type: 'error' });
       pinInput.focus();
       return;
-    }
-    
-    // Validate room code
-    if (window.SecurityModule) {
-      const codeValidation = window.SecurityModule.validateRoomCode(code);
-      if (!codeValidation.valid) {
-        showToast({ title: 'Error', msg: codeValidation.error, type: 'error' });
-        return;
-      }
-    }
-    
-    // Validate player name
-    if (window.SecurityModule) {
-      const nameValidation = window.SecurityModule.validatePlayerName(name);
-      if (!nameValidation.valid) {
-        showToast({ title: 'Error', msg: nameValidation.error, type: 'error' });
-        return;
-      }
     }
     
     if (!window.FirebaseConfig || !window.FirebaseConfig.isAvailable()) {
@@ -2353,14 +2918,14 @@ function promptClassroomJoin() {
     // Check if room exists
     roomRef.once('value').then(snapshot => {
       if (!snapshot.exists()) {
-        showToast({ title: 'Error', msg: 'Room not found. Check the PIN.', type: 'error' });
+        showToast({ title: 'Room Not Found', msg: 'Please check the Game PIN from the host.', type: 'error' });
         return;
       }
       
       const room = snapshot.val();
       
-      if (room.status !== 'lobby' && room.status !== 'active' && room.status !== 'question') {
-        showToast({ title: 'Error', msg: 'Game has ended or not started.', type: 'error' });
+      if (room.status === 'finished') {
+        showToast({ title: 'Game Ended', msg: 'This quiz session has already finished.', type: 'error' });
         return;
       }
       
@@ -2377,10 +2942,10 @@ function promptClassroomJoin() {
       roomRef.child('lastActivity').set(Date.now());
       
       modal.style.display = 'none';
-      showToast({ title: 'Success!', msg: `Joined as ${sanitizedName}. Follow instructions on screen!`, type: 'success', timeout: 8000 });
+      showToast({ title: 'Joined!', msg: `Welcome, ${sanitizedName}! Watch the host screen for questions.`, type: 'success', timeout: 4000 });
       
       // Listen for game state
-      startClassroomPlayerMode(sanitizedCode, playerId, roomRef);
+      startClassroomPlayerMode(sanitizedCode, playerId, roomRef, sanitizedName);
     }).catch(error => {
       showToast({ title: 'Error', msg: 'Failed to join: ' + error.message, type: 'error' });
     });
@@ -2487,38 +3052,75 @@ function promptClassroomJoinLegacy() {
     showToast({ title: 'Success!', msg: `Joined as ${sanitizedName}. Follow instructions on screen!`, type: 'success', timeout: 8000 });
     
     // Listen for game state
-    startClassroomPlayerMode(sanitizedCode, playerId, roomRef);
+    startClassroomPlayerMode(sanitizedCode, playerId, roomRef, sanitizedName);
   }).catch(error => {
     showToast({ title: 'Error', msg: 'Failed to join: ' + error.message, type: 'error' });
   });
 }
 
 // Classroom Player Mode
-function startClassroomPlayerMode(roomCode, playerId, roomRef) {
+function startClassroomPlayerMode(roomCode, playerId, roomRef, playerName) {
   // Hide setup, show game area with modified UI
   setupPanel.style.display = 'none';
   gameArea.style.display = 'block';
   
-  document.getElementById('game-title').textContent = `Room: ${roomCode}`;
+  document.getElementById('game-title').textContent = `🏫 Classroom: ${roomCode}`;
+  
+  // Track my player state
+  let myScore = 0;
+  let myCorrect = 0;
+  let hasAnsweredCurrent = false;
+  
+  // Listen for score updates
+  roomRef.child(`players/${playerId}`).on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      myScore = data.score || 0;
+      myCorrect = data.correct || 0;
+      // Assume global variable scoreEl exists, or define it here
+      const scoreEl = document.getElementById('game-score');
+      if (scoreEl) scoreEl.innerText = myScore;
+    }
+  });
+  
+  // Initial waiting state
+  showClassroomLobbyWaiting(roomCode, playerName);
   
   // Listen for current question
   roomRef.child('currentQuestion').on('value', (snapshot) => {
     const questionIndex = snapshot.val();
+    hasAnsweredCurrent = false;
     if (questionIndex !== null && questionIndex >= 0) {
       loadClassroomQuestion(roomRef, questionIndex, playerId);
     }
   });
   
-  // Listen for status
+  // Listen for status changes
   roomRef.child('status').on('value', (snapshot) => {
     const status = snapshot.val();
-    if (status === 'finished') {
-      showToast({ title: 'Quiz Complete!', msg: 'Thanks for playing!', type: 'success' });
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+    if (status === 'results') {
+      showClassroomRoundResults(roomRef, playerId);
+    } else if (status === 'leaderboard') {
+      showClassroomLeaderboardWaiting(myScore);
+    } else if (status === 'finished') {
+      showClassroomFinalResults(myScore, myCorrect);
     }
   });
+}
+
+function showClassroomLobbyWaiting(roomCode, playerName) {
+  const qTextEl = document.getElementById('qtext');
+  qTextEl.textContent = `You're in! Waiting for host to start the quiz...`;
+  
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = `
+    <div style="text-align: center; padding: 48px 24px; background: rgba(255,255,255,0.06); border: 2px dashed var(--accent); border-radius: 20px;">
+      <div style="font-size: 56px; margin-bottom: 16px;">🎮</div>
+      <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 8px;">Ready, ${playerName}!</h2>
+      <p style="color: var(--muted); font-size: 16px;">Room Code: <strong style="color: var(--accent);">${roomCode}</strong></p>
+      <p style="color: var(--muted); font-size: 14px; margin-top: 16px;">Watch the main screen for the quiz questions!</p>
+    </div>
+  `;
 }
 
 // Load classroom question for player
@@ -2558,16 +3160,40 @@ function displayClassroomQuestion(question, questionIndex, roomRef, playerId) {
   const icons = ['▲', '◆', '●', '■'];
   const colors = ['#e21b3c', '#1368ce', '#ffa602', '#26890c'];
   
+  const gridContainer = document.createElement('div');
+  gridContainer.className = 'classroom-options-grid';
+  gridContainer.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; width: 100%;';
+  
   question.options.forEach((option, i) => {
     const btn = document.createElement('button');
-    btn.className = 'ans classroom-answer';
-    btn.style.borderLeft = `6px solid ${colors[i]}`;
+    btn.className = 'classroom-answer-btn';
+    btn.style.cssText = `
+      background: ${colors[i]};
+      color: #ffffff;
+      border: none;
+      border-radius: 16px;
+      padding: 24px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 16px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    `;
+    
     btn.innerHTML = `
-      <span style="font-size: 32px; margin-right: 12px;">${icons[i]}</span>
-      <span style="font-size: 20px; font-weight: 700;">${option}</span>
+      <span style="font-size: 32px; font-weight: 900; line-height: 1;">${icons[i]}</span>
+      <span style="text-align: left; line-height: 1.3;">${option}</span>
     `;
     
     btn.addEventListener('click', () => {
+      if (navigator.vibrate) navigator.vibrate(50);
+      btn.style.transform = 'scale(0.96)';
+      btn.style.filter = 'brightness(1.2)';
+      
       const answerTime = Date.now();
       const questionStartTime = state.questionStartTime || answerTime;
       const timeTaken = (answerTime - questionStartTime) / 1000;
@@ -2580,11 +3206,13 @@ function displayClassroomQuestion(question, questionIndex, roomRef, playerId) {
       });
       
       // Show waiting
-      showClassroomWaiting();
+      showClassroomWaiting(option, icons[i], colors[i]);
     });
     
-    answersEl.appendChild(btn);
+    gridContainer.appendChild(btn);
   });
+  
+  answersEl.appendChild(gridContainer);
   
   // Record question start time
   roomRef.child('questionStartTime').once('value').then(snapshot => {
@@ -2593,13 +3221,57 @@ function displayClassroomQuestion(question, questionIndex, roomRef, playerId) {
 }
 
 // Show waiting screen for classroom player
-function showClassroomWaiting() {
+function showClassroomWaiting(selectedOption, icon, color) {
   const answersEl = document.getElementById('answers');
   answersEl.innerHTML = `
-    <div style="text-align: center; padding: 60px 20px; background: rgba(76, 175, 80, 0.1); border-radius: 16px;">
-      <div style="font-size: 64px; margin-bottom: 20px;">✓</div>
-      <h2 style="font-size: 32px; margin-bottom: 12px;">Answer Submitted!</h2>
-      <p style="font-size: 20px; color: var(--text-muted);">Waiting for other players...</p>
+    <div style="text-align: center; padding: 48px 20px; background: rgba(255, 255, 255, 0.08); border-radius: 20px; border: 2px solid ${color || 'var(--accent)'};">
+      <div style="font-size: 48px; margin-bottom: 12px;">${icon || '✓'}</div>
+      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Answer Locked In!</h2>
+      ${selectedOption ? `<p style="font-size: 18px; color: var(--text); margin-bottom: 12px;">Selected: <strong>${selectedOption}</strong></p>` : ''}
+      <p style="font-size: 15px; color: var(--muted);">Waiting for time to expire / other players...</p>
+    </div>
+  `;
+}
+
+// Show round results on player device
+function showClassroomRoundResults(roomRef, playerId) {
+  const answersEl = document.getElementById('answers');
+  roomRef.child(`players/${playerId}`).once('value').then(snapshot => {
+    const p = snapshot.val() || {};
+    answersEl.innerHTML = `
+      <div style="text-align: center; padding: 40px 20px; background: rgba(255, 255, 255, 0.08); border-radius: 20px;">
+        <div style="font-size: 48px; margin-bottom: 8px;">📊</div>
+        <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Round Results on Screen</h2>
+        <div style="font-size: 32px; font-weight: 900; color: var(--accent); margin: 12px 0;">${p.score || 0} pts</div>
+        <p style="color: var(--muted); font-size: 15px;">Check the main screen to see the correct answer breakdown!</p>
+      </div>
+    `;
+  });
+}
+
+// Show leaderboard waiting
+function showClassroomLeaderboardWaiting(score) {
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = `
+    <div style="text-align: center; padding: 40px 20px; background: rgba(255, 255, 255, 0.08); border-radius: 20px;">
+      <div style="font-size: 48px; margin-bottom: 8px;">🏆</div>
+      <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Leaderboard Displayed</h2>
+      <div style="font-size: 32px; font-weight: 900; color: var(--accent); margin: 12px 0;">${score || 0} pts</div>
+      <p style="color: var(--muted); font-size: 15px;">Next question starting soon...</p>
+    </div>
+  `;
+}
+
+// Show final results
+function showClassroomFinalResults(score, correct) {
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = `
+    <div style="text-align: center; padding: 48px 20px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; border: 2px solid var(--accent);">
+      <div style="font-size: 56px; margin-bottom: 12px;">🎉</div>
+      <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 8px;">Quiz Completed!</h2>
+      <div style="font-size: 36px; font-weight: 900; color: var(--accent); margin: 12px 0;">${score || 0} Total Points</div>
+      <p style="color: var(--text); font-size: 18px; margin-bottom: 20px;">Correct answers: <strong>${correct || 0}</strong></p>
+      <button onclick="window.location.reload()" class="primary" style="padding: 12px 28px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer;">Play Again</button>
     </div>
   `;
 }

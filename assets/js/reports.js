@@ -52,6 +52,15 @@
       btnSubmit.addEventListener('click', submitReport);
     }
 
+    // Direct quiz header Flag Question button
+    const btnFlagHeader = document.getElementById('btn-flag-question');
+    if (btnFlagHeader) {
+      btnFlagHeader.addEventListener('click', (e) => {
+        e.preventDefault();
+        openReportModal();
+      });
+    }
+
     // Setup report buttons for questions (these will be added dynamically)
     setupReportButtons();
   }
@@ -155,7 +164,8 @@
     if (answersContainer) {
       const answerElements = answersContainer.querySelectorAll('.ans');
       answerElements.forEach(ans => {
-        currentReportContext.answers.push(ans.innerText);
+        const textSpan = ans.querySelector('.choice-text');
+        currentReportContext.answers.push((textSpan ? textSpan.innerText : ans.innerText).trim());
       });
     }
 

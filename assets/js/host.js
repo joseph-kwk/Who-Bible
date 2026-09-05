@@ -107,6 +107,11 @@ function setupEventListeners() {
   document.getElementById('btn-start-quiz').addEventListener('click', startQuiz);
   document.getElementById('btn-cancel-session').addEventListener('click', cancelSession);
   
+  const btnCopyPin = document.getElementById('btn-copy-pin');
+  if (btnCopyPin) {
+    btnCopyPin.addEventListener('click', copyGamePin);
+  }
+  
   // Results screen
   document.getElementById('btn-show-leaderboard').addEventListener('click', showLeaderboardScreen);
   
@@ -126,40 +131,36 @@ function setupEventListeners() {
 // Create Session
 async function createSession() {
   // Rate limiting: Max 5 room creations per minute
-  if (!window.RateLimiter.check('createRoom', 5)) {
+  if (window.RateLimiter && !window.RateLimiter.check('createRoom', 5)) {
     showToast('Too many attempts. Please wait a minute and try again.', 'error');
     return;
   }
   
   const hostName = document.getElementById('host-name').value.trim() || 'Host';
   const difficulty = document.getElementById('quiz-difficulty').value;
-  const numQuestions = parseInt(document.getElementById('quiz-questions').value);
-  const timePerQuestion = parseInt(document.getElementById('quiz-timer').value);
+  const numQuestions = parseInt(document.getElementById('quiz-questions').value) || 10;
+  const timePerQuestion = parseInt(document.getElementById('quiz-timer').value) || 20;
   
   // Validate host name
-  const nameValidation = window.SecurityModule.validateHostName(hostName);
-  if (!nameValidation.valid) {
-    showToast(nameValidation.error, 'error');
-    return;
+  let validName = hostName;
+  if (window.SecurityModule) {
+    const nameValidation = window.SecurityModule.validateHostName(hostName);
+    if (!nameValidation.valid) {
+      showToast(nameValidation.error, 'error');
+      return;
+    }
+    validName = nameValidation.value;
   }
   
-  // Validate settings
-  const settingsValidation = window.SecurityModule.validateQuizSettings({
-    numQuestions,
-    timePerQuestion,
-    difficulty
-  });
-  
-  if (!settingsValidation.valid) {
-    showToast(settingsValidation.errors.join('. '), 'error');
-    return;
-  }
-  
-  // Use sanitized values
-  const sanitizedSettings = settingsValidation.sanitized;
+  // Sanitize settings
+  const sanitizedSettings = {
+    numQuestions: Math.max(5, Math.min(30, numQuestions)),
+    timePerQuestion: Math.max(10, Math.min(60, timePerQuestion)),
+    difficulty: ['easy', 'medium', 'hard'].includes(difficulty) ? difficulty : 'medium'
+  };
   
   hostState.settings = {
-    hostName: nameValidation.value,
+    hostName: validName,
     difficulty: sanitizedSettings.difficulty,
     numQuestions: sanitizedSettings.numQuestions,
     timePerQuestion: sanitizedSettings.timePerQuestion
@@ -174,7 +175,7 @@ async function createSession() {
   
   const roomData = {
     code: hostState.roomCode,
-    host: window.SecurityModule.sanitizeHTML(nameValidation.value),
+    host: window.SecurityModule ? window.SecurityModule.sanitizeHTML(validName) : validName,
     status: 'lobby',
     createdAt: Date.now(),
     lastActivity: Date.now(),
@@ -201,13 +202,43 @@ function generateRoomCode() {
   return `${adj}-${numbers}`;
 }
 
+// Copy Game PIN & Link
+async function copyGamePin() {
+  const baseJoinUrl = window.location.origin + window.location.pathname.replace('host.html', '');
+  const fullJoinUrl = `${baseJoinUrl}index.html?pin=${hostState.roomCode}`;
+  const text = `Join our Who-Bible quiz! PIN: ${hostState.roomCode} - ${fullJoinUrl}`;
+  try {
+    await navigator.clipboard.writeText(fullJoinUrl);
+    showToast(`Copied join link to clipboard! PIN: ${hostState.roomCode}`, 'success');
+  } catch (e) {
+    showToast(`Game PIN: ${hostState.roomCode}`, 'info');
+  }
+}
+
 // Show Lobby
 function showLobby() {
-  const joinUrl = window.location.origin + window.location.pathname.replace('host.html', '');
-  document.getElementById('join-url').textContent = joinUrl;
+  const baseJoinUrl = window.location.origin + window.location.pathname.replace('host.html', '');
+  const fullJoinUrl = `${baseJoinUrl}index.html?pin=${hostState.roomCode}`;
+  
+  document.getElementById('join-url').textContent = window.location.host || 'who-bible.com';
   document.getElementById('room-code').textContent = hostState.roomCode;
   document.getElementById('question-count').textContent = hostState.settings.numQuestions;
   document.getElementById('time-per-question').textContent = hostState.settings.timePerQuestion + 's';
+  
+  // Setup QR Code
+  const qrImg = document.getElementById('lobby-qr-img');
+  const qrFallback = document.getElementById('lobby-qr-fallback');
+  if (qrImg) {
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(fullJoinUrl)}&bgcolor=1a1b26&color=ffffff&margin=8`;
+    qrImg.onload = () => {
+      qrImg.style.display = 'block';
+      if (qrFallback) qrFallback.style.display = 'none';
+    };
+    qrImg.onerror = () => {
+      qrImg.style.display = 'none';
+      if (qrFallback) qrFallback.style.display = 'flex';
+    };
+  }
   
   showScreen('lobby-screen');
 }
@@ -272,106 +303,164 @@ async function startQuiz() {
   showQuestion(0);
 }
 
+// Filter people by difficulty
+function filterPeopleForHost(people, difficulty) {
+  if (difficulty === 'easy') {
+    const common = new Set(['Noah', 'Moses', 'David', 'Solomon', 'Abraham', 'Isaac', 'Jacob', 'Ruth', 'Esther', 'Peter', 'Paul', 'Mary (mother of Jesus)', 'John the Baptist', 'Joseph (son of Jacob)', 'Lazarus', 'Adam', 'Eve', 'Joshua', 'Gideon', 'Samson', 'Daniel', 'Elijah']);
+    return people.filter(p => p.difficulty === 'easy' || common.has(p.name));
+  }
+  if (difficulty === 'hard') {
+    return people.filter(p => p.difficulty === 'hard' || (!p.occupation && !p.mother));
+  }
+  return people.slice();
+}
+
 // Generate Questions
 function generateQuestions(difficulty, count) {
   const questions = [];
   const usedPeople = new Set();
   
-  // Filter by difficulty
-  let pool = PEOPLE_DATA;
-  if (difficulty === 'easy') {
-    pool = PEOPLE_DATA.filter(p => p.notableEvents && p.notableEvents.length > 0);
-  } else if (difficulty === 'hard') {
-    pool = PEOPLE_DATA; // All characters
-  }
+  let pool = filterPeopleForHost(PEOPLE_DATA, difficulty);
+  if (pool.length === 0) pool = PEOPLE_DATA.slice();
   
-  const questionTypes = ['deed', 'age', 'mother', 'occupation', 'event'];
+  // Shuffle pool
+  const shuffledPool = [...pool].sort(() => Math.random() - 0.5);
   
-  for (let i = 0; i < count && pool.length > usedPeople.size; i++) {
-    // Pick random person
-    let person;
-    do {
-      person = pool[Math.floor(Math.random() * pool.length)];
-    } while (usedPeople.has(person.name) && usedPeople.size < pool.length);
+  const questionTypes = ['whoDid', 'mother', 'occupation', 'age', 'event'];
+  
+  for (const person of shuffledPool) {
+    if (questions.length >= count) break;
+    if (usedPeople.has(person.name)) continue;
     
-    usedPeople.add(person.name);
+    // Pick a valid question type for this person
+    const validTypes = [];
+    if (person.notable_events && person.notable_events.length > 0) validTypes.push('whoDid', 'event');
+    if (person.mother) validTypes.push('mother');
+    if (person.occupation) validTypes.push('occupation');
+    if (person.age_notes) validTypes.push('age');
     
-    // Pick random question type
-    const type = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+    if (validTypes.length === 0) validTypes.push('whoDid');
     
-    // Generate question
-    const question = generateQuestionForPerson(person, type, pool);
-    if (question) {
+    const type = validTypes[Math.floor(Math.random() * validTypes.length)];
+    const question = generateQuestionForPerson(person, type, PEOPLE_DATA);
+    
+    if (question && question.options && question.options.length === 4) {
+      usedPeople.add(person.name);
       questions.push({
         ...question,
-        index: i,
+        index: questions.length,
         correctAnswer: question.correct,
         points: 1000 // Base points
       });
     }
   }
   
-  return questions;
+  // If we still need more questions, fill with whoDid questions
+  let i = 0;
+  while (questions.length < count && i < PEOPLE_DATA.length) {
+    const p = PEOPLE_DATA[i++];
+    if (!usedPeople.has(p.name)) {
+      const q = generateQuestionForPerson(p, 'whoDid', PEOPLE_DATA);
+      if (q) {
+        usedPeople.add(p.name);
+        questions.push({
+          ...q,
+          index: questions.length,
+          correctAnswer: q.correct,
+          points: 1000
+        });
+      }
+    }
+  }
+  
+  return questions.slice(0, count);
 }
 
 // Generate question for a person
 function generateQuestionForPerson(person, type, pool) {
-  let prompt, correct, options, verse;
+  let prompt = '';
+  let correct = '';
+  let verse = (person.verses && person.verses.length > 0) ? person.verses.join(', ') : '';
   
+  const rawEvent = (person.notable_events && person.notable_events.length > 0) 
+    ? person.notable_events[0] 
+    : 'is a notable figure in scripture';
+    
   switch (type) {
-    case 'deed':
-      if (!person.notableDeeds || person.notableDeeds.length === 0) return null;
-      const deed = person.notableDeeds[0];
-      prompt = `Who ${deed.toLowerCase()}?`;
+    case 'whoDid':
+    case 'event':
+      prompt = `Who ${rawEvent}?`;
       correct = person.name;
-      verse = person.verses?.[0] || '';
-      break;
-      
-    case 'age':
-      if (!person.age) return null;
-      prompt = `How old was ${person.name} when they died?`;
-      correct = person.age.toString();
-      verse = person.verses?.[0] || '';
       break;
       
     case 'mother':
-      if (!person.mother) return null;
-      prompt = `Who was the mother of ${person.name}?`;
-      correct = person.mother;
-      verse = person.verses?.[0] || '';
+      if (!person.mother) {
+        prompt = `Who ${rawEvent}?`;
+        correct = person.name;
+        type = 'whoDid';
+      } else {
+        prompt = `Who is the mother of ${person.name}?`;
+        correct = person.mother;
+      }
       break;
       
     case 'occupation':
-      if (!person.occupation) return null;
-      prompt = `What was ${person.name}'s occupation?`;
-      correct = person.occupation;
-      verse = person.verses?.[0] || '';
+      if (!person.occupation) {
+        prompt = `Who ${rawEvent}?`;
+        correct = person.name;
+        type = 'whoDid';
+      } else {
+        prompt = `What was ${person.name}'s role or occupation?`;
+        correct = person.occupation;
+      }
       break;
       
-    case 'event':
-      if (!person.notableEvents || person.notableEvents.length === 0) return null;
-      const event = person.notableEvents[0];
-      prompt = `Who ${event.toLowerCase()}?`;
-      correct = person.name;
-      verse = person.verses?.[0] || '';
+    case 'age':
+      if (!person.age_notes) {
+        prompt = `Who ${rawEvent}?`;
+        correct = person.name;
+        type = 'whoDid';
+      } else {
+        prompt = `What do scriptures record about ${person.name}'s life or age?`;
+        correct = person.age_notes;
+      }
       break;
       
     default:
-      return null;
+      prompt = `Who ${rawEvent}?`;
+      correct = person.name;
+      type = 'whoDid';
   }
   
-  // Generate wrong options
-  options = [correct];
-  while (options.length < 4) {
-    const randomPerson = pool[Math.floor(Math.random() * pool.length)];
-    const wrongAnswer = type === 'age' ? randomPerson.age?.toString() :
-                       type === 'mother' ? randomPerson.mother :
-                       type === 'occupation' ? randomPerson.occupation :
-                       randomPerson.name;
+  // Generate distractors
+  const options = [correct];
+  const candidates = pool.filter(p => p.name !== person.name);
+  const shuffledCandidates = [...candidates].sort(() => Math.random() - 0.5);
+  
+  for (const cand of shuffledCandidates) {
+    if (options.length >= 4) break;
     
-    if (wrongAnswer && !options.includes(wrongAnswer)) {
-      options.push(wrongAnswer);
+    let candidateAnswer = '';
+    if (type === 'whoDid' || type === 'event') {
+      candidateAnswer = cand.name;
+    } else if (type === 'mother') {
+      candidateAnswer = cand.mother || cand.name;
+    } else if (type === 'occupation') {
+      candidateAnswer = cand.occupation || cand.name;
+    } else if (type === 'age') {
+      candidateAnswer = cand.age_notes || `Lived during biblical times`;
     }
+    
+    if (candidateAnswer && !options.includes(candidateAnswer)) {
+      options.push(candidateAnswer);
+    }
+  }
+  
+  // Ensure we have 4 options
+  let fallbackIndex = 1;
+  while (options.length < 4) {
+    const fallback = `Option ${fallbackIndex++}`;
+    if (!options.includes(fallback)) options.push(fallback);
   }
   
   // Shuffle options

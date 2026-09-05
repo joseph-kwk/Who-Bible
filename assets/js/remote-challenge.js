@@ -256,6 +256,36 @@ const RemoteChallenge = {
   },
   
   /**
+   * Reset room for a Rematch
+   */
+  async requestRematch() {
+    if (!this.roomRef) return;
+    
+    // Reset player scores and ready flags
+    const snapshot = await this.roomRef.once('value');
+    const room = snapshot.val();
+    if (!room) return;
+    
+    const updates = {
+      status: 'waiting',
+      results: null
+    };
+    
+    Object.keys(room.players || {}).forEach(key => {
+      updates[`players/${key}/score`] = 0;
+      updates[`players/${key}/streak`] = 0;
+      updates[`players/${key}/currentQuestion`] = 0;
+      updates[`players/${key}/ready`] = false;
+    });
+    
+    await this.roomRef.update(updates);
+    
+    if (this.isHost) {
+      await this.generateQuestions(room.settings || {});
+    }
+  },
+
+  /**
    * Leave room and clean up listeners
    */
   leaveRoom() {
@@ -280,11 +310,11 @@ const RemoteChallenge = {
   },
   
   /**
-   * Check if a room code is in URL
+   * Check if a room code or pin is in URL
    */
   getRoomCodeFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    return params.get('room');
+    return params.get('room') || params.get('pin') || params.get('code');
   }
 };
 

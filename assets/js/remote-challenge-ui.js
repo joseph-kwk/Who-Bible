@@ -35,6 +35,14 @@ function showRemoteModal() {
   const modal = document.getElementById('remote-modal');
   if (modal) {
     modal.style.display = 'flex';
+    
+    // Auto-fill names if available
+    const currentPlayerName = (window.state && window.state.currentPlayer) ? window.state.currentPlayer.name : 'Player';
+    const hostInput = document.getElementById('remote-host-name');
+    const joinInput = document.getElementById('remote-join-name');
+    if (hostInput && !hostInput.value) hostInput.value = currentPlayerName;
+    if (joinInput && !joinInput.value) joinInput.value = currentPlayerName;
+    
     showRemoteStep('1');
   }
 }
@@ -56,7 +64,7 @@ function startRemoteChallenge() {
   if (!window.FirebaseConfig?.isAvailable()) {
     showToast({ 
       title: 'Firebase Not Configured', 
-      msg: 'Please set up Firebase to use Remote Challenge. See REMOTE_CHALLENGE_SETUP.md', 
+      msg: 'Please set up Firebase to use Remote Challenge.', 
       type: 'error',
       timeout: 4000
     });
@@ -66,42 +74,18 @@ function startRemoteChallenge() {
   showRemoteModal();
 }
 
-// Save name handlers (for Save buttons next to inputs)
+// Save name handlers
 function handleSaveHostName() {
   const hostNameInput = document.getElementById('remote-host-name');
   const hostName = hostNameInput.value.trim();
   
   if (!hostName) {
-    showToast({ 
-      title: 'Name Required', 
-      msg: 'Please enter your name', 
-      type: 'error' 
-    });
+    showToast({ title: 'Name Required', msg: 'Please enter your name', type: 'error' });
     hostNameInput.focus();
     return;
   }
   
-  // Validate player name
-  if (window.SecurityModule) {
-    const nameValidation = window.SecurityModule.validatePlayerName(hostName);
-    if (!nameValidation.valid) {
-      showToast({ title: 'Error', msg: nameValidation.error, type: 'error' });
-      return;
-    }
-  }
-  
-  showToast({ 
-    title: 'Name Saved!', 
-    msg: `Welcome, ${hostName}!`, 
-    type: 'success',
-    timeout: 1500
-  });
-  
-  // Flash the input to show it's saved
-  hostNameInput.style.boxShadow = '0 0 0 3px var(--primary-color)';
-  setTimeout(() => { 
-    hostNameInput.style.boxShadow = ''; 
-  }, 500);
+  showToast({ title: 'Name Saved!', msg: `Ready as ${hostName}!`, type: 'success', timeout: 1500 });
 }
 
 function handleSaveJoinName() {
@@ -109,52 +93,26 @@ function handleSaveJoinName() {
   const joinName = joinNameInput.value.trim();
   
   if (!joinName) {
-    showToast({ 
-      title: 'Name Required', 
-      msg: 'Please enter your name', 
-      type: 'error' 
-    });
+    showToast({ title: 'Name Required', msg: 'Please enter your name', type: 'error' });
     joinNameInput.focus();
     return;
   }
   
-  // Validate player name
-  if (window.SecurityModule) {
-    const nameValidation = window.SecurityModule.validatePlayerName(joinName);
-    if (!nameValidation.valid) {
-      showToast({ title: 'Error', msg: nameValidation.error, type: 'error' });
-      return;
-    }
-  }
-  
-  showToast({ 
-    title: 'Name Saved!', 
-    msg: `Welcome, ${joinName}!`, 
-    type: 'success',
-    timeout: 1500
-  });
-  
-  // Flash the input to show it's saved
-  joinNameInput.style.boxShadow = '0 0 0 3px var(--primary-color)';
-  setTimeout(() => { 
-    joinNameInput.style.boxShadow = ''; 
-  }, 500);
+  showToast({ title: 'Name Saved!', msg: `Ready as ${joinName}!`, type: 'success', timeout: 1500 });
 }
 
 // Create room flow
 async function handleCreateRoom() {
-  const hostName = document.getElementById('remote-host-name').value.trim();
-  
+  let hostName = document.getElementById('remote-host-name')?.value.trim();
   if (!hostName) {
-    showToast({ title: (window.getText ? window.getText('nameRequired') : 'Name Required'), msg: (window.getText ? window.getText('pleaseEnterName') : 'Please enter your name'), type: 'error' });
-    return;
+    hostName = (window.state?.currentPlayer?.name) || 'Player 1';
   }
   
   try {
     const settings = {
-      difficulty: document.getElementById('difficulty').value,
-      numQuestions: parseInt(document.getElementById('num-questions').value) || 10,
-      timeLimit: parseInt(document.getElementById('time-limit').value) || 60
+      difficulty: document.getElementById('difficulty')?.value || 'medium',
+      numQuestions: parseInt(document.getElementById('num-questions')?.value) || 10,
+      timeLimit: parseInt(document.getElementById('time-limit')?.value) || 60
     };
     
     const result = await window.RemoteChallenge.createRoom(hostName, settings);
@@ -163,6 +121,13 @@ async function handleCreateRoom() {
     showRemoteStep('share');
     document.getElementById('remote-room-code').textContent = result.roomCode;
     document.getElementById('remote-share-url').textContent = result.shareUrl;
+    
+    // Set QR code if image element exists
+    const qrImg = document.getElementById('remote-qr-code-img');
+    if (qrImg) {
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(result.shareUrl)}&bgcolor=1a1b26&color=ffffff&margin=6`;
+      qrImg.style.display = 'block';
+    }
     
     // Store share URL for later
     window.currentRemoteShareUrl = result.shareUrl;
@@ -184,16 +149,14 @@ async function handleCreateRoom() {
 
 // Join room flow
 async function handleJoinRoom() {
-  const roomCode = document.getElementById('remote-room-code-input').value.trim().toUpperCase();
-  const playerName = document.getElementById('remote-join-name').value.trim();
-  
-  if (!roomCode) {
-    showToast({ title: (window.getText ? window.getText('roomCodeRequired') : 'Room Code Required'), msg: (window.getText ? window.getText('pleaseEnterRoomCode') : 'Please enter a room code'), type: 'error' });
-    return;
+  const roomCode = document.getElementById('remote-room-code-input')?.value.trim().toUpperCase();
+  let playerName = document.getElementById('remote-join-name')?.value.trim();
+  if (!playerName) {
+    playerName = (window.state?.currentPlayer?.name) || 'Player 2';
   }
   
-  if (!playerName) {
-    showToast({ title: (window.getText ? window.getText('nameRequired') : 'Name Required'), msg: (window.getText ? window.getText('pleaseEnterName') : 'Please enter your name'), type: 'error' });
+  if (!roomCode) {
+    showToast({ title: 'Room Code Required', msg: 'Please enter a room code (e.g., FAITH-123)', type: 'error' });
     return;
   }
   
@@ -207,7 +170,7 @@ async function handleJoinRoom() {
     
     showToast({ 
       title: 'Joined Room!', 
-      msg: `Playing against ${roomData.host}`, 
+      msg: `Ready to challenge ${roomData.host}!`, 
       type: 'success' 
     });
   } catch (error) {

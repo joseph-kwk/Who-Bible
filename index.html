@@ -7,43 +7,43 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Who-Bible - Bible People Quiz Challenge</title>
-  <meta name="description" content="Learn about Bible people through interactive quizzes. Test your knowledge of biblical characters, their deeds, ages, mothers, and occupations with verse references." />
+  <meta name="description" content="Learn about Bible people through interactive quizzes. Test your knowledge of biblical characters, their deeds, ages, parents, and occupations with verse references." />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260224152030" />
-  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20260224152030" />
-  <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20260224154500" />
-  <link rel="stylesheet" href="assets/css/report-modal.css?v=20260224152030" />
-  <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20260224152030" />
-  <link rel="stylesheet" href="assets/css/auth.css?v=20260224152030" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260905001" />
+  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20260905001" />
+  <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20260905001" />
+  <link rel="stylesheet" href="assets/css/report-modal.css?v=20260905001" />
+  <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20260905001" />
+  <link rel="stylesheet" href="assets/css/auth.css?v=20260905001" />
   
   <!-- Firebase SDK (Compat for remote-challenge.js) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
   <!-- Firebase Config (Modular SDK) -->
-  <script type="module" src="assets/js/firebase-config.js?v=20260122"></script>
+  <script type="module" src="assets/js/firebase-config.js?v=20260905001"></script>
   
   <!-- Authentication -->
-  <script type="module" src="assets/js/auth.js?v=20260209"></script>
-  <script type="module" src="assets/js/auth-ui.js?v=20260209"></script>
+  <script type="module" src="assets/js/auth.js?v=20260905001"></script>
+  <script type="module" src="assets/js/auth-ui.js?v=20260905001"></script>
   
   <!-- App Scripts -->
-  <script src="assets/js/security.js?v=20260116"></script>
-  <script src="assets/js/remote-challenge.js?v=20260110b"></script>
-  <script src="assets/js/remote-challenge-ui.js?v=20260110b"></script>
-  <script src="assets/js/scenarios.js?v=20260110b" defer></script>
-  <script src="assets/js/locations.js?v=20260110b" defer></script>
-  <script src="assets/js/concepts.js?v=20260224151039" defer></script>
-  <script src="assets/js/relationships.js?v=20260224151039" defer></script>
-  <script src="assets/js/content-filter.js?v=20260224151039" defer></script>
-  <script src="assets/js/reports.js?v=20260224151039" defer></script>
-  <script src="assets/js/translations.js?v=20260224154000" defer></script>
-  <script src="assets/js/guest-prompts.js?v=20260224151039" defer></script>
-  <script src="assets/js/app.js?v=20260224151039" defer></script>
+  <script src="assets/js/security.js?v=20260905001"></script>
+  <script src="assets/js/remote-challenge.js?v=20260905001"></script>
+  <script src="assets/js/remote-challenge-ui.js?v=20260905001"></script>
+  <script src="assets/js/scenarios.js?v=20260905001" defer></script>
+  <script src="assets/js/locations.js?v=20260905001" defer></script>
+  <script src="assets/js/concepts.js?v=20260905001" defer></script>
+  <script src="assets/js/relationships.js?v=20260905001" defer></script>
+  <script src="assets/js/content-filter.js?v=20260905001" defer></script>
+  <script src="assets/js/reports.js?v=20260905001" defer></script>
+  <script src="assets/js/translations.js?v=20260905001" defer></script>
+  <script src="assets/js/guest-prompts.js?v=20260905001" defer></script>
+  <script src="assets/js/app.js?v=20260905001" defer></script>
 </head>
 <body>
   <!-- Skip to main content link for keyboard navigation -->
@@ -79,6 +79,10 @@
             </div>
           </button>
 
+          <button id="btn-sound-toggle" class="icon-btn sound-toggle-btn" title="Sound FX: On" aria-label="Toggle Sound Effects">
+            <span id="sound-icon" class="sound-icon-text">🔊</span>
+          </button>
+
           <button id="btn-menu" class="icon-btn menu-toggle" aria-label="Toggle Menu">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -88,7 +92,7 @@
           </button>
 
           <div class="nav-menu-container" id="nav-menu-container">
-            <div class="language-selector">
+            <div class="language-selector" style="display: none;">
               <label for="language-select" class="sr-only">Select Language</label>
               <select id="language-select" aria-label="Language Selection">
                 <option value="en">English</option>
@@ -98,7 +102,7 @@
             </div>
             <nav class="site-nav" aria-label="Site Navigation">
               <a id="nav-community" href="community.html" target="_blank" class="nav-link" rel="noopener">Community</a>
-              <button id="btn-auth-signin" class="auth-signin-btn" aria-label="Sign in or create account">
+              <button id="btn-auth-signin" class="auth-signin-btn" aria-label="Sign in or create account" style="display: none;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
@@ -121,263 +125,357 @@
     <main role="main">
       <!-- Setup Panel -->
       <section id="setup-panel" class="setup-panel" aria-label="Quiz Setup">
-        <div class="brand" id="main-content">
-          <h2 class="brand-title">Who-Bible</h2>
-          <p class="brand-desc">Explore the Bible through interactive quizzes, character studies, and moral scenarios.</p>
+        <div class="brand hero-brand-container" id="main-content">
+          <div class="hero-pill-badge">✨ The Premier Scripture Trivia Experience</div>
+          <h2 class="brand-title gradient-text">Who-Bible</h2>
+          <p class="brand-desc hero-description">
+            Test your scripture mastery, challenge friends in live multiplayer, or host big-screen classroom games across 170+ biblical figures and foundational stories.
+          </p>
+          <div class="hero-feature-tags">
+            <span class="hero-tag">⚡ Real-Time Online 1v1</span>
+            <span class="hero-tag">🏫 Big-Screen Classroom Kahoot</span>
+            <span class="hero-tag">📖 400+ Scriptural Clues</span>
+            <span class="hero-tag">🏆 Ranks & Badges</span>
+          </div>
         </div>
         
-        <!-- Player Welcome & Stats -->
-        <div id="welcome-message" class="player-welcome"></div>
-        
-        <div class="setup-grid">
-          <section class="setup-section" aria-labelledby="player-heading">
-            <h3 id="player-heading">Player</h3>
-            <div class="player-controls">
-              <button id="btn-change-player" class="mode-btn" style="padding: 12px 16px; min-height: auto; max-width: 300px; margin: 0 auto;">
-                <span id="current-player-name" style="display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px;">Guest</span>
-                <div class="mode-desc" style="font-size: 11px; margin-top: 4px;">Click to change</div>
-              </button>
-            </div>
-          </section>
-          
-          <section class="setup-section" aria-labelledby="settings-heading">
-            <h3 id="settings-heading">Game Settings</h3>
-            <div class="setting-row">
-              <label for="difficulty">Difficulty Level</label>
-              <select id="difficulty" aria-describedby="difficulty-help">
-                <option value="easy">Beginner (Common figures)</option>
-                <option value="medium" selected>Intermediate (Mixed)</option>
-                <option value="hard">Expert (All characters)</option>
-              </select>
-              <small id="difficulty-help" class="sr-only">Choose difficulty level based on biblical knowledge</small>
-            </div>
-            <div class="setting-row">
-              <label for="num-questions">Number of Questions</label>
-              <input id="num-questions" type="number" value="10" min="1" max="50" aria-describedby="questions-help" />
-              <small id="questions-help" class="sr-only">Between 1 and 50 questions</small>
-            </div>
-            <div class="setting-row">
-              <label for="time-limit">Time Limit (seconds)</label>
-              <input id="time-limit" type="number" value="60" min="10" max="300" aria-describedby="time-help" />
-              <small id="time-help" class="sr-only">For timed mode only, between 10 and 300 seconds</small>
-            </div>
-            <div class="setting-row">
-              <label for="testament-filter">Testament</label>
-              <select id="testament-filter" aria-label="Filter by testament">
-                <option value="all">All (OT + NT)</option>
-                <option value="ot">Old Testament</option>
-                <option value="nt">New Testament</option>
-              </select>
-            </div>
-            <div class="setting-row">
-              <label for="gender-filter">Gender</label>
-              <select id="gender-filter" aria-label="Filter by gender">
-                <option value="all">All</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-              </select>
-            </div>
-          </section>
-          
-          <section class="setup-section" aria-labelledby="modes-heading">
-            <h3 id="modes-heading">Game Modes</h3>
-            <div class="mode-buttons" role="group" aria-labelledby="modes-heading">
-              <button id="btn-solo" class="mode-btn primary" data-mode="solo" aria-describedby="solo-desc">
-                <div class="mode-icon" aria-hidden="true">📚</div>
-                <div class="mode-text">
-                  <div class="mode-title">Solo Mode</div>
-                  <div class="mode-desc" id="solo-desc">Practice at your own pace</div>
-                </div>
-              </button>
-              <button id="btn-timed" class="mode-btn" data-mode="timed" aria-describedby="timed-desc">
-                <div class="mode-icon" aria-hidden="true">⏱️</div>
-                <div class="mode-text">
-                  <div class="mode-title">Timed Mode</div>
-                  <div class="mode-desc" id="timed-desc">Race against the clock</div>
-                </div>
-              </button>
-              <button id="btn-challenge" class="mode-btn" data-mode="challenge" aria-describedby="challenge-desc">
-                <div class="mode-icon" aria-hidden="true">⚔️</div>
-                <div class="mode-text">
-                  <div class="mode-title">Challenge Mode</div>
-                  <div class="mode-desc" id="challenge-desc">Two players, same device</div>
-                </div>
-              </button>
-              <button id="btn-study" class="mode-btn" data-mode="study" aria-describedby="study-desc">
-                <div class="mode-icon" aria-hidden="true">🔍</div>
-                <div class="mode-text">
-                  <div class="mode-title">Study Mode</div>
-                  <div class="mode-desc" id="study-desc">Browse and learn</div>
-                </div>
-              </button>
-              <button id="btn-scenarios" class="mode-btn" data-mode="scenarios" aria-describedby="scenarios-desc" aria-label="Start Scenarios Mode - Biblical moral dilemmas and decisions">
-                <div class="mode-icon" aria-hidden="true">🎭</div>
-                <div class="mode-text">
-                  <div class="mode-title">Scenarios Mode</div>
-                  <div class="mode-desc" id="scenarios-desc">Moral dilemmas & decisions</div>
-                </div>
-              </button>
-            </div>
-          </section>
-          
-          <section class="setup-section remote-challenge-card" aria-labelledby="remote-heading">
-            <div class="remote-challenge-hero">
-              <div class="remote-challenge-icon">🌐</div>
-              <div class="remote-challenge-content">
-                <h3 id="remote-heading">Play Online with Friends</h3>
-                <p class="remote-challenge-desc">Challenge anyone, anywhere! Create a room, share the link, and compete in real-time.</p>
-                <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
-                  <button id="btn-remote-challenge" class="remote-challenge-btn" data-mode="remote" aria-describedby="remote-desc" style="flex: 1; min-width: 150px;">
-                    <span class="remote-btn-icon">🎮</span>
-                    <span>Start Remote Challenge</span>
-                  </button>
-                  <button id="btn-classroom-mode" class="remote-challenge-btn" style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #26890c, #4caf50);">
-                    <span class="remote-btn-icon">🏫</span>
-                    <span>Classroom Mode</span>
-                  </button>
-                </div>
-                <p class="remote-challenge-note" id="remote-desc">
-                  <span class="remote-status-icon">✓</span> No sign-up required • Instant matchmaking • Live scoring
-                </p>
+        <!-- Player Profile & XP Bar -->
+        <div class="player-quick-bar">
+          <div class="player-profile-badge" id="player-profile-card" title="Click to customize profile & avatar">
+            <div class="player-avatar-mini" id="player-avatar-icon">👑</div>
+            <div class="player-badge-info">
+              <div class="player-name-row">
+                <span class="player-name-display" id="current-player-name">Guest</span>
+                <span class="player-rank-pill" id="player-rank-display">Scripture Seeker</span>
+              </div>
+              <div class="player-xp-track">
+                <div class="player-xp-fill" id="player-xp-fill" style="width: 25%;"></div>
               </div>
             </div>
-          </section>
+            <button id="btn-change-player" class="btn-change-name" title="Edit Profile & Avatar">✏️ Customize</button>
+          </div>
         </div>
+
+        <div id="welcome-message" class="player-welcome"></div>
+
+        <!-- DAILY SCRIPTURE CHALLENGE -->
+        <section class="daily-challenge-section" aria-labelledby="daily-heading">
+          <div class="daily-challenge-card" id="daily-challenge-card">
+            <div class="daily-badge-pill">✨ Daily Challenge</div>
+            <div class="daily-card-content">
+              <div class="daily-figure-avatar" id="daily-figure-avatar">📜</div>
+              <div class="daily-details">
+                <div class="daily-date-row">
+                  <span id="daily-date-str" class="daily-date-label">Today's Scripture Challenge</span>
+                  <span class="daily-xp-pill">+50 Bonus XP</span>
+                </div>
+                <h4 id="daily-figure-name" class="daily-figure-title">Featured Character</h4>
+                <p id="daily-figure-desc" class="daily-figure-snippet">Explore notable biblical deeds and test your knowledge!</p>
+              </div>
+            </div>
+            <button id="btn-start-daily" class="btn-daily-action" aria-label="Start Daily Scripture Challenge">
+              <span>Play Daily (5 Qs)</span>
+              <span class="arrow-icon">→</span>
+            </button>
+          </div>
+        </section>
+        
+        <!-- HERO SECTION: PLAY WITH FRIENDS -->
+        <section class="friends-hero-section" aria-labelledby="friends-heading">
+          <div class="section-header-row">
+            <h3 id="friends-heading" class="section-heading">👥 Play with Friends</h3>
+            <span class="section-badge">Multiplayer</span>
+          </div>
+          
+          <div class="friends-modes-grid">
+            <!-- 1. Remote Online Challenge -->
+            <div class="friend-mode-card card-remote">
+              <div class="friend-card-icon">🌐</div>
+              <div class="friend-card-body">
+                <h4>Remote Challenge</h4>
+                <p>Play online against friends anywhere with live real-time score updates!</p>
+                <div class="friend-card-meta">
+                  <span class="pill-tag">1v1 & Groups</span>
+                  <span class="pill-tag">Link & QR Join</span>
+                </div>
+              </div>
+              <button id="btn-remote-challenge" class="btn-friend-action btn-remote-action" data-mode="remote">
+                <span>Play Online</span>
+                <span class="arrow-icon">→</span>
+              </button>
+            </div>
+
+            <!-- 2. Classroom & Group Kahoot Mode -->
+            <div class="friend-mode-card card-classroom">
+              <div class="friend-card-icon">🏫</div>
+              <div class="friend-card-body">
+                <h4>Classroom / Kahoot Mode</h4>
+                <p>Host on a projector or TV while everyone plays on their phones with a Game PIN!</p>
+                <div class="friend-card-meta">
+                  <span class="pill-tag">Big Screen Host</span>
+                  <span class="pill-tag">Game PIN</span>
+                </div>
+              </div>
+              <div class="classroom-btn-group">
+                <button id="btn-classroom-mode" class="btn-friend-action btn-join-action">
+                  <span>Enter PIN</span>
+                </button>
+                <button id="btn-host-classroom" class="btn-friend-action btn-host-action" title="Host on projector / TV">
+                  <span>🖥️ Host Screen</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 3. Local 2-Player Pass & Play -->
+            <div class="friend-mode-card card-local">
+              <div class="friend-card-icon">⚔️</div>
+              <div class="friend-card-body">
+                <h4>Pass & Play</h4>
+                <p>Two players compete turn-by-turn on this same screen. Test who knows more!</p>
+                <div class="friend-card-meta">
+                  <span class="pill-tag">Same Device</span>
+                  <span class="pill-tag">Turn-Based</span>
+                </div>
+              </div>
+              <button id="btn-challenge" class="btn-friend-action btn-local-action" data-mode="challenge">
+                <span>Start 2-Player</span>
+                <span class="arrow-icon">→</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SINGLE PLAYER & STUDY MODES -->
+        <section class="single-modes-section" aria-labelledby="modes-heading">
+          <div class="section-header-row">
+            <h3 id="modes-heading" class="section-heading">🎯 Solo & Practice Modes</h3>
+          </div>
+          
+          <div class="mode-buttons solo-modes-grid" role="group" aria-labelledby="modes-heading">
+            <button id="btn-solo" class="mode-btn primary" data-mode="solo" aria-describedby="solo-desc">
+              <div class="mode-icon" aria-hidden="true">📖</div>
+              <div class="mode-text">
+                <div class="mode-title">Classic Solo</div>
+                <div class="mode-desc" id="solo-desc">Play at your own pace</div>
+              </div>
+            </button>
+            <button id="btn-timed" class="mode-btn" data-mode="timed" aria-describedby="timed-desc">
+              <div class="mode-icon" aria-hidden="true">⏱️</div>
+              <div class="mode-text">
+                <div class="mode-title">Timed Mode</div>
+                <div class="mode-desc" id="timed-desc">Beat the countdown timer</div>
+              </div>
+            </button>
+            <button id="btn-study" class="mode-btn" data-mode="study" aria-describedby="study-desc">
+              <div class="mode-icon" aria-hidden="true">🔍</div>
+              <div class="mode-text">
+                <div class="mode-title">Study Bible People</div>
+                <div class="mode-desc" id="study-desc">Explore 400+ characters</div>
+              </div>
+            </button>
+            <button id="btn-scenarios" class="mode-btn" data-mode="scenarios" aria-describedby="scenarios-desc" aria-label="Start Scenarios Mode">
+              <div class="mode-icon" aria-hidden="true">🎭</div>
+              <div class="mode-text">
+                <div class="mode-title">Scenarios Mode</div>
+                <div class="mode-desc" id="scenarios-desc">Biblical moral decisions</div>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        <!-- GAME SETTINGS & DIFFICULTY -->
+        <section class="settings-card-section" aria-labelledby="settings-heading">
+          <div class="section-header-row">
+            <h3 id="settings-heading" class="section-heading">⚙️ Game Settings & Difficulty</h3>
+          </div>
+          
+          <div class="settings-grid-layout">
+            <div class="setting-item-box">
+              <label for="difficulty" class="setting-label">Difficulty Level</label>
+              <select id="difficulty" class="setting-select" aria-describedby="difficulty-help">
+                <option value="easy">Beginner (Famous Biblical Figures)</option>
+                <option value="medium" selected>Intermediate (Balanced Scripture Mix)</option>
+                <option value="hard">Expert (All Figures & Canon Details)</option>
+              </select>
+              <small id="difficulty-help" class="setting-help">Calibrates the question pool and clue depth</small>
+            </div>
+
+            <div class="setting-item-box">
+              <label for="num-questions" class="setting-label">Questions</label>
+              <div class="preset-pill-row">
+                <select id="num-questions" class="setting-select" aria-describedby="questions-help">
+                  <option value="5">5 Questions (Quick)</option>
+                  <option value="10" selected>10 Questions (Standard)</option>
+                  <option value="15">15 Questions (Full)</option>
+                  <option value="20">20 Questions (Extended)</option>
+                </select>
+              </div>
+              <small id="questions-help" class="setting-help">Length of each trivia match</small>
+            </div>
+
+            <div class="setting-item-box">
+              <label for="time-limit" class="setting-label">Timed Mode Clock</label>
+              <select id="time-limit" class="setting-select" aria-describedby="time-help">
+                <option value="30">30 Seconds (Fast)</option>
+                <option value="60" selected>60 Seconds (Standard)</option>
+                <option value="90">90 Seconds (Relaxed)</option>
+                <option value="120">120 Seconds</option>
+              </select>
+              <small id="time-help" class="setting-help">Countdown for Timed mode</small>
+            </div>
+
+            <div class="setting-item-box">
+              <label for="testament-filter" class="setting-label">Testament</label>
+              <select id="testament-filter" class="setting-select" aria-label="Filter by testament">
+                <option value="all" selected>All (Old + New Testament)</option>
+                <option value="ot">Old Testament Only</option>
+                <option value="nt">New Testament Only</option>
+              </select>
+              <small class="setting-help">Filter character questions by testament</small>
+            </div>
+
+            <div class="setting-item-box">
+              <label for="gender-filter" class="setting-label">Character Filter</label>
+              <select id="gender-filter" class="setting-select" aria-label="Filter by gender">
+                <option value="all" selected>All Characters</option>
+                <option value="male">Male Characters</option>
+                <option value="female">Female Characters</option>
+              </select>
+              <small class="setting-help">Optional figure demographic filter</small>
+            </div>
+          </div>
+        </section>
       </section>
 
       <!-- Game Area -->
       <section id="game-area" style="display:none" role="main" aria-label="Quiz Game">
-        <div class="game-container">
-          <header class="game-header" role="banner">
-            <button id="btn-back-to-setup" class="back-btn" aria-label="Back to Setup">← Back</button>
-            <div id="game-title" class="game-title">Quiz Mode</div>
-            <div id="timer" class="timer" style="display:none" aria-live="polite">
-              <span>⏱️</span>
+        <div class="game-container modern-game-card">
+          <header class="game-header-modern" role="banner">
+            <button id="btn-back-to-setup" class="back-btn-modern" aria-label="Back to Setup">
+              <span class="back-arrow">←</span>
+              <span>Back</span>
+            </button>
+            <div id="game-title" class="game-mode-pill">Quiz Mode</div>
+            <div id="timer" class="timer-pill" style="display:none" aria-live="polite">
+              <span class="timer-icon">⏱️</span>
               <span id="time-remaining">60</span>s
             </div>
+            <button id="btn-flag-question" class="flag-question-btn" title="Report or flag this question" aria-label="Report or flag this question">
+              <span>🚩</span>
+              <span class="flag-text">Flag Question</span>
+            </button>
           </header>
           
-          <div class="game-stats">
-            <div class="stat-item">
-              <span class="stat-label">Score:</span>
-              <span id="score" class="stat-value">0</span>
+          <!-- Modern Score & Streak HUD -->
+          <div class="game-hud-bar">
+            <div class="hud-stat-chip chip-score">
+              <span class="hud-icon">🏆</span>
+              <div class="hud-info">
+                <span class="hud-label">Score</span>
+                <span id="score" class="hud-value">0</span>
+              </div>
+              <div id="score-pop" class="score-pop-indicator">+10</div>
             </div>
-            <div class="stat-item">
-              <span class="stat-label">Streak:</span>
-              <span id="streak" class="stat-value">0</span>
+
+            <div class="hud-stat-chip chip-streak" id="streak-chip">
+              <span class="hud-icon flame-icon" id="streak-flame">🔥</span>
+              <div class="hud-info">
+                <span class="hud-label">Streak</span>
+                <span id="streak" class="hud-value">0</span>
+              </div>
             </div>
-            <div class="stat-item">
-              <span class="stat-label">Question:</span>
-              <span id="qnum" class="stat-value">1</span>/<span id="qtotal" class="stat-value">10</span>
+
+            <div class="hud-stat-chip chip-progress">
+              <span class="hud-icon">📖</span>
+              <div class="hud-info">
+                <span class="hud-label">Question</span>
+                <span class="hud-value"><span id="qnum">1</span><span class="hud-divider">/</span><span id="qtotal">10</span></span>
+              </div>
             </div>
-            <div id="challenge-status" class="challenge-status" style="display:none">
-              <div><span id="current-player-turn-name" style="font-weight: 600; color: var(--accent);">Player 1</span>'s Turn</div>
-              <div><span id="p1-name" style="font-weight: 600;">P1</span>: <span id="p1-score">0</span> | <span id="p2-name" style="font-weight: 600;">P2</span>: <span id="p2-score">0</span></div>
+          </div>
+
+          <!-- Versus HUD (Challenge / 2-Player Mode) -->
+          <div id="challenge-status" class="versus-hud" style="display:none">
+            <div class="versus-player versus-p1" id="versus-p1-card">
+              <span class="versus-name" id="p1-name">Player 1</span>
+              <span class="versus-score" id="p1-score">0</span>
+            </div>
+            <div class="versus-badge">VS</div>
+            <div class="versus-player versus-p2" id="versus-p2-card">
+              <span class="versus-name" id="p2-name">Player 2</span>
+              <span class="versus-score" id="p2-score">0</span>
+            </div>
+            <div class="versus-turn-indicator">
+              <span>🎯 Turn: <strong id="current-player-turn-name">Player 1</strong></span>
             </div>
           </div>
           
-          <div class="progress-container">
-            <div id="progress-bar" class="progress-bar"></div>
+          <!-- Smooth Animated Progress Track -->
+          <div class="progress-container-modern">
+            <div id="progress-bar" class="progress-bar-modern"></div>
           </div>
           
-          <main id="quiz" class="quiz-content">
-            <div id="question-text" class="question-text" aria-live="assertive"></div>
-            <div id="answers" class="answers-container" role="group" aria-label="Answer choices"></div>
-            <div id="after-ref" class="after-ref" aria-live="polite"></div>
+          <!-- Question, Answers & Controls -->
+          <main id="quiz" class="quiz-content-modern">
+            <div id="question-text" class="question-text-modern" aria-live="assertive"></div>
+            <div id="answers" class="answers-grid-modern" role="group" aria-label="Answer choices"></div>
+            
+            <!-- Controls Bar right next to questions -->
+            <div class="game-controls-modern">
+              <button id="btn-pause" class="control-btn-modern secondary" style="display:none" aria-label="Pause/Resume Timer">⏸️ Pause</button>
+              <button id="btn-next" class="control-btn-modern primary-glow" disabled aria-label="Next Question">
+                <span>Next Question</span>
+                <span class="btn-arrow">→</span>
+              </button>
+              <button id="btn-quit" class="control-btn-modern danger-ghost" aria-label="Quit Game">Quit</button>
+            </div>
+
+            <div id="after-ref" class="after-ref-modern" aria-live="polite"></div>
           </main>
-          
-          <div class="game-controls">
-            <button id="btn-pause" class="control-btn" style="display:none" aria-label="Pause/Resume Timer">Pause</button>
-            <button id="btn-next" class="control-btn primary" disabled aria-label="Next Question">Next</button>
-            <button id="btn-quit" class="control-btn secondary" aria-label="Quit Game">Quit</button>
-          </div>
         </div>
       </section>
 
       <!-- Study Panel -->
       <section id="study-panel" style="display:none" role="main" aria-labelledby="study-heading">
         <div class="study-container">
-          <header class="study-header">
-            <div class="study-header-top">
-              <button id="btn-back-from-study" class="back-btn" aria-label="Back to Setup">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                Back
+          <header class="study-header-compact">
+            <div class="study-top-row">
+              <button id="btn-back-from-study" class="back-btn-modern" aria-label="Back to Setup">
+                <span class="back-arrow">←</span>
+                <span>Back</span>
               </button>
-              <div class="study-title-section">
-                <h2 id="study-heading">Bible People Explorer</h2>
-                <p class="study-subtitle">Discover and learn about biblical characters</p>
-              </div>
+              <h2 id="study-heading" class="study-compact-title">📖 Bible People Explorer</h2>
+              <span class="study-count-badge"><span id="people-count">173</span> People</span>
             </div>
             
-            <div class="study-search-section">
-              <div class="search-bar-wrapper">
-                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <circle cx="11" cy="11" r="8"/>
-                  <path d="m21 21-4.35-4.35"/>
-                </svg>
+            <div class="study-toolbar-row">
+              <div class="search-bar-wrapper compact-search">
+                <span class="search-icon-text">🔍</span>
                 <label for="search-person" class="sr-only">Search Bible people</label>
                 <input id="search-person" type="text" placeholder="Search by name, occupation, or event..." aria-label="Search Bible people" />
               </div>
               
-              <div class="study-filter-row">
-                <div class="filter-group">
-                  <label for="sort-select" class="filter-label">Sort by:</label>
-                  <select id="sort-select" aria-label="Sort order">
-                    <option value="name-asc">Name (A-Z)</option>
-                    <option value="name-desc">Name (Z-A)</option>
-                  </select>
-                </div>
+              <div class="study-controls-inline">
+                <select id="sort-select" class="sort-select-compact" aria-label="Sort order">
+                  <option value="name-asc">A–Z</option>
+                  <option value="name-desc">Z–A</option>
+                </select>
+                <button id="btn-shuffle-list" class="action-btn-compact" title="Shuffle order" aria-label="Shuffle Bible people list">🔀 Shuffle</button>
                 
-                <div class="filter-chips">
+                <div class="filter-chips-compact">
                   <label class="filter-chip">
                     <input id="filter-mother" type="checkbox" />
-                    <span class="chip-text">Has Mother</span>
+                    <span class="chip-text">Parents</span>
                   </label>
                   <label class="filter-chip">
                     <input id="filter-occupation" type="checkbox" />
-                    <span class="chip-text">Has Occupation</span>
+                    <span class="chip-text">Occupation</span>
                   </label>
                   <label class="filter-chip">
                     <input id="filter-age" type="checkbox" />
-                    <span class="chip-text">Has Age Info</span>
+                    <span class="chip-text">Age</span>
                   </label>
                 </div>
-              </div>
-            </div>
-            
-            <div class="study-actions-bar">
-              <div class="people-count-display">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-                <span><strong id="people-count">0</strong> people</span>
-              </div>
-              <div class="study-controls">
-                <button id="btn-expand-all" class="control-btn-icon" aria-label="Expand all person details" title="Expand All">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <polyline points="7 13 12 18 17 13"/>
-                    <polyline points="7 6 12 11 17 6"/>
-                  </svg>
-                </button>
-                <button id="btn-collapse-all" class="control-btn-icon" aria-label="Collapse all person details" title="Collapse All">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <polyline points="17 11 12 6 7 11"/>
-                    <polyline points="17 18 12 13 7 18"/>
-                  </svg>
-                </button>
-                <button id="btn-shuffle-list" class="control-btn-icon" aria-label="Shuffle the list" title="Shuffle">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <polyline points="16 3 21 3 21 8"/>
-                    <line x1="4" y1="20" x2="21" y2="3"/>
-                    <polyline points="21 16 21 21 16 21"/>
-                    <line x1="15" y1="15" x2="21" y2="21"/>
-                    <line x1="4" y1="4" x2="9" y2="9"/>
-                  </svg>
-                </button>
               </div>
             </div>
           </header>
@@ -410,22 +508,86 @@
 
   <noscript>This app requires JavaScript to run.</noscript>
 
-  <!-- Summary Modal -->
-  <div id="summary-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="summary-modal-title" aria-modal="true">
-    <div class="modal" role="document">
+  <!-- Profile & Avatar Customizer Modal -->
+  <div id="profile-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="profile-modal-title" aria-modal="true">
+    <div class="modal modern-modal-card" role="document">
       <header class="modal-header">
-        <h2 id="summary-modal-title">Quiz Summary</h2>
+        <h2 id="profile-modal-title">👤 Player Profile & Avatar</h2>
+        <button id="btn-profile-close" aria-label="Close profile modal">✕</button>
+      </header>
+      <main class="modal-body">
+        <!-- Avatar Picker Grid -->
+        <div class="profile-section">
+          <label class="setting-label">Choose Your Biblical Avatar</label>
+          <div class="avatar-selection-grid" id="avatar-grid">
+            <button type="button" class="avatar-option active" data-avatar="👑" title="Crown of Life">👑</button>
+            <button type="button" class="avatar-option" data-avatar="🦁" title="Lion of Judah">🦁</button>
+            <button type="button" class="avatar-option" data-avatar="🕊️" title="Dove of Peace">🕊️</button>
+            <button type="button" class="avatar-option" data-avatar="⚡" title="Light of the World">⚡</button>
+            <button type="button" class="avatar-option" data-avatar="📖" title="Holy Scriptures">📖</button>
+            <button type="button" class="avatar-option" data-avatar="🛡️" title="Shield of Faith">🛡️</button>
+            <button type="button" class="avatar-option" data-avatar="🌟" title="Star of Bethlehem">🌟</button>
+            <button type="button" class="avatar-option" data-avatar="👤" title="Disciple">👤</button>
+          </div>
+        </div>
+
+        <div class="profile-section" style="margin-top: 16px;">
+          <label for="profile-name-input" class="setting-label">Player Display Name</label>
+          <input id="profile-name-input" type="text" placeholder="Enter your display name" maxlength="20" class="setting-select" />
+        </div>
+
+        <!-- Player Career Statistics Preview -->
+        <div class="profile-stats-card" id="profile-stats-card">
+          <div class="profile-stat-box">
+            <span class="p-stat-value" id="p-stat-games">0</span>
+            <span class="p-stat-label">Games</span>
+          </div>
+          <div class="profile-stat-box">
+            <span class="p-stat-value" id="p-stat-streak">0</span>
+            <span class="p-stat-label">Best Streak</span>
+          </div>
+          <div class="profile-stat-box">
+            <span class="p-stat-value" id="p-stat-accuracy">0%</span>
+            <span class="p-stat-label">Accuracy</span>
+          </div>
+          <div class="profile-stat-box">
+            <span class="p-stat-value" id="p-stat-rank">Seeker</span>
+            <span class="p-stat-label">Current Rank</span>
+          </div>
+        </div>
+      </main>
+      <footer class="modal-footer">
+        <button id="btn-save-profile" class="primary" style="margin-right: 8px;">Save Profile</button>
+        <button id="btn-cancel-profile" class="secondary">Cancel</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Summary & Victory Modal -->
+  <div id="summary-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="summary-modal-title" aria-modal="true">
+    <div class="modal modern-modal-card summary-modal-card" role="document">
+      <header class="modal-header">
+        <h2 id="summary-modal-title">🏆 Match Summary</h2>
         <button id="btn-summary-close" aria-label="Close quiz summary">✕</button>
       </header>
       <main class="modal-body" aria-live="polite">
-        <div id="summary-stats" class="summary-stats"></div>
-        <div id="summary-list" class="summary-list"></div>
-      </main>
-      <footer class="modal-footer">
-        <button id="btn-play-again" class="primary" aria-describedby="play-again-help">Play Again</button>
-        <div class="modal-help">
-          <small id="play-again-help" class="sr-only">Start a new quiz with the same settings</small>
+        <!-- Victory Banner & Accuracy Ring -->
+        <div class="summary-hero-banner">
+          <div class="summary-crown-icon" id="summary-badge-icon">👑</div>
+          <h3 class="summary-headline" id="summary-headline">Outstanding Knowledge!</h3>
+          <p class="summary-subtext" id="summary-subtext">You completed the challenge with flying colors.</p>
         </div>
+
+        <div id="summary-stats" class="summary-stats-grid"></div>
+
+        <div class="summary-review-heading">
+          <h4>📖 Question Breakdown & Scripture Verses</h4>
+        </div>
+        <div id="summary-list" class="summary-review-list"></div>
+      </main>
+      <footer class="modal-footer summary-modal-footer">
+        <button id="btn-share-summary" class="secondary">📤 Share Results</button>
+        <button id="btn-play-again" class="primary">🔄 Play Again</button>
       </footer>
     </div>
   </div>
@@ -511,19 +673,25 @@
         <!-- Step 3: Room Created - Share Link -->
         <div id="remote-step-share" style="display:none;">
           <div style="text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+            <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
             <h3>Room Created!</h3>
-            <p>Share this link with your friend:</p>
-            <div style="background: var(--card); border: 2px solid var(--accent); border-radius: 8px; padding: 16px; margin: 16px 0;">
-              <div style="font-family: monospace; font-size: 18px; font-weight: bold; color: var(--accent); margin-bottom: 8px;" id="remote-room-code">CODE-123</div>
-              <div style="font-size: 14px; word-break: break-all; color: var(--muted);" id="remote-share-url">URL</div>
+            <p style="color: var(--muted); font-size: 14px;">Share this PIN or link with your friend:</p>
+            
+            <div style="background: var(--card); border: 2px solid var(--accent); border-radius: 12px; padding: 16px; margin: 16px 0;">
+              <div style="font-family: monospace; font-size: 24px; font-weight: 900; color: var(--accent); margin-bottom: 8px;" id="remote-room-code">CODE-123</div>
+              <div style="font-size: 13px; word-break: break-all; color: var(--muted);" id="remote-share-url">URL</div>
             </div>
+
+            <!-- QR Code display -->
+            <img id="remote-qr-code-img" class="lobby-qr" alt="QR Code" style="display:none; width: 150px; height: 150px; margin: 12px auto; border-radius: 12px; background: white; padding: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);" />
+
             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
               <button id="btn-copy-link" class="secondary">📋 Copy Link</button>
               <button id="btn-share-link" class="secondary">📤 Share</button>
             </div>
-            <div style="margin-top: 24px; padding: 16px; background: var(--glass); border-radius: 8px;">
-              <div style="font-size: 14px; margin-bottom: 8px;"><strong>Waiting for opponent...</strong></div>
+            
+            <div style="margin-top: 20px; padding: 16px; background: var(--glass); border-radius: 12px;">
+              <div style="font-size: 14px; margin-bottom: 6px;"><strong>Waiting for opponent...</strong></div>
               <div id="remote-opponent-status" style="color: var(--muted); font-size: 13px;">Room created. Waiting for player 2 to join.</div>
             </div>
             <div style="margin-top: 16px;">
@@ -535,19 +703,15 @@
         <!-- Step 4: Join Room -->
         <div id="remote-step-join" style="display:none;">
           <div class="row">
-            <label for="remote-room-code-input">Room Code</label>
+            <label for="remote-room-code-input">Room Code / PIN</label>
             <input id="remote-room-code-input" type="text" placeholder="e.g. FAITH-247" style="text-transform: uppercase;" maxlength="20" />
           </div>
           <div class="row">
             <label for="remote-join-name">Your Name</label>
-            <div style="display: flex; gap: 8px;">
-              <input id="remote-join-name" type="text" placeholder="Enter your name" maxlength="20" style="flex: 1;" />
-              <button id="btn-save-join-name" class="secondary" style="padding: 8px 16px;">Save</button>
-            </div>
-            <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.25em;">Click <b>Save</b> to confirm your name before joining.</div>
+            <input id="remote-join-name" type="text" placeholder="Enter your name" maxlength="20" />
           </div>
           <div style="text-align: center; margin-top: 16px;">
-            <button id="btn-join-room-confirm" class="primary">Join Room</button>
+            <button id="btn-join-room-confirm" class="primary">Join Challenge</button>
           </div>
         </div>
 
@@ -578,18 +742,22 @@
   <div id="classroom-join-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="classroom-join-title" aria-modal="true">
     <div class="modal" role="document">
       <header class="modal-header">
-        <h2 id="classroom-join-title">🏫 Join Classroom Game</h2>
+        <h2 id="classroom-join-title">🏫 Classroom Game</h2>
         <button id="btn-classroom-join-close" aria-label="Close classroom join">✕</button>
       </header>
       <main class="modal-body">
-        <p style="margin-bottom: 1rem; color: var(--text-muted);">Enter the Game PIN from your teacher's screen and your name to join.</p>
+        <p style="margin-bottom: 1.25rem; color: var(--text-muted); font-size: 15px;">Enter the Game PIN from the presenter's screen to play along on your device.</p>
         <div class="row">
           <label for="classroom-pin-input">Game PIN</label>
-          <input id="classroom-pin-input" type="text" placeholder="e.g., FAITH-123" style="text-transform: uppercase;" maxlength="20" />
+          <input id="classroom-pin-input" type="text" placeholder="e.g., FAITH-123" style="text-transform: uppercase; font-size: 18px; font-weight: 700; letter-spacing: 1px;" maxlength="20" />
         </div>
         <div class="row">
-          <label for="classroom-player-name">Your Name</label>
+          <label for="classroom-player-name">Your Display Name</label>
           <input id="classroom-player-name" type="text" placeholder="Enter your name" maxlength="20" />
+        </div>
+        <div style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; text-align: center;">
+          <span style="font-size: 13px; color: var(--muted);">Want to host the quiz for your classroom or group?</span>
+          <button type="button" onclick="window.open('host.html', '_blank')" class="secondary" style="margin-top: 8px; width: 100%; font-size: 13px; padding: 8px 12px;">🖥️ Launch Host View on Projector</button>
         </div>
       </main>
       <footer class="modal-footer">
@@ -680,7 +848,7 @@
     </div>
   </div>
   <!-- Feedback Modal -->
-  <div id="feedback-modal" class="feedback-modal" style="display:none" role="dialog" aria-labelledby="feedback-title" aria-modal="true">
+  <div id="feedback-modal" class="feedback-modal" role="dialog" aria-labelledby="feedback-title" aria-modal="true">
     <div class="feedback-content">
       <header class="feedback-header">
         <h2 id="feedback-title">We'd love your feedback!</h2>
@@ -875,60 +1043,41 @@
     </div>
   </div>
 
-  <!-- Report Modal -->
-  <div id="report-modal" class="report-modal" role="dialog" aria-labelledby="report-title" aria-modal="true">
-    <div class="report-content">
-      <header class="report-header">
-        <h2 id="report-title">🚩 Report an Issue</h2>
-        <button id="btn-report-close" class="close-report" aria-label="Close report">✕</button>
+  <!-- Classroom Mode Join Modal -->
+  <div id="classroom-join-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="classroom-join-title" aria-modal="true">
+    <div class="modal modern-modal-card classroom-join-card" role="document">
+      <header class="modal-header">
+        <h2 id="classroom-join-title">🏫 Join Classroom Game</h2>
+        <button id="btn-classroom-join-close" aria-label="Close classroom modal">✕</button>
       </header>
-      <main class="report-body">
-        <p class="report-intro">Help us improve Who-Bible by reporting questions or content that may be incorrect, misleading, or poorly worded. Your feedback helps everyone learn more accurately!</p>
-        
-        <div class="question-context">
-          <div class="label">Question:</div>
-          <div class="text" id="report-context-question">Loading...</div>
+      <main class="modal-body">
+        <div class="classroom-join-banner">
+          <div class="banner-icon">🎮</div>
+          <p class="banner-text">Enter the Game PIN displayed on the classroom screen to join live!</p>
         </div>
 
-        <div class="report-section">
-          <label>What's the issue?</label>
-          <div class="report-types">
-            <button class="report-type-btn" data-type="wrong-answer">
-              <span class="icon">❌</span>
-              <span>Answer is incorrect</span>
-            </button>
-            <button class="report-type-btn" data-type="wrong-question">
-              <span class="icon">❓</span>
-              <span>Question is wrong or misleading</span>
-            </button>
-            <button class="report-type-btn" data-type="poor-wording">
-              <span class="icon">📝</span>
-              <span>Poorly worded / confusing</span>
-            </button>
-            <button class="report-type-btn" data-type="biblical-accuracy">
-              <span class="icon">📚</span>
-              <span>Biblical accuracy concern</span>
-            </button>
-            <button class="report-type-btn" data-type="other">
-              <span class="icon">💡</span>
-              <span>Other issue or suggestion</span>
-            </button>
-          </div>
+        <div class="profile-section">
+          <label for="classroom-pin-input" class="setting-label">Game PIN (e.g. HOLY-123)</label>
+          <input id="classroom-pin-input" type="text" placeholder="PIN from host screen" maxlength="12" class="setting-select classroom-pin-field" autocomplete="off" />
         </div>
 
-        <div class="report-form-group">
-          <label for="report-details">Additional Details (Optional)</label>
-          <textarea id="report-details" rows="4" placeholder="Please provide any additional context or suggestions to help us understand the issue better..."></textarea>
+        <div class="profile-section" style="margin-top: 14px;">
+          <label for="classroom-player-name" class="setting-label">Your Nickname</label>
+          <input id="classroom-player-name" type="text" placeholder="Enter your name" maxlength="20" class="setting-select" />
+        </div>
+
+        <div class="classroom-join-tip">
+          <span>💡 Or host your own session on a projector:</span>
+          <a href="host.html" target="_blank" class="host-shortcut-link">Open Host Screen ↗</a>
         </div>
       </main>
-      <footer class="report-footer">
-        <button id="btn-report-cancel" class="btn-report-cancel">Cancel</button>
-        <button id="btn-report-submit" class="btn-report-submit">📤 Submit Report</button>
+      <footer class="modal-footer">
+        <button id="btn-classroom-join-save" class="primary" style="margin-right: 8px;">🚀 Join Game</button>
+        <button id="btn-classroom-join-cancel" class="secondary">Cancel</button>
       </footer>
     </div>
   </div>
 
-  <!-- 
   <!-- Toast Notifications -->
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
