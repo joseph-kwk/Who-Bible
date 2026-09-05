@@ -53,35 +53,40 @@
   --font-weight-bold: 700;
 }
 
-/* DUSK THEME (Ancient Scripture Bronze) - Deep warm dark palette, zero glare */
+/* SAPPHIRE NIGHT THEME — Deep midnight blue with soft silver & violet tones */
 body.day {
-  --bg: #14110e;
-  --bg-2: #1c1712;
-  --bg-3: #262019;
-  --card: rgba(28, 23, 18, 0.88);
-  --card-bg: #1c1712;
-  --glass: rgba(28, 23, 18, 0.7);
-  
-  /* Warm parchment readability on dark background */
-  --text: #f5eedb;
-  --text-2: #ded4bf;
-  --muted: #a39780;
-  
-  /* Warm holy bronze & amber accents */
-  --accent: #f59e0b;
-  --accent-2: #ea580c;
-  --accent-3: #d97706;
-  
-  /* Warm status colors */
+  --bg: #080c18;
+  --bg-2: #0d1224;
+  --bg-3: #121830;
+  --card: rgba(13, 18, 36, 0.9);
+  --card-bg: #0d1224;
+  --glass: rgba(13, 18, 36, 0.72);
+
+  /* Crisp silver-white text on deep navy */
+  --text: #e8edf8;
+  --text-2: #c8d0e8;
+  --muted: #7b8ab8;
+
+  /* Electric violet & sapphire accents */
+  --accent: #818cf8;       /* electric indigo */
+  --accent-2: #a78bfa;     /* soft violet */
+  --accent-3: #60a5fa;     /* sky blue */
+
+  /* Sky deep for title gradients */
+  --sky-deep: #3730a3;
+  --sky-soft: #6366f1;
+  --sky-light: #a5b4fc;
+
+  /* Status */
   --good: #34d399;
   --bad: #f87171;
   --warn: #fbbf24;
-  
-  /* Warm bronze borders */
-  --border: rgba(245, 158, 11, 0.16);
-  --border-2: rgba(245, 158, 11, 0.26);
-  --shadow: rgba(0, 0, 0, 0.45);
-  --shadow-2: rgba(0, 0, 0, 0.65);
+
+  /* Borders */
+  --border: rgba(129, 140, 248, 0.14);
+  --border-2: rgba(129, 140, 248, 0.24);
+  --shadow: rgba(0, 0, 0, 0.5);
+  --shadow-2: rgba(0, 0, 0, 0.7);
 }
 
 /* Universal reset and base styles */
@@ -121,17 +126,17 @@ body {
   background-size: 100% 100%;
 }
 
-/* DUSK THEME - Ancient Scripture Bronze / Desert Dusk */
+/* SAPPHIRE NIGHT - Background */
 body.day {
-  background-color: #14110e;
-  color: #f5eedb;
+  background-color: #080c18;
+  color: #e8edf8;
   
   background-image: 
-    radial-gradient(circle at 12% 14%, rgba(217, 119, 6, 0.12) 0%, transparent 45%),
-    radial-gradient(circle at 88% 22%, rgba(194, 65, 12, 0.10) 0%, transparent 50%),
-    radial-gradient(circle at 50% 80%, rgba(245, 158, 11, 0.08) 0%, transparent 55%),
-    radial-gradient(circle at 82% 86%, rgba(217, 119, 6, 0.06) 0%, transparent 40%),
-    linear-gradient(165deg, #14110e 0%, #1a1511 45%, #231c15 100%);
+    radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.14) 0%, transparent 50%),
+    radial-gradient(circle at 85% 15%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 85%, rgba(59, 130, 246, 0.10) 0%, transparent 55%),
+    radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.06) 0%, transparent 40%),
+    linear-gradient(165deg, #080c18 0%, #0d1224 45%, #0f1630 100%);
   background-attachment: fixed;
   background-size: 100% 100%;
 }
@@ -509,6 +514,7 @@ body.day .title-section h1 {
 
 /* ===== THEME TOGGLE BUTTON ===== */
 .theme-toggle {
+  display: none !important;
   width: 48px;
   height: 48px;
   border-radius: var(--border-radius-sm);
@@ -4046,8 +4052,10 @@ body.day {
 }
 
 .btn-remote-action:hover {
-  filter: brightness(1.1);
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.55);
+  transform: translateY(-3px) scale(1.02);
+  color: #fff;
 }
 
 .classroom-btn-group {
@@ -4062,15 +4070,24 @@ body.day {
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
 }
 
+.btn-join-action:hover {
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.55);
+  transform: translateY(-3px) scale(1.02);
+}
+
 .btn-host-action {
   flex: 1;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--text);
   border: 1px solid var(--border-2);
 }
 
 .btn-host-action:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(139, 92, 246, 0.18);
+  border-color: #8b5cf6;
+  color: #c4b5fd;
+  transform: translateY(-2px);
 }
 
 .btn-local-action {
@@ -4080,8 +4097,9 @@ body.day {
 }
 
 .btn-local-action:hover {
-  filter: brightness(1.1);
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #b45309, #d97706);
+  box-shadow: 0 8px 24px rgba(217, 119, 6, 0.6);
+  transform: translateY(-3px) scale(1.02);
 }
 
 /* Solo Modes Section */
@@ -4104,23 +4122,152 @@ body.day {
   margin-bottom: 32px;
 }
 
-.settings-grid-layout {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 18px;
+.settings-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
 }
 
-.setting-item-box {
+.reset-settings-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1.5px solid var(--border-2);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  letter-spacing: 0.3px;
+}
+
+.reset-settings-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Quick presets row */
+.quick-presets-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.presets-label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.preset-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preset-btn {
+  padding: 7px 16px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1.5px solid var(--border-2);
+  background: var(--glass);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  letter-spacing: 0.2px;
+}
+
+.preset-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+.preset-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(129,140,248,0.35);
+}
+
+body:not(.day) .preset-btn.active {
+  box-shadow: 0 4px 16px rgba(255,138,101,0.35);
+}
+
+/* Toggle pill grid */
+.settings-toggles-grid {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 16px;
 }
 
-.setting-label {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
+.setting-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
+
+.setting-toggle-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  min-width: 170px;
+  flex-shrink: 0;
+  letter-spacing: 0.2px;
+}
+
+.toggle-pill-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.toggle-pill {
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1.5px solid var(--border-2);
+  background: var(--glass);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.toggle-pill:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  transform: translateY(-1px);
+  background: var(--card);
+  box-shadow: none;
+}
+
+.toggle-pill.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 3px 12px rgba(129, 140, 248, 0.4);
+}
+
+body:not(.day) .toggle-pill.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 3px 12px rgba(255, 138, 101, 0.35);
+}
+
 
 /* ===== PREMIUM GAME SETTING SELECTS ===== */
 .setting-select {

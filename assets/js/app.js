@@ -702,6 +702,7 @@ async function init(){
   SoundFX.init();
   attachHandlers(); // Attach listeners immediately
   initFeedback(); // Initialize feedback system
+  initSettingsPills(); // Initialize pill toggle settings UI
   
   // Set default settings if not present
   const defaultSettings = {
@@ -720,6 +721,9 @@ async function init(){
   difficultySel.value = savedSettings.difficulty ?? defaultSettings.difficulty;
   numQuestionsInput.value = String(savedSettings.numQuestions ?? defaultSettings.numQuestions);
   timeLimitInput.value = String(savedSettings.timeLimit ?? defaultSettings.timeLimit);
+  
+  // Sync pills to reflect loaded settings
+  syncPillsFromSelects();
   
   // Ensure theme is applied - force initial application
   const themeToApply = savedSettings.theme || defaultSettings.theme;
@@ -882,7 +886,103 @@ function checkFirstTimeUser() {
   }
 }
 
+// ── Settings Pill Toggle System ──────────────────────────────────
+function initSettingsPills() {
+  // Map: data-setting → hidden select id
+  const settingMap = {
+    'difficulty': 'difficulty',
+    'num-questions': 'num-questions',
+    'time-limit': 'time-limit',
+    'testament-filter': 'testament-filter',
+    'gender-filter': 'gender-filter'
+  };
+
+  // Wire up each toggle-pill-row
+  document.querySelectorAll('.toggle-pill-row').forEach(row => {
+    const settingKey = row.getAttribute('data-setting');
+    const selectEl = document.getElementById(settingKey);
+    if (!selectEl) return;
+
+    row.querySelectorAll('.toggle-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        // Deactivate siblings
+        row.querySelectorAll('.toggle-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        // Sync hidden select
+        selectEl.value = pill.getAttribute('data-value');
+        selectEl.dispatchEvent(new Event('change'));
+        // Deactivate presets since user customized
+        document.querySelectorAll('.preset-btn').forEach(pb => pb.classList.remove('active'));
+      });
+    });
+  });
+
+  // Presets
+  const presets = {
+    casual: { difficulty: 'easy', 'num-questions': '5', 'time-limit': '90', 'testament-filter': 'all', 'gender-filter': 'all' },
+    standard: { difficulty: 'medium', 'num-questions': '10', 'time-limit': '60', 'testament-filter': 'all', 'gender-filter': 'all' },
+    epic: { difficulty: 'hard', 'num-questions': '20', 'time-limit': '30', 'testament-filter': 'all', 'gender-filter': 'all' }
+  };
+
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const preset = presets[btn.getAttribute('data-preset')];
+      if (!preset) return;
+      applySettingsValues(preset);
+      document.querySelectorAll('.preset-btn').forEach(pb => pb.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Reset button
+  const btnReset = document.getElementById('btn-reset-settings');
+  if (btnReset) {
+    btnReset.addEventListener('click', () => {
+      const defaults = { difficulty: 'medium', 'num-questions': '10', 'time-limit': '60', 'testament-filter': 'all', 'gender-filter': 'all' };
+      applySettingsValues(defaults);
+      // Re-activate Standard preset
+      document.querySelectorAll('.preset-btn').forEach(pb => pb.classList.remove('active'));
+      const stdBtn = document.querySelector('.preset-btn[data-preset="standard"]');
+      if (stdBtn) stdBtn.classList.add('active');
+      showToast({ title: '↺ Settings Reset', msg: 'All settings restored to defaults', type: 'success', timeout: 2000 });
+    });
+  }
+
+  // Sync pills from current select values (on load)
+  syncPillsFromSelects();
+}
+
+function applySettingsValues(values) {
+  Object.entries(values).forEach(([key, value]) => {
+    const selectEl = document.getElementById(key);
+    if (selectEl) {
+      selectEl.value = value;
+      selectEl.dispatchEvent(new Event('change'));
+    }
+    // Update pill active state
+    const row = document.querySelector(`.toggle-pill-row[data-setting="${key}"]`);
+    if (row) {
+      row.querySelectorAll('.toggle-pill').forEach(p => {
+        p.classList.toggle('active', p.getAttribute('data-value') === value);
+      });
+    }
+  });
+}
+
+function syncPillsFromSelects() {
+  document.querySelectorAll('.toggle-pill-row').forEach(row => {
+    const settingKey = row.getAttribute('data-setting');
+    const selectEl = document.getElementById(settingKey);
+    if (!selectEl) return;
+    const currentVal = selectEl.value;
+    row.querySelectorAll('.toggle-pill').forEach(p => {
+      p.classList.toggle('active', p.getAttribute('data-value') === currentVal);
+    });
+  });
+}
+
 function attachHandlers(){
+
   // Hamburger Menu
   const btnMenu = document.getElementById('btn-menu');
   const navMenuContainer = document.getElementById('nav-menu-container');
@@ -2550,20 +2650,10 @@ function setModalScrollLock(locked) {
 
 // Theme
 function applyTheme(theme){
-  state.theme = theme;
-  document.body.classList.remove('day', 'night');
-  const btnThemeToggle = document.getElementById('btn-theme-toggle');
-  
-  if(theme === 'day') {
-    document.body.classList.add('day');
-    if(btnTheme) btnTheme.setAttribute('title', 'Theme: Ancient Bronze Dusk (Press T)');
-    if(btnThemeToggle) btnThemeToggle.textContent = '🏺';
-  } else {
-    theme = 'night';
-    document.body.classList.add('night');
-    if(btnTheme) btnTheme.setAttribute('title', 'Theme: Celestial Midnight (Press T)');
-    if(btnThemeToggle) btnThemeToggle.textContent = '🌙';
-  }
+  state.theme = 'night';
+  document.body.classList.remove('day');
+  document.body.classList.add('night');
+  if (btnTheme) btnTheme.style.display = 'none';
 }
 
 function saveSettingsFromUI(){
