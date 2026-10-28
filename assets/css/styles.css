@@ -2228,9 +2228,7 @@ button:disabled:hover {
 }
 
 .footer-social-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: none !important;
 }
 
 .footer-social-btn {
@@ -4333,6 +4331,36 @@ body:not(.day) .toggle-pill.active {
   position: relative;
 }
 
+.hero-character-animation-wrap {
+  width: 100%;
+  max-width: 560px;
+  height: 288px;
+  margin: 10px auto 14px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  filter: drop-shadow(0 14px 36px rgba(245, 158, 11, 0.28));
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.hero-character-animation-wrap svg {
+  width: 100%;
+  height: 100%;
+  max-height: 288px;
+}
+
+@media (max-width: 900px) {
+  .hero-character-animation-wrap {
+    max-width: 440px;
+    height: 226px;
+  }
+  .hero-character-animation-wrap svg {
+    max-height: 226px;
+  }
+}
+
 .hero-pill-badge {
   display: inline-flex;
   align-items: center;
@@ -4352,6 +4380,7 @@ body:not(.day) .toggle-pill.active {
 
 .gradient-text {
   background: linear-gradient(135deg, #ffffff 0%, #ffedd5 40%, #f59e0b 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: clamp(28px, 4.5vw, 44px);
@@ -4362,6 +4391,7 @@ body:not(.day) .toggle-pill.active {
 
 body.day .gradient-text {
   background: linear-gradient(135deg, #0f172a 0%, #b45309 60%, #d97706 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -4484,21 +4514,23 @@ body.day .gradient-text {
 
 /* ===== MODERN GAME CARD & HUD ===== */
 .modern-game-card {
-  background: rgba(26, 32, 44, 0.85);
+  background: rgba(26, 32, 44, 0.88);
   backdrop-filter: blur(20px);
   border: 1px solid var(--border-2);
-  border-radius: 24px;
-  padding: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-  max-width: 860px;
+  border-radius: 20px;
+  padding: 18px 22px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  max-width: 820px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .game-header-modern {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  gap: 10px;
 }
 
 .back-btn-modern {
@@ -4508,8 +4540,8 @@ body.day .gradient-text {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 14px;
-  border-radius: 12px;
+  padding: 7px 13px;
+  border-radius: 10px;
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
@@ -4518,16 +4550,18 @@ body.day .gradient-text {
 
 .back-btn-modern:hover {
   background: rgba(255, 255, 255, 0.16);
+  border-color: var(--accent);
 }
 
 .game-mode-pill {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   color: var(--text);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border);
-  padding: 6px 16px;
+  padding: 5px 14px;
   border-radius: 999px;
+  letter-spacing: 0.02em;
 }
 
 .timer-pill {
@@ -4537,10 +4571,10 @@ body.day .gradient-text {
   background: rgba(59, 130, 246, 0.15);
   border: 1px solid rgba(59, 130, 246, 0.35);
   color: #60a5fa;
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 999px;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .timer-pill.warn {
@@ -4559,26 +4593,28 @@ body.day .gradient-text {
 /* HUD Bar */
 .game-hud-bar {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .hud-stat-chip {
   flex: 1;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 12px 16px;
+  border-radius: 12px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   position: relative;
   overflow: hidden;
 }
 
 .hud-icon {
-  font-size: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hud-info {
@@ -4587,17 +4623,18 @@ body.day .gradient-text {
 }
 
 .hud-label {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .hud-value {
-  font-size: 19px;
+  font-size: 17px;
   font-weight: 800;
   color: var(--text);
+  line-height: 1.2;
 }
 
 .hud-divider {
@@ -4630,7 +4667,7 @@ body.day .gradient-text {
 .chip-streak.flame-active {
   border-color: #f59e0b;
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.1));
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
 }
 
 .flame-pulsing {
@@ -4644,64 +4681,147 @@ body.day .gradient-text {
   75% { transform: scale(1.1) rotate(5deg); }
 }
 
-/* Versus HUD */
+/* Versus HUD (Pass & Play + Remote) */
 .versus-hud {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  background: rgba(255, 255, 255, 0.05);
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
   border: 1px solid var(--border-2);
   border-radius: 14px;
-  padding: 12px 18px;
-  margin-bottom: 18px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
   gap: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .versus-player {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 120px;
+}
+
+.versus-player.active-turn {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(245, 158, 11, 0.12));
+  border-color: rgba(212, 175, 55, 0.6);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.25), inset 0 0 10px rgba(212, 175, 55, 0.08);
+  transform: translateY(-1px) scale(1.02);
+}
+
+.versus-player.waiting-turn {
+  opacity: 0.55;
+  filter: grayscale(20%);
+}
+
+.versus-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.versus-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .versus-name {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.versus-turn-pill {
+  display: none;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #d4af37, #f59e0b);
+  color: #1a1608;
+  align-self: flex-start;
+  animation: pulse-turn 1.8s infinite ease-in-out;
+}
+
+.versus-player.active-turn .versus-turn-pill {
+  display: inline-block;
+}
+
+@keyframes pulse-turn {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.06); opacity: 0.88; }
 }
 
 .versus-score {
   font-size: 18px;
   font-weight: 900;
-  color: var(--accent);
+  color: #fbbf24;
+  margin-left: auto;
+  padding-left: 8px;
 }
 
 .versus-badge {
   background: linear-gradient(135deg, #ef4444, #f59e0b);
   color: white;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
   padding: 4px 10px;
-  border-radius: 8px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  letter-spacing: 0.05em;
 }
 
 .versus-turn-indicator {
   width: 100%;
   text-align: center;
   font-size: 13px;
-  color: var(--accent-2);
+  color: #fbbf24;
   font-weight: 600;
   border-top: 1px solid var(--border);
   padding-top: 6px;
+  margin-top: 2px;
+}
+
+/* In-game Turn Banner Above Question */
+.versus-turn-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.16), rgba(245, 158, 11, 0.08));
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: #fef3c7;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease;
 }
 
 /* Progress Track */
 .progress-container-modern {
   width: 100%;
-  height: 8px;
+  height: 5px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 999px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   overflow: hidden;
 }
 
@@ -4716,48 +4836,57 @@ body.day .gradient-text {
 
 /* Quiz Content & Answers */
 .question-text-modern {
-  font-size: clamp(18px, 2.5vw, 22px);
+  font-size: clamp(16px, 2.2vw, 20px);
   font-weight: 700;
-  line-height: 1.5;
+  line-height: 1.45;
   color: var(--text);
-  margin-bottom: 24px;
-  min-height: 56px;
+  margin-bottom: 14px;
+  min-height: auto;
+  text-align: left;
 }
 
 .answers-grid-modern {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 14px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 640px) {
+  .answers-grid-modern {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
 }
 
 .answers-grid-modern .ans {
   background: rgba(255, 255, 255, 0.05);
-  border: 2px solid var(--border);
-  border-radius: 16px;
-  padding: 16px 20px;
-  font-size: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
-  min-height: 60px;
+  gap: 10px;
+  min-height: 48px;
 }
 
 .answers-grid-modern .ans:hover:not(.disabled) {
   background: rgba(255, 255, 255, 0.12);
   border-color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .answers-grid-modern .ans.correct {
   background: rgba(16, 185, 129, 0.2) !important;
   border-color: #10b981 !important;
   color: #34d399 !important;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3) !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.3) !important;
 }
 
 .answers-grid-modern .ans.incorrect {
@@ -4774,24 +4903,29 @@ body.day .gradient-text {
 }
 
 .after-ref-modern {
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 13.5px;
+  line-height: 1.45;
   color: var(--text-2);
-  margin-bottom: 20px;
-  min-height: 24px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  margin-top: 6px;
 }
 
 /* Controls Bar */
 .game-controls-modern {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: flex-end;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .control-btn-modern {
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-size: 15px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -5014,24 +5148,24 @@ body.modal-open, html.modal-open {
 
 .answers-grid-modern {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 12px;
-  margin-bottom: 12px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .game-controls-modern {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: flex-end;
-  margin-top: 10px;
-  margin-bottom: 14px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .after-ref-modern {
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 13.5px;
+  line-height: 1.45;
   color: var(--text-2);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   min-height: 0;
 }
 
@@ -5041,6 +5175,16 @@ body.modal-open, html.modal-open {
   .hero-brand-container {
     padding: 20px 10px 10px;
   }
+
+  .hero-character-animation-wrap {
+    max-width: 320px;
+    height: 165px;
+    margin: 4px auto 10px auto;
+  }
+
+  .hero-character-animation-wrap svg {
+    max-height: 165px;
+  }
   
   .hero-feature-tags {
     display: none;
@@ -5049,22 +5193,59 @@ body.modal-open, html.modal-open {
   .friends-modes-grid {
     grid-template-columns: 1fr;
   }
+
+  .modern-game-card {
+    padding: 12px 14px;
+    border-radius: 16px;
+  }
+  
+  .game-header-modern {
+    margin-bottom: 8px;
+    gap: 6px;
+  }
+  
+  .game-mode-pill {
+    font-size: 13px;
+    padding: 4px 10px;
+  }
+
+  .versus-hud {
+    padding: 8px 12px;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .versus-player {
+    min-width: 90px;
+    padding: 4px 8px;
+  }
+
+  .versus-name {
+    font-size: 13px;
+    max-width: 85px;
+  }
+
+  .versus-score {
+    font-size: 16px;
+  }
   
   .game-hud-bar {
-    gap: 8px;
+    gap: 6px;
+    margin-bottom: 10px;
   }
   
   .hud-stat-chip {
-    padding: 8px 10px;
-    gap: 8px;
+    padding: 6px 8px;
+    gap: 6px;
   }
   
   .hud-value {
-    font-size: 16px;
+    font-size: 15px;
   }
   
   .answers-grid-modern {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
   
   .summary-stats-grid {

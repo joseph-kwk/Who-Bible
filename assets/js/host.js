@@ -303,16 +303,59 @@ async function startQuiz() {
   showQuestion(0);
 }
 
+// Clean event into natural question predicate (active or passive)
+function cleanEventPredicate(event) {
+  if (!event) return 'lived faithfully in scripture';
+  const e = String(event).trim();
+  const words = e.split(/\s+/);
+  const first = words[0].toLowerCase();
+  const rest = words.slice(1).join(' ');
+
+  const passiveVerbs = new Set([
+    'swallowed', 'sold', 'turned', 'visited', 'betrayed', 'raised', 'called',
+    'anointed', 'cast', 'fed', 'taken', 'converted', 'shipwrecked', 'beheaded',
+    'exiled', 'dedicated', 'born', 'struck', 'stoned', 'chosen', 'saved',
+    'blinded', 'imprisoned', 'released', 'buried', 'renamed', 'deceived'
+  ]);
+
+  if (passiveVerbs.has(first)) {
+    return `was ${first} ${rest}`;
+  }
+
+  const titleNouns = new Set([
+    'judge', 'first', 'second', 'ancestor', 'father', 'son', 'brother', 
+    'mother', 'sister', 'cousin', 'prophet', 'priest', 'king', 'queen'
+  ]);
+  if (titleNouns.has(first)) {
+    let article = 'a';
+    if (first === 'ancestor') article = 'an';
+    if (first === 'first' || first === 'second') article = 'the';
+    return `was ${article} ${first} ${rest}`;
+  }
+
+  return `${first} ${rest}`;
+}
+
 // Filter people by difficulty
 function filterPeopleForHost(people, difficulty) {
+  const pList = people || PEOPLE_DATA;
+  if (!pList || pList.length === 0) return [];
+
   if (difficulty === 'easy') {
-    const common = new Set(['Noah', 'Moses', 'David', 'Solomon', 'Abraham', 'Isaac', 'Jacob', 'Ruth', 'Esther', 'Peter', 'Paul', 'Mary (mother of Jesus)', 'John the Baptist', 'Joseph (son of Jacob)', 'Lazarus', 'Adam', 'Eve', 'Joshua', 'Gideon', 'Samson', 'Daniel', 'Elijah']);
-    return people.filter(p => p.difficulty === 'easy' || common.has(p.name));
+    const easyList = pList.filter(p => p.difficulty === 'easy');
+    return easyList.length ? easyList : pList.slice();
+  }
+  if (difficulty === 'medium') {
+    const medList = pList.filter(p => p.difficulty === 'medium');
+    const easyList = pList.filter(p => p.difficulty === 'easy');
+    return [...medList, ...easyList.slice(0, Math.ceil(medList.length * 0.35))];
   }
   if (difficulty === 'hard') {
-    return people.filter(p => p.difficulty === 'hard' || (!p.occupation && !p.mother));
+    const hardList = pList.filter(p => p.difficulty === 'hard');
+    const medList = pList.filter(p => p.difficulty === 'medium');
+    return [...hardList, ...medList.slice(0, Math.ceil(hardList.length * 0.35))];
   }
-  return people.slice();
+  return pList.slice();
 }
 
 // Generate Questions
@@ -326,23 +369,24 @@ function generateQuestions(difficulty, count) {
   // Shuffle pool
   const shuffledPool = [...pool].sort(() => Math.random() - 0.5);
   
-  const questionTypes = ['whoDid', 'mother', 'occupation', 'age', 'event'];
-  
   for (const person of shuffledPool) {
     if (questions.length >= count) break;
     if (usedPeople.has(person.name)) continue;
     
     // Pick a valid question type for this person
     const validTypes = [];
-    if (person.notable_events && person.notable_events.length > 0) validTypes.push('whoDid', 'event');
-    if (person.mother) validTypes.push('mother');
-    if (person.occupation) validTypes.push('occupation');
-    if (person.age_notes) validTypes.push('age');
+    const validEvs = (person.notable_events || []).filter(e => e && e.length > 3);
+    if (validEvs.length > 0) {
+      validTypes.push('whoAmI', 'whoDid', 'whichEvent');
+    }
+    if (person.mother && person.mother.length > 2) validTypes.push('mother');
+    if (person.father && person.father.length > 2) validTypes.push('father');
+    if (person.occupation && person.occupation.length > 3) validTypes.push('occupation');
     
     if (validTypes.length === 0) validTypes.push('whoDid');
     
     const type = validTypes[Math.floor(Math.random() * validTypes.length)];
-    const question = generateQuestionForPerson(person, type, PEOPLE_DATA);
+    const question = generateQuestionForPerson(person, type, pool);
     
     if (question && question.options && question.options.length === 4) {
       usedPeople.add(person.name);
@@ -357,11 +401,11 @@ function generateQuestions(difficulty, count) {
   
   // If we still need more questions, fill with whoDid questions
   let i = 0;
-  while (questions.length < count && i < PEOPLE_DATA.length) {
-    const p = PEOPLE_DATA[i++];
+  while (questions.length < count && i < pool.length) {
+    const p = pool[i++];
     if (!usedPeople.has(p.name)) {
-      const q = generateQuestionForPerson(p, 'whoDid', PEOPLE_DATA);
-      if (q) {
+      const q = generateQuestionForPerson(p, 'whoDid', pool);
+      if (q && q.options && q.options.length === 4) {
         usedPeople.add(p.name);
         questions.push({
           ...q,
@@ -382,85 +426,96 @@ function generateQuestionForPerson(person, type, pool) {
   let correct = '';
   let verse = (person.verses && person.verses.length > 0) ? person.verses.join(', ') : '';
   
-  const rawEvent = (person.notable_events && person.notable_events.length > 0) 
-    ? person.notable_events[0] 
-    : 'is a notable figure in scripture';
+  const validEvs = (person.notable_events || []).filter(e => e && e.length > 3);
+  const rawEvent = validEvs.length > 0 ? validEvs[Math.floor(Math.random() * validEvs.length)] : 'lived faithfully in scripture';
+  const action = cleanEventPredicate(rawEvent);
+
+  const famousMothers = ['Sarah', 'Rebekah', 'Rachel', 'Leah', 'Hannah', 'Elizabeth', 'Mary (mother of Jesus)', 'Jochebed', 'Bathsheba', 'Eve', 'Hagar'];
+  const famousFathers = ['Abraham', 'Isaac', 'Jacob', 'David', 'Saul (first king)', 'Jesse', 'Zechariah', 'Noah', 'Terah', 'Adam'];
+  const biblicalRoles = [
+    'Prophet of the Lord', 'King of Israel', 'Queen of Persia', 'Apostle of Jesus Christ',
+    'Judge of Israel', 'High Priest', 'Fisherman and Disciple', 'Tentmaker and Missionary',
+    'Tax Collector and Disciple', 'Cupbearer to the King', 'Scribe and Teacher of the Law'
+  ];
     
   switch (type) {
-    case 'whoDid':
-    case 'event':
-      prompt = `Who ${rawEvent}?`;
+    case 'whoAmI':
+      prompt = `Who am I? In scripture, I ${action}.`;
       correct = person.name;
+      break;
+
+    case 'whoDid':
+      prompt = `Who in scripture ${action}?`;
+      correct = person.name;
+      break;
+
+    case 'whichEvent':
+      prompt = `Which notable scriptural event is recorded for ${person.name}?`;
+      correct = rawEvent;
       break;
       
     case 'mother':
-      if (!person.mother) {
-        prompt = `Who ${rawEvent}?`;
-        correct = person.name;
-        type = 'whoDid';
-      } else {
-        prompt = `Who is the mother of ${person.name}?`;
-        correct = person.mother;
-      }
+      prompt = `Who is recorded in scripture as the mother of ${person.name}?`;
+      correct = person.mother;
+      break;
+
+    case 'father':
+      prompt = `Who is recorded in scripture as the father of ${person.name}?`;
+      correct = person.father;
       break;
       
     case 'occupation':
-      if (!person.occupation) {
-        prompt = `Who ${rawEvent}?`;
-        correct = person.name;
-        type = 'whoDid';
-      } else {
-        prompt = `What was ${person.name}'s role or occupation?`;
-        correct = person.occupation;
-      }
-      break;
-      
-    case 'age':
-      if (!person.age_notes) {
-        prompt = `Who ${rawEvent}?`;
-        correct = person.name;
-        type = 'whoDid';
-      } else {
-        prompt = `What do scriptures record about ${person.name}'s life or age?`;
-        correct = person.age_notes;
-      }
+      prompt = `What was the biblical calling or role of ${person.name}?`;
+      correct = person.occupation.split(',')[0].trim();
       break;
       
     default:
-      prompt = `Who ${rawEvent}?`;
+      prompt = `Who in scripture ${action}?`;
       correct = person.name;
       type = 'whoDid';
   }
   
   // Generate distractors
   const options = [correct];
-  const candidates = pool.filter(p => p.name !== person.name);
-  const shuffledCandidates = [...candidates].sort(() => Math.random() - 0.5);
-  
-  for (const cand of shuffledCandidates) {
-    if (options.length >= 4) break;
-    
-    let candidateAnswer = '';
-    if (type === 'whoDid' || type === 'event') {
-      candidateAnswer = cand.name;
-    } else if (type === 'mother') {
-      candidateAnswer = cand.mother || cand.name;
-    } else if (type === 'occupation') {
-      candidateAnswer = cand.occupation || cand.name;
-    } else if (type === 'age') {
-      candidateAnswer = cand.age_notes || `Lived during biblical times`;
+
+  if (type === 'whoAmI' || type === 'whoDid') {
+    const candidates = pool.filter(p => p.name !== person.name).map(p => p.name).sort(() => Math.random() - 0.5);
+    for (const name of candidates) {
+      if (options.length >= 4) break;
+      if (!options.includes(name)) options.push(name);
     }
-    
-    if (candidateAnswer && !options.includes(candidateAnswer)) {
-      options.push(candidateAnswer);
+  } else if (type === 'whichEvent') {
+    const otherEvs = [];
+    for (const other of pool) {
+      if (other.name !== person.name && other.notable_events) {
+        for (const oe of other.notable_events) {
+          if (oe && oe.length > 5 && oe !== correct) otherEvs.push(oe);
+        }
+      }
     }
-  }
-  
-  // Ensure we have 4 options
-  let fallbackIndex = 1;
-  while (options.length < 4) {
-    const fallback = `Option ${fallbackIndex++}`;
-    if (!options.includes(fallback)) options.push(fallback);
+    otherEvs.sort(() => Math.random() - 0.5);
+    for (const ev of otherEvs) {
+      if (options.length >= 4) break;
+      if (!options.includes(ev)) options.push(ev);
+    }
+  } else if (type === 'mother') {
+    const mPool = famousMothers.filter(m => m !== correct).sort(() => Math.random() - 0.5);
+    for (const m of mPool) {
+      if (options.length >= 4) break;
+      if (!options.includes(m)) options.push(m);
+    }
+  } else if (type === 'father') {
+    const fPool = famousFathers.filter(f => f !== correct).sort(() => Math.random() - 0.5);
+    for (const f of fPool) {
+      if (options.length >= 4) break;
+      if (!options.includes(f)) options.push(f);
+    }
+  } else if (type === 'occupation') {
+    const rPool = biblicalRoles.filter(r => r.toLowerCase() !== correct.toLowerCase()).sort(() => Math.random() - 0.5);
+    for (const r of rPool) {
+      if (options.length >= 4) break;
+      if (!options.includes(r)) options.push(r);
+    }
   }
   
   // Shuffle options

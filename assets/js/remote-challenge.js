@@ -169,6 +169,36 @@ const RemoteChallenge = {
         window.onRemoteQuestionsReady(questions);
       }
     });
+
+    // Host watches the whole roster so the match starts no matter who readies last
+    if (this.isHost) {
+      this._starting = false;
+      this.roomRef.child('players').on('value', (snapshot) => {
+        const players = snapshot.val() || {};
+        if (window.onRemotePlayersUpdate) window.onRemotePlayersUpdate(players);
+        this.tryStartMatch(players);
+      });
+    } else {
+      this.roomRef.child('players').on('value', (snapshot) => {
+        if (window.onRemotePlayersUpdate) window.onRemotePlayersUpdate(snapshot.val() || {});
+      });
+    }
+  },
+
+  async tryStartMatch(players) {
+    if (!this.isHost || this._starting || !this.roomRef) return;
+    const list = Object.values(players || {}).filter(Boolean);
+    if (list.length < 2 || !list.every(p => p.ready)) return;
+    const statusSnap = await this.roomRef.child('status').once('value');
+    if (statusSnap.val() === 'active') return;
+    this._starting = true;
+    try {
+      const settingsSnap = await this.roomRef.child('settings').once('value');
+      await this.generateQuestions(settingsSnap.val() || {});
+      await this.roomRef.child('status').set('active');
+    } finally {
+      this._starting = false;
+    }
   },
   
   /**
@@ -176,24 +206,7 @@ const RemoteChallenge = {
    */
   async setReady() {
     if (!this.roomRef || !this.playerNumber) return;
-    
     await this.roomRef.child(`players/player${this.playerNumber}/ready`).set(true);
-    
-    // If host, check if all players are ready
-    if (this.isHost) {
-      const snapshot = await this.roomRef.once('value');
-      const room = snapshot.val();
-      
-      // Check if all players are ready
-      const players = room.players || {};
-      const allReady = Object.values(players).every(player => player && player.ready);
-      
-      if (allReady && Object.keys(players).length >= 1) {
-        // All ready - generate questions
-        await this.generateQuestions(room.settings);
-        await this.roomRef.child('status').set('active');
-      }
-    }
   },
   
   /**
@@ -212,22 +225,16 @@ const RemoteChallenge = {
   /**
    * Submit an answer
    */
-  async submitAnswer(questionIndex, isCorrect, timeTaken) {
+  async submitAnswer(questionIndex, isCorrect, timeTaken, totalScore, streak) {
     if (!this.roomRef || !this.playerNumber) return;
     
     const playerPath = `players/player${this.playerNumber}`;
     const resultPath = `results/player${this.playerNumber}`;
     
-    // Update score
-    const snapshot = await this.roomRef.child(playerPath).once('value');
-    const player = snapshot.val();
-    
-    const newScore = isCorrect ? player.score + 1 : player.score;
-    const newStreak = isCorrect ? player.streak + 1 : 0;
-    
+    // Local client is the source of truth for its own points (keeps both screens in sync)
     await this.roomRef.child(playerPath).update({
-      score: newScore,
-      streak: newStreak,
+      score: totalScore || 0,
+      streak: streak || 0,
       currentQuestion: questionIndex + 1
     });
     
@@ -248,11 +255,14 @@ const RemoteChallenge = {
   async completeChallenge() {
     if (!this.roomRef) return;
     
-    await this.roomRef.child('status').set('completed');
-    
-    // Get final results
+    await this.roomRef.child(`players/player${this.playerNumber}/finished`).set(true);
     const snapshot = await this.roomRef.once('value');
-    return snapshot.val();
+    const room = snapshot.val() || {};
+    const all = Object.values(room.players || {}).filter(Boolean);
+    if (all.length && all.every(p => p.finished)) {
+      await this.roomRef.child('status').set('completed');
+    }
+    return room;
   },
   
   /**
@@ -276,6 +286,7 @@ const RemoteChallenge = {
       updates[`players/${key}/streak`] = 0;
       updates[`players/${key}/currentQuestion`] = 0;
       updates[`players/${key}/ready`] = false;
+      updates[`players/${key}/finished`] = false;
     });
     
     await this.roomRef.update(updates);

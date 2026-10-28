@@ -1,524 +1,219 @@
 // Remote Challenge UI Integration for Who-Bible
-// This file handles the UI interactions for remote multiplayer challenges
+// Handles the lobby modal (create / join / ready) and hands the match to app.js via window.WB
 
-// Show/hide remote modal steps
-function showRemoteStep(step) {
-  // Hide all steps
-  document.getElementById('remote-step-1').style.display = 'none';
-  document.getElementById('remote-step-create').style.display = 'none';
-  document.getElementById('remote-step-share').style.display = 'none';
-  document.getElementById('remote-step-join').style.display = 'none';
-  document.getElementById('remote-step-joined').style.display = 'none';
-  
-  // Show requested step
-  const steps = {
-    '1': 'remote-step-1',
-    'create': 'remote-step-create',
-    'share': 'remote-step-share',
-    'join': 'remote-step-join',
-    'joined': 'remote-step-joined'
-  };
-  
-  const stepEl = document.getElementById(steps[step]);
-  if (stepEl) {
-    stepEl.style.display = 'block';
-  }
-  
-  // Show/hide back button
-  const btnBack = document.getElementById('btn-remote-back');
-  if (btnBack) {
-    btnBack.style.display = (step === 'create' || step === 'join') ? 'inline-block' : 'none';
-  }
-}
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const toast = (o) => (window.showToast ? window.showToast(o) : console.log(o.title, o.msg));
+  const myName = () => (window.WB && window.WB.state.currentPlayer && window.WB.state.currentPlayer.name) || 'Player';
 
-function showRemoteModal() {
-  const modal = document.getElementById('remote-modal');
-  if (modal) {
+  let matchStarted = false;
+
+  function showRemoteStep(step) {
+    ['remote-step-1', 'remote-step-create', 'remote-step-share', 'remote-step-join', 'remote-step-joined']
+      .forEach((id) => { const el = $(id); if (el) el.style.display = 'none'; });
+    const map = { '1': 'remote-step-1', create: 'remote-step-create', share: 'remote-step-share', join: 'remote-step-join', joined: 'remote-step-joined' };
+    const el = $(map[step]);
+    if (el) el.style.display = 'block';
+    const back = $('btn-remote-back');
+    if (back) back.style.display = (step === 'create' || step === 'join') ? 'inline-flex' : 'none';
+    const focusMap = { create: 'remote-host-name', join: 'remote-room-code-input' };
+    if (focusMap[step]) setTimeout(() => $(focusMap[step])?.focus(), 60);
+  }
+
+  function resetLobbyButtons() {
+    const h = $('btn-ready-host'), g = $('btn-ready-guest');
+    if (h) { h.disabled = false; h.textContent = "I'm Ready — Start!"; h.style.display = 'none'; }
+    if (g) { g.disabled = false; g.textContent = "I'm Ready!"; }
+    const roster = $('remote-roster'); if (roster) roster.innerHTML = '';
+    const st = $('remote-opponent-status'); if (st) st.textContent = 'Waiting for a friend to join…';
+  }
+
+  function showRemoteModal() {
+    const modal = $('remote-modal');
+    if (!modal) return;
+    matchStarted = false;
+    resetLobbyButtons();
     modal.style.display = 'flex';
-    
-    // Auto-fill names if available
-    const currentPlayerName = (window.state && window.state.currentPlayer) ? window.state.currentPlayer.name : 'Player';
-    const hostInput = document.getElementById('remote-host-name');
-    const joinInput = document.getElementById('remote-join-name');
-    if (hostInput && !hostInput.value) hostInput.value = currentPlayerName;
-    if (joinInput && !joinInput.value) joinInput.value = currentPlayerName;
-    
+    const hostInput = $('remote-host-name'), joinInput = $('remote-join-name');
+    if (hostInput && !hostInput.value) hostInput.value = myName();
+    if (joinInput && !joinInput.value) joinInput.value = myName();
     showRemoteStep('1');
   }
-}
 
-function hideRemoteModal() {
-  const modal = document.getElementById('remote-modal');
-  if (modal) {
-    modal.style.display = 'none';
+  // Close lobby. leave=true abandons the room (user cancelled); false keeps the connection (match starting).
+  function hideRemoteModal(leave = true) {
+    const modal = $('remote-modal');
+    if (modal) modal.style.display = 'none';
+    if (leave && !matchStarted && window.RemoteChallenge) window.RemoteChallenge.leaveRoom();
   }
-  
-  // Clean up if leaving a room
-  if (window.RemoteChallenge) {
-    window.RemoteChallenge.leaveRoom();
-  }
-}
 
-// Remote Challenge button handler
-function startRemoteChallenge() {
-  if (!window.FirebaseConfig?.isAvailable()) {
-    showToast({ 
-      title: 'Firebase Not Configured', 
-      msg: 'Please set up Firebase to use Remote Challenge.', 
-      type: 'error',
-      timeout: 4000
-    });
-    return;
-  }
-  
-  showRemoteModal();
-}
-
-// Save name handlers
-function handleSaveHostName() {
-  const hostNameInput = document.getElementById('remote-host-name');
-  const hostName = hostNameInput.value.trim();
-  
-  if (!hostName) {
-    showToast({ title: 'Name Required', msg: 'Please enter your name', type: 'error' });
-    hostNameInput.focus();
-    return;
-  }
-  
-  showToast({ title: 'Name Saved!', msg: `Ready as ${hostName}!`, type: 'success', timeout: 1500 });
-}
-
-function handleSaveJoinName() {
-  const joinNameInput = document.getElementById('remote-join-name');
-  const joinName = joinNameInput.value.trim();
-  
-  if (!joinName) {
-    showToast({ title: 'Name Required', msg: 'Please enter your name', type: 'error' });
-    joinNameInput.focus();
-    return;
-  }
-  
-  showToast({ title: 'Name Saved!', msg: `Ready as ${joinName}!`, type: 'success', timeout: 1500 });
-}
-
-// Create room flow
-async function handleCreateRoom() {
-  let hostName = document.getElementById('remote-host-name')?.value.trim();
-  if (!hostName) {
-    hostName = (window.state?.currentPlayer?.name) || 'Player 1';
-  }
-  
-  try {
-    const settings = {
-      difficulty: document.getElementById('difficulty')?.value || 'medium',
-      numQuestions: parseInt(document.getElementById('num-questions')?.value) || 10,
-      timeLimit: parseInt(document.getElementById('time-limit')?.value) || 60
-    };
-    
-    const result = await window.RemoteChallenge.createRoom(hostName, settings);
-    
-    // Show share step
-    showRemoteStep('share');
-    document.getElementById('remote-room-code').textContent = result.roomCode;
-    document.getElementById('remote-share-url').textContent = result.shareUrl;
-    
-    // Set QR code if image element exists
-    const qrImg = document.getElementById('remote-qr-code-img');
-    if (qrImg) {
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(result.shareUrl)}&bgcolor=1a1b26&color=ffffff&margin=6`;
-      qrImg.style.display = 'block';
+  function startRemoteChallenge() {
+    if (!window.FirebaseConfig?.isAvailable()) {
+      toast({ title: 'Online play unavailable', msg: 'Could not reach the game server. Check your connection and try again.', type: 'error', timeout: 4000 });
+      return;
     }
-    
-    // Store share URL for later
-    window.currentRemoteShareUrl = result.shareUrl;
-    
-    showToast({ 
-      title: 'Room Created!', 
-      msg: `Code: ${result.roomCode}`, 
-      type: 'success' 
-    });
-  } catch (error) {
-    console.error('Create room error:', error);
-    showToast({ 
-      title: 'Error', 
-      msg: error.message || 'Failed to create room', 
-      type: 'error' 
-    });
+    showRemoteModal();
   }
-}
 
-// Join room flow
-async function handleJoinRoom() {
-  const roomCode = document.getElementById('remote-room-code-input')?.value.trim().toUpperCase();
-  let playerName = document.getElementById('remote-join-name')?.value.trim();
-  if (!playerName) {
-    playerName = (window.state?.currentPlayer?.name) || 'Player 2';
+  function handleSaveHostName() {
+    const v = $('remote-host-name')?.value.trim();
+    if (!v) { toast({ title: 'Name required', msg: 'Please enter your name', type: 'error' }); return; }
+    toast({ title: 'Name saved', msg: `Ready as ${v}`, type: 'success', timeout: 1400 });
   }
-  
-  if (!roomCode) {
-    showToast({ title: 'Room Code Required', msg: 'Please enter a room code (e.g., FAITH-123)', type: 'error' });
-    return;
+  function handleSaveJoinName() {
+    const v = $('remote-join-name')?.value.trim();
+    if (!v) { toast({ title: 'Name required', msg: 'Please enter your name', type: 'error' }); return; }
+    toast({ title: 'Name saved', msg: `Ready as ${v}`, type: 'success', timeout: 1400 });
   }
-  
-  try {
-    const roomData = await window.RemoteChallenge.joinRoom(roomCode, playerName);
-    
-    // Show joined step
-    showRemoteStep('joined');
-    document.getElementById('remote-joined-code').textContent = roomCode;
-    document.getElementById('remote-host-name-display').textContent = roomData.host;
-    
-    showToast({ 
-      title: 'Joined Room!', 
-      msg: `Ready to challenge ${roomData.host}!`, 
-      type: 'success' 
-    });
-  } catch (error) {
-    console.error('Join room error:', error);
-    showToast({ 
-      title: 'Error', 
-      msg: error.message || 'Failed to join room', 
-      type: 'error' 
-    });
-  }
-}
 
-// Copy link handler
-async function handleCopyLink() {
-  const url = window.currentRemoteShareUrl;
-  
-  if (!url) return;
-  
-  try {
-    await navigator.clipboard.writeText(url);
-    showToast({ 
-      title: 'Link Copied!', 
-      msg: 'Share URL copied to clipboard', 
-      type: 'success',
-      timeout: 1500
-    });
-  } catch (error) {
-    console.error('Copy failed:', error);
-    showToast({ 
-      title: 'Copy Failed', 
-      msg: 'Could not copy to clipboard', 
-      type: 'error' 
-    });
-  }
-}
-
-// Share link handler
-async function handleShareLink() {
-  const url = window.currentRemoteShareUrl;
-  const roomCode = document.getElementById('remote-room-code').textContent;
-  
-  if (!url) return;
-  
-  if (navigator.share) {
+  async function handleCreateRoom() {
+    const btn = $('btn-create-room-confirm');
+    const hostName = $('remote-host-name')?.value.trim() || myName();
+    if (btn) { btn.disabled = true; btn.textContent = 'Creating room…'; }
     try {
-      await navigator.share({
-        title: 'Join my Who-Bible Challenge!',
-        text: `Join my Bible quiz challenge! Room code: ${roomCode}`,
-        url: url
-      });
-    } catch (error) {
-      // User cancelled or share failed
-      if (error.name !== 'AbortError') {
-        handleCopyLink(); // Fallback to copy
+      const settings = {
+        difficulty: $('difficulty')?.value || 'medium',
+        numQuestions: parseInt($('num-questions')?.value, 10) || 10,
+        timeLimit: parseInt($('time-limit')?.value, 10) || 60
+      };
+      const result = await window.RemoteChallenge.createRoom(hostName, settings);
+      showRemoteStep('share');
+      $('remote-room-code').textContent = result.roomCode;
+      $('remote-share-url').textContent = result.shareUrl;
+      const qr = $('remote-qr-code-img');
+      if (qr) {
+        qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(result.shareUrl)}&margin=8`;
+        qr.style.display = 'block';
       }
+      window.currentRemoteShareUrl = result.shareUrl;
+      toast({ title: 'Room created!', msg: `Code: ${result.roomCode}`, type: 'success' });
+    } catch (err) {
+      console.error('Create room error:', err);
+      toast({ title: 'Could not create room', msg: err.message || 'Please try again', type: 'error' });
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Create Room & Get Link'; }
     }
-  } else {
-    // No Web Share API - copy instead
+  }
+
+  async function handleJoinRoom() {
+    const roomCode = $('remote-room-code-input')?.value.trim().toUpperCase();
+    const playerName = $('remote-join-name')?.value.trim() || myName();
+    if (!roomCode) { toast({ title: 'Room code required', msg: 'Enter the code your friend shared (e.g. FAITH-123)', type: 'error' }); return; }
+    const btn = $('btn-join-room-confirm');
+    if (btn) { btn.disabled = true; btn.textContent = 'Joining…'; }
+    try {
+      const roomData = await window.RemoteChallenge.joinRoom(roomCode, playerName);
+      showRemoteStep('joined');
+      $('remote-joined-code').textContent = roomCode;
+      $('remote-host-name-display').textContent = roomData.host;
+      toast({ title: 'Joined!', msg: `You're in ${roomData.host}'s room`, type: 'success' });
+    } catch (err) {
+      console.error('Join room error:', err);
+      toast({ title: 'Could not join', msg: err.message || 'Please check the code', type: 'error' });
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Join Challenge'; }
+    }
+  }
+
+  async function handleCopyLink() {
+    const url = window.currentRemoteShareUrl;
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: 'Link copied!', msg: 'Send it to a friend to join', type: 'success', timeout: 1600 });
+    } catch (_) {
+      toast({ title: 'Copy failed', msg: url, type: 'error', timeout: 5000 });
+    }
+  }
+
+  async function handleShareLink() {
+    const url = window.currentRemoteShareUrl;
+    const code = $('remote-room-code')?.textContent || '';
+    if (!url) return;
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Join my Who-Bible challenge!', text: `📖 Think you know the Bible? Join my Who-Bible match — room ${code}`, url }); return; }
+      catch (e) { if (e.name === 'AbortError') return; }
+    }
     handleCopyLink();
   }
-}
 
-// Ready button handlers
-async function handleReadyHost() {
-  try {
-    await window.RemoteChallenge.setReady();
-    document.getElementById('btn-ready-host').textContent = 'Ready! Waiting for opponent...';
-    document.getElementById('btn-ready-host').disabled = true;
-  } catch (error) {
-    console.error('Ready error:', error);
-    showToast({ title: (window.getText ? window.getText('error') : 'Error'), msg: (window.getText ? window.getText('couldNotSetReady') : 'Could not set ready status'), type: 'error' });
-  }
-}
-
-async function handleReadyGuest() {
-  try {
-    await window.RemoteChallenge.setReady();
-    document.getElementById('btn-ready-guest').textContent = 'Ready! Waiting for host...';
-    document.getElementById('btn-ready-guest').disabled = true;
-  } catch (error) {
-    console.error('Ready error:', error);
-    showToast({ title: (window.getText ? window.getText('error') : 'Error'), msg: (window.getText ? window.getText('couldNotSetReady') : 'Could not set ready status'), type: 'error' });
-  }
-}
-
-// Callback: When opponent joins or updates
-window.onRemoteOpponentUpdate = function(opponent) {
-  if (!opponent) return;
-  
-  // Lobby updates
-  const statusEl = document.getElementById('remote-opponent-status');
-  if (statusEl && document.getElementById('remote-modal').style.display !== 'none') {
-    statusEl.textContent = `${opponent.name} has joined! Click Ready when you're set.`;
-  }
-  
-  const btnReady = document.getElementById('btn-ready-host');
-  if (btnReady && document.getElementById('remote-modal').style.display !== 'none') {
-    btnReady.style.display = 'inline-block';
-  }
-  
-  // In-game score updates
-  if (state.mode === 'remote-challenge') {
-    // Determine which score element belongs to opponent
-    // In remote mode, we can fix P1 as "You" and P2 as "Opponent" visually, 
-    // or stick to the P1/P2 slots.
-    // Let's stick to P1/P2 slots to match the data structure.
-    
-    const myPlayerNum = window.RemoteChallenge.playerNumber;
-    const opponentPlayerNum = myPlayerNum === 1 ? 2 : 1;
-    
-    // Update state
-    if (state.players && state.players[opponentPlayerNum - 1]) {
-      state.players[opponentPlayerNum - 1].score = opponent.score;
-      state.players[opponentPlayerNum - 1].name = opponent.name;
+  async function setReady(btnId, waitingText) {
+    const btn = $(btnId);
+    try {
+      if (btn) { btn.disabled = true; btn.textContent = waitingText; }
+      await window.RemoteChallenge.setReady();
+    } catch (err) {
+      console.error('Ready error:', err);
+      if (btn) { btn.disabled = false; btn.textContent = "I'm Ready!"; }
+      toast({ title: 'Error', msg: 'Could not set ready status', type: 'error' });
     }
-    
-    // Update UI
-    const p1ScoreEl = document.getElementById('p1-score');
-    const p2ScoreEl = document.getElementById('p2-score');
-    
-    if (opponentPlayerNum === 1 && p1ScoreEl) p1ScoreEl.textContent = opponent.score;
-    if (opponentPlayerNum === 2 && p2ScoreEl) p2ScoreEl.textContent = opponent.score;
   }
-};
+  const handleReadyHost = () => setReady('btn-ready-host', 'Ready ✓ — waiting for others…');
+  const handleReadyGuest = () => setReady('btn-ready-guest', 'Ready ✓ — waiting for host…');
 
-// Callback: When room status changes
-window.onRemoteRoomStatusChange = function(status) {
-  if (status === 'active') {
-    // Both players ready - start the quiz!
-    hideRemoteModal();
-    startRemoteQuiz();
-  }
-};
+  // Live roster in the lobby
+  window.onRemotePlayersUpdate = function (players) {
+    const list = Object.entries(players || {}).filter(([, p]) => p)
+      .sort(([a], [b]) => parseInt(a.replace('player', ''), 10) - parseInt(b.replace('player', ''), 10));
+    const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const html = list.map(([, p]) => `<li class="roster-item ${p.ready ? 'is-ready' : ''}"><span class="roster-dot"></span><span class="roster-name">${esc(p.name)}</span><span class="roster-state">${p.ready ? 'Ready' : 'Joined'}</span></li>`).join('');
+    ['remote-roster', 'remote-roster-guest'].forEach((id) => { const el = $(id); if (el) el.innerHTML = html; });
 
-// Callback: When questions are ready
-window.onRemoteQuestionsReady = function(questions) {
-  // Store questions for the quiz
-  window.remoteQuizQuestions = questions;
-};
+    const others = list.length - 1;
+    const st = $('remote-opponent-status');
+    if (st) st.textContent = others > 0 ? `${others} friend${others > 1 ? 's' : ''} joined. Tap Ready when everyone is set.` : 'Waiting for a friend to join…';
+    const hb = $('btn-ready-host');
+    if (hb && others > 0 && !hb.disabled) hb.style.display = 'inline-flex';
 
-// Start the actual remote quiz
-async function startRemoteQuiz() {
-  showGame();
-  gameTitle.textContent = 'Remote Challenge';
-  
-  // Set up remote quiz mode
-  state.mode = 'remote-challenge';
-  state.score = 0;
-  state.streak = 0;
-  state.qnum = 0;
-  state.results = [];
-  state.paused = false;
-  
-  // Get room state to set up players
-  try {
-    const roomState = await window.RemoteChallenge.getRoomState();
-    if (roomState && roomState.players) {
-      // Convert players object to array
-      state.players = Object.entries(roomState.players)
-        .sort(([a], [b]) => {
-          const numA = parseInt(a.replace('player', ''));
-          const numB = parseInt(b.replace('player', ''));
-          return numA - numB;
-        })
-        .map(([key, player]) => player || { name: key, score: 0 });
+    // In-game: keep opponent scores live
+    if (matchStarted && window.WB) window.WB.updateRemoteScores(list.map(([, p]) => p));
+  };
+
+  window.onRemoteOpponentUpdate = function () { /* superseded by onRemotePlayersUpdate */ };
+
+  window.onRemoteQuestionsReady = function (questions) {
+    window.remoteQuizQuestions = Array.isArray(questions) ? questions : Object.values(questions || {});
+  };
+
+  window.onRemoteRoomStatusChange = function (status) {
+    if (status === 'active' && !matchStarted) {
+      matchStarted = true;
+      hideRemoteModal(false);
+      startRemoteQuiz();
+    } else if (status === 'completed' && window.WB) {
+      window.WB.onRemoteMatchComplete();
     }
-  } catch (e) {
-    console.warn('Could not fetch room state, using defaults', e);
-    state.players = [ { name: 'Player 1', score: 0 } ];
-  }
-  
-  // Use questions from Firebase
-  if (window.remoteQuizQuestions) {
-    state.questions = window.remoteQuizQuestions;
-    state.qtotal = state.questions.length;
-    qtotalEl.innerText = state.qtotal;
-    scoreEl.innerText = state.score;
-    streakEl.innerText = state.streak;
-    btnNext.disabled = true;
-    
-    // Hide timer but SHOW challenge status for remote mode
-    timerEl.style.display = 'none';
-    btnPause.style.display = 'none';
-    
-    // Show scores
-    const challengeStatusEl = document.getElementById('challenge-status');
-    if (challengeStatusEl) {
-      challengeStatusEl.style.display = 'inline-flex';
-      
-      // Update names/scores in UI
-      const p1ScoreEl = document.getElementById('p1-score');
-      const p2ScoreEl = document.getElementById('p2-score');
-      const currentPlayerEl = document.getElementById('current-player');
-      
-      if (p1ScoreEl) p1ScoreEl.textContent = state.players[0].score;
-      if (p2ScoreEl) p2ScoreEl.textContent = state.players[1].score;
-      
-      // In remote mode, "Current Player" indicator is less relevant as both play simultaneously,
-      // but we can set it to the user's number
-      if (currentPlayerEl) currentPlayerEl.textContent = window.RemoteChallenge.playerNumber;
-    }
-    
-    // Show the quiz interface
-    quizEl.style.display = 'block';
-    const welcomeMsg = document.getElementById('welcome-message');
-    if(welcomeMsg) welcomeMsg.style.display = 'none';
-    
-    nextQuestion();
-    
-    showToast({ 
-      title: 'Remote Challenge Started!', 
-      msg: 'Answer the questions and watch your opponent\'s score!', 
-      type: 'info' 
-    });
-  }
-}
+  };
 
-// Generate questions for remote mode (called by host)
-window.generateRemoteQuestions = function(settings) {
-  const count = settings.numQuestions || 10;
-  const difficulty = settings.difficulty || 'medium';
-  
-  // Use existing question generation logic
-  const types = ['whoDid','whoMother','occupation','age','event'];
-  let pool = filterPeopleByDifficulty(state.people, difficulty);
-  
-  if (difficulty === 'hard') {
-    const topCandidates = pool.slice(0, Math.max(count * 2, 20));
-    shuffle(topCandidates);
-    pool = topCandidates;
-  } else {
-    shuffle(pool);
-  }
-
-  const selected = pool.slice(0, Math.min(count, pool.length));
-  const questions = [];
-  
-  for(const person of selected){
-    const t = types[Math.floor(Math.random()*types.length)];
-    if(t==='whoDid'){
-      const rawEvent = person.notable_events?.[0] || 'did something notable';
-      questions.push({
-        type:'whoDid',
-        prompt:`Who ${rawEvent}?`,
-        answer:person.name,
-        choices: generateChoices(person.name, 'name'),
-        ref:person.verses
-      });
-    }else if(t==='whoMother'){
-      if(person.mother) {
-        questions.push({
-          type:'whoMother',
-          prompt:`Who is the mother of ${person.name}?`,
-          answer:person.mother,
-          choices: generateChoices(person.mother, 'mother'),
-          ref:person.verses
-        });
+  async function startRemoteQuiz() {
+    let questions = window.remoteQuizQuestions;
+    let players = [];
+    try {
+      const room = await window.RemoteChallenge.getRoomState();
+      if (room) {
+        if (!questions && room.questions) questions = Array.isArray(room.questions) ? room.questions : Object.values(room.questions);
+        players = Object.entries(room.players || {}).filter(([, p]) => p)
+          .sort(([a], [b]) => parseInt(a.replace('player', ''), 10) - parseInt(b.replace('player', ''), 10))
+          .map(([, p]) => p);
       }
-    }else if(t==='occupation'){
-      if(person.occupation) {
-        questions.push({
-          type:'occupation',
-          prompt:`What was ${person.name}'s occupation?`,
-          answer:person.occupation,
-          choices: generateChoices(person.occupation, 'occupation'),
-          ref:person.verses
-        });
-      }
-    }else if(t==='age'){
-      if(person.age_notes) {
-        questions.push({
-          type:'age',
-          prompt:`What do we know about ${person.name}'s age?`,
-          answer:person.age_notes,
-          choices: generateChoices(person.age_notes, 'age'),
-          ref:person.verses
-        });
-      }
-    }else if(t==='event'){
-      if(person.notable_events && person.notable_events.length>0) {
-        const event = person.notable_events[0];
-        questions.push({
-          type:'event',
-          prompt:`Who ${event}?`,
-          answer:person.name,
-          choices: generateChoices(person.name, 'name'),
-          ref:person.verses
-        });
-      }
-    }
-  }
-  
-  // Fill if needed
-  let i = 0;
-  while(questions.length < count && i < state.people.length){
-    const p = state.people[i++];
-    const event = p.notable_events?.[0] || 'did something notable';
-    questions.push({
-      type:'whoDid',
-      prompt:`Who ${event}?`,
-      answer:p.name,
-      choices: generateChoices(p.name, 'name'),
-      ref:p.verses
-    });
-  }
-  
-  return questions.slice(0, count);
-};
+    } catch (e) { console.warn('Could not fetch room state', e); }
 
-// Helper to generate multiple choice options
-function generateChoices(correct, type) {
-  const choices = [correct];
-  const candidates = state.people.filter(p => {
-    if (type === 'name') return p.name !== correct;
-    if (type === 'mother') return p.name !== correct && Math.random() > 0.5;
-    if (type === 'occupation') return p.occupation && p.occupation !== correct;
-    if (type === 'age') return p.age_notes && p.age_notes !== correct;
-    return true;
-  });
-  
-  shuffle(candidates);
-  
-  for (let i = 0; i < Math.min(3, candidates.length); i++) {
-    if (type === 'name') {
-      choices.push(candidates[i].name);
-    } else if (type === 'occupation') {
-      choices.push(candidates[i].occupation);
-    } else if (type === 'age') {
-      choices.push(candidates[i].age_notes);
-    } else {
-      choices.push(candidates[i].name);
+    if (!questions || !questions.length) {
+      toast({ title: 'Sync problem', msg: 'Questions did not arrive. Please create a new room.', type: 'error' });
+      matchStarted = false;
+      return;
     }
+    window.WB.startRemoteMatch(questions, players, (window.RemoteChallenge.playerNumber || 1) - 1);
   }
-  
-  // Ensure 4 choices
-  while (choices.length < 4) {
-    choices.push(`Option ${choices.length + 1}`);
-  }
-  
-  shuffle(choices);
-  return choices;
-}
 
-// Export functions for use in app.js
-if (typeof window !== 'undefined') {
+  // Host generates the shared question set using the same engine as solo play
+  window.generateRemoteQuestions = function (settings) {
+    return window.WB.buildSharedQuestions(settings.numQuestions || 10, settings.difficulty || 'medium');
+  };
+
   window.RemoteChallengeUI = {
     show: showRemoteModal,
-    hide: hideRemoteModal,
+    hide: () => hideRemoteModal(true),
     showStep: showRemoteStep,
     start: startRemoteChallenge,
     createRoom: handleCreateRoom,
@@ -528,6 +223,8 @@ if (typeof window !== 'undefined') {
     readyHost: handleReadyHost,
     readyGuest: handleReadyGuest,
     saveHostName: handleSaveHostName,
-    saveJoinName: handleSaveJoinName
+    saveJoinName: handleSaveJoinName,
+    isMatchActive: () => matchStarted,
+    endMatch: () => { matchStarted = false; }
   };
-}
+})();

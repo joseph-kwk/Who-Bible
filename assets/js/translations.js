@@ -101,11 +101,14 @@ const DEFAULT_EN = {
   english: "English",
   french: "Français",
   spanish: "Español",
-  questionWhoDid: "Which biblical figure is associated with: {event}?",
+  questionWhoDid: "Who in scripture {event}?",
+  questionWhoAmI: "Who am I? In scripture, I {event}.",
+  questionWhichEvent: "Which notable scriptural event is recorded for {name}?",
   questionWhoMother: "Who is recorded in scripture as the mother of {name}?",
-  questionOccupation: "What was the biblical role or occupation of {name}?",
+  questionWhoFather: "Who is recorded in scripture as the father of {name}?",
+  questionOccupation: "What was the biblical calling or role of {name}?",
   questionAge: "What does scripture record about the life or age of {name}?",
-  questionEvent: "Which notable biblical figure is connected to: {event}?",
+  questionEvent: "Who in scripture is known for this: {event}?",
   fallbackEvent: "a notable event",
   resetConfirm: "Reset to built-in dataset? This will remove your saved data.",
   quizComplete: "Quiz complete",
@@ -465,12 +468,11 @@ function updateAllText() {
     const t = document.getElementById('time-remaining')?.textContent || '0';
     timerLabelEl.innerHTML = `${getText('time')}: <span id="time-remaining">${t}</span>s`;
   }
-  const challengePlayerLabel = document.querySelector('#challenge-status > div:first-child');
-  if (challengePlayerLabel) {
-    // Get current player name from the span
+  const turnIndicatorEl = document.querySelector('.versus-turn-indicator');
+  if (turnIndicatorEl) {
     const turnNameEl = document.getElementById('current-player-turn-name');
     const playerName = turnNameEl?.textContent || 'Player 1';
-    challengePlayerLabel.innerHTML = `<span id="current-player-turn-name" style="font-weight: 600; color: var(--accent);">${playerName}</span>'s ${getText('turn') || 'Turn'}`;
+    turnIndicatorEl.innerHTML = `<span>🎯 ${getText('turn') || 'Turn'}: <strong id="current-player-turn-name">${playerName}</strong></span>`;
   }
   
   // Update people count

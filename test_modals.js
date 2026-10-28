@@ -11,8 +11,8 @@ function testModalElements() {
     'btnPlayersClose': document.getElementById('btn-players-close'),
     'btnPlayersCancel': document.getElementById('btn-players-cancel'),
     'btnPlayersStart': document.getElementById('btn-players-start'),
-    'p1NameInput': document.getElementById('p1-name'),
-    'p2NameInput': document.getElementById('p2-name')
+    'p1NameInput': document.getElementById('p1-name-input') || document.getElementById('p1-name'),
+    'p2NameInput': document.getElementById('p2-name-input') || document.getElementById('p2-name')
   };
   
   Object.entries(elements).forEach(([name, element]) => {

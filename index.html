@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -7,48 +8,50 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Who-Bible - Bible People Quiz Challenge</title>
-  <meta name="description" content="Learn about Bible people through interactive quizzes. Test your knowledge of biblical characters, their deeds, ages, parents, and occupations with verse references." />
+  <meta name="description"
+    content="Learn about Bible people through interactive quizzes. Test your knowledge of biblical characters, their deeds, ages, parents, and occupations with verse references." />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260905004" />
-  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20260905004" />
-  <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20260905004" />
-  <link rel="stylesheet" href="assets/css/report-modal.css?v=20260905004" />
-  <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20260905004" />
-  <link rel="stylesheet" href="assets/css/auth.css?v=20260905004" />
-  
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261028004" />
+  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20261028004" />
+  <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20261028002" />
+  <link rel="stylesheet" href="assets/css/report-modal.css?v=20261028002" />
+  <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20261028002" />
+  <link rel="stylesheet" href="assets/css/auth.css?v=20261028002" />
+
   <!-- Firebase SDK (Compat for remote-challenge.js) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  
+
   <!-- Firebase Config (Modular SDK) -->
-  <script type="module" src="assets/js/firebase-config.js?v=20260905004"></script>
-  
+  <script type="module" src="assets/js/firebase-config.js?v=20261028002"></script>
+
   <!-- Authentication -->
-  <script type="module" src="assets/js/auth.js?v=20260905004"></script>
-  <script type="module" src="assets/js/auth-ui.js?v=20260905004"></script>
-  
+  <script type="module" src="assets/js/auth.js?v=20261028002"></script>
+  <script type="module" src="assets/js/auth-ui.js?v=20261028002"></script>
+
   <!-- App Scripts -->
-  <script src="assets/js/security.js?v=20260905004"></script>
-  <script src="assets/js/remote-challenge.js?v=20260905004"></script>
-  <script src="assets/js/remote-challenge-ui.js?v=20260905004"></script>
-  <script src="assets/js/scenarios.js?v=20260905004" defer></script>
-  <script src="assets/js/locations.js?v=20260905004" defer></script>
-  <script src="assets/js/concepts.js?v=20260905004" defer></script>
-  <script src="assets/js/relationships.js?v=20260905004" defer></script>
-  <script src="assets/js/content-filter.js?v=20260905004" defer></script>
-  <script src="assets/js/reports.js?v=20260905004" defer></script>
-  <script src="assets/js/translations.js?v=20260905004" defer></script>
-  <script src="assets/js/guest-prompts.js?v=20260905004" defer></script>
-  <script src="assets/js/app.js?v=20260905004" defer></script>
+  <script src="assets/js/security.js?v=20261028004"></script>
+  <script src="assets/js/remote-challenge.js?v=20261028004"></script>
+  <script src="assets/js/remote-challenge-ui.js?v=20261028004"></script>
+  <script src="assets/js/scenarios.js?v=20261028004" defer></script>
+  <script src="assets/js/locations.js?v=20261028004" defer></script>
+  <script src="assets/js/concepts.js?v=20261028004" defer></script>
+  <script src="assets/js/relationships.js?v=20261028004" defer></script>
+  <script src="assets/js/content-filter.js?v=20261028004" defer></script>
+  <script src="assets/js/reports.js?v=20261028004" defer></script>
+  <script src="assets/js/translations.js?v=20261028004" defer></script>
+  <script src="assets/js/guest-prompts.js?v=20261028004" defer></script>
+  <script src="assets/js/app.js?v=20261028004" defer></script>
 </head>
+
 <body>
   <!-- Skip to main content link for keyboard navigation -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
-  
+
   <div class="app">
     <header role="banner">
       <div class="header-content">
@@ -60,31 +63,36 @@
           </div>
         </a>
         <div class="controls">
-          <button id="btn-theme" title="Toggle theme" class="theme-toggle" style="display: none;" data-title-key="toggleTheme" aria-hidden="true">
+          <button id="btn-theme" title="Toggle theme" class="theme-toggle" style="display: none;"
+            data-title-key="toggleTheme" aria-hidden="true">
             <div class="theme-icon">
-              <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <circle cx="12" cy="12" r="5"/>
-                <line x1="12" y1="1" x2="12" y2="3"/>
-                <line x1="12" y1="21" x2="12" y2="23"/>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                <line x1="1" y1="12" x2="3" y2="12"/>
-                <line x1="21" y1="12" x2="23" y2="12"/>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                aria-hidden="true">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" />
+                <line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
               </svg>
-              <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                aria-hidden="true">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               </svg>
             </div>
           </button>
 
-          <button id="btn-sound-toggle" class="icon-btn sound-toggle-btn" title="Sound FX: On" aria-label="Toggle Sound Effects">
+          <button id="btn-sound-toggle" class="icon-btn sound-toggle-btn" title="Sound FX: On"
+            aria-label="Toggle Sound Effects">
             <span id="sound-icon" class="sound-icon-text">🔊</span>
           </button>
 
           <button id="btn-menu" class="icon-btn menu-toggle" aria-label="Toggle Menu">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -102,9 +110,12 @@
             </div>
             <nav class="site-nav" aria-label="Site Navigation">
               <!-- Community hidden for now -->
-              <a id="nav-community" href="community.html" target="_blank" class="nav-link" rel="noopener" style="display:none;">Community</a>
-              <button id="btn-auth-signin" class="auth-signin-btn" aria-label="Sign in or create account" style="display: none;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+              <a id="nav-community" href="community.html" target="_blank" class="nav-link" rel="noopener"
+                style="display:none;">Community</a>
+              <button id="btn-auth-signin" class="auth-signin-btn" aria-label="Sign in or create account"
+                style="display: none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
@@ -125,9 +136,465 @@
       <section id="setup-panel" class="setup-panel" aria-label="Quiz Setup">
         <div class="brand hero-brand-container" id="main-content">
           <div class="hero-pill-badge">✨ The Premier Scripture Trivia Experience</div>
+          
+          <!-- Animated Biblical Figures & Glowing Question Mark Centerpiece -->
+          <div class="hero-character-animation-wrap" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" width="100%" height="100%" style="overflow: visible;">
+  <defs>
+    <!-- Celestial Radiance -->
+    <radialGradient id="celestialHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.45"/>
+      <stop offset="35%" stop-color="#fbbf24" stop-opacity="0.25"/>
+      <stop offset="70%" stop-color="#f59e0b" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#d97706" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="divineAuraCenter" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
+      <stop offset="40%" stop-color="#fde047" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#eab308" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Question Mark Gradients -->
+    <linearGradient id="goldQGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#fef08a"/>
+      <stop offset="55%" stop-color="#f59e0b"/>
+      <stop offset="85%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#92400e"/>
+    </linearGradient>
+    <linearGradient id="qMarkShine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Ground Shadow -->
+    <radialGradient id="groundPedestal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.5"/>
+      <stop offset="60%" stop-color="#000000" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Character Skin Gradients (Warm, Rich, Natural Cartoon Tones) -->
+    <linearGradient id="manSkin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f1b588"/>
+      <stop offset="100%" stop-color="#c98254"/>
+    </linearGradient>
+    <linearGradient id="manSkinShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c98254"/>
+      <stop offset="100%" stop-color="#9a572a"/>
+    </linearGradient>
+    <linearGradient id="womanSkin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fad4b4"/>
+      <stop offset="100%" stop-color="#dc9c72"/>
+    </linearGradient>
+    <linearGradient id="childSkin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fce2cc"/>
+      <stop offset="100%" stop-color="#e2a77f"/>
+    </linearGradient>
+
+    <!-- Clothing & Fabrics -->
+    <linearGradient id="manRobeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="60%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="manMantleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="70%" stop-color="#b45309"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+    <linearGradient id="manHeaddress" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="70%" stop-color="#fde68a"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+
+    <linearGradient id="womanRobeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="60%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#9f1239"/>
+    </linearGradient>
+    <linearGradient id="womanVeilGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="60%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#881337"/>
+    </linearGradient>
+    <linearGradient id="womanShawlGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="60%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+
+    <linearGradient id="childRobeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="60%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    <linearGradient id="childSashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="60%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="celestialGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="softGlowQ" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <style>
+    .anim-halo { animation: pulseHalo 4.5s ease-in-out infinite; transform-origin: 320px 115px; }
+    .anim-qmark { animation: floatQ 3.6s ease-in-out infinite; transform-origin: 320px 85px; }
+    .anim-qmark-left { animation: floatSubtleLeft 4.4s ease-in-out infinite 0.5s; transform-origin: 155px 75px; }
+    .anim-qmark-right { animation: floatSubtleRight 5s ease-in-out infinite 1s; transform-origin: 485px 70px; }
+    .anim-star-1 { animation: starTwinkle 3s ease-in-out infinite 0.2s; transform-origin: 220px 55px; }
+    .anim-star-2 { animation: starTwinkle 3.4s ease-in-out infinite 1.2s; transform-origin: 420px 50px; }
+    .anim-star-3 { animation: starTwinkle 2.8s ease-in-out infinite 0.7s; transform-origin: 320px 25px; }
+    
+    .anim-man { animation: swayMan 5.2s ease-in-out infinite; transform-origin: 175px 305px; }
+    .anim-woman { animation: swayWoman 4.8s ease-in-out infinite 0.3s; transform-origin: 465px 305px; }
+    .anim-child { animation: bounceChild 3.4s ease-in-out infinite 0.6s; transform-origin: 320px 305px; }
+    
+    @keyframes pulseHalo { 0%, 100% { transform: scale(1); opacity: 0.85; } 50% { transform: scale(1.12); opacity: 1; } }
+    @keyframes floatQ { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-12px) rotate(1.2deg); } }
+    @keyframes floatSubtleLeft { 0%, 100% { transform: translateY(0px) scale(0.92); opacity: 0.65; } 50% { transform: translateY(-8px) scale(1); opacity: 0.95; } }
+    @keyframes floatSubtleRight { 0%, 100% { transform: translateY(0px) scale(0.88); opacity: 0.6; } 50% { transform: translateY(-7px) scale(0.96); opacity: 0.9; } }
+    @keyframes starTwinkle { 0%, 100% { transform: scale(0.6); opacity: 0.25; } 50% { transform: scale(1.25); opacity: 1; } }
+    
+    @keyframes swayMan { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-3px) rotate(0.6deg); } }
+    @keyframes swayWoman { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-3.5px) rotate(-0.6deg); } }
+    @keyframes bounceChild { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-5px) scale(1.015); } }
+  </style>
+
+  <!-- Ambient Celestial Halo & Sunbeams -->
+  <g class="anim-halo">
+    <circle cx="320" cy="115" r="145" fill="url(#celestialHalo)" />
+    <circle cx="320" cy="100" r="95" fill="url(#divineAuraCenter)" />
+    <!-- Ray Accents -->
+    <path d="M 320 20 L 322 70 L 318 70 Z" fill="#fde047" opacity="0.35"/>
+    <path d="M 230 50 L 275 85 L 272 88 Z" fill="#fde047" opacity="0.25"/>
+    <path d="M 410 50 L 365 85 L 368 88 Z" fill="#fde047" opacity="0.25"/>
+    <path d="M 190 115 L 250 115 L 250 118 Z" fill="#fde047" opacity="0.2"/>
+    <path d="M 450 115 L 390 115 L 390 118 Z" fill="#fde047" opacity="0.2"/>
+  </g>
+
+  <!-- Twinkling Biblical Constellation Stars -->
+  <g class="anim-star-1" fill="#fef08a">
+    <path d="M 220 45 Q 220 55 210 55 Q 220 55 220 65 Q 220 55 230 55 Q 220 55 220 45 Z" />
+  </g>
+  <g class="anim-star-2" fill="#fef08a">
+    <path d="M 420 40 Q 420 50 410 50 Q 420 50 420 60 Q 420 50 430 50 Q 420 50 420 40 Z" />
+  </g>
+  <g class="anim-star-3" fill="#ffffff">
+    <path d="M 320 18 Q 320 25 313 25 Q 320 25 320 32 Q 320 25 327 25 Q 320 25 320 18 Z" />
+  </g>
+
+  <!-- Ambient Small Question Marks Left & Right -->
+  <g class="anim-qmark-left" filter="url(#softGlowQ)">
+    <text x="145" y="80" font-family="'Cinzel', Georgia, serif" font-size="44" font-weight="900" fill="url(#goldQGrad)" text-anchor="middle" opacity="0.8">?</text>
+  </g>
+  <g class="anim-qmark-right" filter="url(#softGlowQ)">
+    <text x="495" y="75" font-family="'Cinzel', Georgia, serif" font-size="40" font-weight="900" fill="url(#goldQGrad)" text-anchor="middle" opacity="0.75">?</text>
+  </g>
+
+  <!-- Center Floating Question Mark -->
+  <g class="anim-qmark" filter="url(#celestialGlow)">
+    <text x="320" y="130" font-family="'Cinzel Decorative', 'Cinzel', Georgia, serif" font-size="142" font-weight="900" fill="url(#goldQGrad)" text-anchor="middle" letter-spacing="-2">?</text>
+    <text x="318" y="128" font-family="'Cinzel Decorative', 'Cinzel', Georgia, serif" font-size="140" font-weight="900" fill="url(#qMarkShine)" text-anchor="middle" letter-spacing="-2">?</text>
+  </g>
+
+  <!-- Ground Shadows / Pedestal -->
+  <ellipse cx="320" cy="308" rx="230" ry="18" fill="url(#groundPedestal)"/>
+
+  <!-- ========================================================
+       FIGURE 1: THE MAN (Left - Wise, Thoughtful Prophet/Disciple)
+       ======================================================== -->
+  <g class="anim-man" id="hero-figure-man">
+    <!-- Pedestal individual shadow -->
+    <ellipse cx="175" cy="304" rx="55" ry="9" fill="url(#groundPedestal)"/>
+
+    <!-- Robe / Body -->
+    <!-- Main Navy/Blue Robe -->
+    <path d="M 130 205 Q 150 170 175 170 Q 200 170 220 205 L 232 300 Q 175 308 118 300 Z" fill="url(#manRobeGrad)"/>
+    <!-- Fold Shading -->
+    <path d="M 160 185 Q 165 240 162 298 L 175 300 Q 180 240 172 185 Z" fill="#1e3a8a" opacity="0.4"/>
+    <!-- Golden Ochre Mantle / Shawl draped over shoulder -->
+    <path d="M 135 205 Q 165 190 205 208 L 195 300 Q 160 305 130 298 Z" fill="url(#manMantleGrad)"/>
+    <!-- Collar Trim -->
+    <path d="M 155 180 Q 175 195 195 180 Q 185 202 165 202 Q 155 195 155 180 Z" fill="#f59e0b"/>
+
+    <!-- Left Arm & Hand (Resting thoughtfully near beard / chest) -->
+    <path d="M 195 210 Q 212 225 210 250 Q 200 258 188 250 L 180 225 Z" fill="url(#manMantleGrad)"/>
+    <!-- Cartoon Hand -->
+    <ellipse cx="198" cy="254" rx="8" ry="9" fill="url(#manSkin)"/>
+    <!-- Cartoon Fingers -->
+    <path d="M 192 250 Q 198 258 204 250" stroke="#9a572a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+    <!-- Head & Headdress -->
+    <!-- Flowing Headdress / Keffiyeh in background -->
+    <path d="M 140 140 C 130 180 132 230 134 260 L 148 255 C 146 225 145 180 152 155 Z" fill="url(#manHeaddress)"/>
+    <!-- Headdress Wrap over head -->
+    <path d="M 145 142 C 145 105 205 105 205 142 C 208 165 205 200 202 245 L 195 245 C 196 200 196 165 195 145 Q 175 130 145 142 Z" fill="url(#manHeaddress)"/>
+    <!-- Golden Agal / Headband -->
+    <path d="M 148 132 Q 175 124 202 132" stroke="#d97706" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <path d="M 150 132 Q 175 125 200 132" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+    <!-- Neck -->
+    <rect x="167" y="160" width="16" height="22" rx="5" fill="url(#manSkinShadow)"/>
+
+    <!-- Face Shape -->
+    <ellipse cx="175" cy="148" rx="26" ry="29" fill="url(#manSkin)"/>
+
+    <!-- Styled Biblical Beard (Warm, clean, contoured cartoon style) -->
+    <path d="M 152 148 C 150 185 160 198 175 198 C 190 198 200 185 198 148 C 195 165 188 178 175 178 C 162 178 155 165 152 148 Z" fill="#2a1a0f"/>
+    <!-- Mustache -->
+    <path d="M 160 162 Q 175 170 190 162 Q 175 165 160 162 Z" fill="#1b1009"/>
+
+    <!-- Ears -->
+    <ellipse cx="149" cy="148" rx="4.5" ry="7" fill="url(#manSkin)"/>
+    <ellipse cx="201" cy="148" rx="4.5" ry="7" fill="url(#manSkin)"/>
+
+    <!-- Eyes (Expressive, Lively Cartoon Style!) -->
+    <!-- Left Eye White -->
+    <ellipse cx="164" cy="142" rx="6.5" ry="7" fill="#ffffff"/>
+    <!-- Left Eye Iris (Hazel/Mocha) -->
+    <ellipse cx="166" cy="142" rx="4.2" ry="4.5" fill="#451a03"/>
+    <!-- Left Pupil -->
+    <circle cx="166.5" cy="142" r="2.6" fill="#0f0703"/>
+    <!-- Left Eye Sparkles (Highlights) -->
+    <circle cx="165" cy="140" r="1.6" fill="#ffffff"/>
+    <circle cx="167.5" cy="143.5" r="0.9" fill="#ffffff"/>
+    <!-- Left Upper Eyelid / Eyelash -->
+    <path d="M 157 138 Q 164 133 171 138" stroke="#1b1009" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+    <!-- Right Eye White -->
+    <ellipse cx="186" cy="142" rx="6.5" ry="7" fill="#ffffff"/>
+    <!-- Right Eye Iris -->
+    <ellipse cx="188" cy="142" rx="4.2" ry="4.5" fill="#451a03"/>
+    <!-- Right Pupil -->
+    <circle cx="188.5" cy="142" r="2.6" fill="#0f0703"/>
+    <!-- Right Eye Sparkles -->
+    <circle cx="187" cy="140" r="1.6" fill="#ffffff"/>
+    <circle cx="189.5" cy="143.5" r="0.9" fill="#ffffff"/>
+    <!-- Right Upper Eyelid -->
+    <path d="M 179 138 Q 186 133 193 138" stroke="#1b1009" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+    <!-- Expressive Arched Eyebrows (Thoughtful / Contemplative) -->
+    <path d="M 156 133 Q 164 128 172 132" stroke="#2a1a0f" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M 178 132 Q 186 128 194 133" stroke="#2a1a0f" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+    <!-- Cartoon Nose (Friendly, rounded with warm shadow) -->
+    <path d="M 175 140 Q 177 151 172 153 Q 176 156 180 153" stroke="#9a572a" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <ellipse cx="176" cy="151" rx="4.5" ry="3" fill="#f1b588" opacity="0.6"/>
+
+    <!-- Friendly Smile -->
+    <path d="M 168 160 Q 175 166 182 160" stroke="#7c2d12" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+    <!-- Rosy Cheek Blush -->
+    <circle cx="157" cy="152" r="5" fill="#f43f5e" opacity="0.18"/>
+    <circle cx="193" cy="152" r="5" fill="#f43f5e" opacity="0.18"/>
+  </g>
+
+
+  <!-- ========================================================
+       FIGURE 2: THE WOMAN (Right - Graceful, Wise, Smiling)
+       ======================================================== -->
+  <g class="anim-woman" id="hero-figure-woman">
+    <!-- Pedestal shadow -->
+    <ellipse cx="465" cy="304" rx="55" ry="9" fill="url(#groundPedestal)"/>
+
+    <!-- Flowing Robe (Ruby / Rose-Red) -->
+    <path d="M 425 205 Q 445 170 465 170 Q 485 170 505 205 L 518 300 Q 465 308 412 300 Z" fill="url(#womanRobeGrad)"/>
+    <!-- Robe Pleats / Depth -->
+    <path d="M 450 185 Q 455 240 452 298 L 465 300 Q 470 240 462 185 Z" fill="#9f1239" opacity="0.35"/>
+    <!-- Elegant Cream / Ivory Shawl draped across -->
+    <path d="M 435 205 Q 465 218 495 205 L 485 270 Q 465 280 445 270 Z" fill="url(#womanShawlGrad)" opacity="0.95"/>
+    <path d="M 438 208 Q 465 220 492 208" stroke="#f59e0b" stroke-width="2.5" fill="none"/>
+
+    <!-- Arms & Hands folded warmly -->
+    <path d="M 430 215 Q 422 238 440 252 Q 465 258 488 252 Q 508 238 500 215" stroke="url(#womanVeilGrad)" stroke-width="12" stroke-linecap="round" fill="none"/>
+    <!-- Cartoon Hands Clasping -->
+    <ellipse cx="465" cy="254" rx="9" ry="8" fill="url(#womanSkin)"/>
+    <path d="M 460 252 Q 465 258 470 252" stroke="#b45309" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+    <!-- Flowing Veil in background behind neck/shoulders -->
+    <path d="M 432 135 C 418 175 418 240 422 280 L 438 275 C 434 235 434 180 442 145 Z" fill="url(#womanVeilGrad)"/>
+    <path d="M 498 135 C 512 175 512 240 508 280 L 492 275 C 496 235 496 180 488 145 Z" fill="url(#womanVeilGrad)"/>
+
+    <!-- Neck -->
+    <rect x="458" y="160" width="14" height="20" rx="4" fill="url(#womanSkin)"/>
+
+    <!-- Face Shape (Delicate oval cartoon structure) -->
+    <ellipse cx="465" cy="146" rx="24" ry="27" fill="url(#womanSkin)"/>
+
+    <!-- Beautiful Wavy Dark Hair framing face -->
+    <path d="M 441 142 C 441 115 489 115 489 142 C 489 130 480 120 465 120 C 450 120 441 130 441 142 Z" fill="#2e1b10"/>
+    <path d="M 441 142 Q 443 162 447 168 Q 445 155 444 142 Z" fill="#2e1b10"/>
+    <path d="M 489 142 Q 487 162 483 168 Q 485 155 486 142 Z" fill="#2e1b10"/>
+
+    <!-- Flowing Headdress / Veil Covering Head -->
+    <path d="M 438 138 C 438 100 492 100 492 138 C 494 150 496 170 498 190 L 488 190 C 486 170 484 150 484 138 Q 465 125 446 138 C 446 150 444 170 442 190 L 432 190 C 434 170 436 150 438 138 Z" fill="url(#womanVeilGrad)"/>
+    <!-- Golden Headband / Filigree -->
+    <path d="M 442 128 Q 465 120 488 128" stroke="#f59e0b" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+    <path d="M 444 128 Q 465 121 486 128" stroke="#fef08a" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+    <!-- Ears & Little Gold Hoop Earring -->
+    <ellipse cx="441" cy="147" rx="3.5" ry="6" fill="url(#womanSkin)"/>
+    <ellipse cx="489" cy="147" rx="3.5" ry="6" fill="url(#womanSkin)"/>
+    <circle cx="441" cy="152" r="2.5" stroke="#f59e0b" stroke-width="1.2" fill="none"/>
+    <circle cx="489" cy="152" r="2.5" stroke="#f59e0b" stroke-width="1.2" fill="none"/>
+
+    <!-- Eyes (Big, Radiant, Charming Cartoon Almond Eyes!) -->
+    <!-- Left Eye White -->
+    <ellipse cx="454" cy="141" rx="6.2" ry="6.8" fill="#ffffff"/>
+    <!-- Left Iris (Warm Chocolate/Amber) -->
+    <ellipse cx="456" cy="141" rx="4" ry="4.4" fill="#3f1d0b"/>
+    <!-- Left Pupil -->
+    <circle cx="456.5" cy="141" r="2.4" fill="#0f0703"/>
+    <!-- Dual Highlights -->
+    <circle cx="455" cy="139" r="1.6" fill="#ffffff"/>
+    <circle cx="457.5" cy="142.5" r="0.8" fill="#ffffff"/>
+    <!-- Eyelash Line & Subtle Cartoon Lashes -->
+    <path d="M 447 138 Q 454 132 461 137" stroke="#1f140c" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <path d="M 447 136 L 444 133" stroke="#1f140c" stroke-width="1.6" stroke-linecap="round"/>
+
+    <!-- Right Eye White -->
+    <ellipse cx="476" cy="141" rx="6.2" ry="6.8" fill="#ffffff"/>
+    <!-- Right Iris -->
+    <ellipse cx="478" cy="141" rx="4" ry="4.4" fill="#3f1d0b"/>
+    <!-- Right Pupil -->
+    <circle cx="478.5" cy="141" r="2.4" fill="#0f0703"/>
+    <!-- Dual Highlights -->
+    <circle cx="477" cy="139" r="1.6" fill="#ffffff"/>
+    <circle cx="479.5" cy="142.5" r="0.8" fill="#ffffff"/>
+    <!-- Eyelash Line -->
+    <path d="M 469 137 Q 476 132 483 138" stroke="#1f140c" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <path d="M 483 136 L 486 133" stroke="#1f140c" stroke-width="1.6" stroke-linecap="round"/>
+
+    <!-- Graceful Curved Eyebrows -->
+    <path d="M 448 132 Q 455 127 462 131" stroke="#2e1b10" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+    <path d="M 468 131 Q 475 127 482 132" stroke="#2e1b10" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+
+    <!-- Cute Delicate Button Nose -->
+    <path d="M 465 141 Q 467 149 463 151 Q 466 153 469 151" stroke="#b45309" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+
+    <!-- Radiant, Sweet Cartoon Smile -->
+    <path d="M 458 158 Q 465 165 472 158" stroke="#9f1239" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+    <!-- Soft Lower Lip Shading -->
+    <path d="M 461 161 Q 465 163 469 161" stroke="#f43f5e" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.6"/>
+
+    <!-- Sweet Rosy Cheeks -->
+    <ellipse cx="449" cy="149" rx="6" ry="4" fill="#fb7185" opacity="0.25"/>
+    <ellipse cx="481" cy="149" rx="6" ry="4" fill="#fb7185" opacity="0.25"/>
+  </g>
+
+
+  <!-- ========================================================
+       FIGURE 3: THE YOUTH / CHILD (Center - Eager, Wonder, Excited)
+       ======================================================== -->
+  <g class="anim-child" id="hero-figure-child">
+    <!-- Pedestal individual shadow -->
+    <ellipse cx="320" cy="306" rx="46" ry="8" fill="url(#groundPedestal)"/>
+
+    <!-- Emerald Tunic -->
+    <path d="M 285 225 Q 302 195 320 195 Q 338 195 355 225 L 362 300 Q 320 307 278 300 Z" fill="url(#childRobeGrad)"/>
+    <!-- White Linen Undershirt at Neck -->
+    <path d="M 310 195 Q 320 205 330 195 L 325 210 Q 320 215 315 210 Z" fill="#ffffff" opacity="0.9"/>
+    <!-- Sunny Golden Sash tied around waist -->
+    <path d="M 286 248 Q 320 256 354 248 L 352 260 Q 320 268 288 260 Z" fill="url(#childSashGrad)"/>
+    <!-- Sash Tails hanging down -->
+    <path d="M 324 258 Q 328 275 326 292 L 333 290 Q 336 275 332 258 Z" fill="url(#childSashGrad)"/>
+
+    <!-- Left Arm: Pointing Up to the Question Mark in Excitement! -->
+    <!-- Arm reaching upwards -->
+    <path d="M 295 225 Q 275 200 282 175 Q 290 172 296 185 L 308 220 Z" fill="url(#childRobeGrad)"/>
+    <!-- Forearm & Cute Pointing Hand -->
+    <rect x="277" y="162" width="10" height="18" rx="4" transform="rotate(-15 282 171)" fill="url(#childSkin)"/>
+    <!-- Pointing Index Finger -->
+    <path d="M 276 164 L 273 148 Q 277 146 280 148 L 280 162 Z" fill="url(#childSkin)"/>
+    <!-- Clenched little thumb and fingers -->
+    <circle cx="282" cy="165" r="4.5" fill="url(#childSkin)"/>
+
+    <!-- Right Arm: Resting happily at side -->
+    <path d="M 345 225 Q 360 240 355 260 Q 346 262 342 250 L 335 225 Z" fill="url(#childRobeGrad)"/>
+    <ellipse cx="355" cy="262" rx="6" ry="6" fill="url(#childSkin)"/>
+
+    <!-- Neck -->
+    <rect x="313" y="180" width="14" height="18" rx="4" fill="url(#childSkin)"/>
+
+    <!-- Face Shape (Cute, chubby, friendly round cheeks) -->
+    <ellipse cx="320" cy="164" rx="25" ry="26" fill="url(#childSkin)"/>
+
+    <!-- Adorable Bouncy Dark Curls (Hair) -->
+    <!-- Crown of hair puffs -->
+    <circle cx="298" cy="155" r="8" fill="#2d1c11"/>
+    <circle cx="305" cy="145" r="9" fill="#2d1c11"/>
+    <circle cx="316" cy="140" r="10" fill="#2d1c11"/>
+    <circle cx="328" cy="140" r="10" fill="#2d1c11"/>
+    <circle cx="338" cy="145" r="9" fill="#2d1c11"/>
+    <circle cx="344" cy="155" r="8" fill="#2d1c11"/>
+    <!-- Forehead curls -->
+    <path d="M 302 152 Q 312 142 320 150 Q 328 142 338 152 C 330 145 310 145 302 152 Z" fill="#2d1c11"/>
+
+    <!-- Ears -->
+    <ellipse cx="295" cy="165" rx="4" ry="6" fill="url(#childSkin)"/>
+    <ellipse cx="345" cy="165" rx="4" ry="6" fill="url(#childSkin)"/>
+
+    <!-- Eyes (Big, Round, Wonder-Filled Cartoon Eyes Looking Upward!) -->
+    <!-- Left Eye White -->
+    <ellipse cx="310" cy="162" rx="7.5" ry="8.2" fill="#ffffff"/>
+    <!-- Left Iris (Looking upward toward ? ) -->
+    <ellipse cx="310" cy="159" rx="5" ry="5.5" fill="#451a03"/>
+    <!-- Left Pupil -->
+    <circle cx="310" cy="158.5" r="3.2" fill="#0f0703"/>
+    <!-- Sparkling Highlights -->
+    <circle cx="308" cy="156.5" r="2" fill="#ffffff"/>
+    <circle cx="312" cy="161" r="1.1" fill="#ffffff"/>
+    <!-- Upper Eyelid -->
+    <path d="M 302 157 Q 310 152 318 157" stroke="#1f140c" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+
+    <!-- Right Eye White -->
+    <ellipse cx="330" cy="162" rx="7.5" ry="8.2" fill="#ffffff"/>
+    <!-- Right Iris (Looking upward toward ? ) -->
+    <ellipse cx="330" cy="159" rx="5" ry="5.5" fill="#451a03"/>
+    <!-- Right Pupil -->
+    <circle cx="330" cy="158.5" r="3.2" fill="#0f0703"/>
+    <!-- Sparkling Highlights -->
+    <circle cx="328" cy="156.5" r="2" fill="#ffffff"/>
+    <circle cx="332" cy="161" r="1.1" fill="#ffffff"/>
+    <!-- Upper Eyelid -->
+    <path d="M 322 157 Q 330 152 338 157" stroke="#1f140c" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+
+    <!-- Raised Wondering Eyebrows (High & Curved in Excitement!) -->
+    <path d="M 303 151 Q 310 145 317 149" stroke="#2d1c11" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <path d="M 323 149 Q 330 145 337 151" stroke="#2d1c11" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+    <!-- Cute Little Button Nose -->
+    <ellipse cx="320" cy="167" rx="3.5" ry="2.8" fill="#e2a77f"/>
+    <path d="M 318 168 Q 320 170 322 168" stroke="#9a572a" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+
+    <!-- Happy Open Cartoon Smile ("Oh! I know that one!") -->
+    <path d="M 312 173 Q 320 183 328 173 Z" fill="#991b1b"/>
+    <!-- Little Tooth Highlight -->
+    <path d="M 315 173 Q 320 176 325 173 Z" fill="#ffffff"/>
+    <!-- Lip Outline -->
+    <path d="M 311 173 Q 320 184 329 173" stroke="#7f1d1d" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+    <!-- Chubby Rosy Cheeks -->
+    <circle cx="304" cy="168" r="6" fill="#f43f5e" opacity="0.25"/>
+    <circle cx="336" cy="168" r="6" fill="#f43f5e" opacity="0.25"/>
+  </g>
+</svg>
+          </div>
+
           <h2 class="brand-title gradient-text">Who-Bible</h2>
           <p class="brand-desc hero-description">
-            Test your scripture mastery, challenge friends in live multiplayer, or host big-screen classroom games across 170+ biblical figures and foundational stories.
+            Test your scripture mastery, challenge friends in live multiplayer, or host big-screen classroom games
+            across 170+ biblical figures and foundational stories.
           </p>
           <div class="hero-feature-tags">
             <span class="hero-tag">⚡ Real-Time Online 1v1</span>
@@ -136,7 +603,7 @@
             <span class="hero-tag">🏆 Ranks & Badges</span>
           </div>
         </div>
-        
+
         <!-- Player Profile & XP Bar -->
         <div class="player-quick-bar">
           <div class="player-profile-badge" id="player-profile-card" title="Click to customize profile & avatar">
@@ -168,7 +635,8 @@
                   <span class="daily-xp-pill">+50 Bonus XP</span>
                 </div>
                 <h4 id="daily-figure-name" class="daily-figure-title">Featured Character</h4>
-                <p id="daily-figure-desc" class="daily-figure-snippet">Explore notable biblical deeds and test your knowledge!</p>
+                <p id="daily-figure-desc" class="daily-figure-snippet">Explore notable biblical deeds and test your
+                  knowledge!</p>
               </div>
             </div>
             <button id="btn-start-daily" class="btn-daily-action" aria-label="Start Daily Scripture Challenge">
@@ -177,14 +645,14 @@
             </button>
           </div>
         </section>
-        
+
         <!-- HERO SECTION: PLAY WITH FRIENDS -->
         <section class="friends-hero-section" aria-labelledby="friends-heading">
           <div class="section-header-row">
             <h3 id="friends-heading" class="section-heading">👥 Play with Friends</h3>
             <span class="section-badge">Multiplayer</span>
           </div>
-          
+
           <div class="friends-modes-grid">
             <!-- 1. Remote Online Challenge -->
             <div class="friend-mode-card card-remote">
@@ -218,7 +686,8 @@
                 <button id="btn-classroom-mode" class="btn-friend-action btn-join-action">
                   <span>Enter PIN</span>
                 </button>
-                <button id="btn-host-classroom" class="btn-friend-action btn-host-action" title="Host on projector / TV">
+                <button id="btn-host-classroom" class="btn-friend-action btn-host-action"
+                  title="Host on projector / TV">
                   <span>🖥️ Host Screen</span>
                 </button>
               </div>
@@ -248,7 +717,7 @@
           <div class="section-header-row">
             <h3 id="modes-heading" class="section-heading">🎯 Solo & Practice Modes</h3>
           </div>
-          
+
           <div class="mode-buttons solo-modes-grid" role="group" aria-labelledby="modes-heading">
             <button id="btn-solo" class="mode-btn primary" data-mode="solo" aria-describedby="solo-desc">
               <div class="mode-icon" aria-hidden="true">📖</div>
@@ -271,7 +740,8 @@
                 <div class="mode-desc" id="study-desc">Explore 400+ characters</div>
               </div>
             </button>
-            <button id="btn-scenarios" class="mode-btn" data-mode="scenarios" aria-describedby="scenarios-desc" aria-label="Start Scenarios Mode">
+            <button id="btn-scenarios" class="mode-btn" data-mode="scenarios" aria-describedby="scenarios-desc"
+              aria-label="Start Scenarios Mode">
               <div class="mode-icon" aria-hidden="true">🎭</div>
               <div class="mode-text">
                 <div class="mode-title">Scenarios Mode</div>
@@ -282,10 +752,11 @@
         </section>
 
         <!-- GAME SETTINGS & DIFFICULTY -->
-                <section class="settings-card-section" aria-labelledby="settings-heading">
+        <section class="settings-card-section" aria-labelledby="settings-heading">
           <div class="settings-header-row">
             <h3 id="settings-heading" class="section-heading">⚙️ Game Settings</h3>
-            <button id="btn-reset-settings" class="reset-settings-btn" title="Reset all settings to default">↺ Reset to Defaults</button>
+            <button id="btn-reset-settings" class="reset-settings-btn" title="Reset all settings to default">↺ Reset to
+              Defaults</button>
           </div>
 
           <!-- Quick Presets -->
@@ -357,11 +828,35 @@
 
           <!-- Hidden selects for JS backward compatibility -->
           <div style="display:none;" aria-hidden="true">
-            <select id="difficulty"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option><option value="expert">Expert</option></select>
-            <select id="num-questions"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select>
-            <select id="time-limit"><option value="15">15s</option><option value="30">30s</option><option value="60" selected>60s</option><option value="90">90s</option></select>
-            <select id="testament-filter"><option value="all" selected>All</option><option value="ot">OT</option><option value="nt">NT</option></select>
-            <select id="gender-filter"><option value="all" selected>All</option><option value="men">Men</option><option value="women">Women</option></select>
+            <select id="difficulty">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Hard</option>
+              <option value="expert">Expert</option>
+            </select>
+            <select id="num-questions">
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="30">30</option>
+            </select>
+            <select id="time-limit">
+              <option value="15">15s</option>
+              <option value="30">30s</option>
+              <option value="60" selected>60s</option>
+              <option value="90">90s</option>
+            </select>
+            <select id="testament-filter">
+              <option value="all" selected>All</option>
+              <option value="ot">OT</option>
+              <option value="nt">NT</option>
+            </select>
+            <select id="gender-filter">
+              <option value="all" selected>All</option>
+              <option value="men">Men</option>
+              <option value="women">Women</option>
+            </select>
           </div>
         </section>
       </section>
@@ -371,24 +866,47 @@
         <div class="game-container modern-game-card">
           <header class="game-header-modern" role="banner">
             <button id="btn-back-to-setup" class="back-btn-modern" aria-label="Back to Setup">
-              <span class="back-arrow">←</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
               <span>Back</span>
             </button>
             <div id="game-title" class="game-mode-pill">Quiz Mode</div>
             <div id="timer" class="timer-pill" style="display:none" aria-live="polite">
-              <span class="timer-icon">⏱️</span>
+              <span class="timer-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="13" r="8"></circle>
+                  <polyline points="12 9 12 13 14 15"></polyline>
+                  <line x1="12" y1="2" x2="12" y2="4"></line>
+                </svg></span>
               <span id="time-remaining">60</span>s
             </div>
-            <button id="btn-flag-question" class="flag-question-btn" title="Report or flag this question" aria-label="Report or flag this question">
-              <span>🚩</span>
+            <button id="btn-flag-question" class="flag-question-btn" title="Report or flag this question"
+              aria-label="Report or flag this question">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                <line x1="4" y1="22" x2="4" y2="15"></line>
+              </svg>
               <span class="flag-text">Flag Question</span>
             </button>
           </header>
-          
+
           <!-- Modern Score & Streak HUD -->
           <div class="game-hud-bar">
             <div class="hud-stat-chip chip-score">
-              <span class="hud-icon">🏆</span>
+              <span class="hud-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24"
+                  stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                  <path d="M4 22h16"></path>
+                  <path
+                    d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34">
+                  </path>
+                  <path d="M18 4H6v7a6 6 0 0 0 12 0V4z"></path>
+                </svg></span>
               <div class="hud-info">
                 <span class="hud-label">Score</span>
                 <span id="score" class="hud-value">0</span>
@@ -397,7 +915,12 @@
             </div>
 
             <div class="hud-stat-chip chip-streak" id="streak-chip">
-              <span class="hud-icon flame-icon" id="streak-flame">🔥</span>
+              <span class="hud-icon flame-icon" id="streak-flame"><svg width="18" height="18" viewBox="0 0 24 24"
+                  fill="#f97316" stroke="#f97316" stroke-width="1.5">
+                  <path
+                    d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z">
+                  </path>
+                </svg></span>
               <div class="hud-info">
                 <span class="hud-label">Streak</span>
                 <span id="streak" class="hud-value">0</span>
@@ -405,10 +928,15 @@
             </div>
 
             <div class="hud-stat-chip chip-progress">
-              <span class="hud-icon">📖</span>
+              <span class="hud-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa"
+                  stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg></span>
               <div class="hud-info">
                 <span class="hud-label">Question</span>
-                <span class="hud-value"><span id="qnum">1</span><span class="hud-divider">/</span><span id="qtotal">10</span></span>
+                <span class="hud-value"><span id="qnum">1</span><span class="hud-divider">/</span><span
+                    id="qtotal">10</span></span>
               </div>
             </div>
           </div>
@@ -416,35 +944,74 @@
           <!-- Versus HUD (Challenge / 2-Player Mode) -->
           <div id="challenge-status" class="versus-hud" style="display:none">
             <div class="versus-player versus-p1" id="versus-p1-card">
-              <span class="versus-name" id="p1-name">Player 1</span>
+              <span class="versus-avatar" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="#d4af37" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline>
+                  <line x1="13" y1="19" x2="19" y2="13"></line>
+                  <line x1="16" y1="16" x2="20" y2="20"></line>
+                  <line x1="19" y1="21" x2="21" y2="19"></line>
+                  <polyline points="9.5 17.5 21 6 21 3 18 3 6.5 14.5"></polyline>
+                  <line x1="5" y1="13" x2="11" y2="19"></line>
+                </svg></span>
+              <div class="versus-details">
+                <span class="versus-name" id="versus-p1-name">Player 1</span>
+                <span class="versus-turn-pill" id="versus-p1-pill">Turn</span>
+              </div>
               <span class="versus-score" id="p1-score">0</span>
             </div>
             <div class="versus-badge">VS</div>
             <div class="versus-player versus-p2" id="versus-p2-card">
-              <span class="versus-name" id="p2-name">Player 2</span>
+              <span class="versus-avatar" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg></span>
+              <div class="versus-details">
+                <span class="versus-name" id="versus-p2-name">Player 2</span>
+                <span class="versus-turn-pill" id="versus-p2-pill">Turn</span>
+              </div>
               <span class="versus-score" id="p2-score">0</span>
             </div>
             <div class="versus-turn-indicator">
-              <span>🎯 Turn: <strong id="current-player-turn-name">Player 1</strong></span>
+              <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="6"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                </svg> Turn: <strong id="current-player-turn-name">Player 1</strong></span>
             </div>
           </div>
-          
+
           <!-- Smooth Animated Progress Track -->
           <div class="progress-container-modern">
             <div id="progress-bar" class="progress-bar-modern"></div>
           </div>
-          
+
           <!-- Question, Answers & Controls -->
           <main id="quiz" class="quiz-content-modern">
+            <!-- Prominent Turn Indicator Banner for 2-Player Mode -->
+            <div id="versus-turn-banner" class="versus-turn-banner" style="display:none">
+              <span id="versus-turn-banner-text">⚔️ <strong>Player 1</strong>'s Turn to Answer</span>
+            </div>
             <div id="question-text" class="question-text-modern" aria-live="assertive"></div>
             <div id="answers" class="answers-grid-modern" role="group" aria-label="Answer choices"></div>
-            
+
             <!-- Controls Bar right next to questions -->
             <div class="game-controls-modern">
-              <button id="btn-pause" class="control-btn-modern secondary" style="display:none" aria-label="Pause/Resume Timer">⏸️ Pause</button>
+              <button id="btn-pause" class="control-btn-modern secondary" style="display:none"
+                aria-label="Pause/Resume Timer">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+                  <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+                </svg>
+                <span>Pause</span>
+              </button>
               <button id="btn-next" class="control-btn-modern primary-glow" disabled aria-label="Next Question">
                 <span>Next Question</span>
-                <span class="btn-arrow">→</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round" class="btn-arrow">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
               </button>
               <button id="btn-quit" class="control-btn-modern danger-ghost" aria-label="Quit Game">Quit</button>
             </div>
@@ -466,21 +1033,23 @@
               <h2 id="study-heading" class="study-compact-title">📖 Bible People Explorer</h2>
               <span class="study-count-badge"><span id="people-count">173</span> People</span>
             </div>
-            
+
             <div class="study-toolbar-row">
               <div class="search-bar-wrapper compact-search">
                 <span class="search-icon-text">🔍</span>
                 <label for="search-person" class="sr-only">Search Bible people</label>
-                <input id="search-person" type="text" placeholder="Search by name, occupation, or event..." aria-label="Search Bible people" />
+                <input id="search-person" type="text" placeholder="Search by name, occupation, or event..."
+                  aria-label="Search Bible people" />
               </div>
-              
+
               <div class="study-controls-inline">
                 <select id="sort-select" class="sort-select-compact" aria-label="Sort order">
                   <option value="name-asc">A–Z</option>
                   <option value="name-desc">Z–A</option>
                 </select>
-                <button id="btn-shuffle-list" class="action-btn-compact" title="Shuffle order" aria-label="Shuffle Bible people list">🔀 Shuffle</button>
-                
+                <button id="btn-shuffle-list" class="action-btn-compact" title="Shuffle order"
+                  aria-label="Shuffle Bible people list">🔀 Shuffle</button>
+
                 <div class="filter-chips-compact">
                   <label class="filter-chip">
                     <input id="filter-mother" type="checkbox" />
@@ -498,7 +1067,7 @@
               </div>
             </div>
           </header>
-          
+
           <main class="study-content">
             <div id="people-list" class="people-list" aria-live="polite"></div>
           </main>
@@ -510,7 +1079,7 @@
       <!-- Footer glow orbs -->
       <div class="footer-orb footer-orb-1"></div>
       <div class="footer-orb footer-orb-2"></div>
-      
+
       <div class="footer-content">
         <!-- Top row: Brand + Scripture verse -->
         <div class="footer-top-row">
@@ -543,21 +1112,35 @@
             <span>Share with Friends</span>
           </button>
           <!-- Community hidden for now -->
-          <a id="footer-community" href="community.html" class="footer-action-btn community-btn" target="_blank" rel="noopener" style="display:none;">🌐 Community</a>
+          <a id="footer-community" href="community.html" class="footer-action-btn community-btn" target="_blank"
+            rel="noopener" style="display:none;">🌐 Community</a>
         </div>
 
         <!-- Bottom: Copyright + share icons -->
         <div class="footer-bottom">
-          <p class="footer-copy">© <span id="footer-year"></span> Who-Bible · Crafted with ✝️ for Scripture learners everywhere</p>
-          <div class="footer-social-row">
-            <button class="footer-social-btn" id="btn-share-twitter" title="Share on X (Twitter)" aria-label="Share on X">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.261 5.632L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+          <p class="footer-copy">© <span id="footer-year"></span> Who-Bible · Crafted with ✝️ for Scripture learners
+            everywhere</p>
+          <div class="footer-social-row" style="display: none;">
+            <button class="footer-social-btn" id="btn-share-twitter" title="Share on X (Twitter)"
+              aria-label="Share on X">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.261 5.632L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
+              </svg>
             </button>
-            <button class="footer-social-btn" id="btn-share-whatsapp" title="Share on WhatsApp" aria-label="Share on WhatsApp">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            <button class="footer-social-btn" id="btn-share-whatsapp" title="Share on WhatsApp"
+              aria-label="Share on WhatsApp">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
             </button>
-            <button class="footer-social-btn" id="btn-share-facebook" title="Share on Facebook" aria-label="Share on Facebook">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <button class="footer-social-btn" id="btn-share-facebook" title="Share on Facebook"
+              aria-label="Share on Facebook">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path
+                  d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
             </button>
           </div>
         </div>
@@ -568,7 +1151,8 @@
   <noscript>This app requires JavaScript to run.</noscript>
 
   <!-- Profile & Avatar Customizer Modal -->
-  <div id="profile-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="profile-modal-title" aria-modal="true">
+  <div id="profile-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="profile-modal-title"
+    aria-modal="true">
     <div class="modal modern-modal-card" role="document">
       <header class="modal-header">
         <h2 id="profile-modal-title">👤 Player Profile & Avatar</h2>
@@ -592,7 +1176,8 @@
 
         <div class="profile-section" style="margin-top: 16px;">
           <label for="profile-name-input" class="setting-label">Player Display Name</label>
-          <input id="profile-name-input" type="text" placeholder="Enter your display name" maxlength="20" class="setting-select" />
+          <input id="profile-name-input" type="text" placeholder="Enter your display name" maxlength="20"
+            class="setting-select" />
         </div>
 
         <!-- Player Career Statistics Preview -->
@@ -623,7 +1208,8 @@
   </div>
 
   <!-- Summary & Victory Modal -->
-  <div id="summary-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="summary-modal-title" aria-modal="true">
+  <div id="summary-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="summary-modal-title"
+    aria-modal="true">
     <div class="modal modern-modal-card summary-modal-card" role="document">
       <header class="modal-header">
         <h2 id="summary-modal-title">🏆 Match Summary</h2>
@@ -652,33 +1238,43 @@
   </div>
 
   <!-- Challenge Player Setup Modal -->
-  <div id="players-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="challenge-modal-title" aria-modal="true">
+  <div id="players-modal" class="modal-overlay" style="display:none" role="dialog"
+    aria-labelledby="challenge-modal-title" aria-modal="true">
     <div class="modal" role="document">
       <header class="modal-header">
-        <h2 id="challenge-modal-title">Challenge Setup</h2>
+        <h2 id="challenge-modal-title">⚔️ 2-Player Pass & Play</h2>
         <button id="btn-players-close" aria-label="Close challenge setup">✕</button>
       </header>
       <main class="modal-body">
+        <p style="margin: 0 0 16px; color: var(--text-muted); font-size: 14px; line-height: 1.5;">
+          Take turns answering on this device. Enter player names below — they will save automatically!
+        </p>
         <div class="row">
-          <label for="p1-name" id="p1-name-label">Player 1 name</label>
+          <label for="p1-name-input" id="p1-name-label">⚔️ Player 1 Name</label>
           <div style="display: flex; gap: 8px;">
-            <input id="p1-name" type="text" placeholder="P1" aria-describedby="p1-help" style="flex: 1;" />
-            <button id="btn-save-p1-name" class="secondary" style="padding: 8px 16px;">Save</button>
+            <input id="p1-name-input" type="text" placeholder="Player 1" maxlength="20" aria-describedby="p1-help"
+              style="flex: 1;" />
+            <button id="btn-save-p1-name" class="secondary" style="padding: 8px 16px; min-width: 72px;">Save</button>
           </div>
-          <small id="p1-help" style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.25em; display: block;">Click <b>Save</b> to confirm Player 1's name</small>
+          <small id="p1-help"
+            style="font-size: 0.85em; color: var(--text-muted); margin-top: 0.25em; display: block;">Saved on this
+            device</small>
         </div>
         <div class="row">
-          <label for="p2-name" id="p2-name-label">Player 2 name</label>
+          <label for="p2-name-input" id="p2-name-label">🛡️ Player 2 Name</label>
           <div style="display: flex; gap: 8px;">
-            <input id="p2-name" type="text" placeholder="P2" aria-describedby="p2-help" style="flex: 1;" />
-            <button id="btn-save-p2-name" class="secondary" style="padding: 8px 16px;">Save</button>
+            <input id="p2-name-input" type="text" placeholder="Player 2" maxlength="20" aria-describedby="p2-help"
+              style="flex: 1;" />
+            <button id="btn-save-p2-name" class="secondary" style="padding: 8px 16px; min-width: 72px;">Save</button>
           </div>
-          <small id="p2-help" style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.25em; display: block;">Click <b>Save</b> to confirm Player 2's name</small>
+          <small id="p2-help"
+            style="font-size: 0.85em; color: var(--text-muted); margin-top: 0.25em; display: block;">Saved on this
+            device</small>
         </div>
       </main>
       <footer class="modal-footer">
         <button id="btn-players-cancel" aria-describedby="cancel-help">Cancel</button>
-        <button id="btn-players-start" class="primary" aria-describedby="start-help">Start Challenge</button>
+        <button id="btn-players-start" class="primary" aria-describedby="start-help">Start Challenge ⚔️</button>
         <div class="modal-help">
           <small id="cancel-help" class="sr-only">Cancel challenge setup and return to game modes</small>
           <small id="start-help" class="sr-only">Begin two-player challenge mode</small>
@@ -688,7 +1284,8 @@
   </div>
 
   <!-- Remote Challenge Modal -->
-  <div id="remote-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="remote-modal-title" aria-modal="true">
+  <div id="remote-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="remote-modal-title"
+    aria-modal="true">
     <div class="modal" role="document">
       <header class="modal-header">
         <h2 id="remote-modal-title">Remote Challenge</h2>
@@ -722,7 +1319,8 @@
               <input id="remote-host-name" type="text" placeholder="Enter your name" maxlength="20" style="flex: 1;" />
               <button id="btn-save-host-name" class="secondary" style="padding: 8px 16px;">Save</button>
             </div>
-            <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.25em;">Click <b>Save</b> to confirm your name, then create the room.</div>
+            <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.25em;">Click <b>Save</b> to confirm
+              your name, then create the room.</div>
           </div>
           <div style="text-align: center; margin-top: 16px;">
             <button id="btn-create-room-confirm" class="primary">Create Room & Get Link</button>
@@ -735,23 +1333,28 @@
             <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
             <h3>Room Created!</h3>
             <p style="color: var(--muted); font-size: 14px;">Share this PIN or link with your friend:</p>
-            
-            <div style="background: var(--card); border: 2px solid var(--accent); border-radius: 12px; padding: 16px; margin: 16px 0;">
-              <div style="font-family: monospace; font-size: 24px; font-weight: 900; color: var(--accent); margin-bottom: 8px;" id="remote-room-code">CODE-123</div>
+
+            <div
+              style="background: var(--card); border: 2px solid var(--accent); border-radius: 12px; padding: 16px; margin: 16px 0;">
+              <div
+                style="font-family: monospace; font-size: 24px; font-weight: 900; color: var(--accent); margin-bottom: 8px;"
+                id="remote-room-code">CODE-123</div>
               <div style="font-size: 13px; word-break: break-all; color: var(--muted);" id="remote-share-url">URL</div>
             </div>
 
             <!-- QR Code display -->
-            <img id="remote-qr-code-img" class="lobby-qr" alt="QR Code" style="display:none; width: 150px; height: 150px; margin: 12px auto; border-radius: 12px; background: white; padding: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);" />
+            <img id="remote-qr-code-img" class="lobby-qr" alt="QR Code"
+              style="display:none; width: 150px; height: 150px; margin: 12px auto; border-radius: 12px; background: white; padding: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);" />
 
             <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
               <button id="btn-copy-link" class="secondary">📋 Copy Link</button>
               <button id="btn-share-link" class="secondary">📤 Share</button>
             </div>
-            
+
             <div style="margin-top: 20px; padding: 16px; background: var(--glass); border-radius: 12px;">
               <div style="font-size: 14px; margin-bottom: 6px;"><strong>Waiting for opponent...</strong></div>
-              <div id="remote-opponent-status" style="color: var(--muted); font-size: 13px;">Room created. Waiting for player 2 to join.</div>
+              <div id="remote-opponent-status" style="color: var(--muted); font-size: 13px;">Room created. Waiting for
+                player 2 to join.</div>
             </div>
             <div style="margin-top: 16px;">
               <button id="btn-ready-host" class="primary" style="display:none;">Ready to Start!</button>
@@ -763,7 +1366,8 @@
         <div id="remote-step-join" style="display:none;">
           <div class="row">
             <label for="remote-room-code-input">Room Code / PIN</label>
-            <input id="remote-room-code-input" type="text" placeholder="e.g. FAITH-247" style="text-transform: uppercase;" maxlength="20" />
+            <input id="remote-room-code-input" type="text" placeholder="e.g. FAITH-247"
+              style="text-transform: uppercase;" maxlength="20" />
           </div>
           <div class="row">
             <label for="remote-join-name">Your Name</label>
@@ -780,10 +1384,13 @@
             <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
             <h3>Joined Room!</h3>
             <div style="margin: 24px 0; padding: 16px; background: var(--glass); border-radius: 8px;">
-              <div style="font-size: 14px; margin-bottom: 8px;"><strong>Room:</strong> <span id="remote-joined-code">CODE-123</span></div>
-              <div style="font-size: 14px; margin-bottom: 8px;"><strong>Host:</strong> <span id="remote-host-name-display">Player 1</span></div>
+              <div style="font-size: 14px; margin-bottom: 8px;"><strong>Room:</strong> <span
+                  id="remote-joined-code">CODE-123</span></div>
+              <div style="font-size: 14px; margin-bottom: 8px;"><strong>Host:</strong> <span
+                  id="remote-host-name-display">Player 1</span></div>
               <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
-                <div id="remote-joined-status" style="color: var(--muted); font-size: 13px;">Waiting for both players to be ready...</div>
+                <div id="remote-joined-status" style="color: var(--muted); font-size: 13px;">Waiting for both players to
+                  be ready...</div>
               </div>
             </div>
             <button id="btn-ready-guest" class="primary">Ready to Start!</button>
@@ -798,25 +1405,31 @@
   </div>
 
   <!-- Classroom Join Modal -->
-  <div id="classroom-join-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="classroom-join-title" aria-modal="true">
+  <div id="classroom-join-modal" class="modal-overlay" style="display:none" role="dialog"
+    aria-labelledby="classroom-join-title" aria-modal="true">
     <div class="modal" role="document">
       <header class="modal-header">
         <h2 id="classroom-join-title">🏫 Classroom Game</h2>
         <button id="btn-classroom-join-close" aria-label="Close classroom join">✕</button>
       </header>
       <main class="modal-body">
-        <p style="margin-bottom: 1.25rem; color: var(--text-muted); font-size: 15px;">Enter the Game PIN from the presenter's screen to play along on your device.</p>
+        <p style="margin-bottom: 1.25rem; color: var(--text-muted); font-size: 15px;">Enter the Game PIN from the
+          presenter's screen to play along on your device.</p>
         <div class="row">
           <label for="classroom-pin-input">Game PIN</label>
-          <input id="classroom-pin-input" type="text" placeholder="e.g., FAITH-123" style="text-transform: uppercase; font-size: 18px; font-weight: 700; letter-spacing: 1px;" maxlength="20" />
+          <input id="classroom-pin-input" type="text" placeholder="e.g., FAITH-123"
+            style="text-transform: uppercase; font-size: 18px; font-weight: 700; letter-spacing: 1px;" maxlength="20" />
         </div>
         <div class="row">
           <label for="classroom-player-name">Your Display Name</label>
           <input id="classroom-player-name" type="text" placeholder="Enter your name" maxlength="20" />
         </div>
-        <div style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; text-align: center;">
+        <div
+          style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; text-align: center;">
           <span style="font-size: 13px; color: var(--muted);">Want to host the quiz for your classroom or group?</span>
-          <button type="button" onclick="window.open('host.html', '_blank')" class="secondary" style="margin-top: 8px; width: 100%; font-size: 13px; padding: 8px 12px;">🖥️ Launch Host View on Projector</button>
+          <button type="button" onclick="window.open('host.html', '_blank')" class="secondary"
+            style="margin-top: 8px; width: 100%; font-size: 13px; padding: 8px 12px;">🖥️ Launch Host View on
+            Projector</button>
         </div>
       </main>
       <footer class="modal-footer">
@@ -827,7 +1440,8 @@
   </div>
 
   <!-- Community Modal (for room details etc.) -->
-  <div id="community-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="community-modal-title" aria-modal="true">
+  <div id="community-modal" class="modal-overlay" style="display:none" role="dialog"
+    aria-labelledby="community-modal-title" aria-modal="true">
     <div class="modal" role="document">
       <header class="modal-header">
         <h2 id="community-modal-title">Details</h2>
@@ -843,7 +1457,8 @@
   </div>
 
   <!-- Person Details Modal -->
-  <div id="person-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="person-modal-title" aria-modal="true">
+  <div id="person-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="person-modal-title"
+    aria-modal="true">
     <div class="modal" role="document">
       <header class="modal-header">
         <h2 id="person-modal-title">Person Details</h2>
@@ -859,7 +1474,8 @@
   </div>
 
   <!-- Change Player Modal -->
-  <div id="change-player-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="change-player-title" aria-modal="true">
+  <div id="change-player-modal" class="modal-overlay" style="display:none" role="dialog"
+    aria-labelledby="change-player-title" aria-modal="true">
     <div class="modal" role="document">
       <header class="modal-header">
         <h2 id="change-player-title">Change Player</h2>
@@ -879,30 +1495,86 @@
   </div>
 
   <!-- Welcome / First Time Modal -->
-  <div id="welcome-modal" class="modal-overlay welcome-overlay" style="display:none" role="dialog" aria-labelledby="welcome-modal-title" aria-modal="true">
+  <div id="welcome-modal" class="modal-overlay welcome-overlay" style="display:none" role="dialog"
+    aria-labelledby="welcome-modal-title" aria-modal="true">
     <div class="modal welcome-modal-content" role="document">
       <header class="modal-header welcome-header">
-        <h2 id="welcome-modal-title">
-          <span class="welcome-icon">✨</span> Welcome, Friend!
-        </h2>
+        <div class="welcome-header-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <span>Welcome to Who-Bible</span>
+        </div>
         <button id="btn-welcome-close" aria-label="Close welcome message" class="welcome-close-btn">✕</button>
       </header>
       <main class="modal-body welcome-body">
-        <div class="welcome-hero-icon">📖</div>
-        <p class="welcome-intro">We're so glad you're here to explore the Bible with us!</p>
-        
-        <div class="welcome-tip-box">
-          <div class="tip-icon">💡</div>
-          <div class="tip-content">
-            <p class="tip-title">Quick Tip</p>
-            <p>The settings at the top (like <strong>Difficulty</strong>) control the whole game. Feel free to adjust them anytime to match your pace.</p>
+        <div class="welcome-hero-emblem" aria-hidden="true">
+          <svg viewBox="0 0 72 72" width="68" height="68" fill="none">
+            <circle cx="36" cy="36" r="32" fill="url(#welcomeAura)" />
+            <path d="M18 24C18 20.6863 20.6863 18 24 18H33C34.6569 18 36 19.3431 36 21V51C36 49.3431 34.6569 48 33 48H24C20.6863 48 18 45.3137 18 42V24Z" fill="#d97706" />
+            <path d="M54 24C54 20.6863 51.3137 18 48 18H39C37.3431 18 36 19.3431 36 21V51C36 49.3431 37.3431 48 39 48H48C51.3137 48 54 45.3137 54 42V24Z" fill="#b45309" />
+            <path d="M20 22C20 20.8954 20.8954 20 22 20H32C33.1046 20 34 20.8954 34 22V48C34 46.8954 33.1046 46 32 46H22C20.8954 46 20 45.1046 20 44V22Z" fill="#fef3c7" />
+            <path d="M52 22C52 20.8954 51.1046 20 50 20H40C38.8954 20 38 20.8954 38 22V48C38 46.8954 38.8954 46 40 46H50C51.1046 46 52 45.1046 52 44V22Z" fill="#fffbeb" />
+            <line x1="24" y1="26" x2="30" y2="26" stroke="#d97706" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="24" y1="32" x2="30" y2="32" stroke="#d97706" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="24" y1="38" x2="28" y2="38" stroke="#d97706" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="42" y1="26" x2="48" y2="26" stroke="#d97706" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="42" y1="32" x2="48" y2="32" stroke="#d97706" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="42" y1="38" x2="46" y2="38" stroke="#d97706" stroke-width="1.8" stroke-linecap="round"/>
+            <defs>
+              <radialGradient id="welcomeAura" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <h2 id="welcome-modal-title" class="welcome-headline">Explore the People of Scripture</h2>
+        <p class="welcome-intro">
+          Test your mastery across 170+ biblical figures, challenge family and friends, and grow deeper in God's Word through engaging scriptural trivia.
+        </p>
+
+        <div class="welcome-features-grid">
+          <div class="welcome-feat-card">
+            <div class="welcome-feat-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            </div>
+            <div class="welcome-feat-text">
+              <h4>170+ Figures</h4>
+              <p>Rich deeds, lineage, and roles from Genesis to Revelation.</p>
+            </div>
+          </div>
+
+          <div class="welcome-feat-card">
+            <div class="welcome-feat-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline><line x1="13" y1="19" x2="19" y2="13"></line><line x1="16" y1="16" x2="20" y2="20"></line><line x1="19" y1="21" x2="21" y2="19"></line><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"></polyline><line x1="5" y1="14" x2="9" y2="18"></line><line x1="7" y1="17" x2="4" y2="20"></line><line x1="3" y1="19" x2="5" y2="21"></line></svg>
+            </div>
+            <div class="welcome-feat-text">
+              <h4>Multiplayer Modes</h4>
+              <p>Pass-and-play on one device, live 1v1, or Kahoot classroom.</p>
+            </div>
+          </div>
+
+          <div class="welcome-feat-card">
+            <div class="welcome-feat-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="12 8 8 12 12 16 16 12 12 8"></polygon></svg>
+            </div>
+            <div class="welcome-feat-text">
+              <h4>Tailored Levels</h4>
+              <p>Casual, Standard, or Scholar difficulty tailored for you.</p>
+            </div>
           </div>
         </div>
-        
-        <p class="welcome-outro">Have fun learning & growing!</p>
+
+        <div class="welcome-verse-card">
+          <p class="welcome-verse-quote">“Your word is a lamp to my feet and a light to my path.”</p>
+          <span class="welcome-verse-ref">— Psalm 119:105</span>
+        </div>
       </main>
       <footer class="modal-footer welcome-footer">
-        <button id="btn-welcome-ok" class="primary welcome-btn">Let's Play! 🚀</button>
+        <button id="btn-welcome-ok" class="primary welcome-btn">
+          <span>Begin Your Journey</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
       </footer>
     </div>
   </div>
@@ -915,7 +1587,7 @@
       </header>
       <main class="feedback-body">
         <p class="feedback-intro">Help us improve Who-Bible by sharing your thoughts.</p>
-        
+
         <div class="feedback-section">
           <label>Overall Experience</label>
           <div class="feedback-rating" id="rating-overall">
@@ -929,11 +1601,14 @@
 
         <div class="feedback-form-group">
           <label for="feedback-experience">How do you feel about the app overall?</label>
-          <textarea id="feedback-experience" rows="2" placeholder="Tell us about your experience with Who-Bible..."></textarea>
+          <textarea id="feedback-experience" rows="2"
+            placeholder="Tell us about your experience with Who-Bible..."></textarea>
         </div>
 
         <div class="feedback-section">
-          <label style="color: var(--accent-2); font-size: 1.1rem; margin-bottom: 1rem; display: block; text-align: center;">📊 Rate Each Game Mode</label>
+          <label
+            style="color: var(--accent-2); font-size: 1.1rem; margin-bottom: 1rem; display: block; text-align: center;">📊
+            Rate Each Game Mode</label>
           <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
             Help us improve by rating the modes you've tried
           </p>
@@ -1057,8 +1732,9 @@
         <button id="btn-report-close" class="close-report" aria-label="Close report">✕</button>
       </header>
       <main class="report-body">
-        <p class="report-intro">Help us improve Who-Bible by reporting questions or content that may be incorrect, misleading, or poorly worded. Your feedback helps everyone learn more accurately!</p>
-        
+        <p class="report-intro">Help us improve Who-Bible by reporting questions or content that may be incorrect,
+          misleading, or poorly worded. Your feedback helps everyone learn more accurately!</p>
+
         <div class="question-context">
           <div class="label">Question:</div>
           <div class="text" id="report-context-question">Loading...</div>
@@ -1092,7 +1768,8 @@
 
         <div class="report-form-group">
           <label for="report-details">Additional Details (Optional)</label>
-          <textarea id="report-details" rows="4" placeholder="Please provide any additional context or suggestions to help us understand the issue better..."></textarea>
+          <textarea id="report-details" rows="4"
+            placeholder="Please provide any additional context or suggestions to help us understand the issue better..."></textarea>
         </div>
       </main>
       <footer class="report-footer">
@@ -1103,7 +1780,8 @@
   </div>
 
   <!-- Classroom Mode Join Modal -->
-  <div id="classroom-join-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="classroom-join-title" aria-modal="true">
+  <div id="classroom-join-modal" class="modal-overlay" style="display:none" role="dialog"
+    aria-labelledby="classroom-join-title" aria-modal="true">
     <div class="modal modern-modal-card classroom-join-card" role="document">
       <header class="modal-header">
         <h2 id="classroom-join-title">🏫 Join Classroom Game</h2>
@@ -1117,12 +1795,14 @@
 
         <div class="profile-section">
           <label for="classroom-pin-input" class="setting-label">Game PIN (e.g. HOLY-123)</label>
-          <input id="classroom-pin-input" type="text" placeholder="PIN from host screen" maxlength="12" class="setting-select classroom-pin-field" autocomplete="off" />
+          <input id="classroom-pin-input" type="text" placeholder="PIN from host screen" maxlength="12"
+            class="setting-select classroom-pin-field" autocomplete="off" />
         </div>
 
         <div class="profile-section" style="margin-top: 14px;">
           <label for="classroom-player-name" class="setting-label">Your Nickname</label>
-          <input id="classroom-player-name" type="text" placeholder="Enter your name" maxlength="20" class="setting-select" />
+          <input id="classroom-player-name" type="text" placeholder="Enter your name" maxlength="20"
+            class="setting-select" />
         </div>
 
         <div class="classroom-join-tip">
@@ -1141,5 +1821,5 @@
   <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
 
 </body>
-</html>
 
+</html>

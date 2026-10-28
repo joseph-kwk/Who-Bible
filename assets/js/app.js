@@ -568,10 +568,14 @@ const timerEl = document.getElementById('timer');
 const challengeStatusEl = document.getElementById('challenge-status');
 const currentPlayerEl = document.getElementById('current-player'); // Legacy - kept for compatibility
 const currentPlayerTurnNameEl = document.getElementById('current-player-turn-name');
-const p1NameEl = document.getElementById('p1-name');
-const p2NameEl = document.getElementById('p2-name');
+const p1NameEl = document.getElementById('versus-p1-name') || document.getElementById('p1-name');
+const p2NameEl = document.getElementById('versus-p2-name') || document.getElementById('p2-name');
 const p1ScoreEl = document.getElementById('p1-score');
 const p2ScoreEl = document.getElementById('p2-score');
+const versusP1Card = document.getElementById('versus-p1-card');
+const versusP2Card = document.getElementById('versus-p2-card');
+const versusTurnBanner = document.getElementById('versus-turn-banner');
+const versusTurnBannerText = document.getElementById('versus-turn-banner-text');
 const progressBarEl = document.getElementById('progress-bar');
 
 // Study elements
@@ -600,8 +604,8 @@ const playersModal = document.getElementById('players-modal');
 const btnPlayersClose = document.getElementById('btn-players-close');
 const btnPlayersCancel = document.getElementById('btn-players-cancel');
 const btnPlayersStart = document.getElementById('btn-players-start');
-const p1NameInput = document.getElementById('p1-name');
-const p2NameInput = document.getElementById('p2-name');
+const p1NameInput = document.getElementById('p1-name-input') || document.getElementById('p1-name');
+const p2NameInput = document.getElementById('p2-name-input') || document.getElementById('p2-name');
 
 // Remote Challenge Modal elements
 const remoteModal = document.getElementById('remote-modal');
@@ -689,8 +693,8 @@ function translateScenario(scenario){
 
 function translateAnswerForQuestionType(qType, value){
   if(qType==='occupation') return translateOccupation(value);
-  if(qType==='age') return translateEvent(value);
-  if(qType==='name' || qType==='mother') return translateName(value);
+  if(qType==='whoDid' || qType==='whoAmI' || qType==='mother' || qType==='whoMother' || qType==='father' || qType==='name') return translateName(value);
+  if(qType==='whichEvent' || qType==='event') return translateEvent(value);
   return value;
 }
 
@@ -1355,30 +1359,43 @@ function attachHandlers(){
   const btnSaveP2Name = document.getElementById('btn-save-p2-name');
   if (btnSaveP1Name) {
     btnSaveP1Name.addEventListener('click', () => {
-      const name = p1NameInput.value.trim();
+      const name = (p1NameInput ? p1NameInput.value : '').trim();
       if (!name) {
         showToast({ title: 'Name Required', msg: 'Please enter Player 1 name', type: 'error' });
-        p1NameInput.focus();
+        if (p1NameInput) p1NameInput.focus();
         return;
       }
-      showToast({ title: 'Saved!', msg: `Player 1: ${name}`, type: 'success', timeout: 1500 });
-      // Flash effect
-      btnSaveP1Name.style.boxShadow = '0 0 0 2px var(--primary-color)';
-      setTimeout(() => { btnSaveP1Name.style.boxShadow = ''; }, 400);
+      localStorage.setItem('who-bible-p1-name', name);
+      btnSaveP1Name.textContent = '✓ Saved';
+      btnSaveP1Name.style.borderColor = 'var(--success, #10b981)';
+      btnSaveP1Name.style.boxShadow = '0 0 0 2px rgba(16, 185, 129, 0.4)';
+      setTimeout(() => { 
+        btnSaveP1Name.textContent = 'Save';
+        btnSaveP1Name.style.borderColor = '';
+        btnSaveP1Name.style.boxShadow = ''; 
+      }, 1500);
+      showToast({ title: 'Player 1 Saved', msg: `Set to: ${name}`, type: 'success', timeout: 1500 });
+      if (p2NameInput) p2NameInput.focus();
     });
   }
   if (btnSaveP2Name) {
     btnSaveP2Name.addEventListener('click', () => {
-      const name = p2NameInput.value.trim();
+      const name = (p2NameInput ? p2NameInput.value : '').trim();
       if (!name) {
         showToast({ title: 'Name Required', msg: 'Please enter Player 2 name', type: 'error' });
-        p2NameInput.focus();
+        if (p2NameInput) p2NameInput.focus();
         return;
       }
-      showToast({ title: 'Saved!', msg: `Player 2: ${name}`, type: 'success', timeout: 1500 });
-      // Flash effect
-      btnSaveP2Name.style.boxShadow = '0 0 0 2px var(--primary-color)';
-      setTimeout(() => { btnSaveP2Name.style.boxShadow = ''; }, 400);
+      localStorage.setItem('who-bible-p2-name', name);
+      btnSaveP2Name.textContent = '✓ Saved';
+      btnSaveP2Name.style.borderColor = 'var(--success, #10b981)';
+      btnSaveP2Name.style.boxShadow = '0 0 0 2px rgba(16, 185, 129, 0.4)';
+      setTimeout(() => { 
+        btnSaveP2Name.textContent = 'Save';
+        btnSaveP2Name.style.borderColor = '';
+        btnSaveP2Name.style.boxShadow = ''; 
+      }, 1500);
+      showToast({ title: 'Player 2 Saved', msg: `Set to: ${name}`, type: 'success', timeout: 1500 });
     });
   }
   
@@ -1576,6 +1593,13 @@ function showSetup(fromHistory = false){
   setupPanel.style.display = 'flex';
   gameArea.style.display = 'none';
   studyPanel.style.display = 'none';
+  if(challengeStatusEl) challengeStatusEl.style.display = 'none';
+  if(versusTurnBanner) versusTurnBanner.style.display = 'none';
+  const soloScoreChip = document.querySelector('.chip-score');
+  const soloStreakChip = document.querySelector('#streak-chip');
+  if (soloScoreChip) soloScoreChip.style.display = 'flex';
+  if (soloStreakChip) soloStreakChip.style.display = 'flex';
+  if(btnNext) btnNext.innerHTML = '<span>Next Question</span> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
   stopTimer();
   // Reset quiz display
   const quizEl = document.getElementById('quiz');
@@ -1656,11 +1680,17 @@ function startChallenge(){
 }
 
 function startChallengeFromModal(){
-  const name1 = (p1NameInput.value||'Player 1').trim() || 'Player 1';
-  const name2 = (p2NameInput.value||'Player 2').trim() || 'Player 2';
+  const savedP1 = localStorage.getItem('who-bible-p1-name') || '';
+  const savedP2 = localStorage.getItem('who-bible-p2-name') || '';
+  const name1 = (p1NameInput && p1NameInput.value ? p1NameInput.value.trim() : '') || savedP1 || 'Player 1';
+  const name2 = (p2NameInput && p2NameInput.value ? p2NameInput.value.trim() : '') || savedP2 || 'Player 2';
+  
+  localStorage.setItem('who-bible-p1-name', name1);
+  localStorage.setItem('who-bible-p2-name', name2);
+  
   hidePlayersModal();
   showGame();
-  gameTitle.textContent = getText('challengeMode');
+  gameTitle.textContent = getText('challengeMode') || '⚔️ 2-Player Pass & Play';
   
   // Challenge mode uses temporary players for this session only
   // Does not affect the main player profile/stats
@@ -1670,23 +1700,61 @@ function startChallengeFromModal(){
   ];
   state.currentPlayerIndex = 0;
   
-  // Update UI with actual player names
-  if (currentPlayerEl) currentPlayerEl.textContent = '1';
-  if (currentPlayerTurnNameEl) currentPlayerTurnNameEl.textContent = name1;
-  if (p1NameEl) p1NameEl.textContent = name1;
-  if (p2NameEl) p2NameEl.textContent = name2;
-  if (p1ScoreEl) p1ScoreEl.textContent = '0';
-  if (p2ScoreEl) p2ScoreEl.textContent = '0';
-  
   // Ensure timer is stopped for challenge mode
   stopTimer();
   
   prepareQuiz('challenge');
+  updateVersusHUD();
+  
   showToast({ 
-    title: getText('challengeStart'), 
-    msg: `${name1} vs ${name2}! ${getText('challengeStartMsg')}`, 
-    type: 'info' 
+    title: getText('challengeStart') || '⚔️ Match Started!', 
+    msg: `${name1} vs ${name2}! ${getText('challengeStartMsg') || 'Take turns on each question. Good luck!'}`, 
+    type: 'info',
+    timeout: 3000
   });
+}
+
+function updateVersusHUD(){
+  if (!state.players || state.players.length < 2) return;
+  const p1 = state.players[0];
+  const p2 = state.players[1];
+  const activeIdx = state.currentPlayerIndex || 0;
+  const activePlayer = state.players[activeIdx] || p1;
+
+  if (p1NameEl) p1NameEl.textContent = p1.name;
+  if (p2NameEl) p2NameEl.textContent = p2.name;
+  if (p1ScoreEl) p1ScoreEl.textContent = String(p1.score);
+  if (p2ScoreEl) p2ScoreEl.textContent = String(p2.score);
+
+  if (currentPlayerTurnNameEl) {
+    currentPlayerTurnNameEl.textContent = activePlayer.name;
+  }
+  if (currentPlayerEl) {
+    currentPlayerEl.textContent = String(activeIdx + 1);
+  }
+
+  // Active / waiting turn highlights on the versus cards
+  if (versusP1Card) {
+    versusP1Card.classList.toggle('active-turn', activeIdx === 0);
+    versusP1Card.classList.toggle('waiting-turn', activeIdx !== 0);
+  }
+  if (versusP2Card) {
+    versusP2Card.classList.toggle('active-turn', activeIdx === 1);
+    versusP2Card.classList.toggle('waiting-turn', activeIdx !== 1);
+  }
+
+  // Prominent banner above the question
+  if (versusTurnBanner && (state.mode === 'challenge' || state.mode === 'remote-challenge')) {
+    versusTurnBanner.style.display = 'flex';
+    if (versusTurnBannerText) {
+      const iconSvg = activeIdx === 0
+        ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline><line x1="13" y1="19" x2="19" y2="13"></line><line x1="16" y1="16" x2="20" y2="20"></line><line x1="19" y1="21" x2="21" y2="19"></line><polyline points="9.5 17.5 21 6 21 3 18 3 6.5 14.5"></polyline><line x1="5" y1="13" x2="11" y2="19"></line></svg>`
+        : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
+      versusTurnBannerText.innerHTML = `${iconSvg}It is <strong>${escapeHtml(activePlayer.name)}</strong>'s turn to answer!`;
+    }
+  } else if (versusTurnBanner) {
+    versusTurnBanner.style.display = 'none';
+  }
 }
 
 function startStudy(){
@@ -1899,7 +1967,17 @@ function prepareQuiz(mode){
   // Configure mode-specific elements
   timerEl.style.display = (mode==='timed') ? 'inline-flex' : 'none';
   btnPause.style.display = (mode==='timed') ? 'inline-block' : 'none';
-  challengeStatusEl.style.display = (mode==='challenge') ? 'inline-flex' : 'none';
+  const isMulti = (mode==='challenge' || mode==='remote-challenge');
+  if (challengeStatusEl) challengeStatusEl.style.display = isMulti ? 'flex' : 'none';
+  const soloScoreChip = document.querySelector('.chip-score');
+  const soloStreakChip = document.querySelector('#streak-chip');
+  if (soloScoreChip) soloScoreChip.style.display = isMulti ? 'none' : 'flex';
+  if (soloStreakChip) soloStreakChip.style.display = isMulti ? 'none' : 'flex';
+  if (isMulti) {
+    updateVersusHUD();
+  } else if (versusTurnBanner) {
+    versusTurnBanner.style.display = 'none';
+  }
   
   if(mode==='timed'){
     const secs = parseInt(timeLimitInput.value) || 60;
@@ -1930,72 +2008,272 @@ function isValidContent(val) {
   return !invalid.includes(s) && s.length > 2;
 }
 
-function pickQuestionSet(count, difficulty, peoplePool = null){
-  const types = ['whoDid','whoMother','occupation','age','event'];
-  let pool = filterPeopleByDifficulty(peoplePool || state.people, difficulty);
-  
-  if (difficulty === 'hard') {
-    // For hard mode, pool is sorted by difficulty. Take top candidates then shuffle.
-    const topCandidates = pool.slice(0, Math.max(count * 2, 20));
-    shuffle(topCandidates);
-    pool = topCandidates;
-  } else {
-    shuffle(pool);
+// Clean event into natural question predicate (active or passive)
+function cleanEventPredicate(event) {
+  if (!event) return 'lived faithfully in scripture';
+  const e = String(event).trim();
+  const words = e.split(/\s+/);
+  const first = words[0].toLowerCase();
+  const rest = words.slice(1).join(' ');
+
+  const passiveVerbs = new Set([
+    'swallowed', 'sold', 'turned', 'visited', 'betrayed', 'raised', 'called',
+    'anointed', 'cast', 'fed', 'taken', 'converted', 'shipwrecked', 'beheaded',
+    'exiled', 'dedicated', 'born', 'struck', 'stoned', 'chosen', 'saved',
+    'blinded', 'imprisoned', 'released', 'buried', 'renamed', 'deceived'
+  ]);
+
+  if (passiveVerbs.has(first)) {
+    return `was ${first} ${rest}`;
   }
 
-  const selected = pool.slice(0, Math.min(count, pool.length));
-  const questions = [];
-  for(const person of selected){
-    const t = types[Math.floor(Math.random()*types.length)];
-    if(t==='whoDid'){
-      const rawEvent = person.notable_events?.find(e => isValidContent(e)) || null;
-      if (!rawEvent) continue; // Skip if no valid event
-      const event = translateEvent(rawEvent);
-      questions.push({type:'whoDid',prompt:getText('questionWhoDid', {event}),answer:person.name,ref:person.verses, raw:{ event: rawEvent }});
-    }else if(t==='whoMother'){
-      if(person.mother && isValidContent(person.mother)) questions.push({type:'whoMother',prompt:getText('questionWhoMother', {name: person.name}),answer:person.mother,ref:person.verses, raw:{ name: person.name }});
-    }else if(t==='occupation'){
-      if(person.occupation && isValidContent(person.occupation)) questions.push({type:'occupation',prompt:getText('questionOccupation', {name: person.name}),answer:person.occupation,ref:person.verses, raw:{ occupation: person.occupation, name: person.name }});
-    }else if(t==='age'){
-      if(person.age_notes && isValidContent(person.age_notes)) questions.push({type:'age',prompt:getText('questionAge', {name: person.name}),answer:person.age_notes,ref:person.verses, raw:{ name: person.name, age: person.age_notes }});
-    }else if(t==='event'){
-      if(person.notable_events && person.notable_events.length>0) {
-        const rawEvent = person.notable_events.find(e => isValidContent(e));
-        if(rawEvent) {
-          const event = translateEvent(rawEvent);
-          questions.push({type:'event',prompt:getText('questionEvent', {event}),answer:person.name,ref:person.verses, raw:{ event: rawEvent }});
-        }
-      }
-    }
+  const titleNouns = new Set([
+    'judge', 'first', 'second', 'ancestor', 'father', 'son', 'brother', 
+    'mother', 'sister', 'cousin', 'prophet', 'priest', 'king', 'queen'
+  ]);
+  if (titleNouns.has(first)) {
+    let article = 'a';
+    if (first === 'ancestor') article = 'an';
+    if (first === 'first' || first === 'second') article = 'the';
+    return `was ${article} ${first} ${rest}`;
   }
-  // ensure we have at least count questions; fill with simple ones (validated)
-  let i = 0;
-  while(questions.length < count && i < state.people.length){
-    const p = state.people[i++];
-    const rawEvent = p.notable_events?.find(e => isValidContent(e)) || null;
-    if (!rawEvent) continue;
-    const event = translateEvent(rawEvent);
-    questions.push({type:'whoDid',prompt:getText('questionWhoDid', {event}),answer:p.name,ref:p.verses});
-  }
-  return questions.slice(0, count);
+
+  return `${first} ${rest}`;
 }
 
+function filterPeopleByDifficulty(people, difficulty) {
+  const pList = people || state.people;
+  if (!pList || pList.length === 0) return [];
+  
+  if (difficulty === 'easy') {
+    const easyList = pList.filter(p => p.difficulty === 'easy');
+    return easyList.length ? easyList : pList.slice();
+  }
+  
+  if (difficulty === 'medium') {
+    // 75% medium, 25% easy
+    const medList = pList.filter(p => p.difficulty === 'medium');
+    const easyList = pList.filter(p => p.difficulty === 'easy');
+    const shuffledMed = medList.slice();
+    const shuffledEasy = easyList.slice();
+    shuffle(shuffledMed);
+    shuffle(shuffledEasy);
+    return [...shuffledMed, ...shuffledEasy.slice(0, Math.ceil(shuffledMed.length * 0.35))];
+  }
+  
+  if (difficulty === 'hard') {
+    // 75% hard, 25% medium
+    const hardList = pList.filter(p => p.difficulty === 'hard');
+    const medList = pList.filter(p => p.difficulty === 'medium');
+    const shuffledHard = hardList.slice();
+    const shuffledMed = medList.slice();
+    shuffle(shuffledHard);
+    shuffle(shuffledMed);
+    return [...shuffledHard, ...shuffledMed.slice(0, Math.ceil(hardList.length * 0.35))];
+  }
+  
+  return pList.slice();
+}
 
-function filterPeopleByDifficulty(people, difficulty){
-  if(difficulty==='easy'){
-    const common = new Set(['Noah','Moses','David','Solomon','Abraham','Isaac','Jacob','Ruth','Esther','Peter','Paul','Mary (mother of Jesus)','John the Baptist','Joseph (son of Jacob)','Lazarus']);
-    return people.filter(p => p.difficulty === 'easy' || common.has(p.name));
+function pickQuestionSet(count, difficulty, peoplePool = null) {
+  const pool = filterPeopleByDifficulty(peoplePool || state.people, difficulty);
+  if (!pool || pool.length === 0) return [];
+  
+  const shuffledCandidates = pool.slice();
+  shuffle(shuffledCandidates);
+
+  const questions = [];
+  const usedNames = new Set();
+  
+  const famousMothers = ['Sarah', 'Rebekah', 'Rachel', 'Leah', 'Hannah', 'Elizabeth', 'Mary (mother of Jesus)', 'Jochebed', 'Bathsheba', 'Eve', 'Hagar'];
+  const famousFathers = ['Abraham', 'Isaac', 'Jacob', 'David', 'Saul (first king)', 'Jesse', 'Zechariah', 'Noah', 'Terah', 'Adam'];
+  const biblicalRoles = [
+    'Prophet of the Lord', 'King of Israel', 'Queen of Persia', 'Apostle of Jesus Christ',
+    'Judge of Israel', 'High Priest', 'Fisherman and Disciple', 'Tentmaker and Missionary',
+    'Tax Collector and Disciple', 'Cupbearer to the King', 'Scribe and Teacher of the Law'
+  ];
+
+  for (const person of shuffledCandidates) {
+    if (questions.length >= count) break;
+    if (usedNames.has(person.name)) continue;
+
+    const validEvs = (person.notable_events || []).filter(e => isValidContent(e));
+    
+    const candidateTypes = [];
+    if (validEvs.length > 0) {
+      candidateTypes.push('whoAmI', 'whoDid');
+      candidateTypes.push('whichEvent');
+    }
+    if (person.mother && isValidContent(person.mother)) {
+      candidateTypes.push('mother');
+    }
+    if (person.father && isValidContent(person.father)) {
+      candidateTypes.push('father');
+    }
+    if (person.occupation && isValidContent(person.occupation) && person.occupation.length > 3) {
+      candidateTypes.push('occupation');
+    }
+
+    if (candidateTypes.length === 0) continue;
+
+    const qType = candidateTypes[Math.floor(Math.random() * candidateTypes.length)];
+
+    let prompt = '';
+    let answer = '';
+    let choices = [];
+
+    if (qType === 'whoAmI') {
+      const rawEvent = validEvs[Math.floor(Math.random() * validEvs.length)];
+      const action = cleanEventPredicate(rawEvent);
+      prompt = `Who am I? In scripture, I ${action}.`;
+      answer = person.name;
+      
+      const otherNames = pool.filter(p => p.name !== person.name).map(p => p.name);
+      shuffle(otherNames);
+      choices = [answer, ...otherNames.slice(0, 3)];
+      shuffle(choices);
+      
+      questions.push({
+        type: 'whoAmI',
+        prompt,
+        answer,
+        choices,
+        ref: person.verses || [],
+        raw: { name: person.name, event: rawEvent }
+      });
+      usedNames.add(person.name);
+
+    } else if (qType === 'whoDid') {
+      const rawEvent = validEvs[Math.floor(Math.random() * validEvs.length)];
+      const action = cleanEventPredicate(rawEvent);
+      prompt = `Who in scripture ${action}?`;
+      answer = person.name;
+
+      const otherNames = pool.filter(p => p.name !== person.name).map(p => p.name);
+      shuffle(otherNames);
+      choices = [answer, ...otherNames.slice(0, 3)];
+      shuffle(choices);
+
+      questions.push({
+        type: 'whoDid',
+        prompt,
+        answer,
+        choices,
+        ref: person.verses || [],
+        raw: { name: person.name, event: rawEvent }
+      });
+      usedNames.add(person.name);
+
+    } else if (qType === 'whichEvent') {
+      const correctEv = validEvs[Math.floor(Math.random() * validEvs.length)];
+      prompt = `Which notable scriptural event is recorded for ${person.name}?`;
+      answer = correctEv;
+
+      const otherEvents = [];
+      for (const other of pool) {
+        if (other.name !== person.name && other.notable_events) {
+          for (const oe of other.notable_events) {
+            if (isValidContent(oe) && oe !== correctEv) otherEvents.push(oe);
+          }
+        }
+      }
+      shuffle(otherEvents);
+      choices = [answer, ...otherEvents.slice(0, 3)];
+      shuffle(choices);
+
+      questions.push({
+        type: 'whichEvent',
+        prompt,
+        answer,
+        choices,
+        ref: person.verses || [],
+        raw: { name: person.name, event: correctEv }
+      });
+      usedNames.add(person.name);
+
+    } else if (qType === 'mother') {
+      prompt = `Who is recorded in scripture as the mother of ${person.name}?`;
+      answer = person.mother;
+      const filteredMothers = famousMothers.filter(m => m !== answer);
+      shuffle(filteredMothers);
+      choices = [answer, ...filteredMothers.slice(0, 3)];
+      shuffle(choices);
+
+      questions.push({
+        type: 'mother',
+        prompt,
+        answer,
+        choices,
+        ref: person.verses || [],
+        raw: { name: person.name, mother: person.mother }
+      });
+      usedNames.add(person.name);
+
+    } else if (qType === 'father') {
+      prompt = `Who is recorded in scripture as the father of ${person.name}?`;
+      answer = person.father;
+      const filteredFathers = famousFathers.filter(f => f !== answer);
+      shuffle(filteredFathers);
+      choices = [answer, ...filteredFathers.slice(0, 3)];
+      shuffle(choices);
+
+      questions.push({
+        type: 'father',
+        prompt,
+        answer,
+        choices,
+        ref: person.verses || [],
+        raw: { name: person.name, father: person.father }
+      });
+      usedNames.add(person.name);
+
+    } else if (qType === 'occupation') {
+      prompt = `What was the biblical calling or role of ${person.name}?`;
+      answer = person.occupation.split(',')[0].trim();
+      const filteredRoles = biblicalRoles.filter(r => r.toLowerCase() !== answer.toLowerCase());
+      shuffle(filteredRoles);
+      choices = [answer, ...filteredRoles.slice(0, 3)];
+      shuffle(choices);
+
+      questions.push({
+        type: 'occupation',
+        prompt,
+        answer,
+        choices,
+        ref: person.verses || [],
+        raw: { name: person.name, occupation: person.occupation }
+      });
+      usedNames.add(person.name);
+    }
   }
-  if(difficulty==='hard'){
-    // Prefer entries with less-complete bios (harder), but include all
-    const scored = people.map(p=>({
-      p,
-      score: (p.occupation?0:1) + (p.mother?0:1) + (p.age_notes?0:1) + ((p.notable_events?.length||0) < 1 ? 1 : 0)
-    }));
-    scored.sort((a,b)=>b.score-a.score);
-    return scored.map(s=>s.p);
+
+  // Fallback if needed
+  let idx = 0;
+  while (questions.length < count && idx < pool.length) {
+    const p = pool[idx++];
+    if (usedNames.has(p.name)) continue;
+    const evs = (p.notable_events || []).filter(e => isValidContent(e));
+    if (evs.length === 0) continue;
+    const rawEvent = evs[0];
+    const action = cleanEventPredicate(rawEvent);
+    const prompt = `Who in scripture ${action}?`;
+    const answer = p.name;
+    const otherNames = pool.filter(x => x.name !== p.name).map(x => x.name);
+    shuffle(otherNames);
+    const choices = [answer, ...otherNames.slice(0, 3)];
+    shuffle(choices);
+    questions.push({
+      type: 'whoDid',
+      prompt,
+      answer,
+      choices,
+      ref: p.verses || [],
+      raw: { name: p.name, event: rawEvent }
+    });
+    usedNames.add(p.name);
   }
-  return people.slice();
+
+  return questions.slice(0, count);
 }
 
 function nextQuestion(){
@@ -2003,8 +2281,16 @@ function nextQuestion(){
   state.current = state.questions[state.qnum];
   state.qnum++;
   qnumEl.innerText = state.qnum;
-  scoreEl.innerText = state.score;
+  
+  if (state.mode === 'challenge') {
+    state.currentPlayerIndex = (state.qnum - 1) % 2;
+    updateVersusHUD();
+    scoreEl.innerText = state.players[state.currentPlayerIndex].score;
+  } else {
+    scoreEl.innerText = state.score;
+  }
   streakEl.innerText = state.streak;
+  if (btnNext) btnNext.innerHTML = '<span>Next Question</span> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
   renderQuestion(state.current);
   updateProgress();
 }
@@ -2012,22 +2298,30 @@ function nextQuestion(){
 function renderQuestion(q){
   // If the question has raw tokens, regenerate localized prompt to respect current language
   if(q && q.raw){
-    if(q.type==='whoDid' || q.type==='event'){
+    if(q.type==='whoAmI'){
       const ev = translateEvent(q.raw.event);
-      qText.innerText = getText(q.type==='whoDid' ? 'questionWhoDid' : 'questionEvent', { event: ev });
+      const action = cleanEventPredicate(ev);
+      qText.innerText = getText('questionWhoAmI', { event: action });
+    } else if(q.type==='whoDid'){
+      const ev = translateEvent(q.raw.event);
+      const action = cleanEventPredicate(ev);
+      qText.innerText = getText('questionWhoDid', { event: action });
+    } else if(q.type==='whichEvent'){
+      const translatedName = translateName(q.raw.name);
+      qText.innerText = getText('questionWhichEvent', { name: translatedName });
     } else if(q.type==='occupation'){
       const translatedName = translateName(q.raw.name);
       qText.innerText = getText('questionOccupation', { name: translatedName });
-    } else if(q.type==='whoMother'){
+    } else if(q.type==='mother' || q.type==='whoMother'){
       const translatedName = translateName(q.raw.name);
       qText.innerText = getText('questionWhoMother', { name: translatedName });
-    } else if(q.type==='age'){
+    } else if(q.type==='father'){
       const translatedName = translateName(q.raw.name);
-      qText.innerText = getText('questionAge', { name: translatedName });
+      qText.innerText = getText('questionWhoFather', { name: translatedName });
     } else {
       qText.innerText = q.prompt;
     }
-  } else {
+  } else if (q && q.prompt) {
     qText.innerText = q.prompt;
   }
   afterRef.innerText='';
@@ -2083,6 +2377,13 @@ function renderQuestion(q){
 }
 
 function makeChoices(q){
+  if (q && Array.isArray(q.choices) && q.choices.length === 4) {
+    return q.choices.map(original => ({
+      original,
+      display: translateAnswerForQuestionType(q.type, original)
+    }));
+  }
+
   const set = new Set([q.answer]);
   const distractors = getDistractors(q);
   for(const d of distractors){
@@ -2092,21 +2393,19 @@ function makeChoices(q){
     if(set.size>=4) break;
   }
   
-  // Biblical category fallback pools to avoid mismatching names with roles/ages/mothers
+  // Biblical category fallback pools to avoid mismatching names with roles/mothers
   const fallbackPools = {
     occupation: [
-      'Prophet', 'Priest', 'King', 'Judge of Israel', 'Shepherd', 
-      'Fisherman', 'Scribe', 'Carpenter', 'Tentmaker', 
-      'Tax Collector', 'Warrior / Military Commander', 'Cupbearer', 'Apostle'
-    ],
-    age: [
-      'Lived 120 years', 'Lived 175 years', 'Lived 969 years', 'Lived 930 years', 
-      'Died around age 33', 'Lived 110 years', 'Lived 147 years', 'Lived 180 years',
-      'Lived to an advanced age and died in peace'
+      'Prophet of the Lord', 'King of Israel', 'Queen of Persia', 'Apostle of Jesus Christ',
+      'Judge of Israel', 'High Priest', 'Fisherman and Disciple', 'Tentmaker and Missionary',
+      'Tax Collector and Disciple', 'Cupbearer to the King', 'Scribe and Teacher of the Law'
     ],
     whoMother: [
       'Sarah', 'Rebekah', 'Rachel', 'Leah', 'Hannah', 
-      'Elizabeth', 'Mary', 'Jochebed', 'Bathsheba', 'Ruth', 'Eve'
+      'Elizabeth', 'Mary (mother of Jesus)', 'Jochebed', 'Bathsheba', 'Ruth', 'Eve'
+    ],
+    father: [
+      'Abraham', 'Isaac', 'Jacob', 'David', 'Saul (first king)', 'Jesse', 'Zechariah', 'Noah', 'Terah', 'Adam'
     ],
     default: state.people.map(p => p.name)
   };
@@ -2122,18 +2421,6 @@ function makeChoices(q){
     }
   }
 
-  // Safety net if still under 4
-  if (set.size < 4 && q.type !== 'whoDid' && q.type !== 'event') {
-    const defaultPool = fallbackPools.default.slice();
-    shuffle(defaultPool);
-    for (const name of defaultPool) {
-      if (set.size >= 4) break;
-      if (name && normalize(name) !== normalize(q.answer)) {
-        set.add(name);
-      }
-    }
-  }
-
   const arr = Array.from(set).map(original=>({ original, display: translateAnswerForQuestionType(q.type, original) }));
   shuffle(arr);
   return arr;
@@ -2144,11 +2431,21 @@ function getDistractors(q){
   if(q.type==='occupation'){
     const pool = state.people.map(p=>p.occupation).filter(Boolean).filter(x=>normalize(x)!==normalize(q.answer));
     shuffle(pool); results.push(...pool);
-  } else if(q.type==='age'){
-    const pool = state.people.map(p=>p.age_notes).filter(Boolean).filter(x=>normalize(x)!==normalize(q.answer));
-    shuffle(pool); results.push(...pool);
-  } else if(q.type==='whoMother'){
+  } else if(q.type==='mother' || q.type==='whoMother'){
     const pool = state.people.map(p=>p.mother).filter(Boolean).filter(x=>normalize(x)!==normalize(q.answer));
+    shuffle(pool); results.push(...pool);
+  } else if(q.type==='father'){
+    const pool = state.people.map(p=>p.father).filter(Boolean).filter(x=>normalize(x)!==normalize(q.answer));
+    shuffle(pool); results.push(...pool);
+  } else if(q.type==='whichEvent'){
+    const pool = [];
+    for (const p of state.people) {
+      if (p.notable_events) {
+        for (const e of p.notable_events) {
+          if (isValidContent(e) && normalize(e) !== normalize(q.answer)) pool.push(e);
+        }
+      }
+    }
     shuffle(pool); results.push(...pool);
   } else {
     const pool = state.people.map(p=>p.name).filter(x=>normalize(x)!==normalize(q.answer));
@@ -2170,38 +2467,48 @@ function handleAnswer(choice,q, el){
   // Visual feedback simplified (no animations)
 
   if(correct){
-    state.score += 10;
-    state.streak += 1;
-    triggerScorePop(10);
-    updateStreakHUD(state.streak);
-    if (state.streak >= 3) {
-      SoundFX.playStreak();
-    } else {
-      SoundFX.playCorrect();
-    }
-  afterRef.innerText = `${getText('correctAnswer')} — ${getText('references')}: ` + (q.ref||[]).join(', ');
     if(state.mode==='challenge'){
       state.players[state.currentPlayerIndex].score += 10;
-      updateChallengeScores();
+      updateVersusHUD();
+      const currentHero = state.players[state.currentPlayerIndex];
+      SoundFX.playCorrect();
+      afterRef.innerText = `${getText('correctAnswer')} — ${getText('references')}: ` + (q.ref||[]).join(', ');
+      showToast({ title: 'Correct!', msg: `+10 pts for ${currentHero.name}!`, type: 'success', timeout: 1500 });
+    } else {
+      state.score += 10;
+      state.streak += 1;
+      triggerScorePop(10);
+      updateStreakHUD(state.streak);
+      if (state.streak >= 3) {
+        SoundFX.playStreak();
+      } else {
+        SoundFX.playCorrect();
+      }
+      afterRef.innerText = `${getText('correctAnswer')} — ${getText('references')}: ` + (q.ref||[]).join(', ');
+      // Remote challenge: sync score to Firebase
+      if(state.mode==='remote-challenge' && window.RemoteChallenge){
+        window.RemoteChallenge.submitAnswer(state.qnum - 1, true, 0, state.score, state.streak);
+      }
+      showToast({ title: getText('correctAnswer'), msg: getText('correctMsg'), type: 'success', timeout: 1500 });
     }
-    // Remote challenge: sync score to Firebase
-    if(state.mode==='remote-challenge' && window.RemoteChallenge){
-      window.RemoteChallenge.submitAnswer(state.qnum - 1, true, 0);
-    }
-    showToast({ title: getText('correctAnswer'), msg: getText('correctMsg'), type: 'success', timeout: 1500 });
   }else{
     state.streak = 0;
     updateStreakHUD(0);
     SoundFX.playWrong();
-  afterRef.innerText = `${getText('wrongAnswer')}. ${getText('correctLabel')}: ${translateAnswerForQuestionType(q.type, q.answer)}. ${getText('references')}: ${(q.ref||[]).join(', ')}`;
-  // Remote challenge: sync score to Firebase
-    if(state.mode==='remote-challenge' && window.RemoteChallenge){
-      window.RemoteChallenge.submitAnswer(state.qnum - 1, false, 0);
+    afterRef.innerText = `${getText('wrongAnswer')}. ${getText('correctLabel')}: ${translateAnswerForQuestionType(q.type, q.answer)}. ${getText('references')}: ${(q.ref||[]).join(', ')}`;
+    if(state.mode==='challenge'){
+      const currentHero = state.players[state.currentPlayerIndex];
+      showToast({ title: getText('wrongAnswer'), msg: `No points for ${currentHero.name}.`, type: 'error', timeout: 1800 });
+    } else {
+      // Remote challenge: sync score to Firebase
+      if(state.mode==='remote-challenge' && window.RemoteChallenge){
+        window.RemoteChallenge.submitAnswer(state.qnum - 1, false, 0, state.score, 0);
+      }
+      showToast({ title: getText('wrongAnswer'), msg: getText('wrongMsg', { answer: translateAnswerForQuestionType(q.type, q.answer) }), type: 'error', timeout: 1800 });
     }
-  showToast({ title: getText('wrongAnswer'), msg: getText('wrongMsg', { answer: translateAnswerForQuestionType(q.type, q.answer) }), type: 'error', timeout: 1800 });
   }
 
-  scoreEl.innerText = state.score;
+  scoreEl.innerText = state.mode==='challenge' ? state.players[state.currentPlayerIndex].score : state.score;
   streakEl.innerText = state.streak;
   btnNext.disabled = false;
 
@@ -2216,28 +2523,16 @@ function handleAnswer(choice,q, el){
     ref: q.ref||[] 
   });
 
-  // For challenge mode, alternate player each question
+  // For challenge mode, update Next button to preview next player's turn
   if(state.mode==='challenge'){
-    state.currentPlayerIndex = (state.currentPlayerIndex + 1) % 2;
-    const nextPlayer = state.players[state.currentPlayerIndex];
-    
-    // Update both legacy number and actual name
-    if (currentPlayerEl) currentPlayerEl.textContent = String(state.currentPlayerIndex + 1);
-    if (currentPlayerTurnNameEl) currentPlayerTurnNameEl.textContent = nextPlayer.name;
-    
-    showToast({ title: getText('challengeTurn', { player: nextPlayer.name }), msg: getText('challengeTurnMsg', { player: nextPlayer.name }), type: 'info', timeout: 1200 });
-  }
-const [p1, p2] = state.players;
-  if (p1ScoreEl) p1ScoreEl.textContent = String(p1.score);
-  if (p2ScoreEl) p2ScoreEl.textContent = String(p2.score);
-  
-  // Update current player turn display
-  const currentPlayer = state.players[state.currentPlayerIndex];
-  if (currentPlayerTurnNameEl) {
-    currentPlayerTurnNameEl.textContent = currentPlayer.name;
-  }
-  if (currentPlayerEl) {
-    currentPlayerEl.textContent = String(state.currentPlayerIndex + 1); // Legacy compatibility
+    const isLast = state.qnum >= state.qtotal;
+    if(!isLast){
+      const nextIdx = (state.currentPlayerIndex + 1) % 2;
+      const nextPlayer = state.players[nextIdx];
+      btnNext.innerHTML = `<span>Next: ${escapeHtml(nextPlayer.name)}'s Turn</span> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+    } else {
+      btnNext.innerHTML = `<span>View Final Results</span> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"></path></svg>`;
+    }
   }
 }
 
@@ -2814,9 +3109,12 @@ function hideSummaryModal(){
 
 // Players modal
 function showPlayersModal(){
-  p1NameInput.value = 'P1';
-  p2NameInput.value = 'P2';
-  playersModal.style.display = 'flex';
+  const savedP1 = localStorage.getItem('who-bible-p1-name') || '';
+  const savedP2 = localStorage.getItem('who-bible-p2-name') || '';
+  if (p1NameInput) p1NameInput.value = savedP1 || 'Player 1';
+  if (p2NameInput) p2NameInput.value = savedP2 || 'Player 2';
+  if (playersModal) playersModal.style.display = 'flex';
+  setTimeout(() => { if (p1NameInput) p1NameInput.select(); }, 60);
 }
 
 function hidePlayersModal(){
@@ -3485,6 +3783,48 @@ if (typeof window !== 'undefined') {
     displayPlayerInfo();
   });
 }
+
+// Expose clean app interface for Remote Challenge & external modules
+window.WB = {
+  state,
+  buildSharedQuestions: (count, diff) => pickQuestionSet(count, diff),
+  startRemoteMatch: (questions, players, myIdx) => {
+    if (window.RemoteChallengeUI && window.RemoteChallengeUI.hide) {
+      window.RemoteChallengeUI.hide();
+    }
+    showGame();
+    gameTitle.textContent = '🌐 Remote Challenge';
+    state.mode = 'remote-challenge';
+    state.players = (players && players.length >= 2) ? players : [
+      { name: 'Host', score: 0 },
+      { name: 'Guest', score: 0 }
+    ];
+    state.currentPlayerIndex = myIdx || 0;
+    state.questions = (questions || []).slice();
+    state.qtotal = state.questions.length;
+    state.qnum = 0;
+    state.score = 0;
+    state.streak = 0;
+    state.results = [];
+    if (challengeStatusEl) challengeStatusEl.style.display = 'flex';
+    updateVersusHUD();
+    stopTimer();
+    nextQuestion();
+  },
+  updateRemoteScores: (players) => {
+    if (players && players.length >= 2) {
+      state.players[0].score = players[0].score || 0;
+      state.players[1].score = players[1].score || 0;
+      if (p1ScoreEl) p1ScoreEl.textContent = String(players[0].score || 0);
+      if (p2ScoreEl) p2ScoreEl.textContent = String(players[1].score || 0);
+    }
+  },
+  onRemoteMatchComplete: () => {
+    if (state.mode === 'remote-challenge') {
+      endQuiz();
+    }
+  }
+};
 
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {

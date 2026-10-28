@@ -1,11 +1,10 @@
-
-/* ===== WELCOME MODAL STYLES ===== */
+/* ===== WELCOME MODAL STYLES (RETHOUGHT & REFINED) ===== */
 
 /* Animation Keyframes */
 @keyframes popIn {
   0% {
     opacity: 0;
-    transform: scale(0.9) translateY(20px);
+    transform: scale(0.92) translateY(18px);
   }
   100% {
     opacity: 1;
@@ -13,194 +12,290 @@
   }
 }
 
-@keyframes floatIcon {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+@keyframes gentleFloatEmblem {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
-/* Overlay - slightly more transparent/glassy */
+/* Overlay */
 .welcome-overlay {
-  background: rgba(15, 20, 25, 0.65); /* Lighter than default 0.8 */
-  backdrop-filter: blur(12px); /* Stronger blur */
-}
-
-/* Modal Content - Warm & Glassy */
-.welcome-modal-content {
-  background: rgba(30, 35, 45, 0.85); /* Semi-transparent dark */
-  border: 1px solid rgba(255, 183, 77, 0.3); /* Warm gold border */
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy entrance */
-  max-width: 550px;
-}
-
-/* Day mode adjustment */
-body.day .welcome-modal-content {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(221, 107, 32, 0.2);
-}
-
-/* Header - Warm Accent */
-.welcome-header {
-  border-bottom: none;
-  padding-bottom: 0;
+  background: rgba(10, 15, 26, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: none;
+  align-items: center;
   justify-content: center;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  padding: 16px;
+}
+
+/* Modal Content Card */
+.welcome-modal-content {
+  background: rgba(22, 27, 39, 0.94);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 30px rgba(245, 158, 11, 0.12);
+  animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 620px;
+  width: 100%;
+  overflow: hidden;
   position: relative;
 }
 
-.welcome-header h2 {
-  font-size: 28px;
-  background: linear-gradient(135deg, var(--accent-2), var(--accent));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+body.day .welcome-modal-content {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(217, 119, 6, 0.35);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18), 0 0 30px rgba(245, 158, 11, 0.15);
 }
 
-.welcome-icon {
-  font-size: 32px;
-  -webkit-text-fill-color: initial; /* Keep emoji colors */
+/* Header */
+.welcome-header {
+  border-bottom: none;
+  padding: 24px 24px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.welcome-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .welcome-close-btn {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--muted, #94a3b8);
   border-radius: 50%;
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
 }
 
 .welcome-close-btn:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
   transform: rotate(90deg);
 }
 
-/* Body Content */
+/* Body */
 .welcome-body {
   text-align: center;
-  padding: 10px 32px 32px;
+  padding: 8px 28px 20px;
 }
 
-.welcome-hero-icon {
-  font-size: 64px;
-  margin: 10px 0 20px;
-  display: inline-block;
-  animation: floatIcon 3s ease-in-out infinite;
-  filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));
+.welcome-hero-emblem {
+  margin: 6px auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: gentleFloatEmblem 3.6s ease-in-out infinite;
+  filter: drop-shadow(0 8px 18px rgba(245, 158, 11, 0.3));
+}
+
+.welcome-headline {
+  font-size: clamp(22px, 3.5vw, 28px);
+  font-weight: 800;
+  line-height: 1.25;
+  background: linear-gradient(135deg, #ffffff 0%, #ffedd5 40%, #f59e0b 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+body.day .welcome-headline {
+  background: linear-gradient(135deg, #0f172a 0%, #b45309 60%, #d97706 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .welcome-intro {
-  font-size: 18px;
-  line-height: 1.6;
-  color: var(--text);
-  margin-bottom: 24px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--text-2, #cbd5e1);
+  max-width: 500px;
+  margin: 0 auto 20px;
 }
 
-/* Tip Box - Warm & Friendly */
-.welcome-tip-box {
-  background: linear-gradient(135deg, rgba(255, 183, 77, 0.15), rgba(255, 138, 101, 0.1));
-  border: 1px solid rgba(255, 183, 77, 0.3);
-  border-radius: 16px;
-  padding: 20px;
-  display: flex;
-  gap: 16px;
+/* 3-Card Feature Grid */
+.welcome-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
   text-align: left;
-  margin-bottom: 24px;
 }
 
-.tip-icon {
-  font-size: 28px;
-  background: rgba(255, 183, 77, 0.2);
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+.welcome-feat-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.welcome-feat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+body.day .welcome-feat-card {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.welcome-feat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.tip-content {
-  flex: 1;
+.welcome-feat-text h4 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text, #f8fafc);
+  margin: 0 0 3px;
 }
 
-.tip-title {
-  font-weight: var(--font-weight-bold);
-  color: var(--accent-2);
-  margin-bottom: 4px;
-  font-size: 16px;
-  text-transform: uppercase;
+.welcome-feat-text p {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--muted, #94a3b8);
+  margin: 0;
+}
+
+/* Scripture Verse Banner */
+.welcome-verse-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.04));
+  border: 1px dashed rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 8px;
+}
+
+.welcome-verse-quote {
+  font-size: 13px;
+  font-style: italic;
+  color: #fde68a;
+  margin: 0 0 2px;
+  line-height: 1.4;
+}
+
+body.day .welcome-verse-quote {
+  color: #92400e;
+}
+
+.welcome-verse-ref {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted, #94a3b8);
   letter-spacing: 0.5px;
 }
 
-.tip-content p:last-child {
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--text-2);
-}
-
-.welcome-outro {
-  font-size: 16px;
-  color: var(--muted);
-  font-style: italic;
-}
-
-/* Footer & Button */
+/* Footer & Primary Action Button */
 .welcome-footer {
   border-top: none;
   justify-content: center;
-  padding-bottom: 32px;
+  padding: 6px 28px 24px;
 }
 
 .welcome-btn {
-  font-size: 18px;
-  padding: 14px 40px;
-  border-radius: 50px;
-  background: linear-gradient(135deg, var(--accent-2), var(--accent));
-  border: none;
-  box-shadow: 0 10px 20px -5px rgba(255, 138, 101, 0.4);
-  transition: transform 0.2s, box-shadow 0.2s;
-  color: #1a202c; /* Dark text for contrast on bright button */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 15px;
   font-weight: 800;
+  padding: 12px 32px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+  color: #1e1b18;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .welcome-btn:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 15px 25px -5px rgba(255, 138, 101, 0.5);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(245, 158, 11, 0.45);
 }
 
-/* PC / Large Screen Adjustments */
-@media (min-width: 768px) {
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
   .welcome-modal-content {
-    max-width: 600px;
+    border-radius: 20px;
+    margin: 8px;
   }
-  
-  .welcome-header h2 {
-    font-size: 36px;
+
+  .welcome-header {
+    padding: 18px 18px 4px;
   }
-  
+
+  .welcome-body {
+    padding: 4px 18px 16px;
+  }
+
+  .welcome-features-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .welcome-feat-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+  }
+
+  .welcome-feat-icon {
+    width: 32px;
+    height: 32px;
+  }
+
   .welcome-intro {
-    font-size: 20px;
+    font-size: 13.5px;
+    margin-bottom: 14px;
   }
-  
-  .welcome-hero-icon {
-    font-size: 80px;
+
+  .welcome-footer {
+    padding: 4px 18px 20px;
   }
-  
-  .tip-content p:last-child {
-    font-size: 17px;
-  }
-  
+
   .welcome-btn {
-    font-size: 20px;
-    padding: 16px 48px;
+    width: 100%;
+    padding: 12px 20px;
   }
 }
