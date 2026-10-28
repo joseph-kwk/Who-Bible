@@ -22,29 +22,40 @@ const RemoteChallenge = {
   /**
    * Create a new challenge room
    */
-  async createRoom(hostName, settings) {
+  async createRoom(hostName, settings = {}) {
     if (!window.FirebaseConfig?.isAvailable()) {
       throw new Error('Firebase not available. Remote challenges require Firebase configuration.');
     }
     
+    // Security sanitization on hostName
+    const cleanHostName = String(hostName || 'Host').trim().replace(/[<>]/g, '').slice(0, 20) || 'Host';
+
+    // Validate settings
+    const validDifficulties = ['easy', 'medium', 'hard', 'expert'];
+    const difficulty = validDifficulties.includes(settings.difficulty) ? settings.difficulty : 'medium';
+    let numQuestions = parseInt(settings.numQuestions, 10) || 10;
+    // Guaranteed even question count so all players have equal chances
+    numQuestions = Math.min(30, Math.max(6, numQuestions % 2 === 0 ? numQuestions : numQuestions + 1));
+    const timeLimit = [15, 30, 60, 90].includes(parseInt(settings.timeLimit, 10)) ? parseInt(settings.timeLimit, 10) : 60;
+
     const database = window.FirebaseConfig.getDatabase();
     const roomCode = this.generateRoomCode();
     const roomRef = database.ref('rooms/' + roomCode);
     
     const roomData = {
       code: roomCode,
-      host: hostName,
+      host: cleanHostName,
       status: 'waiting', // waiting, active, completed
       createdAt: Date.now(),
       settings: {
-        difficulty: settings.difficulty || 'medium',
-        numQuestions: settings.numQuestions || 10,
-        timeLimit: settings.timeLimit || 60,
+        difficulty,
+        numQuestions,
+        timeLimit,
         maxPlayers: MAX_PLAYERS
       },
       players: {
         player1: {
-          name: hostName,
+          name: cleanHostName,
           score: 0,
           streak: 0,
           ready: false,
@@ -58,7 +69,7 @@ const RemoteChallenge = {
     
     await roomRef.set(roomData);
     
-    this.currentRoom = roomCode;
+    this.currentRoom = cleanRoomCode;
     this.playerNumber = 1;
     this.roomRef = roomRef;
     this.isHost = true;
@@ -80,8 +91,15 @@ const RemoteChallenge = {
       throw new Error('Firebase not available');
     }
     
+    // Security sanitization on roomCode and playerName
+    const cleanRoomCode = String(roomCode || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 15);
+    if (!cleanRoomCode || cleanRoomCode.length < 3) {
+      throw new Error('Invalid room code format. Please check the code.');
+    }
+    const cleanPlayerName = String(playerName || 'Player').trim().replace(/[<>]/g, '').slice(0, 20) || 'Player';
+
     const database = window.FirebaseConfig.getDatabase();
-    const roomRef = database.ref('rooms/' + roomCode);
+    const roomRef = database.ref('rooms/' + cleanRoomCode);
     
     // Check if room exists
     const snapshot = await roomRef.once('value');
@@ -119,7 +137,7 @@ const RemoteChallenge = {
     
     // Join as the next available player
     await roomRef.child(`players/player${playerNum}`).set({
-      name: playerName,
+      name: cleanPlayerName,
       score: 0,
       streak: 0,
       ready: false,

@@ -71,10 +71,14 @@
     const hostName = $('remote-host-name')?.value.trim() || myName();
     if (btn) { btn.disabled = true; btn.textContent = 'Creating room…'; }
     try {
+      const diffEl = document.querySelector('#remote-host-diff-pills .modal-pill.active');
+      const qcountEl = document.querySelector('#remote-host-qcount-pills .modal-pill.active');
+      const timerEl = document.querySelector('#remote-host-timer-pills .modal-pill.active');
+
       const settings = {
-        difficulty: $('difficulty')?.value || 'medium',
-        numQuestions: parseInt($('num-questions')?.value, 10) || 10,
-        timeLimit: parseInt($('time-limit')?.value, 10) || 60
+        difficulty: diffEl?.dataset.value || $('difficulty')?.value || 'medium',
+        numQuestions: parseInt(qcountEl?.dataset.value, 10) || parseInt($('num-questions')?.value, 10) || 10,
+        timeLimit: parseInt(timerEl?.dataset.value, 10) || parseInt($('time-limit')?.value, 10) || 60
       };
       const result = await window.RemoteChallenge.createRoom(hostName, settings);
       showRemoteStep('share');
@@ -106,6 +110,12 @@
       showRemoteStep('joined');
       $('remote-joined-code').textContent = roomCode;
       $('remote-host-name-display').textContent = roomData.host;
+      if ($('remote-joined-settings') && roomData.settings) {
+        const d = (roomData.settings.difficulty || 'medium').toUpperCase();
+        const q = roomData.settings.numQuestions || 10;
+        const t = roomData.settings.timeLimit || 60;
+        $('remote-joined-settings').textContent = `${d} • ${q} Questions • ${t}s Timer`;
+      }
       toast({ title: 'Joined!', msg: `You're in ${roomData.host}'s room`, type: 'success' });
     } catch (err) {
       console.error('Join room error:', err);
@@ -211,6 +221,22 @@
     return window.WB.buildSharedQuestions(settings.numQuestions || 10, settings.difficulty || 'medium');
   };
 
+  
+  // Modal pill selector helper
+  function setupRemotePills() {
+    ['remote-host-diff-pills', 'remote-host-qcount-pills', 'remote-host-timer-pills'].forEach(containerId => {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.addEventListener('click', (e) => {
+        const btn = e.target.closest('.modal-pill');
+        if (!btn) return;
+        container.querySelectorAll('.modal-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded', setupRemotePills);
+  
   window.RemoteChallengeUI = {
     show: showRemoteModal,
     hide: () => hideRemoteModal(true),

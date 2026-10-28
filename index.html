@@ -15,8 +15,8 @@
   <meta http-equiv="Expires" content="0" />
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="apple-touch-icon" href="assets/images/logo.png" />
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261028004" />
-  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20261028004" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261028005" />
+  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20261028005" />
   <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20261028002" />
   <link rel="stylesheet" href="assets/css/report-modal.css?v=20261028002" />
   <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20261028002" />
@@ -34,18 +34,18 @@
   <script type="module" src="assets/js/auth-ui.js?v=20261028002"></script>
 
   <!-- App Scripts -->
-  <script src="assets/js/security.js?v=20261028004"></script>
-  <script src="assets/js/remote-challenge.js?v=20261028004"></script>
-  <script src="assets/js/remote-challenge-ui.js?v=20261028004"></script>
-  <script src="assets/js/scenarios.js?v=20261028004" defer></script>
-  <script src="assets/js/locations.js?v=20261028004" defer></script>
-  <script src="assets/js/concepts.js?v=20261028004" defer></script>
-  <script src="assets/js/relationships.js?v=20261028004" defer></script>
-  <script src="assets/js/content-filter.js?v=20261028004" defer></script>
-  <script src="assets/js/reports.js?v=20261028004" defer></script>
-  <script src="assets/js/translations.js?v=20261028004" defer></script>
-  <script src="assets/js/guest-prompts.js?v=20261028004" defer></script>
-  <script src="assets/js/app.js?v=20261028004" defer></script>
+  <script src="assets/js/security.js?v=20261028005"></script>
+  <script src="assets/js/remote-challenge.js?v=20261028005"></script>
+  <script src="assets/js/remote-challenge-ui.js?v=20261028005"></script>
+  <script src="assets/js/scenarios.js?v=20261028005" defer></script>
+  <script src="assets/js/locations.js?v=20261028005" defer></script>
+  <script src="assets/js/concepts.js?v=20261028005" defer></script>
+  <script src="assets/js/relationships.js?v=20261028005" defer></script>
+  <script src="assets/js/content-filter.js?v=20261028005" defer></script>
+  <script src="assets/js/reports.js?v=20261028005" defer></script>
+  <script src="assets/js/translations.js?v=20261028005" defer></script>
+  <script src="assets/js/guest-prompts.js?v=20261028005" defer></script>
+  <script src="assets/js/app.js?v=20261028005" defer></script>
 </head>
 
 <body>
@@ -90,7 +90,7 @@
             <span id="sound-icon" class="sound-icon-text">🔊</span>
           </button>
 
-          <button id="btn-menu" class="icon-btn menu-toggle" aria-label="Toggle Menu">
+          <button id="btn-menu" class="icon-btn menu-toggle" aria-label="Toggle Menu" style="display: none !important;">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -656,7 +656,24 @@
           <div class="friends-modes-grid">
             <!-- 1. Remote Online Challenge -->
             <div class="friend-mode-card card-remote">
-              <div class="friend-card-icon">🌐</div>
+              <div class="friend-card-icon remote-distance-icon" aria-hidden="true">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Distant Node Left (Local Player) -->
+                  <circle cx="7" cy="18" r="5" fill="#3b82f6" fill-opacity="0.2" stroke="#60a5fa" stroke-width="2"/>
+                  <circle cx="7" cy="18" r="2.2" fill="#93c5fd"/>
+                  <!-- Distant Node Right (Remote Friend) -->
+                  <circle cx="29" cy="18" r="5" fill="#10b981" fill-opacity="0.2" stroke="#34d399" stroke-width="2"/>
+                  <circle cx="29" cy="18" r="2.2" fill="#6ee7b7"/>
+                  <!-- Curved Distance Signal Arcs (Bridge) -->
+                  <path d="M 12 15.5 C 15.5 11 20.5 11 24 15.5" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round"/>
+                  <path d="M 12 20.5 C 15.5 25 20.5 25 24 20.5" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round"/>
+                  <!-- Central Synced Spark of Connection -->
+                  <circle cx="18" cy="18" r="2.5" fill="#fbbf24"/>
+                  <!-- Long-Distance Wireless Ripples -->
+                  <path d="M 3.5 11.5 C 1.2 15.2 1.2 20.8 3.5 24.5" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+                  <path d="M 32.5 11.5 C 34.8 15.2 34.8 20.8 32.5 24.5" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+                </svg>
+              </div>
               <div class="friend-card-body">
                 <h4>Remote Challenge</h4>
                 <p>Play online against friends anywhere with live real-time score updates!</p>
@@ -773,7 +790,7 @@
           <div class="settings-toggles-grid">
             <!-- Difficulty -->
             <div class="setting-toggle-group">
-              <span class="setting-toggle-label">🎯 Difficulty:</span>
+              <span class="setting-toggle-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>Difficulty:</span>
               <div class="toggle-pill-row" data-setting="difficulty">
                 <button class="toggle-pill" data-value="easy">🌱 Easy</button>
                 <button class="toggle-pill active" data-value="medium">⚖️ Medium</button>
@@ -972,11 +989,9 @@
               <span class="versus-score" id="p2-score">0</span>
             </div>
             <div class="versus-turn-indicator">
-              <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2"
+              <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.4"
                   stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <circle cx="12" cy="12" r="6"></circle>
-                  <circle cx="12" cy="12" r="2"></circle>
+                  <polyline points="9 18 15 12 9 6"></polyline>
                 </svg> Turn: <strong id="current-player-turn-name">Player 1</strong></span>
             </div>
           </div>
@@ -1027,44 +1042,58 @@
           <header class="study-header-compact">
             <div class="study-top-row">
               <button id="btn-back-from-study" class="back-btn-modern" aria-label="Back to Setup">
-                <span class="back-arrow">←</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
                 <span>Back</span>
               </button>
-              <h2 id="study-heading" class="study-compact-title">📖 Bible People Explorer</h2>
-              <span class="study-count-badge"><span id="people-count">173</span> People</span>
+              <div class="study-heading-group">
+                <h2 id="study-heading" class="study-compact-title">📖 Scripture Explorer</h2>
+                <span class="study-count-badge" id="study-count-badge"><span id="people-count">170</span> Figures</span>
+              </div>
             </div>
 
-            <div class="study-toolbar-row">
+            <!-- Simplified & Intuitive Study Toolbar -->
+            <div class="study-search-row">
               <div class="search-bar-wrapper compact-search">
-                <span class="search-icon-text">🔍</span>
+                <svg class="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
                 <label for="search-person" class="sr-only">Search Bible people</label>
-                <input id="search-person" type="text" placeholder="Search by name, occupation, or event..."
+                <input id="search-person" type="text" placeholder="Search by name, role, or event..."
                   aria-label="Search Bible people" />
+                <button id="btn-clear-study-search" class="study-clear-search" type="button" aria-label="Clear search text" style="display:none;">✕</button>
               </div>
 
-              <div class="study-controls-inline">
-                <select id="sort-select" class="sort-select-compact" aria-label="Sort order">
-                  <option value="name-asc">A–Z</option>
-                  <option value="name-desc">Z–A</option>
-                </select>
-                <button id="btn-shuffle-list" class="action-btn-compact" title="Shuffle order"
+              <div class="study-quick-actions">
+                <button id="btn-sort-toggle" class="study-action-btn" title="Toggle A-Z / Z-A Sort" aria-label="Toggle sort order">
+                  <span id="sort-toggle-label">A–Z</span>
+                </button>
+                <button id="btn-shuffle-list" class="study-action-btn" title="Shuffle order"
                   aria-label="Shuffle Bible people list">🔀 Shuffle</button>
-
-                <div class="filter-chips-compact">
-                  <label class="filter-chip">
-                    <input id="filter-mother" type="checkbox" />
-                    <span class="chip-text">Parents</span>
-                  </label>
-                  <label class="filter-chip">
-                    <input id="filter-occupation" type="checkbox" />
-                    <span class="chip-text">Occupation</span>
-                  </label>
-                  <label class="filter-chip">
-                    <input id="filter-age" type="checkbox" />
-                    <span class="chip-text">Age</span>
-                  </label>
-                </div>
               </div>
+            </div>
+
+            <!-- Intuitive Category Filter Pills -->
+            <div class="study-filter-pills" role="tablist" aria-label="Filter Bible people">
+              <button class="study-pill active" data-filter="all">All Figures</button>
+              <button class="study-pill" data-filter="ot">Old Testament</button>
+              <button class="study-pill" data-filter="nt">New Testament</button>
+              <button class="study-pill" data-filter="easy">🌱 Easy</button>
+              <button class="study-pill" data-filter="medium">⚖️ Medium</button>
+              <button class="study-pill" data-filter="hard">🔥 Hard</button>
+            </div>
+
+            <!-- Hidden legacy elements for script compatibility -->
+            <div style="display:none;" aria-hidden="true">
+              <select id="sort-select"><option value="name-asc" selected>A–Z</option><option value="name-desc">Z–A</option></select>
+              <input id="filter-mother" type="checkbox" />
+              <input id="filter-occupation" type="checkbox" />
+              <input id="filter-age" type="checkbox" />
             </div>
           </header>
 
@@ -1271,6 +1300,41 @@
             style="font-size: 0.85em; color: var(--text-muted); margin-top: 0.25em; display: block;">Saved on this
             device</small>
         </div>
+
+        <!-- 2-Player Match Settings (Guaranteed Fair & Even) -->
+        <div class="modal-section-divider"></div>
+        <div class="modal-settings-block">
+          <h4 class="modal-subheading">⚙️ Match Settings</h4>
+          
+          <div class="modal-setting-row">
+            <span class="modal-setting-title">⚖️ Fair Turn Questions:</span>
+            <div class="modal-pills-row" id="challenge-qcount-pills">
+              <button type="button" class="modal-pill" data-value="6">6 Qs <span class="pill-sub">(3 each)</span></button>
+              <button type="button" class="modal-pill active" data-value="10">10 Qs <span class="pill-sub">(5 each)</span></button>
+              <button type="button" class="modal-pill" data-value="14">14 Qs <span class="pill-sub">(7 each)</span></button>
+              <button type="button" class="modal-pill" data-value="20">20 Qs <span class="pill-sub">(10 each)</span></button>
+            </div>
+          </div>
+
+          <div class="modal-setting-row">
+            <span class="modal-setting-title">🌱 Match Difficulty:</span>
+            <div class="modal-pills-row" id="challenge-diff-pills">
+              <button type="button" class="modal-pill" data-value="easy">🌱 Easy</button>
+              <button type="button" class="modal-pill active" data-value="medium">⚖️ Medium</button>
+              <button type="button" class="modal-pill" data-value="hard">🔥 Hard</button>
+              <button type="button" class="modal-pill" data-value="expert">⚡ Expert</button>
+            </div>
+          </div>
+
+          <div class="modal-setting-row">
+            <span class="modal-setting-title">⏱️ Turn Timer:</span>
+            <div class="modal-pills-row" id="challenge-timer-pills">
+              <button type="button" class="modal-pill active" data-value="0">Relaxed (Untimed)</button>
+              <button type="button" class="modal-pill" data-value="30">30s (Fast)</button>
+              <button type="button" class="modal-pill" data-value="15">15s (Blitz)</button>
+            </div>
+          </div>
+        </div>
       </main>
       <footer class="modal-footer">
         <button id="btn-players-cancel" aria-describedby="cancel-help">Cancel</button>
@@ -1320,9 +1384,45 @@
               <button id="btn-save-host-name" class="secondary" style="padding: 8px 16px;">Save</button>
             </div>
             <div style="font-size: 0.9em; color: var(--text-muted); margin-top: 0.25em;">Click <b>Save</b> to confirm
-              your name, then create the room.</div>
+              your name.</div>
           </div>
-          <div style="text-align: center; margin-top: 16px;">
+
+          <!-- Host Sets Online Match Levels & Settings -->
+          <div class="modal-section-divider"></div>
+          <div class="modal-settings-block">
+            <h4 class="modal-subheading">👑 Host Match Configuration</h4>
+            
+            <div class="modal-setting-row">
+              <span class="modal-setting-title">🌱 Level / Difficulty:</span>
+              <div class="modal-pills-row" id="remote-host-diff-pills">
+                <button type="button" class="modal-pill" data-value="easy">🌱 Easy</button>
+                <button type="button" class="modal-pill active" data-value="medium">⚖️ Medium</button>
+                <button type="button" class="modal-pill" data-value="hard">🔥 Hard</button>
+                <button type="button" class="modal-pill" data-value="expert">⚡ Expert</button>
+              </div>
+            </div>
+
+            <div class="modal-setting-row">
+              <span class="modal-setting-title">🔢 Fair Question Count:</span>
+              <div class="modal-pills-row" id="remote-host-qcount-pills">
+                <button type="button" class="modal-pill" data-value="6">6 Questions</button>
+                <button type="button" class="modal-pill active" data-value="10">10 Questions</button>
+                <button type="button" class="modal-pill" data-value="14">14 Questions</button>
+                <button type="button" class="modal-pill" data-value="20">20 Questions</button>
+              </div>
+            </div>
+
+            <div class="modal-setting-row">
+              <span class="modal-setting-title">⏱️ Time per Question:</span>
+              <div class="modal-pills-row" id="remote-host-timer-pills">
+                <button type="button" class="modal-pill" data-value="15">15s Blitz</button>
+                <button type="button" class="modal-pill" data-value="30">30s Fast</button>
+                <button type="button" class="modal-pill active" data-value="60">60s Standard</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px;">
             <button id="btn-create-room-confirm" class="primary">Create Room & Get Link</button>
           </div>
         </div>
@@ -1388,6 +1488,8 @@
                   id="remote-joined-code">CODE-123</span></div>
               <div style="font-size: 14px; margin-bottom: 8px;"><strong>Host:</strong> <span
                   id="remote-host-name-display">Player 1</span></div>
+              <div style="font-size: 14px; margin-bottom: 8px;"><strong>Match Settings:</strong> <span
+                  id="remote-joined-settings" style="color: var(--accent); font-weight: 600;">Medium • 10 Questions • 60s</span></div>
               <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
                 <div id="remote-joined-status" style="color: var(--muted); font-size: 13px;">Waiting for both players to
                   be ready...</div>
@@ -1814,6 +1916,52 @@
         <button id="btn-classroom-join-save" class="primary" style="margin-right: 8px;">🚀 Join Game</button>
         <button id="btn-classroom-join-cancel" class="secondary">Cancel</button>
       </footer>
+    </div>
+  </div>
+
+  <!-- Modern Share & Invite Modal -->
+  <div id="share-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="share-modal-title" aria-modal="true">
+    <div class="modal modern-modal-card share-modal-card" role="document">
+      <header class="modal-header">
+        <h2 id="share-modal-title">✨ Share Who-Bible</h2>
+        <button id="btn-share-modal-close" aria-label="Close share dialog">✕</button>
+      </header>
+      <main class="modal-body share-modal-body">
+        <!-- Live Preview Card -->
+        <div class="share-preview-card">
+          <div class="share-card-badge">📜 Scripture Trivia Experience</div>
+          <div class="share-card-content">
+            <div class="share-card-icon-wrap">
+              <img src="assets/images/logo.png" alt="Who-Bible Logo" class="share-card-logo" />
+            </div>
+            <div class="share-card-info">
+              <h3 class="share-card-title">Who-Bible</h3>
+              <p class="share-card-subtitle" id="share-card-quote">"Test your Scripture knowledge with 170+ biblical figures, real-time 1v1 challenges, and daily scripture puzzles!"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Share Actions -->
+        <div class="share-actions-grid">
+          <button id="btn-native-share-trigger" class="share-action-tile primary-tile" type="button">
+            <span class="tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg></span>
+            <span class="tile-label">Share to Apps</span>
+            <span class="tile-desc">WhatsApp, Messages, AirDrop & more</span>
+          </button>
+
+          <button id="btn-copy-invite-link" class="share-action-tile" type="button">
+            <span class="tile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>
+            <span class="tile-label" id="copy-invite-label">Copy Invite Link</span>
+            <span class="tile-desc" id="copy-invite-desc">Instant link to clipboard</span>
+          </button>
+        </div>
+
+        <!-- Direct Link Box -->
+        <div class="share-link-box">
+          <span class="share-link-text" id="share-modal-url">https://who-bible.web.app</span>
+          <button id="btn-copy-url-pill" class="share-copy-pill" type="button">Copy</button>
+        </div>
+      </main>
     </div>
   </div>
 

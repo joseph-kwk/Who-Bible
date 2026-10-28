@@ -472,7 +472,7 @@ function updateAllText() {
   if (turnIndicatorEl) {
     const turnNameEl = document.getElementById('current-player-turn-name');
     const playerName = turnNameEl?.textContent || 'Player 1';
-    turnIndicatorEl.innerHTML = `<span>🎯 ${getText('turn') || 'Turn'}: <strong id="current-player-turn-name">${playerName}</strong></span>`;
+    turnIndicatorEl.innerHTML = `<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polyline points="9 18 15 12 9 6"></polyline></svg>${getText('turn') || 'Turn'}: <strong id="current-player-turn-name">${playerName}</strong></span>`;
   }
   
   // Update people count

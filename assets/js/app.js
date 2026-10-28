@@ -1244,19 +1244,16 @@ function attachHandlers(){
 
   // Header Share button
   if (btnShare) {
-    btnShare.addEventListener('click', async () => {
-      const currentScore = state.score || null;
-      const sd = buildShareData(currentScore);
-      await doShare(sd);
+    btnShare.addEventListener('click', () => {
+      openModernShareModal(buildShareData(state.score || null));
     });
   }
 
   // Footer Share button
   const btnShareFooter = document.getElementById('btn-share-footer');
   if (btnShareFooter) {
-    btnShareFooter.addEventListener('click', async () => {
-      const sd = buildShareData(state.score || null);
-      await doShare(sd);
+    btnShareFooter.addEventListener('click', () => {
+      openModernShareModal(buildShareData(state.score || null));
     });
   }
 
@@ -1687,20 +1684,34 @@ function startChallengeFromModal(){
   
   localStorage.setItem('who-bible-p1-name', name1);
   localStorage.setItem('who-bible-p2-name', name2);
+
+  // Read match settings from modal
+  const qCountEl = document.querySelector('#challenge-qcount-pills .modal-pill.active');
+  const diffEl = document.querySelector('#challenge-diff-pills .modal-pill.active');
+  const timerPillEl = document.querySelector('#challenge-timer-pills .modal-pill.active');
+
+  const chosenQCount = parseInt(qCountEl?.dataset.value, 10) || 10;
+  // Guaranteed strictly even for 2 players so each has equal chances!
+  const fairQCount = chosenQCount % 2 === 0 ? chosenQCount : chosenQCount + 1;
+  const chosenDiff = diffEl?.dataset.value || 'medium';
+  const chosenTimer = parseInt(timerPillEl?.dataset.value, 10) || 0;
+
+  state.challengeSettings = {
+    numQuestions: fairQCount,
+    difficulty: chosenDiff,
+    timeLimit: chosenTimer
+  };
   
   hidePlayersModal();
   showGame();
   gameTitle.textContent = getText('challengeMode') || '⚔️ 2-Player Pass & Play';
   
-  // Challenge mode uses temporary players for this session only
-  // Does not affect the main player profile/stats
   state.players = [ 
     { name: name1, score: 0 }, 
     { name: name2, score: 0 } 
   ];
   state.currentPlayerIndex = 0;
   
-  // Ensure timer is stopped for challenge mode
   stopTimer();
   
   prepareQuiz('challenge');
@@ -1708,9 +1719,9 @@ function startChallengeFromModal(){
   
   showToast({ 
     title: getText('challengeStart') || '⚔️ Match Started!', 
-    msg: `${name1} vs ${name2}! ${getText('challengeStartMsg') || 'Take turns on each question. Good luck!'}`, 
+    msg: `${name1} vs ${name2}! (${fairQCount} Questions, ${fairQCount / 2} each - ${chosenDiff.toUpperCase()})`, 
     type: 'info',
-    timeout: 3000
+    timeout: 3200
   });
 }
 
@@ -1934,8 +1945,16 @@ function prepareQuiz(mode){
   state.mode = mode;
   afterRef.innerText='';
   state.score = 0; state.streak = 0; state.qnum = 0; state.results = []; state.paused = false;
-  const count = parseInt(numQuestionsInput.value) || 10;
-  const difficulty = difficultySel.value;
+  let count = parseInt(numQuestionsInput.value) || 10;
+  let difficulty = difficultySel.value;
+  if (mode === 'challenge' && state.challengeSettings) {
+    count = state.challengeSettings.numQuestions || 10;
+    difficulty = state.challengeSettings.difficulty || 'medium';
+  }
+  // Ensure challenge mode question count is strictly even
+  if (mode === 'challenge') {
+    count = count % 2 === 0 ? count : count + 1;
+  }
   
   // Apply testament and gender filters to the people pool
   let peoplePool = state.people.slice();
@@ -2076,6 +2095,12 @@ function filterPeopleByDifficulty(people, difficulty) {
 }
 
 function pickQuestionSet(count, difficulty, peoplePool = null) {
+  // For 2-player challenge mode, ensure fair even count and balanced difficulty
+  let targetCount = count;
+  if (state.mode === 'challenge') {
+    targetCount = targetCount % 2 === 0 ? targetCount : targetCount + 1;
+  }
+
   const pool = filterPeopleByDifficulty(peoplePool || state.people, difficulty);
   if (!pool || pool.length === 0) return [];
   
@@ -2094,7 +2119,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
   ];
 
   for (const person of shuffledCandidates) {
-    if (questions.length >= count) break;
+    if (questions.length >= targetCount) break;
     if (usedNames.has(person.name)) continue;
 
     const validEvs = (person.notable_events || []).filter(e => isValidContent(e));
@@ -2690,29 +2715,48 @@ function renderPeopleList(filterText = '') {
   peopleList.innerHTML = '';
   
   let arr = state.people.slice();
-  const q = normalize(filterText);
+  const q = normalize(filterText || (searchPerson ? searchPerson.value : ''));
   if (q) {
     arr = arr.filter(p => 
       normalize(p.name).includes(q) || 
       (p.aliases && p.aliases.some(a => normalize(a).includes(q))) ||
-      normalize(p.occupation || '').includes(q)
+      normalize(p.occupation || '').includes(q) ||
+      normalize(p.meaning || '').includes(q) ||
+      (p.notable_events && p.notable_events.some(e => normalize(e).includes(q)))
     );
   }
   
+  // Category Pill Filter
+  const cat = state.studyCategory || 'all';
+  if (cat === 'ot') arr = arr.filter(p => p.testament === 'ot');
+  else if (cat === 'nt') arr = arr.filter(p => p.testament === 'nt');
+  else if (cat === 'easy') arr = arr.filter(p => p.difficulty === 'easy');
+  else if (cat === 'medium') arr = arr.filter(p => p.difficulty === 'medium');
+  else if (cat === 'hard') arr = arr.filter(p => p.difficulty === 'hard');
+
+  // Legacy fallback if checked
   if (filterOccupation?.checked) arr = arr.filter(p => !!p.occupation);
   if (filterAge?.checked) arr = arr.filter(p => !!p.age_notes);
   if (filterMother?.checked) arr = arr.filter(p => !!p.mother || !!p.father);
   
-  if (sortSelect) {
-    if (sortSelect.value === 'name-asc') arr.sort((a, b) => a.name.localeCompare(b.name));
-    if (sortSelect.value === 'name-desc') arr.sort((a, b) => b.name.localeCompare(a.name));
+  // Sort
+  const sortVal = state.studySort || (sortSelect ? sortSelect.value : 'name-asc');
+  if (sortVal === 'name-desc') {
+    arr.sort((a, b) => b.name.localeCompare(a.name));
+  } else {
+    arr.sort((a, b) => a.name.localeCompare(b.name));
   }
+
   if (peopleCountEl) peopleCountEl.textContent = String(arr.length);
+  const clearBtn = document.getElementById('btn-clear-study-search');
+  if (clearBtn) clearBtn.style.display = q ? 'inline-flex' : 'none';
+
   for (const p of arr) {
     const item = document.createElement('div');
     item.className = 'person-card';
     
     const icon = getPersonIcon(p);
+    const diffBadge = p.difficulty ? `<span class="tag tag-${p.difficulty}">${p.difficulty.toUpperCase()}</span>` : '';
     
     item.innerHTML = `
       <div class="card-header">
@@ -2720,9 +2764,10 @@ function renderPeopleList(filterText = '') {
         <div class="card-title">${p.name}</div>
       </div>
       <div class="card-body">
-        <div class="card-info">${translateOccupation(p.occupation) || getText('unknownOccupation') || 'Unknown'}</div>
+        <div class="card-info">${translateOccupation(p.occupation) || getText('unknownOccupation') || 'Biblical Figure'}</div>
         <div class="card-tags">
           ${p.testament === 'ot' ? '<span class="tag tag-ot">Old Testament</span>' : '<span class="tag tag-nt">New Testament</span>'}
+          ${diffBadge}
         </div>
       </div>
     `;
@@ -3834,3 +3879,129 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
+
+// =========================================
+// Modern Share & Invite Dialog
+// =========================================
+function openModernShareModal(customData = null) {
+  const sd = customData || buildShareData(state.score || null);
+  const modal = document.getElementById('share-modal');
+  if (!modal) {
+    doShare(sd);
+    return;
+  }
+  const quoteEl = document.getElementById('share-card-quote');
+  const urlEl = document.getElementById('share-modal-url');
+  if (quoteEl && sd.text) quoteEl.textContent = `"${sd.text}"`;
+  if (urlEl) urlEl.textContent = sd.url || window.location.href;
+  modal.style.display = 'flex';
+  window._activeShareData = sd;
+}
+
+function closeModernShareModal() {
+  const modal = document.getElementById('share-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function setupModernShareEvents() {
+  const modal = document.getElementById('share-modal');
+  const closeBtn = document.getElementById('btn-share-modal-close');
+  const nativeBtn = document.getElementById('btn-native-share-trigger');
+  const copyBtn = document.getElementById('btn-copy-invite-link');
+  const copyPill = document.getElementById('btn-copy-url-pill');
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModernShareModal);
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModernShareModal();
+    });
+  }
+
+  const handleCopy = async () => {
+    const sd = window._activeShareData || buildShareData(state.score || null);
+    const textToCopy = `${sd.text}\n\n👉 ${sd.url || window.location.href}`;
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      const label = document.getElementById('copy-invite-label');
+      const desc = document.getElementById('copy-invite-desc');
+      if (label) label.textContent = '✓ Link Copied!';
+      if (desc) desc.textContent = 'Ready to paste anywhere';
+      showToast({ title: '🔗 Link Copied!', msg: 'Invite link copied to clipboard', type: 'success', timeout: 2400 });
+      setTimeout(() => {
+        if (label) label.textContent = 'Copy Invite Link';
+        if (desc) desc.textContent = 'Instant link to clipboard';
+      }, 3000);
+    } catch (_) {
+      showToast({ title: 'Copy Failed', msg: 'Please copy manually', type: 'error' });
+    }
+  };
+
+  if (copyBtn) copyBtn.addEventListener('click', handleCopy);
+  if (copyPill) copyPill.addEventListener('click', handleCopy);
+
+  if (nativeBtn) {
+    nativeBtn.addEventListener('click', async () => {
+      const sd = window._activeShareData || buildShareData(state.score || null);
+      if (navigator.share) {
+        try {
+          await navigator.share(sd);
+          closeModernShareModal();
+          return;
+        } catch (e) {
+          if (e.name === 'AbortError') return;
+        }
+      }
+      handleCopy();
+    });
+  }
+}
+
+// Setup Simplified Study Controls & Category Pills
+function setupSimplifiedStudyControls() {
+  const clearBtn = document.getElementById('btn-clear-study-search');
+  if (clearBtn && searchPerson) {
+    clearBtn.addEventListener('click', () => {
+      searchPerson.value = '';
+      clearBtn.style.display = 'none';
+      renderPeopleList('');
+      searchPerson.focus();
+    });
+  }
+
+  const sortToggleBtn = document.getElementById('btn-sort-toggle');
+  const sortToggleLabel = document.getElementById('sort-toggle-label');
+  if (sortToggleBtn) {
+    sortToggleBtn.addEventListener('click', () => {
+      state.studySort = state.studySort === 'name-desc' ? 'name-asc' : 'name-desc';
+      if (sortToggleLabel) {
+        sortToggleLabel.textContent = state.studySort === 'name-desc' ? 'Z–A' : 'A–Z';
+      }
+      if (sortSelect) sortSelect.value = state.studySort;
+      renderPeopleList(searchPerson ? searchPerson.value : '');
+    });
+  }
+
+  const pills = document.querySelectorAll('.study-pill');
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      state.studyCategory = pill.dataset.filter || 'all';
+      renderPeopleList(searchPerson ? searchPerson.value : '');
+    });
+  });
+
+  // Setup modal pill toggles in 2-Player Pass & Play modal
+  ['challenge-qcount-pills', 'challenge-diff-pills', 'challenge-timer-pills'].forEach(id => {
+    const group = document.getElementById(id);
+    if (!group) return;
+    group.addEventListener('click', (e) => {
+      const btn = e.target.closest('.modal-pill');
+      if (!btn) return;
+      group.querySelectorAll('.modal-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+}
+
