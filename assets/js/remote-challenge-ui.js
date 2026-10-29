@@ -29,6 +29,7 @@
   }
 
   function showRemoteModal() {
+    setupRemotePills();
     const modal = $('remote-modal');
     if (!modal) return;
     matchStarted = false;

@@ -468,12 +468,6 @@ function updateAllText() {
     const t = document.getElementById('time-remaining')?.textContent || '0';
     timerLabelEl.innerHTML = `${getText('time')}: <span id="time-remaining">${t}</span>s`;
   }
-  const turnIndicatorEl = document.querySelector('.versus-turn-indicator');
-  if (turnIndicatorEl) {
-    const turnNameEl = document.getElementById('current-player-turn-name');
-    const playerName = turnNameEl?.textContent || 'Player 1';
-    turnIndicatorEl.innerHTML = `<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><polyline points="9 18 15 12 9 6"></polyline></svg>${getText('turn') || 'Turn'}: <strong id="current-player-turn-name">${playerName}</strong></span>`;
-  }
   
   // Update people count
   const peopleCount = document.getElementById('people-count');

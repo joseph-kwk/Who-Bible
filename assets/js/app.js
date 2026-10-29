@@ -1417,7 +1417,10 @@ function attachHandlers(){
 
   // Click outside to close modals
   window.addEventListener('click', (e) => {
-    if (e.target === modalEl) hideSummaryModal();
+    if (e.target === modalEl) {
+      if (Date.now() - (window._modalOpenedTime || 0) < 400) return;
+      hideSummaryModal();
+    }
     if (e.target === playersModal) hidePlayersModal();
     if (e.target === remoteModal) {
       if (window.RemoteChallengeUI && window.RemoteChallengeUI.hide) {
@@ -1701,6 +1704,7 @@ function startChallengeFromModal(){
     difficulty: chosenDiff,
     timeLimit: chosenTimer
   };
+  localStorage.setItem('who-bible-challenge-settings', JSON.stringify(state.challengeSettings));
   
   hidePlayersModal();
   showGame();
@@ -2298,7 +2302,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
     usedNames.add(p.name);
   }
 
-  return questions.slice(0, count);
+  return questions.slice(0, targetCount);
 }
 
 function nextQuestion(){
@@ -2538,8 +2542,13 @@ function handleAnswer(choice,q, el){
   btnNext.disabled = false;
 
   // Record result
+  const activeIdx = state.mode === 'challenge' ? state.currentPlayerIndex : 0;
+  const activeName = (state.players && state.players[activeIdx]) ? state.players[activeIdx].name : (state.currentPlayer?.name || 'Player');
+
   state.results.push({ 
     prompt: q.prompt, 
+    playerIdx: activeIdx,
+    playerName: activeName, 
     chosen: choice, 
     correctAnswer: q.answer, 
     chosenDisplay: translateAnswerForQuestionType(q.type, choice),
@@ -2569,15 +2578,23 @@ function updateChallengeScores(){
 function endQuiz(){
   let endText = `${getText('quizComplete')}! ${getText('yourScore')}: ${state.score}`;
   if(state.mode==='challenge'){
-    const [p1,p2] = state.players;
+    const p1 = (state.players && state.players[0]) || { name: 'Player 1', score: 0 };
+    const p2 = (state.players && state.players[1]) || { name: 'Player 2', score: 0 };
     const isTie = p1.score === p2.score;
     const winnerName = p1.score > p2.score ? p1.name : p2.name;
-    endText += ` — ${isTie ? getText('tieGame') : getText('winner') + ': ' + winnerName}`;
+    endText = `⚔️ Match Complete! ${isTie ? 'Tie Game!' : 'Winner: ' + winnerName} (${p1.name}: ${p1.score} vs ${p2.name}: ${p2.score})`;
   }
   qText.innerText = endText;
-  answersEl.innerHTML='';
-  afterRef.innerText='';
+  answersEl.innerHTML = '';
+  afterRef.innerHTML = '';
   stopTimer();
+  
+  // In-page reopen button so players can always review summary
+  const reopenBtn = document.createElement('button');
+  reopenBtn.className = 'btn-reopen-summary';
+  reopenBtn.innerHTML = '<span>🏆 View Match Summary & Review</span>';
+  reopenBtn.onclick = () => showSummaryModal();
+  afterRef.appendChild(reopenBtn);
   
   // Update player statistics
   const correctAnswers = state.results.filter(r => r.correct).length;
@@ -2585,7 +2602,6 @@ function endQuiz(){
   updatePlayerStats(state.score, state.streak, correctAnswers, totalQuestions, state.mode);
   displayPlayerInfo();
   
-  // Dispatch game completed event for guest prompts
   document.dispatchEvent(new CustomEvent('gameCompleted', {
     detail: {
       score: state.score,
@@ -2596,7 +2612,6 @@ function endQuiz(){
     }
   }));
   
-  // Complete remote challenge if in remote mode
   if(state.mode==='remote-challenge' && window.RemoteChallenge){
     window.RemoteChallenge.completeChallenge();
   }
@@ -2604,8 +2619,11 @@ function endQuiz(){
   state.current=null; state.questions=[]; state.qnum=0; state.qtotal=0;
   btnNext.disabled = true;
 
-  // Show summary modal
-  showSummaryModal();
+  try {
+    showSummaryModal();
+  } catch (err) {
+    console.error('Error opening summary modal:', err);
+  }
   showToast({ title: getText('quizComplete'), msg: `${getText('yourScore')}: ${state.score}${state.mode==='challenge'?`. ${winnerText()}`:''}`, type: 'success', timeout: 5000 });
 
   // Auto-prompt feedback if not given yet
@@ -3018,11 +3036,12 @@ function loadSettings(){
 function showSummaryModal(){
   if(!modalEl) return;
   document.body.style.overflow = 'hidden';
+  window._modalOpenedTime = Date.now();
   
   const total = state.results.length;
   const correct = state.results.filter(r=>r.correct).length;
   const accuracy = total ? Math.round((correct/total)*100) : 0;
-  const xpEarned = correct * 10 + (state.streak * 5);
+  const isMulti = (state.mode === 'challenge' || state.mode === 'remote-challenge');
   
   if (accuracy >= 70) {
     SoundFX.playFanfare();
@@ -3035,34 +3054,61 @@ function showSummaryModal(){
   const subtextEl = document.getElementById('summary-subtext');
   const badgeIconEl = document.getElementById('summary-badge-icon');
   
-  if (accuracy >= 90) {
-    if (badgeIconEl) badgeIconEl.textContent = '👑';
-    if (headlineEl) headlineEl.textContent = 'Masterful Knowledge!';
-    if (subtextEl) subtextEl.textContent = 'You answered almost every question flawlessly.';
-  } else if (accuracy >= 70) {
-    if (badgeIconEl) badgeIconEl.textContent = '🌟';
-    if (headlineEl) headlineEl.textContent = 'Great Performance!';
-    if (subtextEl) subtextEl.textContent = 'Strong grasp of scripture and biblical accounts.';
-  } else {
-    if (badgeIconEl) badgeIconEl.textContent = '📖';
-    if (headlineEl) headlineEl.textContent = 'Challenge Completed!';
-    if (subtextEl) subtextEl.textContent = 'Every round builds your scripture knowledge deeper.';
-  }
-
-  // Versus / 2-Player banner if applicable
-  let versusBannerHtml = '';
-  if (state.mode === 'challenge' || state.mode === 'remote-challenge') {
-    const [p1, p2] = state.players;
+  if (isMulti) {
+    const p1 = (state.players && state.players[0]) || { name: 'Player 1', score: 0 };
+    const p2 = (state.players && state.players[1]) || { name: 'Player 2', score: 0 };
     const isTie = p1.score === p2.score;
     const winnerName = p1.score > p2.score ? p1.name : p2.name;
-    const winnerText = isTie ? '🤝 Tie Match!' : `🏆 Winner: ${winnerName}!`;
+
+    if (badgeIconEl) badgeIconEl.textContent = isTie ? '🤝' : '🏆';
+    if (headlineEl) headlineEl.textContent = isTie ? 'Match Tied!' : `${winnerName} Victory!`;
+    if (subtextEl) subtextEl.textContent = isTie ? 'An evenly matched battle of scripture knowledge!' : `Congratulations ${winnerName} on winning the match!`;
+  } else {
+    if (accuracy >= 90) {
+      if (badgeIconEl) badgeIconEl.textContent = '👑';
+      if (headlineEl) headlineEl.textContent = 'Masterful Knowledge!';
+      if (subtextEl) subtextEl.textContent = 'You answered almost every question flawlessly.';
+    } else if (accuracy >= 70) {
+      if (badgeIconEl) badgeIconEl.textContent = '🌟';
+      if (headlineEl) headlineEl.textContent = 'Great Performance!';
+      if (subtextEl) subtextEl.textContent = 'Strong grasp of scripture and biblical accounts.';
+    } else {
+      if (badgeIconEl) badgeIconEl.textContent = '📖';
+      if (headlineEl) headlineEl.textContent = 'Challenge Completed!';
+      if (subtextEl) subtextEl.textContent = 'Every round builds your scripture knowledge deeper.';
+    }
+  }
+
+  // Versus / 2-Player banner & dual player statistics
+  let versusBannerHtml = '';
+  if (isMulti) {
+    const p1 = (state.players && state.players[0]) || { name: 'Player 1', score: 0 };
+    const p2 = (state.players && state.players[1]) || { name: 'Player 2', score: 0 };
+    const isTie = p1.score === p2.score;
+    const winnerBadge = isTie ? '🤝 Match Tied!' : `🏆 ${p1.score > p2.score ? p1.name : p2.name} Wins!`;
+
+    const p1Results = state.results.filter(r => r.playerIdx === 0);
+    const p2Results = state.results.filter(r => r.playerIdx === 1);
+    const p1Correct = p1Results.filter(r => r.correct).length;
+    const p2Correct = p2Results.filter(r => r.correct).length;
+    const p1Acc = p1Results.length ? Math.round((p1Correct / p1Results.length) * 100) : 0;
+    const p2Acc = p2Results.length ? Math.round((p2Correct / p2Results.length) * 100) : 0;
+
     versusBannerHtml = `
       <div class="summary-versus-card">
-        <div class="versus-result-title">${winnerText}</div>
-        <div class="versus-score-row">
-          <span>${p1.name}: <strong>${p1.score}</strong></span>
-          <span class="vs-dot">•</span>
-          <span>${p2.name}: <strong>${p2.score}</strong></span>
+        <div class="versus-result-title">${winnerBadge}</div>
+        <div class="versus-dual-stats">
+          <div class="player-stat-col ${p1.score > p2.score ? 'is-winner' : ''}">
+            <div class="p-col-name">⚔️ ${escapeHtml(p1.name)}</div>
+            <div class="p-col-score">${p1.score} <small>pts</small></div>
+            <div class="p-col-meta">${p1Correct}/${p1Results.length} Correct (${p1Acc}%)</div>
+          </div>
+          <div class="versus-divider-badge">VS</div>
+          <div class="player-stat-col ${p2.score > p1.score ? 'is-winner' : ''}">
+            <div class="p-col-name">🛡️ ${escapeHtml(p2.name)}</div>
+            <div class="p-col-score">${p2.score} <small>pts</small></div>
+            <div class="p-col-meta">${p2Correct}/${p2Results.length} Correct (${p2Acc}%)</div>
+          </div>
         </div>
       </div>
     `;
@@ -3070,25 +3116,29 @@ function showSummaryModal(){
   
   // Render stats grid
   if (summaryStatsEl) {
-    summaryStatsEl.innerHTML = `
-      ${versusBannerHtml}
-      <div class="summary-stat-box">
-        <span class="s-stat-num">${accuracy}%</span>
-        <span class="s-stat-label">Accuracy</span>
-      </div>
-      <div class="summary-stat-box">
-        <span class="s-stat-num">${correct}/${total}</span>
-        <span class="s-stat-label">Correct</span>
-      </div>
-      <div class="summary-stat-box">
-        <span class="s-stat-num">${state.score}</span>
-        <span class="s-stat-label">Points</span>
-      </div>
-      <div class="summary-stat-box">
-        <span class="s-stat-num">+${xpEarned}</span>
-        <span class="s-stat-label">XP Earned</span>
-      </div>
-    `;
+    if (isMulti) {
+      summaryStatsEl.innerHTML = versusBannerHtml;
+    } else {
+      const xpEarned = correct * 10 + (state.streak * 5);
+      summaryStatsEl.innerHTML = `
+        <div class="summary-stat-box">
+          <span class="s-stat-num">${accuracy}%</span>
+          <span class="s-stat-label">Accuracy</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="s-stat-num">${correct}/${total}</span>
+          <span class="s-stat-label">Correct</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="s-stat-num">${state.score}</span>
+          <span class="s-stat-label">Points</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="s-stat-num">+${xpEarned}</span>
+          <span class="s-stat-label">XP Earned</span>
+        </div>
+      `;
+    }
   }
 
   // Render question breakdown list
@@ -3102,28 +3152,33 @@ function showSummaryModal(){
         ? r.ref.map(v => `<span class="verse-badge">${v}</span>`).join(' ')
         : '<span class="verse-badge">Biblical Canon</span>';
 
+      const playerTag = (isMulti && r.playerName)
+        ? `<span class="review-player-tag ${r.playerIdx === 0 ? 'p1-tag' : 'p2-tag'}">${r.playerIdx === 0 ? '⚔️' : '🛡️'} ${escapeHtml(r.playerName)}</span>`
+        : '';
+
       div.innerHTML = `
         <div class="review-card-header">
           <span class="review-q-num">Q${idx + 1}</span>
+          ${playerTag}
           <span class="review-status-icon">${statusIcon}</span>
-          <div class="review-prompt">${r.prompt}</div>
+          <div class="review-prompt">${escapeHtml(r.prompt || '')}</div>
         </div>
         <div class="review-card-body">
           <div class="review-answer-row">
-            <span class="review-ans-label">Your Choice:</span>
-            <span class="review-ans-val ${r.correct ? 'ans-correct-val' : 'ans-wrong-val'}">${r.chosenDisplay || r.chosen}</span>
+            <span class="review-ans-label">${isMulti ? escapeHtml(r.playerName) + "'s Answer:" : 'Your Choice:'}</span>
+            <span class="review-ans-val ${r.correct ? 'ans-correct-val' : 'ans-wrong-val'}">${escapeHtml(r.chosenDisplay || r.chosen || '')}</span>
           </div>
           ${!r.correct ? `
             <div class="review-answer-row">
               <span class="review-ans-label">Correct:</span>
-              <span class="review-ans-val ans-correct-val">${r.correctDisplay || r.correctAnswer}</span>
+              <span class="review-ans-val ans-correct-val">${escapeHtml(r.correctDisplay || r.correctAnswer || '')}</span>
             </div>
           ` : ''}
           <div class="review-verse-row">
             <span class="review-verse-label">Scripture Reference:</span>
             <div class="review-verse-list">${versesFormatted}</div>
           </div>
-          ${r.explanation ? `<div class="review-explanation">${r.explanation}</div>` : ''}
+          ${r.explanation ? `<div class="review-explanation">${escapeHtml(r.explanation)}</div>` : ''}
         </div>
       `;
       summaryListEl.appendChild(div);
@@ -3133,14 +3188,16 @@ function showSummaryModal(){
   // Share results button
   const btnShareSummary = document.getElementById('btn-share-summary');
   if (btnShareSummary) {
-    btnShareSummary.onclick = async () => {
-      const shareText = `🏆 Who-Bible Trivia Match: I scored ${state.score} pts with ${accuracy}% accuracy! Play along: ${window.location.origin}`;
-      if (navigator.share) {
-        try { await navigator.share({ title: 'Who-Bible Score', text: shareText }); } catch (_) {}
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(shareText);
-        showToast({ title: 'Copied to Clipboard!', msg: 'Share your score with friends', type: 'success', timeout: 2000 });
-      }
+    btnShareSummary.onclick = () => {
+      const isMultiMatch = (state.mode === 'challenge' || state.mode === 'remote-challenge');
+      const p1 = (state.players && state.players[0]) || { name: 'Player 1', score: 0 };
+      const p2 = (state.players && state.players[1]) || { name: 'Player 2', score: 0 };
+      const shareTitle = isMultiMatch ? `Who-Bible Match: ${p1.name} (${p1.score}pts) vs ${p2.name} (${p2.score}pts)` : 'Who-Bible Trivia Results';
+      const shareText = isMultiMatch
+        ? `⚔️ Who-Bible Match: ${p1.name} (${p1.score}pts) vs ${p2.name} (${p2.score}pts)! Think you can top our biblical knowledge? Play now at ${window.location.origin}`
+        : `🏆 Who-Bible Score: I achieved ${accuracy}% accuracy with ${state.score} points! Test your Scripture knowledge at ${window.location.origin}`;
+      
+      openModernShareModal({ title: shareTitle, text: shareText, url: window.location.origin });
     };
   }
 
@@ -3153,7 +3210,52 @@ function hideSummaryModal(){
 }
 
 // Players modal
+
+function initModalPillToggles() {
+  const groups = ['challenge-qcount-pills', 'challenge-diff-pills', 'challenge-timer-pills'];
+  groups.forEach(id => {
+    const group = document.getElementById(id);
+    if (!group) return;
+    // Remove old listeners by cloning
+    const newGroup = group.cloneNode(true);
+    group.parentNode.replaceChild(newGroup, group);
+
+    newGroup.addEventListener('click', (e) => {
+      const btn = e.target.closest('.modal-pill');
+      if (!btn) return;
+      newGroup.querySelectorAll('.modal-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+}
+
 function showPlayersModal(){
+  initModalPillToggles();
+
+  // Restore saved challenge settings if available
+  const savedSettings = JSON.parse(localStorage.getItem('who-bible-challenge-settings') || '{}');
+  if (savedSettings.numQuestions) {
+    const qBtn = document.querySelector(`#challenge-qcount-pills .modal-pill[data-value="${savedSettings.numQuestions}"]`);
+    if (qBtn) {
+      document.querySelectorAll('#challenge-qcount-pills .modal-pill').forEach(b => b.classList.remove('active'));
+      qBtn.classList.add('active');
+    }
+  }
+  if (savedSettings.difficulty) {
+    const dBtn = document.querySelector(`#challenge-diff-pills .modal-pill[data-value="${savedSettings.difficulty}"]`);
+    if (dBtn) {
+      document.querySelectorAll('#challenge-diff-pills .modal-pill').forEach(b => b.classList.remove('active'));
+      dBtn.classList.add('active');
+    }
+  }
+  if (savedSettings.timeLimit !== undefined) {
+    const tBtn = document.querySelector(`#challenge-timer-pills .modal-pill[data-value="${savedSettings.timeLimit}"]`);
+    if (tBtn) {
+      document.querySelectorAll('#challenge-timer-pills .modal-pill').forEach(b => b.classList.remove('active'));
+      tBtn.classList.add('active');
+    }
+  }
+
   const savedP1 = localStorage.getItem('who-bible-p1-name') || '';
   const savedP2 = localStorage.getItem('who-bible-p2-name') || '';
   if (p1NameInput) p1NameInput.value = savedP1 || 'Player 1';
