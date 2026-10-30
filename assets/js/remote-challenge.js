@@ -2,19 +2,29 @@
 // Handles real-time multiplayer quiz challenges via Firebase
 
 const MAX_PLAYERS = 8; // Maximum players per room
+const FB_TIMEOUT_MS = 10000;
+
+function withTimeout(promise, ms = FB_TIMEOUT_MS, errorMsg = 'Connection timed out. Please check your internet and try again.') {
+  let timerId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timerId = setTimeout(() => reject(new Error(errorMsg)), ms);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timerId));
+}
 
 const RemoteChallenge = {
   currentRoom: null,
   playerNumber: null,
   roomRef: null,
   isHost: false,
+  _starting: false,
   
   /**
-   * Generate a random room code
+   * Generate a random room code (e.g. FAITH-482)
    */
   generateRoomCode() {
     const adjectives = ['BRAVE', 'WISE', 'HOLY', 'DIVINE', 'BLESSED', 'MIGHTY', 'FAITH', 'GRACE'];
-    const numbers = Math.floor(Math.random() * 1000);
+    const numbers = Math.floor(100 + Math.random() * 900);
     const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
     return `${adj}-${numbers}`;
   },
@@ -26,6 +36,9 @@ const RemoteChallenge = {
     if (!window.FirebaseConfig?.isAvailable()) {
       throw new Error('Firebase not available. Remote challenges require Firebase configuration.');
     }
+
+    // Clean up any prior room listeners first
+    this.leaveRoom();
     
     // Security sanitization on hostName
     const cleanHostName = String(hostName || 'Host').trim().replace(/[<>]/g, '').slice(0, 20) || 'Host';
@@ -39,13 +52,23 @@ const RemoteChallenge = {
     const timeLimit = [15, 30, 60, 90].includes(parseInt(settings.timeLimit, 10)) ? parseInt(settings.timeLimit, 10) : 60;
 
     const database = window.FirebaseConfig.getDatabase();
-    const roomCode = this.generateRoomCode();
-    const roomRef = database.ref('rooms/' + roomCode);
+
+    // Generate unique non-colliding room code
+    let roomCode = this.generateRoomCode();
+    let roomRef = database.ref('rooms/' + roomCode);
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const existing = await withTimeout(roomRef.once('value'), FB_TIMEOUT_MS);
+      if (!existing.exists() || existing.val()?.status === 'completed' || existing.val()?.status === 'cancelled') {
+        break;
+      }
+      roomCode = this.generateRoomCode();
+      roomRef = database.ref('rooms/' + roomCode);
+    }
     
     const roomData = {
       code: roomCode,
       host: cleanHostName,
-      status: 'waiting', // waiting, active, completed
+      status: 'waiting', // waiting, active, completed, cancelled
       createdAt: Date.now(),
       settings: {
         difficulty,
@@ -67,14 +90,14 @@ const RemoteChallenge = {
       results: {}
     };
     
-    await roomRef.set(roomData);
+    await withTimeout(roomRef.set(roomData), FB_TIMEOUT_MS);
     
-    this.currentRoom = cleanRoomCode;
+    this.currentRoom = roomCode;
     this.playerNumber = 1;
     this.roomRef = roomRef;
     this.isHost = true;
     
-    // Listen for player 2 joining
+    // Listen for player 2+ joining
     this.setupRoomListeners();
     
     return {
@@ -90,6 +113,9 @@ const RemoteChallenge = {
     if (!window.FirebaseConfig?.isAvailable()) {
       throw new Error('Firebase not available');
     }
+
+    // Clean up any prior room listeners first
+    this.leaveRoom();
     
     // Security sanitization on roomCode and playerName
     const cleanRoomCode = String(roomCode || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 15);
@@ -102,30 +128,37 @@ const RemoteChallenge = {
     const roomRef = database.ref('rooms/' + cleanRoomCode);
     
     // Check if room exists
-    const snapshot = await roomRef.once('value');
+    const snapshot = await withTimeout(roomRef.once('value'), FB_TIMEOUT_MS);
     if (!snapshot.exists()) {
       throw new Error('Room not found. Please check the code.');
     }
     
     const roomData = snapshot.val();
     
-    // Check if room is already completed
+    // Check if room is already completed or cancelled
     if (roomData.status === 'completed') {
       throw new Error('This room has already finished.');
+    }
+    if (roomData.status === 'cancelled') {
+      throw new Error('The host closed this room.');
+    }
+    if (roomData.status === 'active') {
+      throw new Error('This match is already in progress.');
     }
     
     // Find the next available player slot
     const maxPlayers = roomData.settings?.maxPlayers || MAX_PLAYERS;
-    const playerCount = roomData.playerCount || Object.keys(roomData.players).length;
+    const playersObj = roomData.players || {};
+    const activePlayersCount = Object.keys(playersObj).filter(k => playersObj[k]).length;
     
-    if (playerCount >= maxPlayers) {
+    if (activePlayersCount >= maxPlayers) {
       throw new Error(`Room is full. Maximum ${maxPlayers} players allowed.`);
     }
     
     // Find next available player number
     let playerNum = null;
     for (let i = 2; i <= maxPlayers; i++) {
-      if (!roomData.players[`player${i}`]) {
+      if (!playersObj[`player${i}`]) {
         playerNum = i;
         break;
       }
@@ -136,18 +169,18 @@ const RemoteChallenge = {
     }
     
     // Join as the next available player
-    await roomRef.child(`players/player${playerNum}`).set({
+    await withTimeout(roomRef.child(`players/player${playerNum}`).set({
       name: cleanPlayerName,
       score: 0,
       streak: 0,
       ready: false,
       currentQuestion: 0
-    });
+    }), FB_TIMEOUT_MS);
     
     // Update player count
-    await roomRef.child('playerCount').set(playerCount + 1);
+    await roomRef.child('playerCount').set(activePlayersCount + 1);
     
-    this.currentRoom = roomCode;
+    this.currentRoom = cleanRoomCode;
     this.playerNumber = playerNum;
     this.roomRef = roomRef;
     this.isHost = false;
@@ -224,19 +257,18 @@ const RemoteChallenge = {
    */
   async setReady() {
     if (!this.roomRef || !this.playerNumber) return;
-    await this.roomRef.child(`players/player${this.playerNumber}/ready`).set(true);
+    await withTimeout(this.roomRef.child(`players/player${this.playerNumber}/ready`).set(true), FB_TIMEOUT_MS);
   },
   
   /**
    * Generate questions for the room (host only)
    */
   async generateQuestions(settings) {
-    if (!this.isHost) return;
+    if (!this.isHost || !this.roomRef) return;
     
-    // Get the question generation from main app
     if (window.generateRemoteQuestions) {
       const questions = window.generateRemoteQuestions(settings);
-      await this.roomRef.child('questions').set(questions);
+      await withTimeout(this.roomRef.child('questions').set(questions), FB_TIMEOUT_MS);
     }
   },
   
@@ -249,38 +281,45 @@ const RemoteChallenge = {
     const playerPath = `players/player${this.playerNumber}`;
     const resultPath = `results/player${this.playerNumber}`;
     
-    // Local client is the source of truth for its own points (keeps both screens in sync)
-    await this.roomRef.child(playerPath).update({
-      score: totalScore || 0,
-      streak: streak || 0,
-      currentQuestion: questionIndex + 1
-    });
-    
-    // Save result
-    const result = {
-      questionIndex,
-      correct: isCorrect,
-      timeTaken,
-      timestamp: Date.now()
-    };
-    
-    await this.roomRef.child(`${resultPath}/${questionIndex}`).set(result);
+    try {
+      await this.roomRef.child(playerPath).update({
+        score: totalScore || 0,
+        streak: streak || 0,
+        currentQuestion: questionIndex + 1
+      });
+      
+      const result = {
+        questionIndex,
+        correct: isCorrect,
+        timeTaken,
+        timestamp: Date.now()
+      };
+      
+      await this.roomRef.child(`${resultPath}/${questionIndex}`).set(result);
+    } catch (err) {
+      console.warn('Could not sync remote answer:', err);
+    }
   },
   
   /**
    * Complete the challenge
    */
   async completeChallenge() {
-    if (!this.roomRef) return;
+    if (!this.roomRef || !this.playerNumber) return null;
     
-    await this.roomRef.child(`players/player${this.playerNumber}/finished`).set(true);
-    const snapshot = await this.roomRef.once('value');
-    const room = snapshot.val() || {};
-    const all = Object.values(room.players || {}).filter(Boolean);
-    if (all.length && all.every(p => p.finished)) {
-      await this.roomRef.child('status').set('completed');
+    try {
+      await this.roomRef.child(`players/player${this.playerNumber}/finished`).set(true);
+      const snapshot = await this.roomRef.once('value');
+      const room = snapshot.val() || {};
+      const all = Object.values(room.players || {}).filter(Boolean);
+      if (all.length && all.every(p => p.finished)) {
+        await this.roomRef.child('status').set('completed');
+      }
+      return room;
+    } catch (err) {
+      console.warn('Could not complete remote challenge:', err);
+      return null;
     }
-    return room;
   },
   
   /**
@@ -289,7 +328,6 @@ const RemoteChallenge = {
   async requestRematch() {
     if (!this.roomRef) return;
     
-    // Reset player scores and ready flags
     const snapshot = await this.roomRef.once('value');
     const room = snapshot.val();
     if (!room) return;
@@ -317,15 +355,32 @@ const RemoteChallenge = {
   /**
    * Leave room and clean up listeners
    */
-  leaveRoom() {
-    if (this.roomRef) {
-      this.roomRef.off();
+  leaveRoom(notifyRoom = true) {
+    const ref = this.roomRef;
+    const wasHost = this.isHost;
+    const pNum = this.playerNumber;
+
+    if (ref) {
+      ref.off();
+      if (notifyRoom) {
+        ref.child('status').once('value').then((snap) => {
+          const st = snap.val();
+          if (st === 'waiting') {
+            if (wasHost) {
+              ref.child('status').set('cancelled').catch(() => {});
+            } else if (pNum && pNum > 1) {
+              ref.child(`players/player${pNum}`).remove().catch(() => {});
+            }
+          }
+        }).catch(() => {});
+      }
       this.roomRef = null;
     }
     
     this.currentRoom = null;
     this.playerNumber = null;
     this.isHost = false;
+    this._starting = false;
   },
   
   /**
@@ -334,16 +389,16 @@ const RemoteChallenge = {
   async getRoomState() {
     if (!this.roomRef) return null;
     
-    const snapshot = await this.roomRef.once('value');
+    const snapshot = await withTimeout(this.roomRef.once('value'), FB_TIMEOUT_MS);
     return snapshot.val();
   },
   
   /**
-   * Check if a room code or pin is in URL
+   * Check if a room code is in URL
    */
   getRoomCodeFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    return params.get('room') || params.get('pin') || params.get('code');
+    return params.get('room') || params.get('code');
   }
 };
 

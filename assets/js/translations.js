@@ -1,7 +1,7 @@
 // Default English fallback so UI works even if JSON fetch fails (e.g., file://)
 const DEFAULT_EN = {
   brandTitle: "Who-Bible",
-  brandDesc: "Bible people quiz: deeds, ages, parents, roles, and events — with refs.",
+  brandDesc: "Interactive Bible trivia, scenarios & verse-backed study",
   gameSettings: "Game Settings",
   difficulty: "Difficulty",
   difficultyEasy: "Beginner",
@@ -364,8 +364,8 @@ function updateAllText() {
     const title = btn.querySelector('.mode-title');
     const desc = btn.querySelector('.mode-desc');
     if (title && desc) {
-      const icon = btn.querySelector('.mode-icon').textContent;
-      if (icon === '📚') {
+      const icon = btn.querySelector('.mode-icon')?.textContent?.trim();
+      if (icon === '📚' || icon === '📖') {
         title.textContent = getText('soloMode');
         desc.textContent = getText('soloDesc');
       } else if (icon === '⏱️') {
@@ -381,34 +381,26 @@ function updateAllText() {
     }
   });
   
-  // Update buttons
-  const buttons = document.querySelectorAll('button');
-  buttons.forEach(btn => {
-    const text = btn.textContent.toLowerCase();
-    if (text.includes('export json') || text.includes('exporter json') || text.includes('exportar json')) {
-      btn.textContent = getText('exportJSON');
-    } else if (text.includes('import json') || text.includes('importer json') || text.includes('importar json')) {
-      btn.textContent = getText('importJSON');
-    } else if (text.includes('reset data') || text.includes('réinitialiser') || text.includes('restablecer')) {
-      btn.textContent = getText('resetData');
-    } else if (text.includes('shuffle') || text.includes('mélanger') || text.includes('mezclar')) {
-      btn.textContent = getText('shuffleList');
-    } else if (text.includes('expand all') || text.includes('tout développer') || text.includes('expandir todo')) {
-      btn.textContent = getText('expandAll');
-    } else if (text.includes('collapse all') || text.includes('tout réduire') || text.includes('contraer todo')) {
-      btn.textContent = getText('collapseAll');
-    } else if (text.includes('next') || text.includes('suivant') || text.includes('siguiente')) {
-      btn.textContent = getText('next');
-    } else if (text.includes('pause') || text.includes('pause') || text.includes('pausa')) {
-      btn.textContent = getText('pause');
-    } else if (text.includes('quit') || text.includes('quitter') || text.includes('salir')) {
-      btn.textContent = getText('quit');
-    } else if (text.includes('close') || text.includes('fermer') || text.includes('cerrar')) {
-      btn.textContent = getText('close');
-    } else if (text.includes('cancel') || text.includes('annuler') || text.includes('cancelar')) {
-      btn.textContent = getText('cancel');
-    }
-  });
+  // Update explicit buttons safely without wiping out SVG icons
+  const btnExport = document.getElementById('btn-export');
+  if (btnExport) btnExport.textContent = getText('exportJSON');
+  const btnImport = document.getElementById('btn-import');
+  if (btnImport) btnImport.textContent = getText('importJSON');
+  const btnResetData = document.getElementById('btn-reset-data');
+  if (btnResetData) btnResetData.textContent = getText('resetData');
+  const btnExpandAll = document.getElementById('btn-expand-all');
+  if (btnExpandAll) btnExpandAll.textContent = getText('expandAll');
+  const btnCollapseAll = document.getElementById('btn-collapse-all');
+  if (btnCollapseAll) btnCollapseAll.textContent = getText('collapseAll');
+  const btnQuitEl = document.getElementById('btn-quit');
+  if (btnQuitEl && (!window.state || window.state.mode !== 'classroom')) {
+    btnQuitEl.textContent = getText('quit');
+  }
+  const btnPauseSpan = document.querySelector('#btn-pause span');
+  if (btnPauseSpan) {
+    const isPaused = !!(window.state && window.state.paused);
+    btnPauseSpan.textContent = isPaused ? getText('resume') : getText('pause');
+  }
   
   // Update placeholders
   const searchInput = document.getElementById('search-person');
@@ -465,16 +457,9 @@ function updateAllText() {
   }
   const timerLabelEl = document.getElementById('timer');
   if (timerLabelEl) {
-    const t = document.getElementById('time-remaining')?.textContent || '0';
-    timerLabelEl.innerHTML = `${getText('time')}: <span id="time-remaining">${t}</span>s`;
-  }
-  
-  // Update people count
-  const peopleCount = document.getElementById('people-count');
-  if (peopleCount) {
-    const parent = peopleCount.parentElement;
-    if (parent) {
-      parent.innerHTML = parent.innerHTML.replace('People:', getText('people') + ':');
+    const trSpan = document.getElementById('time-remaining');
+    if (!trSpan) {
+      timerLabelEl.innerHTML = `<span class="timer-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><polyline points="12 9 12 13 14 15"></polyline><line x1="12" y1="2" x2="12" y2="4"></line></svg></span><span id="time-remaining">60</span>s`;
     }
   }
   

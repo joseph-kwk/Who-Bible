@@ -11,8 +11,6 @@ import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase
 import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 // Firebase configuration
-// IMPORTANT: These are your production credentials
-// Get them from: https://console.firebase.google.com/
 const firebaseConfig = {
   apiKey: "AIzaSyB_3QdJKS4hbCq4I6PecRG8yI0RngMdd9c",
   authDomain: "who-bible.firebaseapp.com",
@@ -42,16 +40,14 @@ try {
 // Export Firebase instances for modular SDK (used by auth.js, etc.)
 export { auth, db, realtimeDb as database, app };
 
-// Legacy support for compat SDK (used by remote-challenge.js)
-// This ensures backward compatibility with existing code
+// Compat SDK bridge (used by remote-challenge.js, host.js, classroom mode)
 if (typeof window !== 'undefined') {
-  // Check if compat SDK is loaded
   if (typeof firebase !== 'undefined') {
     let compatInitialized = false;
     let compatDatabase = null;
 
     function initializeCompatFirebase() {
-      if (compatInitialized) return true;
+      if (compatInitialized && compatDatabase) return true;
 
       try {
         if (!firebase.apps.length) {
@@ -67,12 +63,16 @@ if (typeof window !== 'undefined') {
       }
     }
 
-    // Export compat interface for legacy code
     window.FirebaseConfig = {
       initialize: initializeCompatFirebase,
-      isAvailable: () => compatInitialized || initializeCompatFirebase(),
-      getDatabase: () => compatDatabase,
+      isAvailable: () => (compatInitialized && !!compatDatabase) || initializeCompatFirebase(),
+      getDatabase: () => {
+        if (!compatDatabase) initializeCompatFirebase();
+        return compatDatabase;
+      },
       config: firebaseConfig
     };
+
+    window.dispatchEvent(new CustomEvent('firebase:ready'));
   }
 }

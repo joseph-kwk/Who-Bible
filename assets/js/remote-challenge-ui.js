@@ -24,8 +24,12 @@
     const h = $('btn-ready-host'), g = $('btn-ready-guest');
     if (h) { h.disabled = false; h.textContent = "I'm Ready — Start!"; h.style.display = 'none'; }
     if (g) { g.disabled = false; g.textContent = "I'm Ready!"; }
-    const roster = $('remote-roster'); if (roster) roster.innerHTML = '';
-    const st = $('remote-opponent-status'); if (st) st.textContent = 'Waiting for a friend to join…';
+    ['remote-roster', 'remote-roster-guest'].forEach((id) => {
+      const el = $(id);
+      if (el) el.innerHTML = '';
+    });
+    const st = $('remote-opponent-status');
+    if (st) st.textContent = 'Waiting for a friend to join…';
   }
 
   function showRemoteModal() {
@@ -33,8 +37,10 @@
     const modal = $('remote-modal');
     if (!modal) return;
     matchStarted = false;
+    window.remoteQuizQuestions = null;
     resetLobbyButtons();
     modal.style.display = 'flex';
+    if (typeof window.syncModalScrollLock === 'function') window.syncModalScrollLock();
     const hostInput = $('remote-host-name'), joinInput = $('remote-join-name');
     if (hostInput && !hostInput.value) hostInput.value = myName();
     if (joinInput && !joinInput.value) joinInput.value = myName();
@@ -45,7 +51,10 @@
   function hideRemoteModal(leave = true) {
     const modal = $('remote-modal');
     if (modal) modal.style.display = 'none';
-    if (leave && !matchStarted && window.RemoteChallenge) window.RemoteChallenge.leaveRoom();
+    if (typeof window.syncModalScrollLock === 'function') window.syncModalScrollLock();
+    if (leave && !matchStarted && window.RemoteChallenge) {
+      window.RemoteChallenge.leaveRoom(true);
+    }
   }
 
   function startRemoteChallenge() {
@@ -83,10 +92,13 @@
       };
       const result = await window.RemoteChallenge.createRoom(hostName, settings);
       showRemoteStep('share');
-      $('remote-room-code').textContent = result.roomCode;
-      $('remote-share-url').textContent = result.shareUrl;
+      const codeEl = $('remote-room-code');
+      const urlEl = $('remote-share-url');
+      if (codeEl) codeEl.textContent = result.roomCode;
+      if (urlEl) urlEl.textContent = result.shareUrl;
       const qr = $('remote-qr-code-img');
       if (qr) {
+        qr.onerror = () => { qr.style.display = 'none'; };
         qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(result.shareUrl)}&margin=8`;
         qr.style.display = 'block';
       }
@@ -109,8 +121,8 @@
     try {
       const roomData = await window.RemoteChallenge.joinRoom(roomCode, playerName);
       showRemoteStep('joined');
-      $('remote-joined-code').textContent = roomCode;
-      $('remote-host-name-display').textContent = roomData.host;
+      if ($('remote-joined-code')) $('remote-joined-code').textContent = roomData.code || roomCode;
+      if ($('remote-host-name-display')) $('remote-host-name-display').textContent = roomData.host || 'Host';
       if ($('remote-joined-settings') && roomData.settings) {
         const d = (roomData.settings.difficulty || 'medium').toUpperCase();
         const q = roomData.settings.numQuestions || 10;
@@ -167,14 +179,22 @@
     const list = Object.entries(players || {}).filter(([, p]) => p)
       .sort(([a], [b]) => parseInt(a.replace('player', ''), 10) - parseInt(b.replace('player', ''), 10));
     const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    const html = list.map(([, p]) => `<li class="roster-item ${p.ready ? 'is-ready' : ''}"><span class="roster-dot"></span><span class="roster-name">${esc(p.name)}</span><span class="roster-state">${p.ready ? 'Ready' : 'Joined'}</span></li>`).join('');
+    const html = list.map(([, p]) => `<li class="roster-item ${p.ready ? 'is-ready' : ''}"><span class="roster-dot"></span><span class="roster-name">${esc(p.name)}</span><span class="roster-state">${p.ready ? '✓ Ready' : 'Joined'}</span></li>`).join('');
     ['remote-roster', 'remote-roster-guest'].forEach((id) => { const el = $(id); if (el) el.innerHTML = html; });
 
-    const others = list.length - 1;
+    const others = Math.max(0, list.length - 1);
     const st = $('remote-opponent-status');
-    if (st) st.textContent = others > 0 ? `${others} friend${others > 1 ? 's' : ''} joined. Tap Ready when everyone is set.` : 'Waiting for a friend to join…';
+    if (st) st.textContent = others > 0 ? `${others} friend${others > 1 ? 's' : ''} joined! Tap Ready when everyone is set.` : 'Waiting for a friend to join…';
+    const joinedSt = $('remote-joined-status');
+    if (joinedSt) {
+      const readyCount = list.filter(([, p]) => p.ready).length;
+      joinedSt.textContent = `Players ready: ${readyCount} / ${list.length}`;
+    }
     const hb = $('btn-ready-host');
-    if (hb && others > 0 && !hb.disabled) hb.style.display = 'inline-flex';
+    if (hb) {
+      if (others > 0) hb.style.display = 'inline-flex';
+      else if (!hb.disabled) hb.style.display = 'none';
+    }
 
     // In-game: keep opponent scores live
     if (matchStarted && window.WB) window.WB.updateRemoteScores(list.map(([, p]) => p));
@@ -191,6 +211,12 @@
       matchStarted = true;
       hideRemoteModal(false);
       startRemoteQuiz();
+    } else if (status === 'cancelled' && !matchStarted) {
+      if (window.RemoteChallenge && !window.RemoteChallenge.isHost) {
+        toast({ title: 'Room Closed', msg: 'The host closed the room.', type: 'warn', timeout: 3500 });
+        window.RemoteChallenge.leaveRoom(false);
+        hideRemoteModal(false);
+      }
     } else if (status === 'completed' && window.WB) {
       window.WB.onRemoteMatchComplete();
     }
@@ -199,9 +225,11 @@
   async function startRemoteQuiz() {
     let questions = window.remoteQuizQuestions;
     let players = [];
+    let settings = {};
     try {
       const room = await window.RemoteChallenge.getRoomState();
       if (room) {
+        settings = room.settings || {};
         if (!questions && room.questions) questions = Array.isArray(room.questions) ? room.questions : Object.values(room.questions);
         players = Object.entries(room.players || {}).filter(([, p]) => p)
           .sort(([a], [b]) => parseInt(a.replace('player', ''), 10) - parseInt(b.replace('player', ''), 10))
@@ -214,7 +242,7 @@
       matchStarted = false;
       return;
     }
-    window.WB.startRemoteMatch(questions, players, (window.RemoteChallenge.playerNumber || 1) - 1);
+    window.WB.startRemoteMatch(questions, players, (window.RemoteChallenge.playerNumber || 1) - 1, settings);
   }
 
   // Host generates the shared question set using the same engine as solo play
@@ -222,12 +250,12 @@
     return window.WB.buildSharedQuestions(settings.numQuestions || 10, settings.difficulty || 'medium');
   };
 
-  
-  // Modal pill selector helper
+  // Modal pill selector helper (idempotent)
   function setupRemotePills() {
     ['remote-host-diff-pills', 'remote-host-qcount-pills', 'remote-host-timer-pills'].forEach(containerId => {
       const container = document.getElementById(containerId);
-      if (!container) return;
+      if (!container || container.dataset.pillsBound === '1') return;
+      container.dataset.pillsBound = '1';
       container.addEventListener('click', (e) => {
         const btn = e.target.closest('.modal-pill');
         if (!btn) return;
@@ -235,6 +263,12 @@
         btn.classList.add('active');
       });
     });
+
+    const cancelBtn = $('btn-remote-cancel');
+    if (cancelBtn && cancelBtn.dataset.bound !== '1') {
+      cancelBtn.dataset.bound = '1';
+      cancelBtn.addEventListener('click', () => hideRemoteModal(true));
+    }
   }
   document.addEventListener('DOMContentLoaded', setupRemotePills);
   

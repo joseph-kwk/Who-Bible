@@ -3,275 +3,465 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Who-Bible - Host View (Classroom Mode)</title>
-  <meta name="description" content="Host view for Kahoot-style Bible quiz sessions">
-  <link rel="icon" type="image/png" href="assets/images/logo.png">
-  <link rel="stylesheet" href="assets/css/host.css?v=20260905001">
-  
-  <!-- Firebase SDK (Compat for remote-challenge.js) -->
+  <title>Who-Bible — Live Host (Classroom Mode)</title>
+  <meta name="description" content="Interactive Kahoot-style Scripture trivia host screen for classrooms, youth groups, and churches.">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0f1d">
+  <link rel="stylesheet" href="assets/css/host.css?v=20261030001">
+
+  <!-- Firebase SDK (Compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  
-  <!-- App Scripts -->
-  <!-- Firebase Config (Modular SDK) -->
-  <script type="module" src="assets/js/firebase-config.js?v=20260905001"></script>
-  <script src="assets/js/security.js?v=20260905001"></script>
-  <script src="assets/js/translations.js?v=20260905001" defer></script>
-  <script src="assets/js/host.js?v=20260905001" defer></script>
+
+  <!-- Firebase Config & App Scripts -->
+  <script type="module" src="assets/js/firebase-config.js?v=20261030001"></script>
+  <script src="assets/js/security.js?v=20261030001"></script>
+  <script src="assets/js/translations.js?v=20261030001" defer></script>
+  <script src="assets/js/host.js?v=20261030001" defer></script>
 </head>
 <body class="host-view">
-  
-  <!-- Setup Screen -->
-  <div id="setup-screen" class="screen active">
-    <div class="setup-container">
-      <div class="logo-header">
-        <img src="assets/images/logo.png" alt="Who-Bible Logo" class="logo">
-        <h1>Who-Bible</h1>
-        <p class="subtitle">Classroom Mode - Host View</p>
-      </div>
-      
-      <div class="setup-card">
-        <h2>Create Quiz Session</h2>
-        
-        <div class="form-group">
-          <label for="host-name">Your Name (Host)</label>
-          <input type="text" id="host-name" placeholder="Teacher, Pastor, etc." value="Host">
-        </div>
-        
-        <div class="form-group">
-          <label for="quiz-difficulty">Difficulty</label>
-          <select id="quiz-difficulty">
-            <option value="easy">Beginner (Common Figures)</option>
-            <option value="medium" selected>Intermediate (Mixed)</option>
-            <option value="hard">Expert (All Characters)</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label for="quiz-questions">Number of Questions</label>
-          <input type="number" id="quiz-questions" min="5" max="30" value="10">
-        </div>
-        
-        <div class="form-group">
-          <label for="quiz-timer">Time per Question (seconds)</label>
-          <input type="number" id="quiz-timer" min="10" max="60" value="20">
-        </div>
-        
-        <button id="btn-create-session" class="btn-primary btn-large">
-          Create Session
-        </button>
-      </div>
-    </div>
+
+  <!-- Ambient Celestial Backdrop -->
+  <div class="host-ambient-bg" aria-hidden="true">
+    <div class="ambient-orb orb-gold"></div>
+    <div class="ambient-orb orb-blue"></div>
   </div>
-  
-  <!-- Lobby Screen -->
-  <div id="lobby-screen" class="screen">
-    <div class="lobby-container">
-      <div class="lobby-header">
-        <div class="lobby-instructions">
-          <p class="join-callout">Join on any phone, tablet, or laptop:</p>
-          <h1><span id="join-url" class="join-url">who-bible.com</span></h1>
-          <div class="room-code-display">
-            <span class="label">Game PIN:</span>
-            <span id="room-code" class="room-code">HOLY-123</span>
-            <button id="btn-copy-pin" class="btn-copy" title="Copy PIN & Link">📋 Copy</button>
+
+  <!-- Persistent Host Top Bar -->
+  <header class="host-topbar">
+    <div class="host-topbar-left">
+      <a href="index.html" class="host-brand-link" title="Return to Who-Bible Main App">
+        <img src="assets/images/logo.png" alt="Who-Bible Logo" class="host-brand-logo">
+        <div class="host-brand-text">
+          <span class="host-brand-title">Who-Bible</span>
+          <span class="host-brand-badge">LIVE CLASSROOM</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="host-topbar-center" id="topbar-live-pin" style="display:none;">
+      <span class="live-pin-label">Join at <strong id="topbar-join-domain">who-bible.web.app</strong></span>
+      <span class="live-pin-divider">•</span>
+      <button type="button" id="btn-topbar-copy-pin" class="live-pin-pill" title="Click to copy Game PIN">
+        <span>PIN:</span>
+        <strong id="topbar-pin-code">FAITH-123</strong>
+      </button>
+    </div>
+
+    <div class="host-topbar-right">
+      <span id="host-conn-badge" class="conn-badge connecting">
+        <span class="conn-dot"></span>
+        <span id="host-conn-text">Connecting…</span>
+      </span>
+      <button type="button" id="btn-sound-host" class="topbar-icon-btn" title="Toggle Sound Effects" aria-label="Toggle Sound">🔊</button>
+      <a href="index.html#game-modes-section" class="topbar-back-btn">← Main App</a>
+    </div>
+  </header>
+
+  <main class="host-stage">
+
+    <!-- ==========================================
+         1. SETUP SCREEN
+         ========================================== -->
+    <section id="setup-screen" class="screen active" aria-labelledby="setup-heading">
+      <div class="setup-shell">
+        <div class="setup-hero">
+          <span class="setup-eyebrow">🏫 Interactive Group Trivia</span>
+          <h1 id="setup-heading">Host a Live Scripture Arena</h1>
+          <p>Project this screen for your classroom, youth group, or family night. Everyone plays live from their phones — no app download or login needed.</p>
+        </div>
+
+        <div class="setup-card">
+          <div class="setup-grid">
+            <!-- Host Name -->
+            <div class="setup-field full-span">
+              <label for="host-name" class="field-label">Host / Presenter Name</label>
+              <input type="text" id="host-name" class="host-input" placeholder="e.g. Pastor John, Sister Mary, Youth Group" maxlength="24" value="Host">
+            </div>
+
+            <!-- Difficulty Pills -->
+            <div class="setup-field">
+              <span class="field-label">Difficulty Level</span>
+              <div class="pill-group" id="host-diff-pills" role="radiogroup" aria-label="Difficulty">
+                <button type="button" class="host-pill" data-value="easy">🌱 Beginner</button>
+                <button type="button" class="host-pill active" data-value="medium">⚖️ Standard</button>
+                <button type="button" class="host-pill" data-value="hard">🔥 Scholar</button>
+                <button type="button" class="host-pill" data-value="mixed">🎲 Mixed</button>
+              </div>
+            </div>
+
+            <!-- Testament Scope Pills -->
+            <div class="setup-field">
+              <span class="field-label">Scripture Scope</span>
+              <div class="pill-group" id="host-testament-pills" role="radiogroup" aria-label="Testament Scope">
+                <button type="button" class="host-pill active" data-value="all">📜 Full Bible</button>
+                <button type="button" class="host-pill" data-value="ot">🏛️ Old Testament</button>
+                <button type="button" class="host-pill" data-value="nt">✝️ New Testament</button>
+              </div>
+            </div>
+
+            <!-- Question Count Pills -->
+            <div class="setup-field">
+              <span class="field-label">Number of Questions</span>
+              <div class="pill-group" id="host-qcount-pills" role="radiogroup" aria-label="Number of Questions">
+                <button type="button" class="host-pill" data-value="5">5 Quick</button>
+                <button type="button" class="host-pill active" data-value="10">10 Classic</button>
+                <button type="button" class="host-pill" data-value="15">15 Deep</button>
+                <button type="button" class="host-pill" data-value="20">20 Epic</button>
+              </div>
+            </div>
+
+            <!-- Timer Pills -->
+            <div class="setup-field">
+              <span class="field-label">Time per Question</span>
+              <div class="pill-group" id="host-timer-pills" role="radiogroup" aria-label="Time per Question">
+                <button type="button" class="host-pill" data-value="15">⚡ 15s Blitz</button>
+                <button type="button" class="host-pill active" data-value="20">⏱️ 20s Fast</button>
+                <button type="button" class="host-pill" data-value="30">🧭 30s Standard</button>
+                <button type="button" class="host-pill" data-value="45">🌿 45s Relaxed</button>
+              </div>
+            </div>
+
+            <!-- Who-Bible Twist Toggle -->
+            <div class="setup-field full-span">
+              <div class="twist-feature-box">
+                <div class="twist-info">
+                  <div class="twist-title">✨ Who-Bible Twist: Scripture Clue &amp; Faith Streaks</div>
+                  <p class="twist-desc">Reveals a live Bible book/chapter clue halfway through tough questions and awards 🔥 streak bonuses for consecutive right answers.</p>
+                </div>
+                <label class="twist-switch" aria-label="Enable Scripture Clue and Faith Streaks">
+                  <input type="checkbox" id="host-twist-toggle" checked>
+                  <span class="twist-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="setup-actions">
+            <button type="button" id="btn-create-session" class="btn-gold-xl">
+              <span>🚀 Create Live Room</span>
+            </button>
           </div>
         </div>
-        <div class="lobby-qr-box">
-          <img id="lobby-qr-img" class="lobby-qr" alt="Scan to join" src="" style="display:none;" />
-          <div id="lobby-qr-fallback" class="qr-placeholder">📱 Scan to Join</div>
-        </div>
       </div>
-      
-      <div class="lobby-stats">
-        <div class="stat">
-          <span class="stat-value" id="player-count">0</span>
-          <span class="stat-label">Players</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value" id="question-count">10</span>
-          <span class="stat-label">Questions</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value" id="time-per-question">20s</span>
-          <span class="stat-label">Per Question</span>
-        </div>
-      </div>
-      
-      <div class="players-grid" id="players-grid">
-        <!-- Players will be added here dynamically -->
-      </div>
-      
-      <div class="lobby-footer">
-        <button id="btn-start-quiz" class="btn-success btn-large" disabled>
-          Start Quiz
-        </button>
-        <button id="btn-cancel-session" class="btn-secondary">
-          Cancel Session
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Question Screen -->
-  <div id="question-screen" class="screen">
-    <div class="question-container">
-      <div class="question-header">
-        <div class="question-number">
-          Question <span id="current-question-num">1</span> of <span id="total-questions">10</span>
-        </div>
-        <div class="timer-display">
-          <svg class="timer-circle" viewBox="0 0 100 100">
-            <circle class="timer-bg" cx="50" cy="50" r="45"></circle>
-            <circle class="timer-progress" cx="50" cy="50" r="45" id="timer-circle"></circle>
-          </svg>
-          <span class="timer-text" id="timer-text">20</span>
-        </div>
-      </div>
-      
-      <div class="question-content">
-        <div class="question-type" id="question-type">Multiple Choice</div>
-        <h2 class="question-text" id="question-text">Who was the father of Isaac?</h2>
-        <div class="question-meta" id="question-meta">
-          <span class="verse-ref">Genesis 21:3</span>
-        </div>
-      </div>
-      
-      <div class="answers-display" id="answers-display">
-        <div class="answer-card red">
-          <div class="answer-icon">▲</div>
-          <div class="answer-text">Abraham</div>
-          <div class="answer-count">0</div>
-        </div>
-        <div class="answer-card blue">
-          <div class="answer-icon">◆</div>
-          <div class="answer-text">Jacob</div>
-          <div class="answer-count">0</div>
-        </div>
-        <div class="answer-card yellow">
-          <div class="answer-icon">●</div>
-          <div class="answer-text">Isaac</div>
-          <div class="answer-count">0</div>
-        </div>
-        <div class="answer-card green">
-          <div class="answer-icon">■</div>
-          <div class="answer-text">Moses</div>
-          <div class="answer-count">0</div>
-        </div>
-      </div>
-      
-      <div class="response-status">
-        <span id="responses-count">0</span> of <span id="total-players">5</span> answered
-      </div>
-    </div>
-  </div>
-  
-  <!-- Results Screen -->
-  <div id="results-screen" class="screen">
-    <div class="results-container">
-      <div class="results-header">
-        <h2>Question Results</h2>
-      </div>
-      
-      <div class="correct-answer-display">
-        <div class="correct-icon">✓</div>
-        <p>The correct answer was:</p>
-        <h3 id="correct-answer-text">Abraham</h3>
-      </div>
-      
-      <div class="answer-breakdown" id="answer-breakdown">
-        <!-- Answer statistics will go here -->
-      </div>
-      
-      <div class="results-footer">
-        <button id="btn-show-leaderboard" class="btn-primary btn-large">
-          Show Leaderboard
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Leaderboard Screen -->
-  <div id="leaderboard-screen" class="screen">
-    <div class="leaderboard-container">
-      <div class="leaderboard-header">
-        <h2>🏆 Leaderboard</h2>
-        <p class="leaderboard-subtitle">After Question <span id="leaderboard-question-num">1</span></p>
-      </div>
-      
-      <div class="podium" id="podium">
-        <!-- Top 3 will be displayed as podium -->
-      </div>
-      
-      <div class="leaderboard-list" id="leaderboard-list">
-        <!-- Other players will be listed here -->
-      </div>
-      
-      <div class="leaderboard-footer">
-        <button id="btn-next-question" class="btn-success btn-large">
-          Next Question →
-        </button>
-        <button id="btn-end-quiz" class="btn-secondary">
-          End Quiz
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Final Results Screen -->
-  <div id="final-screen" class="screen">
-    <div class="final-container">
-      <div class="final-header">
-        <h1>🎉 Quiz Complete!</h1>
-        <p class="final-subtitle">Final Standings</p>
-      </div>
-      
-      <div class="final-podium" id="final-podium">
-        <!-- Top 3 final winners -->
-      </div>
-      
-      <div class="final-list" id="final-list">
-        <!-- All players ranked -->
-      </div>
-      
-      <div class="final-stats">
-        <div class="stat">
-          <span class="stat-value" id="final-players">5</span>
-          <span class="stat-label">Players</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value" id="final-questions">10</span>
-          <span class="stat-label">Questions</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value" id="final-accuracy">72%</span>
-          <span class="stat-label">Avg Accuracy</span>
-        </div>
-      </div>
-      
-      <div class="final-footer">
-        <button id="btn-new-session" class="btn-primary btn-large">
-          Start New Session
-        </button>
-        <button id="btn-exit" class="btn-secondary">
-          Exit to Main App
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Toast Notifications -->
-  <div id="toast-container" aria-live="polite"></div>
+    </section>
 
-  <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px; background: var(--bg-2, #1a1a2e); border-top: 2px solid var(--border, #2d2d44); text-align: center; font-size: 12px; color: var(--muted, #8892b0); z-index: 100;">
-    <p style="margin: 0;">© <span id="footer-year"></span> Who-Bible | <a href="index.html" style="color: var(--accent, #64ffda); text-decoration: none;">Return to Main App</a></p>
-  </footer>
-  
-  <script>
-    // Set current year in footer
-    const footerYear = document.getElementById('footer-year');
-    if (footerYear) footerYear.textContent = new Date().getFullYear();
-  </script>
-  
+    <!-- ==========================================
+         2. WAITING LOBBY SCREEN
+         ========================================== -->
+    <section id="lobby-screen" class="screen" aria-labelledby="lobby-pin-heading">
+      <div class="lobby-layout">
+        <!-- Join Instructions & Giant PIN -->
+        <div class="lobby-join-panel">
+          <div class="join-steps-row">
+            <div class="join-step-card">
+              <span class="step-num">1</span>
+              <div class="step-copy">
+                <span class="step-caption">Open on any phone or tablet</span>
+                <strong id="join-url" class="step-domain">who-bible.web.app</strong>
+              </div>
+            </div>
+            <div class="join-step-card">
+              <span class="step-num">2</span>
+              <div class="step-copy">
+                <span class="step-caption">Tap <strong>Classroom</strong> &amp; enter Game PIN</span>
+                <span class="step-sub">Or scan the QR code below</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pin-showcase-card" id="lobby-pin-heading">
+            <span class="pin-eyebrow">GAME PIN</span>
+            <button type="button" id="btn-copy-pin" class="giant-pin-btn" title="Click to copy PIN">
+              <span id="room-pin">FAITH-123</span>
+              <span class="pin-copy-hint" id="pin-copy-hint">📋 Copy PIN</span>
+            </button>
+            <div class="lobby-share-btns">
+              <button type="button" id="btn-copy-join-link" class="btn-glass-sm">🔗 Copy Direct Join Link</button>
+              <span class="lobby-settings-chip" id="lobby-settings-summary">Standard • 10 Qs • 20s</span>
+            </div>
+          </div>
+
+          <div class="qr-card" id="qr-card-wrap">
+            <div id="qr-code" class="qr-box"></div>
+            <div class="qr-caption">📱 Point camera to join instantly</div>
+          </div>
+        </div>
+
+        <!-- Players Roster & Start Controls -->
+        <div class="lobby-roster-panel">
+          <div class="roster-header">
+            <div class="roster-count-wrap">
+              <span class="roster-pulse-dot"></span>
+              <h2><span id="player-count">0</span> <span id="player-count-label">Players Joined</span></h2>
+            </div>
+            <span class="roster-host-tag">Hosted by <strong id="lobby-host-name">Host</strong></span>
+          </div>
+
+          <div id="players-list" class="players-grid-lobby">
+            <div class="empty-lobby-state">
+              <div class="empty-lobby-radar">📡</div>
+              <h3>Waiting for players to join…</h3>
+              <p>Players will pop up here live as soon as they enter the PIN!</p>
+            </div>
+          </div>
+
+          <div class="lobby-footer-actions">
+            <button type="button" id="btn-start-quiz" class="btn-gold-xl" disabled>
+              <span id="btn-start-quiz-text">Waiting for at least 1 player…</span>
+            </button>
+            <div class="lobby-secondary-row">
+              <button type="button" id="btn-start-solo-preview" class="btn-ghost-subtle" title="Test or run the projector quiz without player devices">
+                ▶️ Start Projector Solo / Preview
+              </button>
+              <button type="button" id="btn-cancel-session" class="btn-danger-subtle">
+                ✕ Cancel Room
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         3. LIVE QUESTION SCREEN
+         ========================================== -->
+    <section id="question-screen" class="screen" aria-live="polite">
+      <div class="question-progress-track">
+        <div id="question-progress-fill" class="question-progress-fill"></div>
+      </div>
+
+      <div class="question-hud-bar">
+        <div class="q-hud-pill">
+          <span class="q-hud-label">Question</span>
+          <strong><span id="current-q">1</span> / <span id="total-q">10</span></strong>
+        </div>
+
+        <div class="q-category-pill" id="question-type">Who Am I?</div>
+
+        <div class="q-hud-right">
+          <div class="q-answered-pill">
+            <strong id="answered-count">0</strong>
+            <span>/ <span id="total-players">0</span> Answered</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-stage-center">
+        <!-- Circular Countdown Timer -->
+        <div class="timer-ring-wrap">
+          <svg class="timer-ring-svg" viewBox="0 0 100 100">
+            <circle class="timer-ring-track" cx="50" cy="50" r="44"></circle>
+            <circle class="timer-ring-bar" id="timer-ring-bar" cx="50" cy="50" r="44"></circle>
+          </svg>
+          <div class="timer-ring-value" id="timer-value">20</div>
+        </div>
+
+        <!-- Question Prompt Card -->
+        <div class="question-prompt-card">
+          <h2 id="question-text" class="question-headline">Loading question…</h2>
+
+          <!-- Who-Bible Twist: Mid-round Scripture Clue -->
+          <div id="scripture-clue-banner" class="scripture-clue-banner" style="display:none;">
+            <span class="clue-icon">📜</span>
+            <span class="clue-label">Scripture Clue:</span>
+            <strong id="scripture-clue-text">1 Samuel 17</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2x2 Geometric Kahoot Answer Tiles -->
+      <div class="kahoot-answers-grid" id="host-answers-grid">
+        <div class="kahoot-tile tile-red" data-option="0">
+          <span class="tile-shape" aria-hidden="true">▲</span>
+          <span class="tile-text" id="option-0">Option 1</span>
+        </div>
+        <div class="kahoot-tile tile-blue" data-option="1">
+          <span class="tile-shape" aria-hidden="true">◆</span>
+          <span class="tile-text" id="option-1">Option 2</span>
+        </div>
+        <div class="kahoot-tile tile-gold" data-option="2">
+          <span class="tile-shape" aria-hidden="true">●</span>
+          <span class="tile-text" id="option-2">Option 3</span>
+        </div>
+        <div class="kahoot-tile tile-green" data-option="3">
+          <span class="tile-shape" aria-hidden="true">■</span>
+          <span class="tile-text" id="option-3">Option 4</span>
+        </div>
+      </div>
+
+      <!-- Host Action Controls -->
+      <div class="host-action-bar">
+        <button type="button" id="btn-reveal-clue" class="btn-glass-sm">📜 Show Scripture Clue</button>
+        <button type="button" id="btn-skip-timer" class="btn-primary-action">⏭️ Reveal Answer Now</button>
+        <button type="button" id="btn-end-quiz" class="btn-danger-subtle">🛑 End Session</button>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         4. QUESTION RESULTS & SCRIPTURE INSIGHT
+         ========================================== -->
+    <section id="results-screen" class="screen">
+      <div class="results-shell">
+        <div class="correct-reveal-banner">
+          <div class="reveal-badge">✓ CORRECT ANSWER</div>
+          <h2 id="correct-answer-text" class="reveal-answer-title">David</h2>
+          <div id="results-scripture-box" class="results-scripture-box">
+            <span class="scripture-ref-pill" id="results-verse-pill">📖 1 Samuel 17:45-50</span>
+            <p id="results-bio-insight" class="scripture-bio-text"></p>
+          </div>
+          <div id="fastest-responder-pill" class="fastest-pill" style="display:none;"></div>
+        </div>
+
+        <!-- Kahoot Distribution Bars -->
+        <div class="distribution-grid">
+          <div class="dist-col dist-red" id="dist-col-0">
+            <div class="dist-count" id="count-0">0</div>
+            <div class="dist-bar-track">
+              <div class="dist-bar-fill" id="bar-0"></div>
+            </div>
+            <div class="dist-label">
+              <span class="dist-shape">▲</span>
+              <span class="dist-opt-name" id="dist-opt-0">Option 1</span>
+              <span class="dist-check" id="check-0"></span>
+            </div>
+          </div>
+
+          <div class="dist-col dist-blue" id="dist-col-1">
+            <div class="dist-count" id="count-1">0</div>
+            <div class="dist-bar-track">
+              <div class="dist-bar-fill" id="bar-1"></div>
+            </div>
+            <div class="dist-label">
+              <span class="dist-shape">◆</span>
+              <span class="dist-opt-name" id="dist-opt-1">Option 2</span>
+              <span class="dist-check" id="check-1"></span>
+            </div>
+          </div>
+
+          <div class="dist-col dist-gold" id="dist-col-2">
+            <div class="dist-count" id="count-2">0</div>
+            <div class="dist-bar-track">
+              <div class="dist-bar-fill" id="bar-2"></div>
+            </div>
+            <div class="dist-label">
+              <span class="dist-shape">●</span>
+              <span class="dist-opt-name" id="dist-opt-2">Option 3</span>
+              <span class="dist-check" id="check-2"></span>
+            </div>
+          </div>
+
+          <div class="dist-col dist-green" id="dist-col-3">
+            <div class="dist-count" id="count-3">0</div>
+            <div class="dist-bar-track">
+              <div class="dist-bar-fill" id="bar-3"></div>
+            </div>
+            <div class="dist-label">
+              <span class="dist-shape">■</span>
+              <span class="dist-opt-name" id="dist-opt-3">Option 4</span>
+              <span class="dist-check" id="check-3"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="host-action-bar centered">
+          <button type="button" id="btn-show-leaderboard" class="btn-gold-xl">
+            <span id="btn-after-results-text">🏆 Show Standings →</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         5. STANDINGS / LEADERBOARD SCREEN
+         ========================================== -->
+    <section id="leaderboard-screen" class="screen">
+      <div class="leaderboard-shell">
+        <div class="leaderboard-header">
+          <span class="setup-eyebrow" id="leaderboard-round-label">After Round 1</span>
+          <h2>🏆 Live Standings</h2>
+        </div>
+
+        <div id="leaderboard-list" class="leaderboard-rows"></div>
+
+        <div class="host-action-bar centered">
+          <button type="button" id="btn-next-question" class="btn-gold-xl">
+            <span>Next Question →</span>
+          </button>
+          <button type="button" id="btn-end-from-lb" class="btn-danger-subtle">🛑 End Session</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         6. FINAL PODIUM SCREEN
+         ========================================== -->
+    <section id="final-screen" class="screen">
+      <div class="final-shell">
+        <div class="final-header">
+          <span class="setup-eyebrow">🎉 SESSION COMPLETE</span>
+          <h1>Champions of Scripture!</h1>
+        </div>
+
+        <div id="podium-stage" class="podium-stage"></div>
+
+        <div class="final-summary-stats">
+          <div class="final-stat-box">
+            <span class="final-stat-val" id="final-players">0</span>
+            <span class="final-stat-lbl">Players</span>
+          </div>
+          <div class="final-stat-box">
+            <span class="final-stat-val" id="final-questions">10</span>
+            <span class="final-stat-lbl">Questions</span>
+          </div>
+          <div class="final-stat-box">
+            <span class="final-stat-val" id="final-accuracy">0%</span>
+            <span class="final-stat-lbl">Group Accuracy</span>
+          </div>
+        </div>
+
+        <div id="final-runners-up" class="final-runners-up"></div>
+
+        <div class="host-action-bar centered">
+          <button type="button" id="btn-replay-same-room" class="btn-gold-xl">
+            <span>🔄 Play Again (Same Room)</span>
+          </button>
+          <button type="button" id="btn-new-session" class="btn-glass-lg">
+            <span>✨ New Room / Settings</span>
+          </button>
+          <a href="index.html#game-modes-section" class="btn-glass-lg">🎮 Back to Game Modes</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 3-2-1 Get Ready Countdown Overlay -->
+  <div id="countdown-overlay" class="countdown-overlay" style="display:none;" aria-live="assertive">
+    <div class="countdown-inner">
+      <span class="countdown-label" id="countdown-label">Look up! Question 1 starting in…</span>
+      <div class="countdown-number" id="countdown-number">3</div>
+    </div>
+  </div>
+
+  <!-- Custom Styled Confirmation Modal (Zero Native Alerts/Confirms!) -->
+  <div id="host-confirm-modal" class="host-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="host-confirm-title">
+    <div class="host-modal-card">
+      <h3 id="host-confirm-title">Confirm Action</h3>
+      <p id="host-confirm-msg">Are you sure?</p>
+      <div class="host-modal-actions">
+        <button type="button" id="btn-host-confirm-cancel" class="btn-glass-sm">Keep Playing</button>
+        <button type="button" id="btn-host-confirm-ok" class="btn-danger-solid">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="host-toast-container" class="host-toast-container" aria-live="polite"></div>
+
 </body>
 </html>

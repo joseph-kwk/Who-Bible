@@ -21,17 +21,16 @@ const getText = (key, params) => window.getText ? window.getText(key, params) : 
  * Initialize authentication UI
  */
 export function initAuthUI() {
-    console.log('[Auth UI] Initializing authentication UI...');
     createAuthModals();
     setupAuthListeners();
     updateUIForAuthState();
-    console.log('[Auth UI] Authentication UI initialized successfully');
 }
 
 /**
  * Create authentication modal HTML
  */
 function createAuthModals() {
+    if (document.getElementById('auth-modal')) return;
     const modalHTML = `
         <!-- Login/Signup Modal -->
         <div id="auth-modal" class="auth-modal" style="display: none;">
@@ -199,58 +198,42 @@ function createAuthModals() {
  * Setup event listeners
  */
 function setupAuthListeners() {
-    // Header Sign In button
     const authButton = document.getElementById('btn-auth-signin');
     if (authButton) {
-        console.log('[Auth UI] Sign-in button found, attaching listener');
         authButton.addEventListener('click', () => {
-            console.log('[Auth UI] Sign-in button clicked');
             if (isAuthenticated()) {
-                // If already logged in, show profile dropdown (future feature)
                 showNotification('Already signed in!');
             } else {
-                console.log('[Auth UI] Opening auth modal');
                 showAuthModal('login');
             }
         });
-    } else {
-        console.error('[Auth UI] Sign-in button not found!');
     }
     
-    // Tab switching
     document.querySelectorAll('.auth-tab').forEach(tab => {
         tab.addEventListener('click', () => switchTab(tab.dataset.tab));
     });
 
-    // Close modal
     document.getElementById('close-auth-modal')?.addEventListener('click', closeAuthModal);
     
-    // Click outside to close
     document.getElementById('auth-modal')?.addEventListener('click', (e) => {
         if (e.target.id === 'auth-modal') closeAuthModal();
     });
 
-    // Login
     document.getElementById('login-submit-btn')?.addEventListener('click', handleLogin);
     document.getElementById('google-signin-btn')?.addEventListener('click', handleGoogleSignIn);
     
-    // Signup
     document.getElementById('signup-submit-btn')?.addEventListener('click', handleSignup);
     document.getElementById('google-signup-btn')?.addEventListener('click', handleGoogleSignIn);
     document.getElementById('signup-password')?.addEventListener('input', checkPasswordStrength);
     
-    // Password reset
     document.getElementById('forgot-password-btn')?.addEventListener('click', showResetForm);
     document.getElementById('back-to-login-btn')?.addEventListener('click', () => switchTab('login'));
     document.getElementById('reset-submit-btn')?.addEventListener('click', handlePasswordReset);
     
-    // Guest mode
     document.getElementById('continue-guest-btn')?.addEventListener('click', closeAuthModal);
     
-    // Logout
     document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
 
-    // Listen for auth state changes
     window.addEventListener('auth:login', () => {
         closeAuthModal();
         updateUIForAuthState();
@@ -261,7 +244,6 @@ function setupAuthListeners() {
         updateUIForAuthState();
     });
 
-    // Enter key submissions
     ['login-email', 'login-password'].forEach(id => {
         document.getElementById(id)?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleLogin();
@@ -269,9 +251,6 @@ function setupAuthListeners() {
     });
 }
 
-/**
- * Switch between login/signup tabs
- */
 function switchTab(tab) {
     document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
@@ -280,18 +259,12 @@ function switchTab(tab) {
     document.getElementById(`${tab}-form`)?.classList.add('active');
 }
 
-/**
- * Show reset password form
- */
 function showResetForm() {
     switchTab('reset');
     document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
     document.getElementById('reset-form')?.classList.add('active');
 }
 
-/**
- * Handle login
- */
 async function handleLogin() {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
@@ -308,18 +281,13 @@ async function handleLogin() {
 
     const result = await loginUser(email, password);
     
-    if (result.success) {
-        // Modal will close via auth:login event
-    } else {
+    if (!result.success) {
         showError(errorEl, result.error);
         button.disabled = false;
         button.textContent = getText('auth.signIn');
     }
 }
 
-/**
- * Handle signup
- */
 async function handleSignup() {
     const name = document.getElementById('signup-name').value;
     const email = document.getElementById('signup-email').value;
@@ -351,7 +319,6 @@ async function handleSignup() {
     
     if (result.success) {
         showNotification(getText('auth.verificationEmailSent'));
-        // Modal will close via auth:login event
     } else {
         showError(errorEl, result.error);
         button.disabled = false;
@@ -359,9 +326,6 @@ async function handleSignup() {
     }
 }
 
-/**
- * Handle Google sign in
- */
 async function handleGoogleSignIn() {
     const result = await loginWithGoogle();
     
@@ -371,9 +335,6 @@ async function handleGoogleSignIn() {
     }
 }
 
-/**
- * Handle password reset
- */
 async function handlePasswordReset() {
     const email = document.getElementById('reset-email').value;
     const errorEl = document.getElementById('reset-error');
@@ -404,18 +365,25 @@ async function handlePasswordReset() {
 }
 
 /**
- * Handle logout
+ * Handle logout (Zero native browser confirm dialog)
  */
 async function handleLogout() {
-    if (confirm(getText('auth.confirmLogout') || 'Are you sure you want to sign out?')) {
+    const message = getText('auth.confirmLogout') || 'Are you sure you want to sign out?';
+    const confirmed = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Sign Out',
+            message,
+            confirmText: 'Sign Out',
+            cancelText: 'Cancel'
+          })
+        : true;
+
+    if (confirmed) {
         await logoutUser();
-        showNotification(getText('auth.signedOut'));
+        showNotification(getText('auth.signedOut') || 'Signed out successfully.');
     }
 }
 
-/**
- * Check password strength
- */
 function checkPasswordStrength() {
     const password = document.getElementById('signup-password').value;
     const strengthBar = document.getElementById('password-strength');
@@ -450,44 +418,38 @@ function checkPasswordStrength() {
     }
 }
 
-/**
- * Show auth modal
- */
 export function showAuthModal(tab = 'login') {
-    document.getElementById('auth-modal').style.display = 'flex';
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        if (typeof window.syncModalScrollLock === 'function') window.syncModalScrollLock();
+    }
     switchTab(tab);
 }
 
-/**
- * Alias for compatibility
- */
 export function openAuthModal(tab = 'login') {
     showAuthModal(tab);
 }
 
-/**
- * Close auth modal
- */
 function closeAuthModal() {
-    document.getElementById('auth-modal').style.display = 'none';
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        if (typeof window.syncModalScrollLock === 'function') window.syncModalScrollLock();
+    }
     clearAuthForms();
 }
 
-/**
- * Clear all auth forms
- */
 function clearAuthForms() {
     document.querySelectorAll('.auth-input').forEach(input => input.value = '');
     document.querySelectorAll('.auth-error, .auth-success').forEach(el => {
         el.style.display = 'none';
         el.textContent = '';
     });
-    document.getElementById('terms-agree').checked = false;
+    const terms = document.getElementById('terms-agree');
+    if (terms) terms.checked = false;
 }
 
-/**
- * Show error message
- */
 function showError(element, message) {
     if (element) {
         element.textContent = message;
@@ -496,72 +458,50 @@ function showError(element, message) {
     }
 }
 
-/**
- * Show notification (implement based on your notification system)
- */
 function showNotification(message) {
-    // This should integrate with your existing notification system
-    console.log('Notification:', message);
-    // TODO: Show toast notification
+    if (typeof window.showToast === 'function') {
+        window.showToast({ title: 'Account', msg: message, type: 'info', timeout: 3000 });
+    } else {
+        console.log('Notification:', message);
+    }
 }
 
-/**
- * Update UI based on authentication state
- */
 function updateUIForAuthState() {
     const user = getCurrentUser();
     const profile = getUserProfile();
     
-    // Update header Sign In button
     const authButton = document.getElementById('btn-auth-signin');
     const authButtonText = document.getElementById('auth-button-text');
     
     if (user && profile) {
-        // User is logged in - show their name
-        if (authButtonText) {
-            authButtonText.textContent = profile.displayName || 'My Account';
-        }
-        if (authButton) {
-            authButton.setAttribute('aria-label', 'View account');
-        }
+        if (authButtonText) authButtonText.textContent = profile.displayName || 'My Account';
+        if (authButton) authButton.setAttribute('aria-label', 'View account');
     } else {
-        // User is guest - show Sign In
-        if (authButtonText) {
-            authButtonText.textContent = 'Sign In';
-        }
-        if (authButton) {
-            authButton.setAttribute('aria-label', 'Sign in or create account');
-        }
+        if (authButtonText) authButtonText.textContent = 'Sign In';
+        if (authButton) authButton.setAttribute('aria-label', 'Sign in or create account');
     }
     
-    // Update any UI elements that need to know about auth state
     const loginButtons = document.querySelectorAll('.show-auth-btn');
     const userButtons = document.querySelectorAll('.user-profile-btn');
     
     if (user && profile) {
-        // Show user profile button
         loginButtons.forEach(btn => btn.style.display = 'none');
         userButtons.forEach(btn => btn.style.display = 'block');
-        
-        // Update profile display
         updateProfileDisplay(profile);
     } else {
-        // Show login button
         loginButtons.forEach(btn => btn.style.display = 'block');
         userButtons.forEach(btn => btn.style.display = 'none');
     }
 }
 
-/**
- * Update profile display in dropdown
- */
 function updateProfileDisplay(profile) {
     if (!profile) return;
     
-    document.getElementById('profile-name').textContent = profile.displayName || 'Scholar';
-    document.getElementById('profile-avatar').src = profile.photoURL || 'assets/images/default-avatar.png';
+    const nameEl = document.getElementById('profile-name');
+    const avatarEl = document.getElementById('profile-avatar');
+    if (nameEl) nameEl.textContent = profile.displayName || 'Scholar';
+    if (avatarEl) avatarEl.src = profile.photoURL || 'assets/images/logo.png';
     
-    // Add language indicator
     const profileHeader = document.querySelector('.profile-header');
     if (profileHeader && profile.preferredLanguage) {
         const existingIndicator = profileHeader.querySelector('.language-indicator');
@@ -573,43 +513,24 @@ function updateProfileDisplay(profile) {
         languageIndicator.title = `Preferred language: ${getLanguageName(profile.preferredLanguage)}`;
         profileHeader.appendChild(languageIndicator);
     }
-    
-    // Update level and XP from stats (would be loaded separately)
-    // This is placeholder - actual stats loading happens in user-profile.js
 }
 
-/**
- * Get language flag emoji
- */
 function getLanguageFlag(langCode) {
-    const flags = {
-        'en': '🇬🇧',
-        'es': '🇪🇸',
-        'fr': '🇫🇷'
-    };
+    const flags = { 'en': '🇬🇧', 'es': '🇪🇸', 'fr': '🇫🇷' };
     return flags[langCode] || '🌐';
 }
 
-/**
- * Get language name
- */
 function getLanguageName(langCode) {
-    const names = {
-        'en': 'English',
-        'es': 'Español',
-        'fr': 'Français'
-    };
+    const names = { 'en': 'English', 'es': 'Español', 'fr': 'Français' };
     return names[langCode] || langCode;
 }
 
-// Export for use by guest prompts and other modules
 if (typeof window !== 'undefined') {
-    window.openAuthModal = showAuthModal;  // Export as openAuthModal for compatibility
-    window.showAuthModal = showAuthModal;  // Also export with current name
+    window.openAuthModal = showAuthModal;
+    window.showAuthModal = showAuthModal;
     window.closeAuthModal = closeAuthModal;
 }
 
-// Initialize on load
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initAuthUI);
 } else {

@@ -7,9 +7,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>Who-Bible - Bible People Quiz Challenge</title>
+  <title>Who-Bible - Interactive Bible Trivia & Study</title>
   <meta name="description"
-    content="Learn about Bible people through interactive quizzes. Test your knowledge of biblical characters, their deeds, ages, parents, and occupations with verse references." />
+    content="Interactive Bible trivia, real-life scriptural scenarios, character study, and live multiplayer challenges backed by Scripture references." />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -20,8 +20,8 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#f59e0b" />
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261028005" />
-  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20261028005" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261030006" />
+  <link rel="stylesheet" href="assets/css/welcome-modal.css?v=20261030001" />
   <link rel="stylesheet" href="assets/css/feedback-modal.css?v=20261028002" />
   <link rel="stylesheet" href="assets/css/report-modal.css?v=20261028002" />
   <link rel="stylesheet" href="assets/css/guest-prompts.css?v=20261028002" />
@@ -32,25 +32,25 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
   <!-- Firebase Config (Modular SDK) -->
-  <script type="module" src="assets/js/firebase-config.js?v=20261028002"></script>
+  <script type="module" src="assets/js/firebase-config.js?v=20261030001"></script>
 
   <!-- Authentication -->
   <script type="module" src="assets/js/auth.js?v=20261028002"></script>
-  <script type="module" src="assets/js/auth-ui.js?v=20261028002"></script>
+  <script type="module" src="assets/js/auth-ui.js?v=20261030001"></script>
 
   <!-- App Scripts -->
-  <script src="assets/js/security.js?v=20261028005"></script>
-  <script src="assets/js/remote-challenge.js?v=20261028005"></script>
-  <script src="assets/js/remote-challenge-ui.js?v=20261028005"></script>
+  <script src="assets/js/security.js?v=20261030001"></script>
+  <script src="assets/js/remote-challenge.js?v=20261030001"></script>
+  <script src="assets/js/remote-challenge-ui.js?v=20261030001"></script>
   <script src="assets/js/scenarios.js?v=20261028005" defer></script>
   <script src="assets/js/locations.js?v=20261028005" defer></script>
   <script src="assets/js/concepts.js?v=20261028005" defer></script>
   <script src="assets/js/relationships.js?v=20261028005" defer></script>
   <script src="assets/js/content-filter.js?v=20261028005" defer></script>
-  <script src="assets/js/reports.js?v=20261028005" defer></script>
-  <script src="assets/js/translations.js?v=20261028005" defer></script>
+  <script src="assets/js/reports.js?v=20261030001" defer></script>
+  <script src="assets/js/translations.js?v=20261030005" defer></script>
   <script src="assets/js/guest-prompts.js?v=20261028005" defer></script>
-  <script src="assets/js/app.js?v=20261028005" defer></script>
+  <script src="assets/js/app.js?v=20261030006" defer></script>
 </head>
 
 <body>
@@ -64,7 +64,7 @@
           <img src="assets/images/logo.png" alt="Who-Bible Logo" class="logo" />
           <div class="title-section">
             <h1 class="brand-title">Who-Bible</h1>
-            <p class="muted brand-desc">Interactive Bible people quiz with verse references</p>
+            <p class="muted brand-desc">Interactive Bible trivia, scenarios &amp; verse-backed study</p>
           </div>
         </a>
         <div class="controls">
@@ -629,7 +629,7 @@
         <div id="welcome-message" class="player-welcome"></div>
 
         <!-- DAILY SCRIPTURE CHALLENGE -->
-        <section class="daily-challenge-section" aria-labelledby="daily-heading">
+        <section id="daily-challenge-section" class="daily-challenge-section" aria-labelledby="daily-heading">
           <div class="daily-challenge-card" id="daily-challenge-card">
             <div class="daily-badge-pill">✨ Daily Challenge</div>
             <div class="daily-card-content">
@@ -652,7 +652,7 @@
         </section>
 
         <!-- HERO SECTION: PLAY WITH FRIENDS -->
-        <section class="friends-hero-section" aria-labelledby="friends-heading">
+        <section id="game-modes-section" class="friends-hero-section" aria-labelledby="friends-heading">
           <div class="section-header-row">
             <h3 id="friends-heading" class="section-heading">👥 Play with Friends</h3>
             <span class="section-badge">Multiplayer</span>
@@ -663,20 +663,28 @@
             <div class="friend-mode-card card-remote">
               <div class="friend-card-icon remote-distance-icon" aria-hidden="true">
                 <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <!-- Distant Node Left (Local Player) -->
-                  <circle cx="7" cy="18" r="5" fill="#3b82f6" fill-opacity="0.2" stroke="#60a5fa" stroke-width="2"/>
-                  <circle cx="7" cy="18" r="2.2" fill="#93c5fd"/>
-                  <!-- Distant Node Right (Remote Friend) -->
-                  <circle cx="29" cy="18" r="5" fill="#10b981" fill-opacity="0.2" stroke="#34d399" stroke-width="2"/>
-                  <circle cx="29" cy="18" r="2.2" fill="#6ee7b7"/>
-                  <!-- Curved Distance Signal Arcs (Bridge) -->
-                  <path d="M 12 15.5 C 15.5 11 20.5 11 24 15.5" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round"/>
-                  <path d="M 12 20.5 C 15.5 25 20.5 25 24 20.5" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round"/>
-                  <!-- Central Synced Spark of Connection -->
-                  <circle cx="18" cy="18" r="2.5" fill="#fbbf24"/>
-                  <!-- Long-Distance Wireless Ripples -->
-                  <path d="M 3.5 11.5 C 1.2 15.2 1.2 20.8 3.5 24.5" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
-                  <path d="M 32.5 11.5 C 34.8 15.2 34.8 20.8 32.5 24.5" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+                  <defs>
+                    <radialGradient id="earthOceanGrad" cx="35%" cy="30%" r="70%">
+                      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+                      <stop offset="60%" stop-color="#2563eb" stop-opacity="0.25"/>
+                      <stop offset="100%" stop-color="#1e3a8a" stop-opacity="0.4"/>
+                    </radialGradient>
+                  </defs>
+                  <!-- Outer Orbital Connection Ring -->
+                  <ellipse cx="18" cy="18" rx="16.2" ry="6.4" transform="rotate(-22 18 18)" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3 2.5" opacity="0.75"/>
+                  <!-- Earth Sphere -->
+                  <circle cx="18" cy="18" r="12.5" fill="url(#earthOceanGrad)" stroke="#60a5fa" stroke-width="2"/>
+                  <!-- Stylized Continents Hints -->
+                  <path d="M 12.5 11.5 C 14.5 10.5 16.5 11.8 16.2 13.8 C 15.9 15.5 13.8 16.2 14.2 18.2 C 14.6 20.2 16.5 21 15.8 23.8 C 15.2 25.5 13.2 24.8 12.4 22.8 C 11.5 20.5 10.5 14.2 12.5 11.5 Z" fill="#34d399" fill-opacity="0.55"/>
+                  <path d="M 20.5 10.8 C 23.2 11.2 25.8 13.5 25.4 16.5 C 25.0 19.2 22.8 19.8 22.4 22.5 C 22.1 24.2 20.2 24.5 19.8 22.4 C 19.4 20.2 20.8 17.8 19.8 15.5 C 18.9 13.5 18.8 10.5 20.5 10.8 Z" fill="#34d399" fill-opacity="0.55"/>
+                  <!-- Globe Meridians & Equator -->
+                  <ellipse cx="18" cy="18" rx="6.2" ry="12.5" stroke="#93c5fd" stroke-width="1.2" stroke-opacity="0.55"/>
+                  <path d="M 5.8 18 H 30.2" stroke="#93c5fd" stroke-width="1.2" stroke-opacity="0.55"/>
+                  <path d="M 7.5 12.8 C 13.5 14.4 22.5 14.4 28.5 12.8" stroke="#93c5fd" stroke-width="1.1" stroke-opacity="0.4"/>
+                  <path d="M 7.5 23.2 C 13.5 21.6 22.5 21.6 28.5 23.2" stroke="#93c5fd" stroke-width="1.1" stroke-opacity="0.4"/>
+                  <!-- Live Player Spark Nodes on Orbit -->
+                  <circle cx="32.8" cy="12" r="2.6" fill="#fbbf24"/>
+                  <circle cx="3.2" cy="24" r="2.2" fill="#34d399"/>
                 </svg>
               </div>
               <div class="friend-card-body">
@@ -735,7 +743,7 @@
         </section>
 
         <!-- SINGLE PLAYER & STUDY MODES -->
-        <section class="single-modes-section" aria-labelledby="modes-heading">
+        <section id="solo-modes-section" class="single-modes-section" aria-labelledby="modes-heading">
           <div class="section-header-row">
             <h3 id="modes-heading" class="section-heading">🎯 Solo & Practice Modes</h3>
           </div>
@@ -759,7 +767,7 @@
               <div class="mode-icon" aria-hidden="true">🔍</div>
               <div class="mode-text">
                 <div class="mode-title">Study Bible People</div>
-                <div class="mode-desc" id="study-desc">Explore 400+ characters</div>
+                <div class="mode-desc" id="study-desc">Explore 170+ biblical figures</div>
               </div>
             </button>
             <button id="btn-scenarios" class="mode-btn" data-mode="scenarios" aria-describedby="scenarios-desc"
@@ -773,114 +781,38 @@
           </div>
         </section>
 
-        <!-- GAME SETTINGS & DIFFICULTY -->
-        <section class="settings-card-section" aria-labelledby="settings-heading">
-          <div class="settings-header-row">
-            <h3 id="settings-heading" class="section-heading">⚙️ Game Settings</h3>
-            <button id="btn-reset-settings" class="reset-settings-btn" title="Reset all settings to default">↺ Reset to
-              Defaults</button>
-          </div>
-
-          <!-- Quick Presets -->
-          <div class="quick-presets-row">
-            <span class="presets-label">⚡ Quick Presets:</span>
-            <div class="preset-btns">
-              <button class="preset-btn" data-preset="casual">Casual (5Q, Easy, 90s)</button>
-              <button class="preset-btn active" data-preset="standard">Standard (10Q, Med, 60s)</button>
-              <button class="preset-btn" data-preset="epic">Epic (20Q, Hard, 30s)</button>
-            </div>
-          </div>
-
-          <!-- Interactive Pill Toggles -->
-          <div class="settings-toggles-grid">
-            <!-- Difficulty -->
-            <div class="setting-toggle-group">
-              <span class="setting-toggle-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>Difficulty:</span>
-              <div class="toggle-pill-row" data-setting="difficulty">
-                <button class="toggle-pill" data-value="easy">🌱 Easy</button>
-                <button class="toggle-pill active" data-value="medium">⚖️ Medium</button>
-                <button class="toggle-pill" data-value="hard">🔥 Hard</button>
-                <button class="toggle-pill" data-value="expert">⚡ Expert</button>
-              </div>
-            </div>
-
-            <!-- Number of Questions -->
-            <div class="setting-toggle-group">
-              <span class="setting-toggle-label">🔢 Questions:</span>
-              <div class="toggle-pill-row" data-setting="num-questions">
-                <button class="toggle-pill" data-value="5">5</button>
-                <button class="toggle-pill active" data-value="10">10</button>
-                <button class="toggle-pill" data-value="15">15</button>
-                <button class="toggle-pill" data-value="20">20</button>
-                <button class="toggle-pill" data-value="30">30</button>
-              </div>
-            </div>
-
-            <!-- Timer Limit -->
-            <div class="setting-toggle-group">
-              <span class="setting-toggle-label">⏱️ Time Per Question:</span>
-              <div class="toggle-pill-row" data-setting="time-limit">
-                <button class="toggle-pill" data-value="15">15s (Blitz)</button>
-                <button class="toggle-pill" data-value="30">30s (Fast)</button>
-                <button class="toggle-pill active" data-value="60">60s (Standard)</button>
-                <button class="toggle-pill" data-value="90">90s (Relaxed)</button>
-              </div>
-            </div>
-
-            <!-- Testament Filter -->
-            <div class="setting-toggle-group">
-              <span class="setting-toggle-label">📜 Testament:</span>
-              <div class="toggle-pill-row" data-setting="testament-filter">
-                <button class="toggle-pill active" data-value="all">All Bible</button>
-                <button class="toggle-pill" data-value="ot">Old Testament</button>
-                <button class="toggle-pill" data-value="nt">New Testament</button>
-              </div>
-            </div>
-
-            <!-- Gender Filter -->
-            <div class="setting-toggle-group">
-              <span class="setting-toggle-label">👥 Figures:</span>
-              <div class="toggle-pill-row" data-setting="gender-filter">
-                <button class="toggle-pill active" data-value="all">All People</button>
-                <button class="toggle-pill" data-value="men">Men of Faith</button>
-                <button class="toggle-pill" data-value="women">Women of Faith</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Hidden selects for JS backward compatibility -->
-          <div style="display:none;" aria-hidden="true">
-            <select id="difficulty">
-              <option value="easy">Easy</option>
-              <option value="medium" selected>Medium</option>
-              <option value="hard">Hard</option>
-              <option value="expert">Expert</option>
-            </select>
-            <select id="num-questions">
-              <option value="5">5</option>
-              <option value="10" selected>10</option>
-              <option value="15">15</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-            </select>
-            <select id="time-limit">
-              <option value="15">15s</option>
-              <option value="30">30s</option>
-              <option value="60" selected>60s</option>
-              <option value="90">90s</option>
-            </select>
-            <select id="testament-filter">
-              <option value="all" selected>All</option>
-              <option value="ot">OT</option>
-              <option value="nt">NT</option>
-            </select>
-            <select id="gender-filter">
-              <option value="all" selected>All</option>
-              <option value="men">Men</option>
-              <option value="women">Women</option>
-            </select>
-          </div>
-        </section>
+        <!-- Hidden state selects for JS settings persistence -->
+        <div style="display:none;" aria-hidden="true">
+          <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+            <option value="expert">Expert</option>
+          </select>
+          <select id="num-questions">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+          </select>
+          <select id="time-limit">
+            <option value="30">30s</option>
+            <option value="60" selected>60s</option>
+            <option value="90">90s</option>
+            <option value="120">120s</option>
+          </select>
+          <select id="testament-filter">
+            <option value="all" selected>All</option>
+            <option value="ot">OT</option>
+            <option value="nt">NT</option>
+          </select>
+          <select id="gender-filter">
+            <option value="all" selected>All</option>
+            <option value="male">Men</option>
+            <option value="female">Women</option>
+          </select>
+        </div>
       </section>
 
       <!-- Game Area -->
@@ -1019,8 +951,8 @@
                 </svg>
                 <span>Pause</span>
               </button>
-              <button id="btn-next" class="control-btn-modern primary-glow" disabled aria-label="Next Question">
-                <span>Next Question</span>
+              <button id="btn-next" class="control-btn-modern primary-glow" style="display:none" disabled aria-label="Next Question">
+                <span>Next</span>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                   stroke-linecap="round" stroke-linejoin="round" class="btn-arrow">
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -1038,9 +970,9 @@
       <!-- Study Panel -->
       <section id="study-panel" style="display:none" role="main" aria-labelledby="study-heading">
         <div class="study-container">
-          <header class="study-header-compact">
+          <div class="study-toolbar-card">
             <div class="study-top-row">
-              <button id="btn-back-from-study" class="back-btn-modern" aria-label="Back to Setup">
+              <button id="btn-back-from-study" class="back-btn-modern" type="button" aria-label="Back to Setup">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
                   stroke-linecap="round" stroke-linejoin="round">
                   <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -1048,14 +980,26 @@
                 </svg>
                 <span>Back</span>
               </button>
+
               <div class="study-heading-group">
                 <h2 id="study-heading" class="study-compact-title">📖 Scripture Explorer</h2>
                 <span class="study-count-badge" id="study-count-badge"><span id="people-count">170</span> Figures</span>
               </div>
+
+              <div class="study-quick-actions">
+                <button id="btn-sort-toggle" class="study-action-btn" type="button" title="Toggle A-Z / Z-A Sort" aria-label="Toggle sort order">
+                  <span id="sort-toggle-label">A–Z</span>
+                </button>
+                <button id="btn-shuffle-list" class="study-action-btn" type="button" title="Shuffle order"
+                  aria-label="Shuffle Bible people list">🔀 Shuffle</button>
+                <button id="btn-study-reset-filters" class="study-action-btn reset-chip" type="button" style="display:none;" title="Reset all filters">
+                  ↺ Reset
+                </button>
+              </div>
             </div>
 
-            <!-- Simplified & Intuitive Study Toolbar -->
-            <div class="study-search-row">
+            <!-- Unified Search + Clean Filter Bar -->
+            <div class="study-controls-bar">
               <div class="search-bar-wrapper compact-search">
                 <svg class="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                   stroke-linecap="round" stroke-linejoin="round">
@@ -1063,28 +1007,23 @@
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
                 <label for="search-person" class="sr-only">Search Bible people</label>
-                <input id="search-person" type="text" placeholder="Search by name, role, or event..."
-                  aria-label="Search Bible people" />
+                <input id="search-person" type="text" placeholder="Search name, role, or scripture event..."
+                  aria-label="Search Bible people" autocomplete="off" />
                 <button id="btn-clear-study-search" class="study-clear-search" type="button" aria-label="Clear search text" style="display:none;">✕</button>
               </div>
 
-              <div class="study-quick-actions">
-                <button id="btn-sort-toggle" class="study-action-btn" title="Toggle A-Z / Z-A Sort" aria-label="Toggle sort order">
-                  <span id="sort-toggle-label">A–Z</span>
-                </button>
-                <button id="btn-shuffle-list" class="study-action-btn" title="Shuffle order"
-                  aria-label="Shuffle Bible people list">🔀 Shuffle</button>
+              <div class="study-segmented-group" id="study-testament-tabs" role="tablist" aria-label="Filter by Testament">
+                <button type="button" class="study-seg-btn active" data-testament="all">All</button>
+                <button type="button" class="study-seg-btn" data-testament="ot">Old Testament</button>
+                <button type="button" class="study-seg-btn" data-testament="nt">New Testament</button>
               </div>
-            </div>
 
-            <!-- Intuitive Category Filter Pills -->
-            <div class="study-filter-pills" role="tablist" aria-label="Filter Bible people">
-              <button class="study-pill active" data-filter="all">All Figures</button>
-              <button class="study-pill" data-filter="ot">Old Testament</button>
-              <button class="study-pill" data-filter="nt">New Testament</button>
-              <button class="study-pill" data-filter="easy">🌱 Easy</button>
-              <button class="study-pill" data-filter="medium">⚖️ Medium</button>
-              <button class="study-pill" data-filter="hard">🔥 Hard</button>
+              <div class="study-level-group" id="study-difficulty-tabs" role="group" aria-label="Filter by Difficulty">
+                <button type="button" class="study-lvl-chip active" data-diff="all">All Levels</button>
+                <button type="button" class="study-lvl-chip" data-diff="easy">Easy</button>
+                <button type="button" class="study-lvl-chip" data-diff="medium">Medium</button>
+                <button type="button" class="study-lvl-chip" data-diff="hard">Hard</button>
+              </div>
             </div>
 
             <!-- Hidden legacy elements for script compatibility -->
@@ -1094,7 +1033,7 @@
               <input id="filter-occupation" type="checkbox" />
               <input id="filter-age" type="checkbox" />
             </div>
-          </header>
+          </div>
 
           <main class="study-content">
             <div id="people-list" class="people-list" aria-live="polite"></div>
@@ -1259,8 +1198,101 @@
         <div id="summary-list" class="summary-review-list"></div>
       </main>
       <footer class="modal-footer summary-modal-footer">
-        <button id="btn-share-summary" class="secondary">📤 Share Results</button>
-        <button id="btn-play-again" class="primary">🔄 Play Again</button>
+        <button id="btn-summary-home" class="secondary" type="button">🎮 Game Modes</button>
+        <button id="btn-summary-settings" class="secondary" type="button" style="display:none">⚙️ Settings</button>
+        <button id="btn-share-summary" class="secondary" type="button">📤 Share</button>
+        <button id="btn-play-again" class="primary" type="button">🔄 Play Again</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Mode-Specific Quick-Launch Settings Modal (Solo, Timed, Scenarios) -->
+  <div id="mode-launch-modal" class="modal-overlay" style="display:none" role="dialog"
+    aria-labelledby="mode-launch-title" aria-modal="true">
+    <div class="modal modern-modal-card mode-launch-card" role="document">
+      <header class="modal-header">
+        <h2 id="mode-launch-title">📖 Classic Solo</h2>
+        <button id="btn-mode-launch-close" type="button" aria-label="Close mode settings">✕</button>
+      </header>
+      <main class="modal-body mode-launch-body">
+        <div class="mode-launch-top-row">
+          <p id="mode-launch-subtitle" class="mode-launch-subtitle">Customize your session — your choices save automatically.</p>
+          <button id="btn-reset-settings" type="button" class="reset-settings-btn" title="Reset settings to default">↺ Defaults</button>
+        </div>
+
+        <!-- Quick Presets (Solo & Timed) -->
+        <div class="quick-presets-row mode-launch-presets" id="launch-presets-row" data-launch-modes="solo,timed">
+          <span class="presets-label">⚡ Presets:</span>
+          <div class="preset-btns">
+            <button type="button" class="preset-btn" data-preset="casual" id="preset-btn-casual">Casual (5Q, Easy)</button>
+            <button type="button" class="preset-btn active" data-preset="standard" id="preset-btn-standard">Standard (10Q, Med)</button>
+            <button type="button" class="preset-btn" data-preset="epic" id="preset-btn-epic">Epic (20Q, Hard)</button>
+          </div>
+        </div>
+
+        <div class="mode-launch-rows">
+          <!-- Countdown Clock (Timed Mode Only — highlighted at the top!) -->
+          <div class="mode-launch-group launch-clock-spotlight" data-launch-modes="timed">
+            <span class="mode-launch-label">⏱️ Countdown Clock</span>
+            <div class="toggle-pill-row" data-setting="time-limit">
+              <button type="button" class="toggle-pill" data-value="30">30s Blitz</button>
+              <button type="button" class="toggle-pill active" data-value="60">60s Standard</button>
+              <button type="button" class="toggle-pill" data-value="90">90s Extended</button>
+              <button type="button" class="toggle-pill" data-value="120">120s Marathon</button>
+            </div>
+          </div>
+
+          <!-- Difficulty (Solo, Timed, Scenarios) -->
+          <div class="mode-launch-group" data-launch-modes="solo,timed,scenarios">
+            <span class="mode-launch-label">📊 Difficulty</span>
+            <div class="toggle-pill-row" data-setting="difficulty">
+              <button type="button" class="toggle-pill" data-value="easy">🌱 Easy</button>
+              <button type="button" class="toggle-pill active" data-value="medium">⚖️ Medium</button>
+              <button type="button" class="toggle-pill" data-value="hard">🔥 Hard</button>
+              <button type="button" class="toggle-pill" data-value="expert">⚡ Expert</button>
+            </div>
+          </div>
+
+          <!-- Number of Questions (Solo, Timed, Scenarios) -->
+          <div class="mode-launch-group" data-launch-modes="solo,timed,scenarios">
+            <span class="mode-launch-label" id="launch-qcount-label">🔢 Questions</span>
+            <div class="toggle-pill-row" data-setting="num-questions">
+              <button type="button" class="toggle-pill" data-value="5">5</button>
+              <button type="button" class="toggle-pill active" data-value="10">10</button>
+              <button type="button" class="toggle-pill" data-value="15">15</button>
+              <button type="button" class="toggle-pill" data-value="20">20</button>
+              <button type="button" class="toggle-pill" data-value="30">30</button>
+            </div>
+          </div>
+
+          <!-- Testament Filter (Solo & Timed Only) -->
+          <div class="mode-launch-group" data-launch-modes="solo,timed">
+            <span class="mode-launch-label">📜 Testament</span>
+            <div class="toggle-pill-row" data-setting="testament-filter">
+              <button type="button" class="toggle-pill active" data-value="all">All Bible</button>
+              <button type="button" class="toggle-pill" data-value="ot">Old Testament</button>
+              <button type="button" class="toggle-pill" data-value="nt">New Testament</button>
+            </div>
+          </div>
+
+          <!-- Figures Filter (Solo & Timed Only) -->
+          <div class="mode-launch-group" data-launch-modes="solo,timed">
+            <span class="mode-launch-label">👥 Figures</span>
+            <div class="toggle-pill-row" data-setting="gender-filter">
+              <button type="button" class="toggle-pill active" data-value="all">All People</button>
+              <button type="button" class="toggle-pill" data-value="male">Men of Faith</button>
+              <button type="button" class="toggle-pill" data-value="female">Women of Faith</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mode-launch-summary-bar" id="mode-launch-summary">
+          Ready: 10 Questions • Medium • All Bible
+        </div>
+      </main>
+      <footer class="modal-footer mode-launch-footer">
+        <button id="btn-mode-launch-cancel" type="button" class="secondary">Cancel</button>
+        <button id="btn-mode-launch-start" type="button" class="primary">Start Quiz →</button>
       </footer>
     </div>
   </div>
@@ -1351,18 +1383,18 @@
     aria-modal="true">
     <div class="modal" role="document">
       <header class="modal-header">
-        <h2 id="remote-modal-title">Remote Challenge</h2>
+        <h2 id="remote-modal-title">🌍 Remote Challenge</h2>
         <button id="btn-remote-close" aria-label="Close remote challenge">✕</button>
       </header>
       <main class="modal-body">
         <!-- Step 1: Choose Create or Join -->
         <div id="remote-step-1">
           <div style="text-align: center; margin-bottom: 24px;">
-            <p>Play with anyone, anywhere! No sign-in required.</p>
+            <p>Play with anyone, anywhere in the world! No sign-in required.</p>
           </div>
           <div style="display: flex; gap: 16px; flex-direction: column;">
             <button id="btn-create-room" class="primary" style="padding: 16px;">
-              <div style="font-size: 24px; margin-bottom: 8px;">🎮</div>
+              <div style="font-size: 24px; margin-bottom: 8px;">🌍</div>
               <div><strong>Create Room</strong></div>
               <div style="font-size: 14px; opacity: 0.8;">Start a new challenge and share with a friend</div>
             </button>
@@ -1451,9 +1483,10 @@
             </div>
 
             <div style="margin-top: 20px; padding: 16px; background: var(--glass); border-radius: 12px;">
-              <div style="font-size: 14px; margin-bottom: 6px;"><strong>Waiting for opponent...</strong></div>
+              <div style="font-size: 14px; margin-bottom: 6px;"><strong>Live Room Roster</strong></div>
               <div id="remote-opponent-status" style="color: var(--muted); font-size: 13px;">Room created. Waiting for
                 player 2 to join.</div>
+              <ul id="remote-roster" class="remote-roster-list"></ul>
             </div>
             <div style="margin-top: 16px;">
               <button id="btn-ready-host" class="primary" style="display:none;">Ready to Start!</button>
@@ -1489,6 +1522,7 @@
                   id="remote-host-name-display">Player 1</span></div>
               <div style="font-size: 14px; margin-bottom: 8px;"><strong>Match Settings:</strong> <span
                   id="remote-joined-settings" style="color: var(--accent); font-weight: 600;">Medium • 10 Questions • 60s</span></div>
+              <ul id="remote-roster-guest" class="remote-roster-list"></ul>
               <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
                 <div id="remote-joined-status" style="color: var(--muted); font-size: 13px;">Waiting for both players to
                   be ready...</div>
@@ -1501,41 +1535,6 @@
       <footer class="modal-footer">
         <button id="btn-remote-back" style="display:none;">← Back</button>
         <button id="btn-remote-cancel">Cancel</button>
-      </footer>
-    </div>
-  </div>
-
-  <!-- Classroom Join Modal -->
-  <div id="classroom-join-modal" class="modal-overlay" style="display:none" role="dialog"
-    aria-labelledby="classroom-join-title" aria-modal="true">
-    <div class="modal" role="document">
-      <header class="modal-header">
-        <h2 id="classroom-join-title">🏫 Classroom Game</h2>
-        <button id="btn-classroom-join-close" aria-label="Close classroom join">✕</button>
-      </header>
-      <main class="modal-body">
-        <p style="margin-bottom: 1.25rem; color: var(--text-muted); font-size: 15px;">Enter the Game PIN from the
-          presenter's screen to play along on your device.</p>
-        <div class="row">
-          <label for="classroom-pin-input">Game PIN</label>
-          <input id="classroom-pin-input" type="text" placeholder="e.g., FAITH-123"
-            style="text-transform: uppercase; font-size: 18px; font-weight: 700; letter-spacing: 1px;" maxlength="20" />
-        </div>
-        <div class="row">
-          <label for="classroom-player-name">Your Display Name</label>
-          <input id="classroom-player-name" type="text" placeholder="Enter your name" maxlength="20" />
-        </div>
-        <div
-          style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; text-align: center;">
-          <span style="font-size: 13px; color: var(--muted);">Want to host the quiz for your classroom or group?</span>
-          <button type="button" onclick="window.open('host.html', '_blank')" class="secondary"
-            style="margin-top: 8px; width: 100%; font-size: 13px; padding: 8px 12px;">🖥️ Launch Host View on
-            Projector</button>
-        </div>
-      </main>
-      <footer class="modal-footer">
-        <button id="btn-classroom-join-save" class="primary" style="margin-right:0.5em;">Join Game</button>
-        <button id="btn-classroom-join-cancel">Cancel</button>
       </footer>
     </div>
   </div>
@@ -1961,6 +1960,23 @@
           <button id="btn-copy-url-pill" class="share-copy-pill" type="button">Copy</button>
         </div>
       </main>
+    </div>
+  </div>
+
+  <!-- Custom Confirmation Dialog Modal (Replaces native confirm/alert) -->
+  <div id="confirm-modal" class="modal-overlay" style="display:none; z-index: 2500;" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <div class="modal modern-modal-card confirm-modal-card" role="document">
+      <header class="modal-header">
+        <h2 id="confirm-modal-title">Confirm Action</h2>
+        <button id="btn-confirm-modal-close" type="button" aria-label="Close confirmation dialog">✕</button>
+      </header>
+      <main class="modal-body">
+        <p id="confirm-modal-message" style="color: var(--text); font-size: 15px; line-height: 1.5; margin: 0;">Are you sure you want to continue?</p>
+      </main>
+      <footer class="modal-footer">
+        <button id="btn-confirm-modal-cancel" type="button" class="secondary">Cancel</button>
+        <button id="btn-confirm-modal-ok" type="button" class="primary">Confirm</button>
+      </footer>
     </div>
   </div>
 

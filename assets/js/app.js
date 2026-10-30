@@ -35,7 +35,12 @@ function loadPlayer() {
   try {
     const playerData = localStorage.getItem('who-bible-player');
     if (playerData) {
-      state.currentPlayer = JSON.parse(playerData);
+      const parsed = JSON.parse(playerData);
+      if (parsed && parsed.stats) {
+        if (!Number.isFinite(parsed.stats.winRate)) parsed.stats.winRate = 0;
+        if (!Number.isFinite(parsed.stats.averageScore)) parsed.stats.averageScore = 0;
+      }
+      state.currentPlayer = parsed;
       return state.currentPlayer;
     }
   } catch(_) {}
@@ -90,6 +95,7 @@ function initializeStats() {
 
 function updatePlayerStats(score, streak, correct, total, mode) {
   if (!state.currentPlayer) return;
+  if (!total && !state.timedOut) return;
   
   const stats = state.currentPlayer.stats;
   stats.gamesPlayed++;
@@ -98,8 +104,8 @@ function updatePlayerStats(score, streak, correct, total, mode) {
   stats.bestStreak = Math.max(stats.bestStreak, streak);
   stats.totalCorrect += correct;
   stats.totalQuestions += total;
-  stats.averageScore = Math.round(stats.totalScore / stats.gamesPlayed);
-  stats.winRate = Math.round((stats.totalCorrect / stats.totalQuestions) * 100);
+  stats.averageScore = stats.gamesPlayed > 0 ? Math.round(stats.totalScore / stats.gamesPlayed) : 0;
+  stats.winRate = stats.totalQuestions > 0 ? Math.round((stats.totalCorrect / stats.totalQuestions) * 100) : 0;
   stats.lastPlayedAt = new Date().toISOString();
   
   // Track mode preferences
@@ -492,7 +498,10 @@ function updateDailyChallengeCard() {
   }
 }
 
-function startDailyChallenge() {
+async function startDailyChallenge() {
+  if (!state.people || state.people.length === 0) {
+    await ensurePeopleLoaded();
+  }
   if (!state.people || state.people.length === 0) {
     showToast({ title: 'Loading...', msg: 'Please wait a moment for data to load', type: 'info' });
     return;
@@ -508,6 +517,23 @@ function startDailyChallenge() {
   state.results = [];
   state.paused = false;
 
+  const welcomeMsg = document.getElementById('welcome-message');
+  if (welcomeMsg) welcomeMsg.style.display = 'none';
+  const soloScoreChip = document.querySelector('.chip-score');
+  const soloStreakChip = document.querySelector('#streak-chip');
+  const progressChip = document.querySelector('.chip-progress');
+  const progressTrack = document.querySelector('.progress-container-modern');
+  if (soloScoreChip) soloScoreChip.style.display = 'flex';
+  if (soloStreakChip) soloStreakChip.style.display = 'flex';
+  if (progressChip) progressChip.style.display = 'flex';
+  if (progressTrack) progressTrack.style.display = 'block';
+  if (versusTurnBanner) versusTurnBanner.style.display = 'none';
+  clearAutoAdvance();
+  if (btnNext) {
+    btnNext.style.display = 'none';
+    btnNext.disabled = true;
+  }
+
   const dailyPerson = getDailyFigure();
   const pool = [dailyPerson, ...state.people.filter(p => p.name !== dailyPerson.name)];
   state.questions = pickQuestionSet(5, 'medium', pool);
@@ -515,13 +541,13 @@ function startDailyChallenge() {
   qtotalEl.innerText = state.qtotal;
   scoreEl.innerText = state.score;
   streakEl.innerText = state.streak;
-  btnNext.disabled = true;
   quizEl.style.display = 'block';
   timerEl.style.display = 'none';
   if (btnPause) btnPause.style.display = 'none';
   challengeStatusEl.style.display = 'none';
   stopTimer();
   nextQuestion();
+  resetViewportScroll();
   showToast({ title: 'Daily Challenge Started!', msg: `5 Questions • Featured: ${dailyPerson.name}`, type: 'success', timeout: 2200 });
 }
 
@@ -699,20 +725,73 @@ function translateAnswerForQuestionType(qType, value){
 }
 
 // =========================
-// Init
+// Init & Data Bootstrap
 // =========================
+let peopleLoadPromise = null;
+
+async function ensurePeopleLoaded() {
+  if (Array.isArray(state.people) && state.people.length > 0) {
+    return state.people;
+  }
+  if (!peopleLoadPromise) {
+    peopleLoadPromise = (async () => {
+      try {
+        const response = await fetch('assets/data/people.json');
+        if (response.ok) {
+          const externalData = await response.json();
+          if (Array.isArray(externalData) && externalData.length > 0) {
+            DEFAULT_PEOPLE_DATA.length = 0;
+            DEFAULT_PEOPLE_DATA.push(...externalData);
+            console.log('✓ Loaded', externalData.length, 'people from external JSON');
+          }
+        }
+      } catch (error) {
+        console.warn('Could not load external people data, using defaults:', error);
+      } finally {
+        const stored = loadPeopleDataFromLocalStorage();
+        state.people = (Array.isArray(stored) && stored.length > 0) ? stored : DEFAULT_PEOPLE_DATA.slice();
+        peopleLoadPromise = null;
+      }
+      return state.people;
+    })();
+  }
+  return peopleLoadPromise;
+}
+
+function setSelectValueSafe(selectEl, rawValue, fallbackValue) {
+  if (!selectEl) return;
+  let val = String(rawValue ?? fallbackValue);
+  // Migrate legacy setting values seamlessly
+  if (selectEl.id === 'gender-filter') {
+    if (val === 'men') val = 'male';
+    else if (val === 'women') val = 'female';
+  } else if (selectEl.id === 'time-limit') {
+    if (val === '15') val = '30';
+  }
+  const hasOption = Array.from(selectEl.options || []).some(opt => opt.value === val);
+  selectEl.value = hasOption ? val : String(fallbackValue);
+}
+
 async function init(){
   console.log('Initializing app...');
+  window.state = state;
+  window.showToast = showToast;
+  window.showConfirmDialog = showConfirmDialog;
   SoundFX.init();
+  initUniversalModalScrollLock();
   attachHandlers(); // Attach listeners immediately
   initFeedback(); // Initialize feedback system
   initSettingsPills(); // Initialize pill toggle settings UI
+  setupModernShareEvents(); // Wire share modal copy & native share actions
+  setupSimplifiedStudyControls(); // Wire Study Mode search, sort & filter tabs
   
   // Set default settings if not present
   const defaultSettings = {
     difficulty: 'medium',
     numQuestions: 10,
     timeLimit: 60,
+    testamentFilter: 'all',
+    genderFilter: 'all',
     theme: 'night',
     language: 'en'
   };
@@ -721,17 +800,19 @@ async function init(){
     savedSettings = { ...defaultSettings };
     localStorage.setItem('settings', JSON.stringify(savedSettings));
   }
-  // Apply settings to UI and state
-  difficultySel.value = savedSettings.difficulty ?? defaultSettings.difficulty;
-  numQuestionsInput.value = String(savedSettings.numQuestions ?? defaultSettings.numQuestions);
-  timeLimitInput.value = String(savedSettings.timeLimit ?? defaultSettings.timeLimit);
+  // Apply settings safely to UI and state (including Testament & Figures filters)
+  setSelectValueSafe(difficultySel, savedSettings.difficulty, defaultSettings.difficulty);
+  setSelectValueSafe(numQuestionsInput, savedSettings.numQuestions, defaultSettings.numQuestions);
+  setSelectValueSafe(timeLimitInput, savedSettings.timeLimit, defaultSettings.timeLimit);
+  setSelectValueSafe(document.getElementById('testament-filter'), savedSettings.testamentFilter, defaultSettings.testamentFilter);
+  setSelectValueSafe(document.getElementById('gender-filter'), savedSettings.genderFilter, defaultSettings.genderFilter);
+  saveSettingsFromUI();
   
-  // Sync pills to reflect loaded settings
+  // Sync pills & preset buttons to reflect loaded settings
   syncPillsFromSelects();
   
   // Ensure theme is applied - force initial application
   const themeToApply = savedSettings.theme || defaultSettings.theme;
-  console.log('Initial theme to apply:', themeToApply); // Debug
   applyTheme(themeToApply);
   // Set language
   const savedLang = localStorage.getItem('who-bible-language');
@@ -742,20 +823,9 @@ async function init(){
   } else {
     setLanguage(defaultSettings.language);
   }
-  // Load people data from external JSON file
-  try {
-    const response = await fetch('assets/data/people.json');
-    if (response.ok) {
-      const externalData = await response.json();
-      DEFAULT_PEOPLE_DATA.length = 0; // Clear hardcoded data
-      DEFAULT_PEOPLE_DATA.push(...externalData); // Replace with external data
-      console.log('✓ Loaded', externalData.length, 'people from external JSON');
-    }
-  } catch (error) {
-    console.warn('Could not load external people data, using defaults:', error);
-  }
-  
-  state.people = loadPeopleDataFromLocalStorage() || DEFAULT_PEOPLE_DATA.slice();
+
+  // Load people data immediately before secondary modules so quiz modes are ready right away
+  await ensurePeopleLoaded();
   updateDailyChallengeCard();
   renderPeopleList();
   
@@ -781,24 +851,21 @@ async function init(){
     console.log('✓ Concepts module loaded:', window.ConceptModule.concepts.length, 'concepts');
   }
   
-  // Initialize Firebase and show Remote Challenge if available
-  if (window.FirebaseConfig) {
-    const firebaseReady = window.FirebaseConfig.initialize();
-    if (firebaseReady && btnRemoteChallenge) {
+  // Initialize Firebase and show Remote Challenge / handle deep-link PINs
+  const activateFirebaseFeatures = () => {
+    if (!window.FirebaseConfig || !window.FirebaseConfig.isAvailable()) return false;
+    if (btnRemoteChallenge) {
       btnRemoteChallenge.style.display = 'block';
-      console.log('✓ Remote Challenge enabled (Firebase configured)');
-      
+    }
+    if (!window._wbDeepLinkChecked) {
+      window._wbDeepLinkChecked = true;
       const urlParams = new URLSearchParams(window.location.search);
       const pinFromUrl = urlParams.get('pin');
       const roomCodeFromUrl = window.RemoteChallenge?.getRoomCodeFromUrl();
-      
+
       if (pinFromUrl) {
-        // Auto-open Classroom join modal
-        setTimeout(() => {
-          promptClassroomJoin(pinFromUrl);
-        }, 300);
+        setTimeout(() => promptClassroomJoin(pinFromUrl), 250);
       } else if (roomCodeFromUrl) {
-        // Auto-open Remote Challenge join flow
         setTimeout(() => {
           if (window.RemoteChallengeUI) {
             window.RemoteChallengeUI.show();
@@ -806,11 +873,16 @@ async function init(){
             const input = document.getElementById('remote-room-code-input');
             if (input) input.value = roomCodeFromUrl;
           }
-        }, 300);
+        }, 250);
       }
-    } else {
-      console.log('ℹ Remote Challenge disabled (Firebase not configured)');
     }
+    return true;
+  };
+
+  if (!activateFirebaseFeatures()) {
+    window.addEventListener('firebase:ready', () => {
+      activateFirebaseFeatures();
+    }, { once: true });
   }
   
   // Load or create player
@@ -827,9 +899,13 @@ async function init(){
     displayPlayerInfo();
   }
   
-  // Initialize history state
+  // Initialize history state & support direct #game-modes-section / #modes deep-link
+  const initialHash = (window.location.hash || '').toLowerCase();
   if (!history.state) {
     history.replaceState({ view: 'setup' }, '', window.location.pathname);
+  }
+  if (['#modes', '#game-modes', '#game-modes-section'].includes(initialHash)) {
+    scrollToGameModes();
   }
 
   renderPeopleList();
@@ -890,17 +966,16 @@ function checkFirstTimeUser() {
   }
 }
 
-// ── Settings Pill Toggle System ──────────────────────────────────
-function initSettingsPills() {
-  // Map: data-setting → hidden select id
-  const settingMap = {
-    'difficulty': 'difficulty',
-    'num-questions': 'num-questions',
-    'time-limit': 'time-limit',
-    'testament-filter': 'testament-filter',
-    'gender-filter': 'gender-filter'
-  };
+// ── Settings Pill Toggle System & Mode Quick-Launch Modal ────────
+const SETTINGS_PRESETS = {
+  casual: { difficulty: 'easy', 'num-questions': '5', 'time-limit': '90', 'testament-filter': 'all', 'gender-filter': 'all' },
+  standard: { difficulty: 'medium', 'num-questions': '10', 'time-limit': '60', 'testament-filter': 'all', 'gender-filter': 'all' },
+  epic: { difficulty: 'hard', 'num-questions': '20', 'time-limit': '90', 'testament-filter': 'all', 'gender-filter': 'all' }
+};
 
+let pendingLaunchMode = null;
+
+function initSettingsPills() {
   // Wire up each toggle-pill-row
   document.querySelectorAll('.toggle-pill-row').forEach(row => {
     const settingKey = row.getAttribute('data-setting');
@@ -909,32 +984,21 @@ function initSettingsPills() {
 
     row.querySelectorAll('.toggle-pill').forEach(pill => {
       pill.addEventListener('click', () => {
-        // Deactivate siblings
         row.querySelectorAll('.toggle-pill').forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
-        // Sync hidden select
         selectEl.value = pill.getAttribute('data-value');
         selectEl.dispatchEvent(new Event('change'));
-        // Deactivate presets since user customized
-        document.querySelectorAll('.preset-btn').forEach(pb => pb.classList.remove('active'));
+        syncPillsFromSelects();
       });
     });
   });
 
-  // Presets
-  const presets = {
-    casual: { difficulty: 'easy', 'num-questions': '5', 'time-limit': '90', 'testament-filter': 'all', 'gender-filter': 'all' },
-    standard: { difficulty: 'medium', 'num-questions': '10', 'time-limit': '60', 'testament-filter': 'all', 'gender-filter': 'all' },
-    epic: { difficulty: 'hard', 'num-questions': '20', 'time-limit': '30', 'testament-filter': 'all', 'gender-filter': 'all' }
-  };
-
   document.querySelectorAll('.preset-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const preset = presets[btn.getAttribute('data-preset')];
+      const preset = SETTINGS_PRESETS[btn.getAttribute('data-preset')];
       if (!preset) return;
       applySettingsValues(preset);
-      document.querySelectorAll('.preset-btn').forEach(pb => pb.classList.remove('active'));
-      btn.classList.add('active');
+      syncPillsFromSelects();
     });
   });
 
@@ -942,35 +1006,130 @@ function initSettingsPills() {
   const btnReset = document.getElementById('btn-reset-settings');
   if (btnReset) {
     btnReset.addEventListener('click', () => {
-      const defaults = { difficulty: 'medium', 'num-questions': '10', 'time-limit': '60', 'testament-filter': 'all', 'gender-filter': 'all' };
-      applySettingsValues(defaults);
-      // Re-activate Standard preset
-      document.querySelectorAll('.preset-btn').forEach(pb => pb.classList.remove('active'));
-      const stdBtn = document.querySelector('.preset-btn[data-preset="standard"]');
-      if (stdBtn) stdBtn.classList.add('active');
+      applySettingsValues(SETTINGS_PRESETS.standard);
+      syncPillsFromSelects();
       showToast({ title: '↺ Settings Reset', msg: 'All settings restored to defaults', type: 'success', timeout: 2000 });
     });
   }
 
+  // Mode Quick-Launch Modal buttons
+  document.getElementById('btn-mode-launch-close')?.addEventListener('click', closeModeLaunchModal);
+  document.getElementById('btn-mode-launch-cancel')?.addEventListener('click', closeModeLaunchModal);
+  document.getElementById('btn-mode-launch-start')?.addEventListener('click', () => {
+    SoundFX.playClick();
+    launchConfiguredMode();
+  });
+
   // Sync pills from current select values (on load)
   syncPillsFromSelects();
+}
+
+function updateModeLaunchSummary(mode = pendingLaunchMode) {
+  const summaryEl = document.getElementById('mode-launch-summary');
+  if (!summaryEl || !mode) return;
+
+  const qCount = document.getElementById('num-questions')?.value || '10';
+  const diffRaw = document.getElementById('difficulty')?.value || 'medium';
+  const diffLabel = { easy: 'Easy', medium: 'Medium', hard: 'Hard', expert: 'Expert' }[diffRaw] || 'Medium';
+  const clockSecs = document.getElementById('time-limit')?.value || '60';
+  const testRaw = document.getElementById('testament-filter')?.value || 'all';
+  const testLabel = { all: 'All Bible', ot: 'Old Testament', nt: 'New Testament' }[testRaw] || 'All Bible';
+  const genRaw = document.getElementById('gender-filter')?.value || 'all';
+  const genLabel = { all: '', male: ' • Men of Faith', female: ' • Women of Faith' }[genRaw] || '';
+
+  if (mode === 'timed') {
+    summaryEl.textContent = `⏱️ Ready: ${qCount} Questions • ${clockSecs}s Clock • ${diffLabel} • ${testLabel}${genLabel}`;
+  } else if (mode === 'scenarios') {
+    summaryEl.textContent = `🎭 Ready: ${qCount} Scenarios • ${diffLabel} Level`;
+  } else {
+    summaryEl.textContent = `📖 Ready: ${qCount} Questions • ${diffLabel} • ${testLabel}${genLabel}`;
+  }
+}
+
+function openModeLaunchModal(mode) {
+  const launchModal = document.getElementById('mode-launch-modal');
+  if (!launchModal) {
+    if (mode === 'solo') startSolo();
+    else if (mode === 'timed') startTimed();
+    else if (mode === 'scenarios') startScenarios();
+    return;
+  }
+
+  pendingLaunchMode = mode;
+
+  const titleEl = document.getElementById('mode-launch-title');
+  const subtitleEl = document.getElementById('mode-launch-subtitle');
+  const startBtn = document.getElementById('btn-mode-launch-start');
+  const qLabel = document.getElementById('launch-qcount-label');
+  const pCasual = document.getElementById('preset-btn-casual');
+  const pStandard = document.getElementById('preset-btn-standard');
+  const pEpic = document.getElementById('preset-btn-epic');
+
+  if (mode === 'timed') {
+    if (titleEl) titleEl.textContent = `⏱️ ${getText('timedMode') || 'Timed Mode'}`;
+    if (subtitleEl) subtitleEl.textContent = 'Choose your countdown clock and difficulty — choices save automatically.';
+    if (startBtn) startBtn.textContent = '⏱️ Start Timed Run →';
+    if (qLabel) qLabel.textContent = '🔢 Questions';
+    if (pCasual) pCasual.textContent = 'Casual (5Q, Easy, 90s)';
+    if (pStandard) pStandard.textContent = 'Standard (10Q, Med, 60s)';
+    if (pEpic) pEpic.textContent = 'Epic (20Q, Hard, 90s)';
+  } else if (mode === 'scenarios') {
+    if (titleEl) titleEl.textContent = `🎭 ${getText('scenariosMode') || 'Scenarios Mode'}`;
+    if (subtitleEl) subtitleEl.textContent = 'Step into real-life biblical dilemmas and moral decisions.';
+    if (startBtn) startBtn.textContent = '🎭 Start Scenarios →';
+    if (qLabel) qLabel.textContent = '🔢 Scenarios';
+  } else {
+    if (titleEl) titleEl.textContent = `📖 ${getText('soloMode') || 'Classic Solo'}`;
+    if (subtitleEl) subtitleEl.textContent = 'Play at your own pace with Scripture references after every question.';
+    if (startBtn) startBtn.textContent = '📖 Start Solo Quiz →';
+    if (qLabel) qLabel.textContent = '🔢 Questions';
+    if (pCasual) pCasual.textContent = 'Casual (5Q, Easy)';
+    if (pStandard) pStandard.textContent = 'Standard (10Q, Med)';
+    if (pEpic) pEpic.textContent = 'Epic (20Q, Hard)';
+  }
+
+  // Show only setting blocks relevant to the selected mode
+  launchModal.querySelectorAll('[data-launch-modes]').forEach(el => {
+    const allowed = (el.getAttribute('data-launch-modes') || '').split(',').map(s => s.trim());
+    el.style.display = allowed.includes(mode) ? '' : 'none';
+  });
+
+  syncPillsFromSelects();
+  updateModeLaunchSummary(mode);
+
+  launchModal.style.display = 'flex';
+  syncModalScrollLock();
+  setTimeout(() => startBtn?.focus({ preventScroll: true }), 40);
+}
+
+function closeModeLaunchModal() {
+  const launchModal = document.getElementById('mode-launch-modal');
+  if (launchModal) launchModal.style.display = 'none';
+  pendingLaunchMode = null;
+  syncModalScrollLock();
+}
+
+function launchConfiguredMode() {
+  const mode = pendingLaunchMode;
+  closeModeLaunchModal();
+  if (mode === 'timed') {
+    startTimed();
+  } else if (mode === 'scenarios') {
+    startScenarios();
+  } else if (mode === 'solo') {
+    startSolo();
+  }
 }
 
 function applySettingsValues(values) {
   Object.entries(values).forEach(([key, value]) => {
     const selectEl = document.getElementById(key);
     if (selectEl) {
-      selectEl.value = value;
+      setSelectValueSafe(selectEl, value, value);
       selectEl.dispatchEvent(new Event('change'));
     }
-    // Update pill active state
-    const row = document.querySelector(`.toggle-pill-row[data-setting="${key}"]`);
-    if (row) {
-      row.querySelectorAll('.toggle-pill').forEach(p => {
-        p.classList.toggle('active', p.getAttribute('data-value') === value);
-      });
-    }
   });
+  syncPillsFromSelects();
 }
 
 function syncPillsFromSelects() {
@@ -983,6 +1142,23 @@ function syncPillsFromSelects() {
       p.classList.toggle('active', p.getAttribute('data-value') === currentVal);
     });
   });
+
+  // Highlight matching Quick Preset button (ignoring time-limit when configuring Untimed Solo)
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    const presetKey = btn.getAttribute('data-preset');
+    const preset = SETTINGS_PRESETS[presetKey];
+    if (!preset) return;
+    const matches = Object.entries(preset).every(([k, v]) => {
+      if (pendingLaunchMode === 'solo' && k === 'time-limit') return true;
+      const el = document.getElementById(k);
+      return el && el.value === v;
+    });
+    btn.classList.toggle('active', matches);
+  });
+
+  if (pendingLaunchMode) {
+    updateModeLaunchSummary(pendingLaunchMode);
+  }
 }
 
 function attachHandlers(){
@@ -1007,10 +1183,13 @@ function attachHandlers(){
     });
   }
 
-  // Home link handler
+  // Home link handler (top-left brand logo scrolls to top of home page)
   const homeLink = document.getElementById('home-link');
   if (homeLink) {
-    homeLink.addEventListener('click', (e)=>{ e.preventDefault(); showSetup(); });
+    homeLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showSetup(false, { scrollToModes: false });
+    });
   }
   
   // Player management & Profile modal
@@ -1108,12 +1287,12 @@ function attachHandlers(){
     btnStartDaily.addEventListener('click', startDailyChallenge);
   }
   
-  // Mode buttons
-  if (btnSolo) btnSolo.addEventListener('click', () => { SoundFX.playClick(); startSolo(); });
-  if (btnTimed) btnTimed.addEventListener('click', () => { SoundFX.playClick(); startTimed(); });
+  // Mode buttons (Solo, Timed, and Scenarios open mode-tailored Quick-Launch sheet)
+  if (btnSolo) btnSolo.addEventListener('click', () => { SoundFX.playClick(); openModeLaunchModal('solo'); });
+  if (btnTimed) btnTimed.addEventListener('click', () => { SoundFX.playClick(); openModeLaunchModal('timed'); });
   if (btnChallenge) btnChallenge.addEventListener('click', () => { SoundFX.playClick(); startChallenge(); });
   if (btnStudy) btnStudy.addEventListener('click', () => { SoundFX.playClick(); startStudy(); });
-  if (btnScenarios) btnScenarios.addEventListener('click', () => { SoundFX.playClick(); startScenarios(); });
+  if (btnScenarios) btnScenarios.addEventListener('click', () => { SoundFX.playClick(); openModeLaunchModal('scenarios'); });
   
   // Navigation
   if (btnBackToSetup) btnBackToSetup.addEventListener('click', () => { SoundFX.playClick(); showSetup(); });
@@ -1123,6 +1302,7 @@ function attachHandlers(){
   // Game controls
   if (btnNext) {
     btnNext.addEventListener('click', () => {
+      clearAutoAdvance();
       SoundFX.playClick();
       if (state.mode === 'scenarios') {
         nextScenarioQuestion();
@@ -1140,18 +1320,35 @@ function attachHandlers(){
   if (filterMother) filterMother.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
   if (filterOccupation) filterOccupation.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
   if (filterAge) filterAge.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
-  if (btnShuffleList) btnShuffleList.addEventListener('click', ()=>{ shuffle(state.people); renderPeopleList(searchPerson ? searchPerson.value : ''); SoundFX.playClick(); });
+  if (btnShuffleList) {
+    btnShuffleList.addEventListener('click', () => {
+      state.studySort = 'shuffle';
+      state.shuffledPeople = state.people.slice();
+      shuffle(state.shuffledPeople);
+      const sortToggleBtn = document.getElementById('btn-sort-toggle');
+      if (sortToggleBtn) sortToggleBtn.classList.remove('active');
+      btnShuffleList.classList.add('active');
+      renderPeopleList(searchPerson ? searchPerson.value : '');
+      SoundFX.playClick();
+    });
+  }
   if (btnExpandAll) btnExpandAll.addEventListener('click', ()=>toggleAllDetails(true));
   if (btnCollapseAll) btnCollapseAll.addEventListener('click', ()=>toggleAllDetails(false));
   
-  // Testament and gender filters
+  // Testament and gender filters (persist as part of Game Settings)
   const testamentFilter = document.getElementById('testament-filter');
   const genderFilter = document.getElementById('gender-filter');
   if (testamentFilter) {
-    testamentFilter.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
+    testamentFilter.addEventListener('change', () => {
+      saveSettingsFromUI();
+      renderPeopleList(searchPerson ? searchPerson.value : '');
+    });
   }
   if (genderFilter) {
-    genderFilter.addEventListener('change', ()=>renderPeopleList(searchPerson ? searchPerson.value : ''));
+    genderFilter.addEventListener('change', () => {
+      saveSettingsFromUI();
+      renderPeopleList(searchPerson ? searchPerson.value : '');
+    });
   }
   
   // Data management
@@ -1336,15 +1533,53 @@ function attachHandlers(){
     btnConfirmJoin.addEventListener('click', window.RemoteChallengeUI.joinRoom);
   }
   
-  // Modal Close Handlers
+  // Modal Close & Play Again Handlers
   if (btnSummaryClose) btnSummaryClose.addEventListener('click', hideSummaryModal);
+  const btnSummaryHome = document.getElementById('btn-summary-home');
+  if (btnSummaryHome) {
+    btnSummaryHome.addEventListener('click', () => {
+      SoundFX.playClick();
+      hideSummaryModal();
+      showSetup();
+    });
+  }
+  const btnSummarySettings = document.getElementById('btn-summary-settings');
+  if (btnSummarySettings) {
+    btnSummarySettings.addEventListener('click', () => {
+      SoundFX.playClick();
+      const lastMode = state.mode;
+      hideSummaryModal();
+      showSetup();
+      if (lastMode === 'solo' || lastMode === 'timed' || lastMode === 'scenarios') {
+        openModeLaunchModal(lastMode);
+      } else if (lastMode === 'challenge') {
+        showPlayersModal();
+      }
+    });
+  }
   if (btnPlayAgain) btnPlayAgain.addEventListener('click', () => {
+    SoundFX.playClick();
+    const lastMode = state.mode;
     hideSummaryModal();
-    // Restart based on last mode
-    if (state.mode === 'solo') startSolo();
-    else if (state.mode === 'timed') startTimed();
-    else if (state.mode === 'challenge') startChallenge();
-    else showSetup();
+    if (lastMode === 'solo') {
+      startSolo();
+    } else if (lastMode === 'timed') {
+      startTimed();
+    } else if (lastMode === 'scenarios') {
+      startScenarios();
+    } else if (lastMode === 'daily') {
+      startDailyChallenge();
+    } else if (lastMode === 'challenge') {
+      startChallengeRematch();
+    } else if (lastMode === 'remote-challenge') {
+      if (window.RemoteChallenge) window.RemoteChallenge.leaveRoom(true);
+      showSetup();
+      if (window.RemoteChallengeUI && window.RemoteChallengeUI.show) {
+        window.RemoteChallengeUI.show();
+      }
+    } else {
+      showSetup();
+    }
   });
   
   if (btnPlayersClose) btnPlayersClose.addEventListener('click', hidePlayersModal);
@@ -1417,6 +1652,10 @@ function attachHandlers(){
 
   // Click outside to close modals
   window.addEventListener('click', (e) => {
+    const launchModal = document.getElementById('mode-launch-modal');
+    if (launchModal && e.target === launchModal) {
+      closeModeLaunchModal();
+    }
     if (e.target === modalEl) {
       if (Date.now() - (window._modalOpenedTime || 0) < 400) return;
       hideSummaryModal();
@@ -1437,20 +1676,57 @@ function attachHandlers(){
 
     // Escape always closes any active dialog/modal
     if (e.key === 'Escape') {
+      const launchModal = document.getElementById('mode-launch-modal');
+      if (launchModal && launchModal.style.display === 'flex') {
+        closeModeLaunchModal();
+        return;
+      }
+      const confirmModal = document.getElementById('confirm-modal');
+      if (confirmModal && confirmModal.style.display === 'flex') {
+        document.getElementById('btn-confirm-modal-cancel')?.click();
+        return;
+      }
+      const shareModal = document.getElementById('share-modal');
+      if (shareModal && shareModal.style.display === 'flex') {
+        closeModernShareModal();
+        return;
+      }
+      const classroomModal = document.getElementById('classroom-join-modal');
+      if (classroomModal && classroomModal.style.display === 'flex') {
+        document.getElementById('btn-classroom-join-cancel')?.click();
+        return;
+      }
+      const personModal = document.getElementById('person-modal');
+      if (personModal && personModal.style.display === 'flex') {
+        personModal.style.display = 'none';
+        syncModalScrollLock();
+        return;
+      }
+      const changePlayerModal = document.getElementById('change-player-modal');
+      if (changePlayerModal && changePlayerModal.style.display === 'flex') {
+        document.getElementById('btn-change-player-cancel')?.click();
+        return;
+      }
       const reportModal = document.getElementById('report-modal');
       if (reportModal && reportModal.classList.contains('show')) {
         reportModal.classList.remove('show');
-        document.body.style.overflow = '';
+        syncModalScrollLock();
       }
       const feedbackModal = document.getElementById('feedback-modal');
       if (feedbackModal && feedbackModal.classList.contains('show')) {
         feedbackModal.classList.remove('show');
-        document.body.style.overflow = '';
+        syncModalScrollLock();
       }
       const profileModal = document.getElementById('profile-modal');
-      if (profileModal && profileModal.style.display === 'flex') profileModal.style.display = 'none';
+      if (profileModal && profileModal.style.display === 'flex') {
+        profileModal.style.display = 'none';
+        syncModalScrollLock();
+      }
       const welcomeModal = document.getElementById('welcome-modal');
-      if (welcomeModal && welcomeModal.style.display === 'flex') welcomeModal.style.display = 'none';
+      if (welcomeModal && welcomeModal.style.display === 'flex') {
+        welcomeModal.style.display = 'none';
+        syncModalScrollLock();
+      }
       if (modalEl && modalEl.style.display === 'flex') hideSummaryModal();
       if (playersModal && playersModal.style.display === 'flex') hidePlayersModal();
       if (remoteModal && remoteModal.style.display === 'flex') {
@@ -1458,6 +1734,7 @@ function attachHandlers(){
           window.RemoteChallengeUI.hide();
         } else {
           remoteModal.style.display = 'none';
+          syncModalScrollLock();
         }
       }
       return;
@@ -1465,6 +1742,18 @@ function attachHandlers(){
 
     // Do not intercept keystrokes if typing inside text fields
     if (isTyping) return;
+
+    // Quick-Launch Modal: pressing Enter starts the configured mode immediately
+    const activeLaunchModal = document.getElementById('mode-launch-modal');
+    if (activeLaunchModal && activeLaunchModal.style.display === 'flex' && e.key === 'Enter') {
+      const activeId = document.activeElement?.id || '';
+      if (!['btn-mode-launch-cancel', 'btn-mode-launch-close', 'btn-reset-settings'].includes(activeId)) {
+        e.preventDefault();
+        SoundFX.playClick();
+        launchConfiguredMode();
+        return;
+      }
+    }
 
     // Toggle SoundFX Mute with 'm'
     if (e.key === 'm' || e.key === 'M') {
@@ -1480,9 +1769,9 @@ function attachHandlers(){
       return;
     }
 
-    // In-game play controls when Game Area is active
+    // In-game play controls when Game Area is active (and no modal is covering it)
     const gameArea = document.getElementById('game-area');
-    const isGameActive = gameArea && gameArea.style.display !== 'none';
+    const isGameActive = gameArea && gameArea.style.display !== 'none' && !document.body.classList.contains('modal-open');
 
     if (isGameActive) {
       // 1, 2, 3, 4 for answer selection
@@ -1588,8 +1877,142 @@ window.addEventListener('popstate', (event) => {
   }
 });
 
-function showSetup(fromHistory = false){
+function resetViewportScroll() {
+  const htmlEl = document.documentElement;
+  const prevBehavior = htmlEl.style.scrollBehavior;
+  htmlEl.style.scrollBehavior = 'auto';
+  window.scrollTo(0, 0);
+  htmlEl.scrollTop = 0;
+  if (document.body) document.body.scrollTop = 0;
+  const gameContent = document.querySelector('.game-content');
+  const studyContent = document.querySelector('.study-content');
+  if (gameContent) gameContent.scrollTop = 0;
+  if (studyContent) studyContent.scrollTop = 0;
+  requestAnimationFrame(() => {
+    window.scrollTo(0, 0);
+    htmlEl.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
+    htmlEl.style.scrollBehavior = prevBehavior || '';
+  });
+}
+
+function scrollToGameModes(previousMode = '') {
+  const isMobile = window.innerWidth <= 768;
+  const soloModes = ['solo', 'timed', 'study', 'scenarios'];
+
+  let targetEl = null;
+  if (previousMode === 'daily') {
+    targetEl = document.getElementById('daily-challenge-section') || document.querySelector('.daily-challenge-section');
+  } else if (isMobile && soloModes.includes(previousMode)) {
+    targetEl = document.getElementById('solo-modes-section') || document.querySelector('.single-modes-section');
+  }
+  if (!targetEl) {
+    targetEl = document.getElementById('game-modes-section') || document.querySelector('.friends-hero-section') || document.querySelector('.single-modes-section');
+  }
+  if (!targetEl) {
+    resetViewportScroll();
+    return;
+  }
+
+  const applyJump = () => {
+    const htmlEl = document.documentElement;
+    const prevBehavior = htmlEl.style.scrollBehavior;
+    htmlEl.style.scrollBehavior = 'auto';
+    const rect = targetEl.getBoundingClientRect();
+    const topOffset = Math.max(0, Math.round(rect.top + window.scrollY - 20));
+    window.scrollTo(0, topOffset);
+    htmlEl.scrollTop = topOffset;
+    if (document.body) document.body.scrollTop = topOffset;
+    htmlEl.style.scrollBehavior = prevBehavior || '';
+  };
+
+  applyJump();
+  requestAnimationFrame(() => applyJump());
+}
+
+function clearAutoAdvance() {
+  if (state.autoAdvanceTimer) {
+    clearTimeout(state.autoAdvanceTimer);
+    state.autoAdvanceTimer = null;
+  }
+  if (btnNext) {
+    btnNext.classList.remove('auto-advancing');
+    btnNext.style.removeProperty('--auto-ms');
+  }
+}
+
+function scheduleAutoAdvance(isCorrect = true) {
+  clearAutoAdvance();
+  if (!state.mode || state.mode === 'idle' || state.mode === 'classroom') return;
+
+  let delayMs = isCorrect ? 1200 : 1950;
+  if (state.mode === 'timed') {
+    delayMs = isCorrect ? 750 : 1200;
+  } else if (state.mode === 'remote-challenge') {
+    delayMs = isCorrect ? 950 : 1450;
+  } else if (state.mode === 'challenge') {
+    delayMs = isCorrect ? 1600 : 2100;
+  } else if (state.mode === 'scenarios') {
+    delayMs = isCorrect ? 2800 : 3600;
+  }
+
+  const isLast = state.qnum >= state.qtotal;
+  const arrowSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+
+  if (btnNext) {
+    btnNext.disabled = false;
+    btnNext.style.display = 'inline-flex';
+    if (isLast) {
+      btnNext.innerHTML = `<span>Final Results</span> ${arrowSvg}`;
+    } else if (state.mode === 'challenge' && state.players && state.players.length >= 2) {
+      const nextIdx = (state.currentPlayerIndex + 1) % 2;
+      const nextPlayer = state.players[nextIdx];
+      btnNext.innerHTML = `<span>Up Next: ${escapeHtml(nextPlayer.name)}</span> ${arrowSvg}`;
+    } else {
+      btnNext.innerHTML = `<span>Next</span> ${arrowSvg}`;
+    }
+    btnNext.style.setProperty('--auto-ms', `${delayMs}ms`);
+    void btnNext.offsetWidth;
+    btnNext.classList.add('auto-advancing');
+  }
+
+  const expectedMode = state.mode;
+  const expectedQnum = state.qnum;
+
+  const tryAdvance = () => {
+    state.autoAdvanceTimer = null;
+    if (state.mode !== expectedMode || state.qnum !== expectedQnum) return;
+
+    // Defer cleanly if player paused Timed Mode or opened the Report Question modal
+    const reportOpen = document.getElementById('report-modal')?.classList.contains('show');
+    if (state.paused || reportOpen) {
+      if (btnNext) btnNext.classList.remove('auto-advancing');
+      state.autoAdvanceTimer = setTimeout(tryAdvance, 400);
+      return;
+    }
+
+    clearAutoAdvance();
+    if (state.mode === 'scenarios') {
+      nextScenarioQuestion();
+    } else {
+      nextQuestion();
+    }
+  };
+
+  state.autoAdvanceTimer = setTimeout(tryAdvance, delayMs);
+}
+
+function showSetup(fromHistory = false, options = {}){
+  const previousMode = state.mode;
+  const shouldScrollToModes = options.scrollToModes !== false;
   if(!fromHistory) updateHistory('setup');
+  clearAutoAdvance();
+  cleanupClassroomPlayerMode(true);
+  if (state.mode === 'remote-challenge' && window.RemoteChallenge) {
+    window.RemoteChallenge.leaveRoom(true);
+    if (window.RemoteChallengeUI?.endMatch) window.RemoteChallengeUI.endMatch();
+  }
+  state.mode = 'idle';
   setupPanel.style.display = 'flex';
   gameArea.style.display = 'none';
   studyPanel.style.display = 'none';
@@ -1597,21 +2020,39 @@ function showSetup(fromHistory = false){
   if(versusTurnBanner) versusTurnBanner.style.display = 'none';
   const soloScoreChip = document.querySelector('.chip-score');
   const soloStreakChip = document.querySelector('#streak-chip');
+  const progressChip = document.querySelector('.chip-progress');
+  const progressTrack = document.querySelector('.progress-container-modern');
   if (soloScoreChip) soloScoreChip.style.display = 'flex';
   if (soloStreakChip) soloStreakChip.style.display = 'flex';
-  if(btnNext) btnNext.innerHTML = '<span>Next Question</span> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+  if (progressChip) progressChip.style.display = 'flex';
+  if (progressTrack) progressTrack.style.display = 'block';
+  if (btnNext) {
+    btnNext.style.display = 'none';
+    btnNext.disabled = true;
+    btnNext.innerHTML = '<span>Next</span> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+  }
+  if (btnQuit) btnQuit.textContent = getText('quit') || 'Quit';
+  state.paused = false;
   stopTimer();
+  if (timerEl) timerEl.classList.remove('warn', 'danger', 'paused');
   // Reset quiz display
   const quizEl = document.getElementById('quiz');
   const welcomeMsg = document.getElementById('welcome-message');
-  if(quizEl) quizEl.style.display = 'none';
+  if(quizEl) {
+    quizEl.classList.remove('quiz-paused');
+    quizEl.style.display = 'none';
+  }
   if(welcomeMsg) welcomeMsg.style.display = 'block';
   // Reset question number display
   if(typeof qnumEl !== 'undefined' && typeof qtotalEl !== 'undefined') {
     qnumEl.innerText = '0';
-    // set total to selected number of questions for clarity
     const selected = parseInt(numQuestionsInput.value)||10;
     qtotalEl.innerText = String(selected);
+  }
+  if (shouldScrollToModes) {
+    scrollToGameModes(previousMode);
+  } else {
+    resetViewportScroll();
   }
 }
 
@@ -1620,14 +2061,18 @@ function showGame(fromHistory = false){
   setupPanel.style.display = 'none';
   gameArea.style.display = 'flex';
   studyPanel.style.display = 'none';
+  resetViewportScroll();
 }
 
 function showStudy(fromHistory = false){
   if(!fromHistory) updateHistory('study');
+  clearAutoAdvance();
+  state.mode = 'study';
   setupPanel.style.display = 'none';
   gameArea.style.display = 'none';
   studyPanel.style.display = 'flex';
-  renderPeopleList();
+  renderPeopleList(searchPerson ? searchPerson.value : '');
+  resetViewportScroll();
 }
 
 // Community removed from main SPA; use community.html
@@ -1658,28 +2103,34 @@ function escapeHtml(s){
 // =========================
 // Modes
 // =========================
-function startSolo(){
+async function startSolo(){
+  if (!state.people || state.people.length === 0) await ensurePeopleLoaded();
   showGame();
   gameTitle.textContent = getText('soloMode');
   prepareQuiz('solo');
   showToast({ title: getText('soloStart'), msg: getText('soloStartMsg'), type: 'info' });
 }
 
-function startTimed(){
+async function startTimed(){
+  if (!state.people || state.people.length === 0) await ensurePeopleLoaded();
   showGame();
   gameTitle.textContent = getText('timedMode');
   prepareQuiz('timed');
-  const secs = parseInt(timeLimitInput.value)||60;
-  // Ensure timer starts immediately
-  startTimer(secs);
-  showToast({ title: getText('timedStart'), msg: getText('timedStartMsg'), type: 'warn' });
+  const secs = parseInt(timeLimitInput.value, 10) || 60;
+  showToast({
+    title: `⏱️ ${getText('timedStart') || 'Timed Mode'}`,
+    msg: `${state.qtotal} Questions • ${secs}s Clock — Beat the timer!`,
+    type: 'warn',
+    timeout: 2400
+  });
 }
 
 function startChallenge(){
   showPlayersModal();
 }
 
-function startChallengeFromModal(){
+async function startChallengeFromModal(){
+  if (!state.people || state.people.length === 0) await ensurePeopleLoaded();
   const savedP1 = localStorage.getItem('who-bible-p1-name') || '';
   const savedP2 = localStorage.getItem('who-bible-p2-name') || '';
   const name1 = (p1NameInput && p1NameInput.value ? p1NameInput.value.trim() : '') || savedP1 || 'Player 1';
@@ -1729,6 +2180,44 @@ function startChallengeFromModal(){
   });
 }
 
+async function startChallengeRematch(){
+  if (!state.people || state.people.length === 0) await ensurePeopleLoaded();
+  const savedP1 = localStorage.getItem('who-bible-p1-name') || 'Player 1';
+  const savedP2 = localStorage.getItem('who-bible-p2-name') || 'Player 2';
+  const name1 = (state.players && state.players[0] && state.players[0].name) ? state.players[0].name : savedP1;
+  const name2 = (state.players && state.players[1] && state.players[1].name) ? state.players[1].name : savedP2;
+
+  if (!state.challengeSettings) {
+    try {
+      const saved = JSON.parse(localStorage.getItem('who-bible-challenge-settings') || '{}');
+      state.challengeSettings = {
+        numQuestions: saved.numQuestions || 10,
+        difficulty: saved.difficulty || 'medium',
+        timeLimit: saved.timeLimit || 0
+      };
+    } catch (_) {
+      state.challengeSettings = { numQuestions: 10, difficulty: 'medium', timeLimit: 0 };
+    }
+  }
+
+  showGame();
+  gameTitle.textContent = getText('challengeMode') || '⚔️ 2-Player Pass & Play';
+  state.players = [
+    { name: name1, score: 0 },
+    { name: name2, score: 0 }
+  ];
+  state.currentPlayerIndex = 0;
+  stopTimer();
+  prepareQuiz('challenge');
+  updateVersusHUD();
+  showToast({
+    title: '⚔️ Rematch Started!',
+    msg: `${name1} vs ${name2} — fresh questions, scores reset to 0!`,
+    type: 'info',
+    timeout: 2800
+  });
+}
+
 function updateVersusHUD(){
   if (!state.players || state.players.length < 2) return;
   const p1 = state.players[0];
@@ -1759,13 +2248,18 @@ function updateVersusHUD(){
   }
 
   // Prominent banner above the question
-  if (versusTurnBanner && (state.mode === 'challenge' || state.mode === 'remote-challenge')) {
+  if (versusTurnBanner && state.mode === 'challenge') {
     versusTurnBanner.style.display = 'flex';
     if (versusTurnBannerText) {
       const iconSvg = activeIdx === 0
         ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline><line x1="13" y1="19" x2="19" y2="13"></line><line x1="16" y1="16" x2="20" y2="20"></line><line x1="19" y1="21" x2="21" y2="19"></line><polyline points="9.5 17.5 21 6 21 3 18 3 6.5 14.5"></polyline><line x1="5" y1="13" x2="11" y2="19"></line></svg>`
         : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
       versusTurnBannerText.innerHTML = `${iconSvg}It is <strong>${escapeHtml(activePlayer.name)}</strong>'s turn to answer!`;
+    }
+  } else if (versusTurnBanner && state.mode === 'remote-challenge') {
+    versusTurnBanner.style.display = 'flex';
+    if (versusTurnBannerText) {
+      versusTurnBannerText.innerHTML = `🌐 Live Match: <strong>${escapeHtml(p1.name)}</strong> vs <strong>${escapeHtml(p2.name)}</strong> — Race through all questions!`;
     }
   } else if (versusTurnBanner) {
     versusTurnBanner.style.display = 'none';
@@ -1792,49 +2286,98 @@ function startScenarios(){
 
 function prepareScenarioQuiz(){
   state.mode = 'scenarios';
-  afterRef.innerText='';
+  afterRef.innerText = '';
   state.score = 0; state.streak = 0; state.qnum = 0; state.results = []; state.paused = false;
-  
+
   // Reset and shuffle scenarios
   window.ScenarioModule.reset();
   window.ScenarioModule.shuffleScenarios();
-  
-  const count = parseInt(numQuestionsInput.value) || Math.min(10, window.ScenarioModule.scenarios.length);
-  state.questions = window.ScenarioModule.scenarios.slice(0, count);
+
+  const allScenarios = window.ScenarioModule.scenarios.slice();
+  const count = parseInt(numQuestionsInput.value, 10) || Math.min(10, allScenarios.length);
+  const diff = difficultySel ? difficultySel.value : 'medium';
+
+  // Prioritize scenarios matching selected difficulty while filling up to target count
+  const preferredLevels = {
+    easy: ['Beginner', 'Intermediate'],
+    medium: ['Intermediate', 'Beginner'],
+    hard: ['Advanced', 'Intermediate'],
+    expert: ['Expert', 'Advanced', 'Intermediate']
+  }[diff] || ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
+
+  const prioritized = allScenarios.filter(s => preferredLevels.includes(s.level));
+  const remainder = allScenarios.filter(s => !preferredLevels.includes(s.level));
+  shuffle(prioritized);
+  shuffle(remainder);
+
+  // Clone each selected scenario and generate a randomized option permutation so answers are evenly distributed across A, B, C!
+  state.questions = [...prioritized, ...remainder].slice(0, count).map(s => {
+    const optCount = Array.isArray(s.options) ? s.options.length : 3;
+    const optionOrder = Array.from({ length: optCount }, (_, i) => i);
+    shuffle(optionOrder);
+    return { ...s, optionOrder };
+  });
+
   state.qtotal = state.questions.length;
   qtotalEl.innerText = state.qtotal;
   scoreEl.innerText = state.score;
   streakEl.innerText = state.streak;
-  btnNext.disabled = true;
-  
-  // Show the quiz interface
+  clearAutoAdvance();
+  if (btnNext) {
+    btnNext.disabled = true;
+    btnNext.style.display = 'none';
+  }
+
+  // Show the quiz interface and restore solo HUD chips
   quizEl.style.display = 'block';
-  
+  const welcomeMsg = document.getElementById('welcome-message');
+  if (welcomeMsg) welcomeMsg.style.display = 'none';
+  const soloScoreChip = document.querySelector('.chip-score');
+  const soloStreakChip = document.querySelector('#streak-chip');
+  const progressChip = document.querySelector('.chip-progress');
+  const progressTrack = document.querySelector('.progress-container-modern');
+  if (soloScoreChip) soloScoreChip.style.display = 'flex';
+  if (soloStreakChip) soloStreakChip.style.display = 'flex';
+  if (progressChip) progressChip.style.display = 'flex';
+  if (progressTrack) progressTrack.style.display = 'block';
+
   // Hide mode-specific elements
   timerEl.style.display = 'none';
   btnPause.style.display = 'none';
   challengeStatusEl.style.display = 'none';
+  if (versusTurnBanner) versusTurnBanner.style.display = 'none';
   stopTimer();
-  
+
   nextScenarioQuestion();
+  resetViewportScroll();
 }
 
 function nextScenarioQuestion(){
+  clearAutoAdvance();
   if(state.qnum >= state.qtotal){
     endQuiz();
     return;
   }
-  
+
   state.qnum++;
   qnumEl.innerText = state.qnum;
   updateProgress();
-  
+
   const scenario = state.questions[state.qnum - 1];
+  if (scenario) scenario._answered = false;
   state.current = scenario;
-  
+
   renderScenarioQuestion(scenario);
-  btnNext.disabled = true;
+  if (btnNext) {
+    btnNext.disabled = true;
+    btnNext.style.display = 'none';
+  }
   afterRef.innerText = '';
+  resetViewportScroll();
+}
+
+function stripScenarioPrefix(optText) {
+  return String(optText || '').replace(/^[A-Da-d][\.\)]\s*/, '').trim();
 }
 
 function renderScenarioQuestion(scenario){
@@ -1847,7 +2390,7 @@ function renderScenarioQuestion(scenario){
   const translatedScenario = translateScenario(scenario);
 
   // Build the question prompt
-  let prompt = `
+  const prompt = `
   <div class="scenario-card">
     <div class="scenario-header">
       <span class="scenario-theme">${translatedScenario.theme || getText('unknownTheme')}</span>
@@ -1858,44 +2401,68 @@ function renderScenarioQuestion(scenario){
       <div class="scenario-context">${getText('scenarioQuestion')}</div>
     </div>
   </div>`;
-  
+
   qText.innerHTML = prompt;
-  
-  // Render answer options
+
+  // Render answer options in randomized order (scenario.optionOrder)
   answersEl.innerHTML = '';
-  if (translatedScenario.options && Array.isArray(translatedScenario.options)) {
-    translatedScenario.options.forEach((option, index) => {
-      const btn = document.createElement('button');
-      btn.className = 'ans scenario-option';
-    const letter = option.charAt(0);
-    const text = option.substring(3);
-    btn.dataset.value = letter;
+  const rawOptions = Array.isArray(translatedScenario.options) ? translatedScenario.options : [];
+  const baseOptions = Array.isArray(scenario.options) ? scenario.options : rawOptions;
+  const order = Array.isArray(scenario.optionOrder) && scenario.optionOrder.length === rawOptions.length
+    ? scenario.optionOrder
+    : rawOptions.map((_, i) => i);
+  const displayLetters = ['A', 'B', 'C', 'D'];
+
+  order.forEach((origIdx, displayIdx) => {
+    const rawTranslated = rawOptions[origIdx] || '';
+    const rawOriginal = baseOptions[origIdx] || rawTranslated;
+    const origLetter = String(rawOriginal).trim().charAt(0).toUpperCase();
+    const displayLetter = displayLetters[displayIdx] || String(displayIdx + 1);
+    const cleanText = stripScenarioPrefix(rawTranslated);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = `choice-${displayIdx + 1}`;
+    btn.className = 'ans scenario-option';
+    btn.dataset.value = origLetter;
+    btn.dataset.displayLetter = displayLetter;
+    btn.dataset.cleanText = cleanText;
     btn.innerHTML = `
-      <span class="option-letter">${letter}</span>
-      <span class="option-text">${text}</span>
+      <span class="option-letter">${displayLetter}</span>
+      <span class="option-text">${escapeHtml(cleanText)}</span>
     `;
-    btn.addEventListener('click', ()=> answerScenarioQuestion(letter));
+    btn.addEventListener('click', () => answerScenarioQuestion(origLetter, displayLetter, cleanText));
     answersEl.appendChild(btn);
   });
-  }
 }
 
-function answerScenarioQuestion(selected){
+function answerScenarioQuestion(selectedOrigLetter, selectedDisplayLetter = '', selectedCleanText = ''){
   const scenario = state.current;
+  if (!scenario || scenario._answered) return;
+  scenario._answered = true;
   const translatedScenario = translateScenario(scenario);
-  const isCorrect = selected === scenario.correct_answer;
-  
-  // Disable all answer buttons
+  const isCorrect = selectedOrigLetter === scenario.correct_answer;
+
+  let correctDisplayLabel = scenario.correct_answer;
+  let chosenDisplayLabel = selectedDisplayLetter || selectedOrigLetter;
+
+  // Disable all answer buttons and highlight correct / incorrect
   Array.from(answersEl.querySelectorAll('.ans')).forEach(btn => {
     btn.disabled = true;
+    btn.classList.add('disabled');
     if (btn.dataset.value === scenario.correct_answer) {
       btn.classList.add('correct');
+      correctDisplayLabel = `${btn.dataset.displayLetter}. ${btn.dataset.cleanText}`;
     }
-    if (btn.dataset.value === selected && !isCorrect) {
-      btn.classList.add('wrong');
+    if (btn.dataset.value === selectedOrigLetter) {
+      chosenDisplayLabel = `${btn.dataset.displayLetter}. ${btn.dataset.cleanText}`;
+      if (!isCorrect) {
+        btn.classList.add('incorrect');
+        btn.classList.add('wrong');
+      }
     }
   });
-  
+
   // Update score and streak
   if (isCorrect) {
     state.score += 10;
@@ -1909,48 +2476,57 @@ function answerScenarioQuestion(selected){
     }
     scoreEl.innerText = state.score;
     streakEl.innerText = state.streak;
-    showToast({ title: getText('correct') || 'Correct!', msg: '', type: 'success', timeout: 1000 });
+    showToast({ title: getText('correct') || 'Correct!', msg: '', type: 'success', timeout: 1200 });
   } else {
     state.streak = 0;
     updateStreakHUD(0);
     SoundFX.playWrong();
     scoreEl.innerText = state.score;
     streakEl.innerText = state.streak;
-    showToast({ title: getText('wrongAnswer') || getText('wrong'), msg: '', type: 'error', timeout: 1000 });
+    showToast({ title: getText('wrongAnswer') || getText('wrong'), msg: '', type: 'error', timeout: 1400 });
   }
-  
-  // Record result
-  // Find the full text for the selected and correct options (use translated versions)
-  const selectedOptionText = translatedScenario.options.find(o => o.startsWith(selected))?.substring(3) || selected;
-  const correctOptionText = translatedScenario.options.find(o => o.startsWith(scenario.correct_answer))?.substring(3) || scenario.correct_answer;
 
   state.results.push({
     prompt: translatedScenario.challenge,
-    chosenDisplay: `${selected}. ${selectedOptionText}`,
-    correctDisplay: `${scenario.correct_answer}. ${correctOptionText}`,
+    chosenDisplay: chosenDisplayLabel || selectedCleanText,
+    correctDisplay: correctDisplayLabel,
     correct: isCorrect,
-    ref: [scenario.book_ref],
+    ref: scenario.book_ref ? [scenario.book_ref] : [],
     explanation: translatedScenario.explanation
   });
-  
+
   // Show explanation
   afterRef.innerHTML = `
     <div class="scenario-explanation">
       <strong>${isCorrect ? getText('scenarioCorrect') : getText('scenarioIncorrect')}</strong>
-      <p>${translatedScenario.explanation}</p>
-      <p class="scenario-tags">${scenario.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')}</p>
+      <p>${translatedScenario.explanation || ''}</p>
+      <p class="scenario-tags">${(scenario.tags || []).map(tag => `<span class="tag">${tag}</span>`).join(' ')}</p>
     </div>
   `;
-  
-  btnNext.disabled = false;
+
+  scheduleAutoAdvance(isCorrect);
+}
+
+function setPauseButtonVisual(isPaused) {
+  if (!btnPause) return;
+  const label = isPaused ? (getText('resume') || 'Resume') : (getText('pause') || 'Pause');
+  const iconSvg = isPaused
+    ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>'
+    : '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>';
+  btnPause.innerHTML = `${iconSvg}<span>${escapeHtml(label)}</span>`;
 }
 
 function prepareQuiz(mode){
+  clearAutoAdvance();
+  stopTimer();
   state.mode = mode;
+  state.timedOut = false;
+  state.timeRemainingAtEnd = 0;
   afterRef.innerText='';
   state.score = 0; state.streak = 0; state.qnum = 0; state.results = []; state.paused = false;
-  let count = parseInt(numQuestionsInput.value) || 10;
-  let difficulty = difficultySel.value;
+
+  let count = parseInt(numQuestionsInput.value, 10) || 10;
+  let difficulty = difficultySel ? (difficultySel.value || 'medium') : 'medium';
   if (mode === 'challenge' && state.challengeSettings) {
     count = state.challengeSettings.numQuestions || 10;
     difficulty = state.challengeSettings.difficulty || 'medium';
@@ -1960,57 +2536,90 @@ function prepareQuiz(mode){
     count = count % 2 === 0 ? count : count + 1;
   }
   
-  // Apply testament and gender filters to the people pool
+  // Apply testament and gender filters to the people pool (normalizing legacy men/women -> male/female)
   let peoplePool = state.people.slice();
   const testamentFilter = document.getElementById('testament-filter');
   const genderFilter = document.getElementById('gender-filter');
   
-  if (testamentFilter && testamentFilter.value !== 'all') {
+  if (testamentFilter && testamentFilter.value && testamentFilter.value !== 'all') {
     peoplePool = peoplePool.filter(p => p.testament === testamentFilter.value);
   }
   
-  if (genderFilter && genderFilter.value !== 'all') {
-    peoplePool = peoplePool.filter(p => p.gender === genderFilter.value);
+  if (genderFilter && genderFilter.value && genderFilter.value !== 'all') {
+    const rawGender = genderFilter.value;
+    const wantGender = rawGender === 'men' ? 'male' : rawGender === 'women' ? 'female' : rawGender;
+    peoplePool = peoplePool.filter(p => p.gender === wantGender);
+  }
+
+  // Fallback to full pool if filters resulted in empty pool
+  if (peoplePool.length === 0) {
+    peoplePool = state.people.slice();
   }
   
   state.questions = pickQuestionSet(count, difficulty, peoplePool);
+  if (!state.questions || state.questions.length === 0) {
+    state.questions = pickQuestionSet(count, 'all', state.people);
+  }
   state.qtotal = state.questions.length;
+  state.lastQuizTotal = state.qtotal;
+
+  if (state.qtotal === 0) {
+    showToast({ title: 'Loading Data…', msg: 'Biblical figures are still loading. Please try again in a second.', type: 'warn', timeout: 2500 });
+    showSetup();
+    return;
+  }
+
   qtotalEl.innerText = state.qtotal;
   scoreEl.innerText = state.score;
   streakEl.innerText = state.streak;
-  btnNext.disabled = true;
+  if (btnNext) {
+    btnNext.disabled = true;
+    btnNext.style.display = 'none';
+  }
   
-  // Show the quiz interface
-  quizEl.style.display = 'block';
+  // Show the quiz interface and clear any pause state
+  if (quizEl) {
+    quizEl.classList.remove('quiz-paused');
+    quizEl.style.display = 'block';
+  }
   
   // Hide welcome message and show quiz content
   const welcomeMsg = document.getElementById('welcome-message');
   if(welcomeMsg) welcomeMsg.style.display = 'none';
   
   // Configure mode-specific elements
-  timerEl.style.display = (mode==='timed') ? 'inline-flex' : 'none';
-  btnPause.style.display = (mode==='timed') ? 'inline-block' : 'none';
-  const isMulti = (mode==='challenge' || mode==='remote-challenge');
+  if (timerEl) {
+    timerEl.classList.remove('warn', 'danger', 'paused');
+    timerEl.style.display = (mode === 'timed') ? 'inline-flex' : 'none';
+  }
+  if (btnPause) {
+    setPauseButtonVisual(false);
+    btnPause.style.display = (mode === 'timed') ? 'inline-flex' : 'none';
+  }
+
+  const isMulti = (mode === 'challenge' || mode === 'remote-challenge');
   if (challengeStatusEl) challengeStatusEl.style.display = isMulti ? 'flex' : 'none';
   const soloScoreChip = document.querySelector('.chip-score');
   const soloStreakChip = document.querySelector('#streak-chip');
+  const progressChip = document.querySelector('.chip-progress');
+  const progressTrack = document.querySelector('.progress-container-modern');
   if (soloScoreChip) soloScoreChip.style.display = isMulti ? 'none' : 'flex';
   if (soloStreakChip) soloStreakChip.style.display = isMulti ? 'none' : 'flex';
+  if (progressChip) progressChip.style.display = 'flex';
+  if (progressTrack) progressTrack.style.display = 'block';
+
   if (isMulti) {
     updateVersusHUD();
   } else if (versusTurnBanner) {
     versusTurnBanner.style.display = 'none';
   }
   
-  if(mode==='timed'){
-    const secs = parseInt(timeLimitInput.value) || 60;
-    // Timer is started in startTimed, but if we restart or come from elsewhere:
-    if(!state.timerId) startTimer(secs);
-    scheduleTimeWarnings();
-  } else {
-    stopTimer();
-  }
   nextQuestion();
+
+  if (mode === 'timed') {
+    const secs = parseInt(timeLimitInput?.value, 10) || 60;
+    startTimer(secs);
+  }
 }
 
 function quitQuiz(){
@@ -2092,7 +2701,20 @@ function filterPeopleByDifficulty(people, difficulty) {
     const shuffledMed = medList.slice();
     shuffle(shuffledHard);
     shuffle(shuffledMed);
-    return [...shuffledHard, ...shuffledMed.slice(0, Math.ceil(hardList.length * 0.35))];
+    const combined = [...shuffledHard, ...shuffledMed.slice(0, Math.ceil(hardList.length * 0.35))];
+    return combined.length ? combined : pList.slice();
+  }
+
+  if (difficulty === 'expert') {
+    // Strict hard-first pool, falling back to medium only if needed
+    const hardList = pList.filter(p => p.difficulty === 'hard');
+    const medList = pList.filter(p => p.difficulty === 'medium');
+    const shuffledHard = hardList.slice();
+    const shuffledMed = medList.slice();
+    shuffle(shuffledHard);
+    shuffle(shuffledMed);
+    const combined = [...shuffledHard, ...shuffledMed];
+    return combined.length ? combined : pList.slice();
   }
   
   return pList.slice();
@@ -2105,14 +2727,29 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
     targetCount = targetCount % 2 === 0 ? targetCount : targetCount + 1;
   }
 
-  const pool = filterPeopleByDifficulty(peoplePool || state.people, difficulty);
-  if (!pool || pool.length === 0) return [];
+  const basePool = (Array.isArray(peoplePool) && peoplePool.length > 0) ? peoplePool : state.people;
+  if (!basePool || basePool.length === 0) return [];
+
+  let pool = filterPeopleByDifficulty(basePool, difficulty);
+  if (!pool || pool.length === 0) pool = basePool.slice();
+
+  // If narrow filter + difficulty yielded fewer candidates than targetCount, top up from remaining basePool figures
+  if (pool.length < targetCount && basePool.length > pool.length) {
+    const existingNames = new Set(pool.map(p => p.name));
+    const extras = basePool.filter(p => !existingNames.has(p.name));
+    shuffle(extras);
+    pool = [...pool, ...extras];
+  }
+
+  // Distractor source ensures 4 distinct choices even when a narrow filter has < 4 figures
+  const distractorPeople = basePool.length >= 8 ? basePool : state.people;
   
   const shuffledCandidates = pool.slice();
   shuffle(shuffledCandidates);
 
   const questions = [];
   const usedNames = new Set();
+  const usedPrompts = new Set();
   
   const famousMothers = ['Sarah', 'Rebekah', 'Rachel', 'Leah', 'Hannah', 'Elizabeth', 'Mary (mother of Jesus)', 'Jochebed', 'Bathsheba', 'Eve', 'Hagar'];
   const famousFathers = ['Abraham', 'Isaac', 'Jacob', 'David', 'Saul (first king)', 'Jesse', 'Zechariah', 'Noah', 'Terah', 'Adam'];
@@ -2121,6 +2758,27 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
     'Judge of Israel', 'High Priest', 'Fisherman and Disciple', 'Tentmaker and Missionary',
     'Tax Collector and Disciple', 'Cupbearer to the King', 'Scribe and Teacher of the Law'
   ];
+
+  const getDistinctNameChoices = (correctName) => {
+    const samePoolNames = pool.filter(p => p.name !== correctName).map(p => p.name);
+    shuffle(samePoolNames);
+    const chosen = new Set([correctName]);
+    for (const n of samePoolNames) {
+      if (chosen.size >= 4) break;
+      chosen.add(n);
+    }
+    if (chosen.size < 4) {
+      const fallbackNames = distractorPeople.filter(p => p.name !== correctName).map(p => p.name);
+      shuffle(fallbackNames);
+      for (const n of fallbackNames) {
+        if (chosen.size >= 4) break;
+        chosen.add(n);
+      }
+    }
+    const arr = Array.from(chosen);
+    shuffle(arr);
+    return arr;
+  };
 
   for (const person of shuffledCandidates) {
     if (questions.length >= targetCount) break;
@@ -2156,11 +2814,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
       const action = cleanEventPredicate(rawEvent);
       prompt = `Who am I? In scripture, I ${action}.`;
       answer = person.name;
-      
-      const otherNames = pool.filter(p => p.name !== person.name).map(p => p.name);
-      shuffle(otherNames);
-      choices = [answer, ...otherNames.slice(0, 3)];
-      shuffle(choices);
+      choices = getDistinctNameChoices(answer);
       
       questions.push({
         type: 'whoAmI',
@@ -2171,17 +2825,14 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
         raw: { name: person.name, event: rawEvent }
       });
       usedNames.add(person.name);
+      usedPrompts.add(prompt);
 
     } else if (qType === 'whoDid') {
       const rawEvent = validEvs[Math.floor(Math.random() * validEvs.length)];
       const action = cleanEventPredicate(rawEvent);
       prompt = `Who in scripture ${action}?`;
       answer = person.name;
-
-      const otherNames = pool.filter(p => p.name !== person.name).map(p => p.name);
-      shuffle(otherNames);
-      choices = [answer, ...otherNames.slice(0, 3)];
-      shuffle(choices);
+      choices = getDistinctNameChoices(answer);
 
       questions.push({
         type: 'whoDid',
@@ -2192,6 +2843,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
         raw: { name: person.name, event: rawEvent }
       });
       usedNames.add(person.name);
+      usedPrompts.add(prompt);
 
     } else if (qType === 'whichEvent') {
       const correctEv = validEvs[Math.floor(Math.random() * validEvs.length)];
@@ -2199,7 +2851,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
       answer = correctEv;
 
       const otherEvents = [];
-      for (const other of pool) {
+      for (const other of distractorPeople) {
         if (other.name !== person.name && other.notable_events) {
           for (const oe of other.notable_events) {
             if (isValidContent(oe) && oe !== correctEv) otherEvents.push(oe);
@@ -2219,6 +2871,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
         raw: { name: person.name, event: correctEv }
       });
       usedNames.add(person.name);
+      usedPrompts.add(prompt);
 
     } else if (qType === 'mother') {
       prompt = `Who is recorded in scripture as the mother of ${person.name}?`;
@@ -2237,6 +2890,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
         raw: { name: person.name, mother: person.mother }
       });
       usedNames.add(person.name);
+      usedPrompts.add(prompt);
 
     } else if (qType === 'father') {
       prompt = `Who is recorded in scripture as the father of ${person.name}?`;
@@ -2255,6 +2909,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
         raw: { name: person.name, father: person.father }
       });
       usedNames.add(person.name);
+      usedPrompts.add(prompt);
 
     } else if (qType === 'occupation') {
       prompt = `What was the biblical calling or role of ${person.name}?`;
@@ -2273,12 +2928,13 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
         raw: { name: person.name, occupation: person.occupation }
       });
       usedNames.add(person.name);
+      usedPrompts.add(prompt);
     }
   }
 
-  // Fallback if needed
+  // Fallback pass 1: unused figures in pool
   let idx = 0;
-  while (questions.length < count && idx < pool.length) {
+  while (questions.length < targetCount && idx < pool.length) {
     const p = pool[idx++];
     if (usedNames.has(p.name)) continue;
     const evs = (p.notable_events || []).filter(e => isValidContent(e));
@@ -2287,10 +2943,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
     const action = cleanEventPredicate(rawEvent);
     const prompt = `Who in scripture ${action}?`;
     const answer = p.name;
-    const otherNames = pool.filter(x => x.name !== p.name).map(x => x.name);
-    shuffle(otherNames);
-    const choices = [answer, ...otherNames.slice(0, 3)];
-    shuffle(choices);
+    const choices = getDistinctNameChoices(answer);
     questions.push({
       type: 'whoDid',
       prompt,
@@ -2300,14 +2953,42 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
       raw: { name: p.name, event: rawEvent }
     });
     usedNames.add(p.name);
+    usedPrompts.add(prompt);
+  }
+
+  // Fallback pass 2: if narrow filter (e.g. NT Women = 9 figures) has fewer figures than requested 15/20/30 questions,
+  // generate distinct additional event questions from those figures before topping up!
+  if (questions.length < targetCount) {
+    for (const p of shuffledCandidates) {
+      if (questions.length >= targetCount) break;
+      const evs = (p.notable_events || []).filter(e => isValidContent(e));
+      for (const rawEvent of evs) {
+        if (questions.length >= targetCount) break;
+        const action = cleanEventPredicate(rawEvent);
+        const prompt = `Who in scripture ${action}?`;
+        if (usedPrompts.has(prompt)) continue;
+        const choices = getDistinctNameChoices(p.name);
+        questions.push({
+          type: 'whoDid',
+          prompt,
+          answer: p.name,
+          choices,
+          ref: p.verses || [],
+          raw: { name: p.name, event: rawEvent }
+        });
+        usedPrompts.add(prompt);
+      }
+    }
   }
 
   return questions.slice(0, targetCount);
 }
 
 function nextQuestion(){
+  clearAutoAdvance();
   if(state.qnum >= state.qtotal){ endQuiz(); return; }
   state.current = state.questions[state.qnum];
+  if (state.current) state.current._answered = false;
   state.qnum++;
   qnumEl.innerText = state.qnum;
   
@@ -2315,13 +2996,24 @@ function nextQuestion(){
     state.currentPlayerIndex = (state.qnum - 1) % 2;
     updateVersusHUD();
     scoreEl.innerText = state.players[state.currentPlayerIndex].score;
+    const turnSecs = Number(state.challengeSettings?.timeLimit) || 0;
+    if (turnSecs > 0) {
+      startTurnTimer(turnSecs);
+    } else {
+      stopTimer();
+      if (timerEl) timerEl.style.display = 'none';
+    }
   } else {
     scoreEl.innerText = state.score;
   }
   streakEl.innerText = state.streak;
-  if (btnNext) btnNext.innerHTML = '<span>Next Question</span> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+  if (btnNext) {
+    btnNext.disabled = true;
+    btnNext.style.display = 'none';
+  }
   renderQuestion(state.current);
   updateProgress();
+  resetViewportScroll();
 }
 
 function renderQuestion(q){
@@ -2354,7 +3046,10 @@ function renderQuestion(q){
     qText.innerText = q.prompt;
   }
   afterRef.innerText='';
-  btnNext.disabled = true;
+  if (btnNext) {
+    btnNext.disabled = true;
+    btnNext.style.display = 'none';
+  }
   answersEl.innerHTML='';
   answersEl.setAttribute('aria-activedescendant','');
   answersEl.setAttribute('aria-label', getText('answersLabel'));
@@ -2400,9 +3095,9 @@ function renderQuestion(q){
     div.addEventListener('click',()=>handleAnswer(choiceObj.original,q,div));
     answersEl.appendChild(div);
   });
-  // Focus first choice for accessibility
+  // Focus first choice for keyboard accessibility without scrolling the viewport down
   const first = answersEl.querySelector('.ans');
-  if(first) first.focus();
+  if(first) first.focus({ preventScroll: true });
 }
 
 function makeChoices(q){
@@ -2484,6 +3179,9 @@ function getDistractors(q){
 }
 
 function handleAnswer(choice,q, el){
+  if (!q || q._answered || (el && el.classList.contains('disabled'))) return;
+  q._answered = true;
+  if (state.mode === 'challenge') stopTimer();
   // Disable further answers; mark correctness
   const correct = normalize(choice) === normalize(q.answer);
   const ansNodes = Array.from(answersEl.querySelectorAll('.ans'));
@@ -2539,10 +3237,9 @@ function handleAnswer(choice,q, el){
 
   scoreEl.innerText = state.mode==='challenge' ? state.players[state.currentPlayerIndex].score : state.score;
   streakEl.innerText = state.streak;
-  btnNext.disabled = false;
 
   // Record result
-  const activeIdx = state.mode === 'challenge' ? state.currentPlayerIndex : 0;
+  const activeIdx = (state.mode === 'challenge' || state.mode === 'remote-challenge') ? state.currentPlayerIndex : 0;
   const activeName = (state.players && state.players[activeIdx]) ? state.players[activeIdx].name : (state.currentPlayer?.name || 'Player');
 
   state.results.push({ 
@@ -2557,17 +3254,7 @@ function handleAnswer(choice,q, el){
     ref: q.ref||[] 
   });
 
-  // For challenge mode, update Next button to preview next player's turn
-  if(state.mode==='challenge'){
-    const isLast = state.qnum >= state.qtotal;
-    if(!isLast){
-      const nextIdx = (state.currentPlayerIndex + 1) % 2;
-      const nextPlayer = state.players[nextIdx];
-      btnNext.innerHTML = `<span>Next: ${escapeHtml(nextPlayer.name)}'s Turn</span> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
-    } else {
-      btnNext.innerHTML = `<span>View Final Results</span> <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"></path></svg>`;
-    }
-  }
+  scheduleAutoAdvance(correct);
 }
 
 function updateChallengeScores(){
@@ -2576,8 +3263,18 @@ function updateChallengeScores(){
 }
 
 function endQuiz(){
+  clearAutoAdvance();
+  state.paused = false;
+  if (state.qtotal > 0) state.lastQuizTotal = state.qtotal;
+  state.timeRemainingAtEnd = Math.max(0, state.timerSecondsRemaining || 0);
+  if (quizEl) quizEl.classList.remove('quiz-paused');
+
   let endText = `${getText('quizComplete')}! ${getText('yourScore')}: ${state.score}`;
-  if(state.mode==='challenge'){
+  if (state.mode === 'timed') {
+    endText = state.timedOut
+      ? `⏰ ${getText('timeUp') || "Time's Up!"} ${getText('yourScore')}: ${state.score}`
+      : `⚡ Beat the Clock! (${state.timeRemainingAtEnd}s left) • ${getText('yourScore')}: ${state.score}`;
+  } else if(state.mode==='challenge' || state.mode==='remote-challenge'){
     const p1 = (state.players && state.players[0]) || { name: 'Player 1', score: 0 };
     const p2 = (state.players && state.players[1]) || { name: 'Player 2', score: 0 };
     const isTie = p1.score === p2.score;
@@ -2617,7 +3314,10 @@ function endQuiz(){
   }
   
   state.current=null; state.questions=[]; state.qnum=0; state.qtotal=0;
-  btnNext.disabled = true;
+  if (btnNext) {
+    btnNext.disabled = true;
+    btnNext.style.display = 'none';
+  }
 
   try {
     showSummaryModal();
@@ -2651,26 +3351,94 @@ function startTimer(seconds){
   state.timerSecondsRemaining = seconds;
   const trEl = document.getElementById('time-remaining');
   if(trEl) trEl.textContent = String(state.timerSecondsRemaining);
-  timerEl.style.display = 'inline-flex';
+  if (timerEl) {
+    timerEl.classList.remove('warn', 'danger', 'paused');
+    timerEl.style.display = 'inline-flex';
+  }
+  const warnThresholds = new Set([30, 10, 5]);
   state.timerId = setInterval(()=>{
     if(state.paused) return;
     state.timerSecondsRemaining -= 1;
+    const t = Math.max(0, state.timerSecondsRemaining);
     const currentTrEl = document.getElementById('time-remaining');
-    if(currentTrEl) currentTrEl.textContent = String(Math.max(0, state.timerSecondsRemaining));
-    // Timer styling thresholds
-    timerEl.classList.remove('warn','danger');
-    if(state.timerSecondsRemaining <= 5) timerEl.classList.add('danger');
-    else if(state.timerSecondsRemaining <= 15) timerEl.classList.add('warn');
-    if(state.timerSecondsRemaining <= 10 && state.timerSecondsRemaining > 0) {
+    if(currentTrEl) currentTrEl.textContent = String(t);
+
+    // Timer styling thresholds & warnings
+    if (timerEl) {
+      timerEl.classList.remove('warn','danger');
+      if (t <= 5) timerEl.classList.add('danger');
+      else if (t <= 15) timerEl.classList.add('warn');
+    }
+
+    if (warnThresholds.has(t) && t < seconds) {
+      warnThresholds.delete(t);
+      showToast({
+        title: getText('timeWarning') || '⏱️ Time Warning',
+        msg: getText('timeWarningMsg', { time: t }) || `Only ${t} seconds remaining!`,
+        type: t <= 5 ? 'error' : 'warn',
+        timeout: 1200
+      });
+    }
+
+    if(t <= 10 && t > 0) {
       SoundFX.playTick();
     }
     if(state.timerSecondsRemaining <= 0){
+      state.timedOut = true;
+      clearAutoAdvance();
       stopTimer();
       SoundFX.playWrong();
-      showToast({ title: getText('timeUp'), msg: getText('timeUpMsg'), type: 'warn', timeout: 2000 });
+      showToast({ title: getText('timeUp') || "⏰ Time's Up!", msg: getText('timeUpMsg') || 'Clock expired!', type: 'warn', timeout: 2200 });
       endQuiz();
     }
   },1000);
+}
+
+function startTurnTimer(seconds){
+  stopTimer();
+  state.timerSecondsRemaining = seconds;
+  const trEl = document.getElementById('time-remaining');
+  if (trEl) trEl.textContent = String(state.timerSecondsRemaining);
+  timerEl.classList.remove('warn', 'danger');
+  timerEl.style.display = 'inline-flex';
+  state.timerId = setInterval(() => {
+    state.timerSecondsRemaining -= 1;
+    const currentTrEl = document.getElementById('time-remaining');
+    if (currentTrEl) currentTrEl.textContent = String(Math.max(0, state.timerSecondsRemaining));
+    timerEl.classList.remove('warn', 'danger');
+    if (state.timerSecondsRemaining <= 5) timerEl.classList.add('danger');
+    else if (state.timerSecondsRemaining <= 10) timerEl.classList.add('warn');
+    if (state.timerSecondsRemaining <= 5 && state.timerSecondsRemaining > 0) {
+      SoundFX.playTick();
+    }
+    if (state.timerSecondsRemaining <= 0) {
+      stopTimer();
+      const q = state.current;
+      if (!q || q._answered) return;
+      q._answered = true;
+      Array.from(answersEl.querySelectorAll('.ans')).forEach(node => {
+        node.classList.add('disabled');
+        if (normalize(node.dataset.value) === normalize(q.answer)) node.classList.add('correct');
+      });
+      SoundFX.playWrong();
+      const activeIdx = state.currentPlayerIndex || 0;
+      const activePlayer = (state.players && state.players[activeIdx]) || { name: 'Player' };
+      afterRef.innerText = `${getText('timeUp') || 'Time Up'}! ${getText('correctLabel')}: ${translateAnswerForQuestionType(q.type, q.answer)}. ${getText('references')}: ${(q.ref || []).join(', ')}`;
+      showToast({ title: '⏱️ Turn Time Expired', msg: `No points for ${activePlayer.name}.`, type: 'warn', timeout: 2000 });
+      state.results.push({
+        prompt: q.prompt,
+        playerIdx: activeIdx,
+        playerName: activePlayer.name,
+        chosen: 'Time Expired',
+        correctAnswer: q.answer,
+        chosenDisplay: '⏱️ Time Expired',
+        correctDisplay: translateAnswerForQuestionType(q.type, q.answer),
+        correct: false,
+        ref: q.ref || []
+      });
+      scheduleAutoAdvance(false);
+    }
+  }, 1000);
 }
 
 function stopTimer(){
@@ -2687,7 +3455,9 @@ function stopTimer(){
 function togglePause(){
   if(state.mode!=='timed') return;
   state.paused = !state.paused;
-  btnPause.textContent = state.paused ? getText('resume') : getText('pause');
+  setPauseButtonVisual(state.paused);
+  if (quizEl) quizEl.classList.toggle('quiz-paused', state.paused);
+  if (timerEl) timerEl.classList.toggle('paused', state.paused);
   
   // Disable/Enable answers based on pause state
   const ansNodes = Array.from(answersEl.querySelectorAll('.ans'));
@@ -2695,13 +3465,11 @@ function togglePause(){
     if(state.paused) {
       node.classList.add('disabled');
       node.style.pointerEvents = 'none';
-      node.style.opacity = '0.5';
     } else {
       // Only re-enable if not already answered/disabled
-      if(!node.classList.contains('correct') && !node.classList.contains('incorrect')) {
+      if(!node.classList.contains('correct') && !node.classList.contains('incorrect') && !(state.current && state.current._answered)) {
         node.classList.remove('disabled');
         node.style.pointerEvents = 'auto';
-        node.style.opacity = '1';
       }
     }
   });
@@ -2731,9 +3499,13 @@ function getPersonIcon(p) {
 function renderPeopleList(filterText = '') {
   if (!peopleList) return;
   peopleList.innerHTML = '';
-  
-  let arr = state.people.slice();
-  const q = normalize(filterText || (searchPerson ? searchPerson.value : ''));
+
+  const sortVal = state.studySort || (sortSelect ? sortSelect.value : 'name-asc');
+  let arr = (sortVal === 'shuffle' && Array.isArray(state.shuffledPeople) && state.shuffledPeople.length === state.people.length)
+    ? state.shuffledPeople.slice()
+    : state.people.slice();
+
+  const q = normalize(filterText !== '' ? filterText : (searchPerson ? searchPerson.value : ''));
   if (q) {
     arr = arr.filter(p => 
       normalize(p.name).includes(q) || 
@@ -2743,31 +3515,53 @@ function renderPeopleList(filterText = '') {
       (p.notable_events && p.notable_events.some(e => normalize(e).includes(q)))
     );
   }
-  
-  // Category Pill Filter
-  const cat = state.studyCategory || 'all';
-  if (cat === 'ot') arr = arr.filter(p => p.testament === 'ot');
-  else if (cat === 'nt') arr = arr.filter(p => p.testament === 'nt');
-  else if (cat === 'easy') arr = arr.filter(p => p.difficulty === 'easy');
-  else if (cat === 'medium') arr = arr.filter(p => p.difficulty === 'medium');
-  else if (cat === 'hard') arr = arr.filter(p => p.difficulty === 'hard');
+
+  // Segmented Testament + Difficulty Filters (can combine cleanly!)
+  const testamentVal = state.studyTestament || 'all';
+  const diffVal = state.studyDifficulty || 'all';
+  if (testamentVal !== 'all') {
+    arr = arr.filter(p => p.testament === testamentVal);
+  }
+  if (diffVal !== 'all') {
+    arr = arr.filter(p => p.difficulty === diffVal);
+  }
 
   // Legacy fallback if checked
   if (filterOccupation?.checked) arr = arr.filter(p => !!p.occupation);
   if (filterAge?.checked) arr = arr.filter(p => !!p.age_notes);
   if (filterMother?.checked) arr = arr.filter(p => !!p.mother || !!p.father);
   
-  // Sort
-  const sortVal = state.studySort || (sortSelect ? sortSelect.value : 'name-asc');
+  // Sort unless in active Shuffle mode
   if (sortVal === 'name-desc') {
     arr.sort((a, b) => b.name.localeCompare(a.name));
-  } else {
+  } else if (sortVal !== 'shuffle') {
     arr.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   if (peopleCountEl) peopleCountEl.textContent = String(arr.length);
   const clearBtn = document.getElementById('btn-clear-study-search');
   if (clearBtn) clearBtn.style.display = q ? 'inline-flex' : 'none';
+
+  // Show/hide Reset Filters chip when any filter/search/shuffle is active
+  const resetBtn = document.getElementById('btn-study-reset-filters');
+  const hasActiveFilter = !!(q || testamentVal !== 'all' || diffVal !== 'all' || sortVal === 'shuffle');
+  if (resetBtn) resetBtn.style.display = hasActiveFilter ? 'inline-flex' : 'none';
+
+  if (arr.length === 0) {
+    const emptyEl = document.createElement('div');
+    emptyEl.className = 'study-empty-state';
+    emptyEl.innerHTML = `
+      <div style="font-size: 36px;">🔎</div>
+      <h3>No matching biblical figures found</h3>
+      <p style="margin-bottom: 16px;">Try a broader search term or reset your Testament / Level filters.</p>
+      <button type="button" class="study-action-btn active" id="btn-empty-clear-study">↺ Reset All Filters</button>
+    `;
+    emptyEl.querySelector('#btn-empty-clear-study')?.addEventListener('click', () => {
+      document.getElementById('btn-study-reset-filters')?.click();
+    });
+    peopleList.appendChild(emptyEl);
+    return;
+  }
 
   for (const p of arr) {
     const item = document.createElement('div');
@@ -2933,8 +3727,14 @@ function validatePerson(p){
   return { valid:true };
 }
 
-function resetData(){
-  if(confirm(getText('resetConfirm'))){
+async function resetData(){
+  const confirmed = await showConfirmDialog({
+    title: 'Reset Character Data?',
+    message: getText('resetConfirm') || 'Reset to built-in dataset? This will remove any custom imported data.',
+    confirmText: 'Reset Data',
+    cancelText: 'Cancel'
+  });
+  if(confirmed){
     localStorage.removeItem('peopleData');
     state.people = DEFAULT_PEOPLE_DATA.slice();
     renderPeopleList();
@@ -2951,7 +3751,7 @@ function loadPeopleDataFromLocalStorage(){
     const txt = localStorage.getItem('peopleData');
     if(!txt) return null;
     const parsed = JSON.parse(txt);
-    return Array.isArray(parsed) ? parsed : null;
+    return (Array.isArray(parsed) && parsed.length > 0) ? parsed : null;
   }catch(_){ return null; }
 }
 
@@ -3006,6 +3806,98 @@ function setModalScrollLock(locked) {
   }
 }
 
+function isModalElementVisible(el) {
+  if (!el) return false;
+  if (el.classList.contains('show') || el.classList.contains('active')) return true;
+  const inlineDisplay = el.style ? el.style.display : '';
+  if (inlineDisplay && inlineDisplay !== 'none') return true;
+  if (!inlineDisplay) {
+    const computed = window.getComputedStyle(el);
+    return computed.display !== 'none' && computed.visibility !== 'hidden' && computed.opacity !== '0';
+  }
+  return false;
+}
+
+function syncModalScrollLock() {
+  const candidates = document.querySelectorAll('.modal-overlay, #feedback-modal, #report-modal, #auth-modal');
+  let anyOpen = false;
+  for (const el of candidates) {
+    if (isModalElementVisible(el)) {
+      anyOpen = true;
+      break;
+    }
+  }
+  setModalScrollLock(anyOpen);
+}
+window.syncModalScrollLock = syncModalScrollLock;
+
+function initUniversalModalScrollLock() {
+  const observeTarget = (el) => {
+    if (!el || el._wbScrollObserved) return;
+    el._wbScrollObserved = true;
+    const obs = new MutationObserver(() => syncModalScrollLock());
+    obs.observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
+  };
+
+  document.querySelectorAll('.modal-overlay, #feedback-modal, #report-modal, #auth-modal').forEach(observeTarget);
+
+  // Also catch dynamically injected modals (e.g. #auth-modal added by auth-ui.js)
+  const bodyObs = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      m.addedNodes.forEach((node) => {
+        if (node.nodeType === 1) {
+          if (node.matches?.('.modal-overlay, #feedback-modal, #report-modal, #auth-modal')) {
+            observeTarget(node);
+            syncModalScrollLock();
+          }
+          node.querySelectorAll?.('.modal-overlay, #feedback-modal, #report-modal, #auth-modal').forEach(observeTarget);
+        }
+      });
+    }
+  });
+  bodyObs.observe(document.body, { childList: true });
+}
+
+function showConfirmDialog({ title = 'Confirm Action', message = 'Are you sure?', confirmText = 'Confirm', cancelText = 'Cancel' } = {}) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('confirm-modal');
+    const titleEl = document.getElementById('confirm-modal-title');
+    const msgEl = document.getElementById('confirm-modal-message');
+    const okBtn = document.getElementById('btn-confirm-modal-ok');
+    const cancelBtn = document.getElementById('btn-confirm-modal-cancel');
+    const closeBtn = document.getElementById('btn-confirm-modal-close');
+
+    if (!modal || !okBtn || !cancelBtn) {
+      resolve(true);
+      return;
+    }
+
+    if (titleEl) titleEl.textContent = title;
+    if (msgEl) msgEl.textContent = message;
+    okBtn.textContent = confirmText;
+    cancelBtn.textContent = cancelText;
+
+    modal.style.display = 'flex';
+    syncModalScrollLock();
+
+    const finish = (val) => {
+      modal.style.display = 'none';
+      syncModalScrollLock();
+      okBtn.onclick = null;
+      cancelBtn.onclick = null;
+      if (closeBtn) closeBtn.onclick = null;
+      modal.onclick = null;
+      resolve(val);
+    };
+
+    okBtn.onclick = () => finish(true);
+    cancelBtn.onclick = () => finish(false);
+    if (closeBtn) closeBtn.onclick = () => finish(false);
+    modal.onclick = (e) => { if (e.target === modal) finish(false); };
+    setTimeout(() => okBtn.focus(), 50);
+  });
+}
+
 // Theme
 function applyTheme(theme){
   state.theme = 'night';
@@ -3015,11 +3907,17 @@ function applyTheme(theme){
 }
 
 function saveSettingsFromUI(){
+  const existing = loadSettings() || {};
+  const testamentEl = document.getElementById('testament-filter');
+  const genderEl = document.getElementById('gender-filter');
   const settings = {
-    difficulty: difficultySel.value,
-    numQuestions: parseInt(numQuestionsInput.value)||10,
-    timeLimit: parseInt(timeLimitInput.value)||60,
-    theme: state.theme
+    ...existing,
+    difficulty: difficultySel?.value || 'medium',
+    numQuestions: parseInt(numQuestionsInput?.value, 10) || 10,
+    timeLimit: parseInt(timeLimitInput?.value, 10) || 60,
+    testamentFilter: testamentEl?.value || 'all',
+    genderFilter: genderEl?.value || 'all',
+    theme: state.theme || 'night'
   };
   try{ localStorage.setItem('settings', JSON.stringify(settings)); }catch(_){/* ignore */}
 }
@@ -3037,8 +3935,32 @@ function showSummaryModal(){
   if(!modalEl) return;
   document.body.style.overflow = 'hidden';
   window._modalOpenedTime = Date.now();
+  const modalBody = modalEl.querySelector('.modal-body');
+  if (modalBody) modalBody.scrollTop = 0;
+
+  // Customize Play Again & Settings button dynamically per mode
+  const btnSummarySettingsEl = document.getElementById('btn-summary-settings');
+  if (btnSummarySettingsEl) {
+    btnSummarySettingsEl.style.display = ['solo', 'timed', 'scenarios', 'challenge'].includes(state.mode)
+      ? 'inline-flex'
+      : 'none';
+  }
+  if (btnPlayAgain) {
+    if (state.mode === 'challenge') {
+      btnPlayAgain.textContent = '⚔️ Rematch';
+    } else if (state.mode === 'remote-challenge') {
+      btnPlayAgain.textContent = '🌍 New Online Match';
+    } else if (state.mode === 'daily') {
+      btnPlayAgain.textContent = '🔄 Replay Daily';
+    } else {
+      btnPlayAgain.textContent = '🔄 Play Again';
+    }
+  }
   
-  const total = state.results.length;
+  const answeredCount = state.results.length;
+  const total = (state.mode === 'timed' && state.lastQuizTotal > answeredCount)
+    ? state.lastQuizTotal
+    : answeredCount;
   const correct = state.results.filter(r=>r.correct).length;
   const accuracy = total ? Math.round((correct/total)*100) : 0;
   const isMulti = (state.mode === 'challenge' || state.mode === 'remote-challenge');
@@ -3063,6 +3985,20 @@ function showSummaryModal(){
     if (badgeIconEl) badgeIconEl.textContent = isTie ? '🤝' : '🏆';
     if (headlineEl) headlineEl.textContent = isTie ? 'Match Tied!' : `${winnerName} Victory!`;
     if (subtextEl) subtextEl.textContent = isTie ? 'An evenly matched battle of scripture knowledge!' : `Congratulations ${winnerName} on winning the match!`;
+  } else if (state.mode === 'timed') {
+    if (state.timedOut) {
+      if (badgeIconEl) badgeIconEl.textContent = '⏰';
+      if (headlineEl) headlineEl.textContent = "Time's Up!";
+      if (subtextEl) subtextEl.textContent = `You answered ${answeredCount} of ${total} questions (${correct} correct) before the clock hit 0s.`;
+    } else if (accuracy >= 80) {
+      if (badgeIconEl) badgeIconEl.textContent = '⚡';
+      if (headlineEl) headlineEl.textContent = 'Beat the Clock!';
+      if (subtextEl) subtextEl.textContent = `Finished all ${total} questions with ${state.timeRemainingAtEnd || 0}s to spare!`;
+    } else {
+      if (badgeIconEl) badgeIconEl.textContent = '⏱️';
+      if (headlineEl) headlineEl.textContent = 'Timed Run Complete!';
+      if (subtextEl) subtextEl.textContent = `Completed all ${total} questions with ${state.timeRemainingAtEnd || 0}s remaining on the clock.`;
+    }
   } else {
     if (accuracy >= 90) {
       if (badgeIconEl) badgeIconEl.textContent = '👑';
@@ -3089,10 +4025,13 @@ function showSummaryModal(){
 
     const p1Results = state.results.filter(r => r.playerIdx === 0);
     const p2Results = state.results.filter(r => r.playerIdx === 1);
-    const p1Correct = p1Results.filter(r => r.correct).length;
-    const p2Correct = p2Results.filter(r => r.correct).length;
-    const p1Acc = p1Results.length ? Math.round((p1Correct / p1Results.length) * 100) : 0;
-    const p2Acc = p2Results.length ? Math.round((p2Correct / p2Results.length) * 100) : 0;
+    const isRemote = state.mode === 'remote-challenge';
+    const p1Total = isRemote ? total : p1Results.length;
+    const p2Total = isRemote ? total : p2Results.length;
+    const p1Correct = p1Results.length ? p1Results.filter(r => r.correct).length : (isRemote ? Math.round((p1.score || 0) / 10) : 0);
+    const p2Correct = p2Results.length ? p2Results.filter(r => r.correct).length : (isRemote ? Math.round((p2.score || 0) / 10) : 0);
+    const p1Acc = p1Total ? Math.round((p1Correct / p1Total) * 100) : 0;
+    const p2Acc = p2Total ? Math.round((p2Correct / p2Total) * 100) : 0;
 
     versusBannerHtml = `
       <div class="summary-versus-card">
@@ -3101,13 +4040,13 @@ function showSummaryModal(){
           <div class="player-stat-col ${p1.score > p2.score ? 'is-winner' : ''}">
             <div class="p-col-name">⚔️ ${escapeHtml(p1.name)}</div>
             <div class="p-col-score">${p1.score} <small>pts</small></div>
-            <div class="p-col-meta">${p1Correct}/${p1Results.length} Correct (${p1Acc}%)</div>
+            <div class="p-col-meta">${p1Correct}/${p1Total} Correct (${p1Acc}%)</div>
           </div>
           <div class="versus-divider-badge">VS</div>
           <div class="player-stat-col ${p2.score > p1.score ? 'is-winner' : ''}">
             <div class="p-col-name">🛡️ ${escapeHtml(p2.name)}</div>
             <div class="p-col-score">${p2.score} <small>pts</small></div>
-            <div class="p-col-meta">${p2Correct}/${p2Results.length} Correct (${p2Acc}%)</div>
+            <div class="p-col-meta">${p2Correct}/${p2Total} Correct (${p2Acc}%)</div>
           </div>
         </div>
       </div>
@@ -3206,7 +4145,7 @@ function showSummaryModal(){
 
 function hideSummaryModal(){
   if(modalEl) modalEl.style.display = 'none';
-  document.body.style.overflow = '';
+  syncModalScrollLock();
 }
 
 // Players modal
@@ -3369,7 +4308,7 @@ function initFeedback() {
   // Close Modal
   const close = () => {
     modal.classList.remove('show');
-    document.body.style.overflow = '';
+    syncModalScrollLock();
   };
   if(btnClose) btnClose.addEventListener('click', close);
   if(btnCancel) btnCancel.addEventListener('click', close);
@@ -3468,443 +4407,679 @@ window.showPlayerChangeModal = function() {
   }
 };
 
-// Classroom Mode - Join Prompt
+// =========================================
+// Classroom / Kahoot Player Mode
+// =========================================
+let activeClassroomSession = null;
+
+function withClassroomTimeout(promise, ms = 8000, msg = 'Connection timed out. Please check your internet connection.') {
+  let tid;
+  const timeout = new Promise((_, reject) => {
+    tid = setTimeout(() => reject(new Error(msg)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(tid));
+}
+
+function cleanupClassroomPlayerMode(notifyLeave = false) {
+  if (!activeClassroomSession) return;
+  const session = activeClassroomSession;
+  activeClassroomSession = null;
+
+  if (session.timerInterval) {
+    clearInterval(session.timerInterval);
+    session.timerInterval = null;
+  }
+
+  if (session.roomRef) {
+    try {
+      session.roomRef.off('value', session.onRoomValue);
+    } catch (_) {
+      try { session.roomRef.off(); } catch (__) {}
+    }
+    if (notifyLeave && session.status === 'lobby' && session.playerId) {
+      session.roomRef.child(`players/${session.playerId}`).remove().catch(() => {});
+    }
+  }
+}
+
+function computeClassroomStanding(playersMap, playerId) {
+  const entries = Object.entries(playersMap || {}).map(([id, p]) => ({
+    id,
+    score: Number(p?.score) || 0,
+    correct: Number(p?.correct) || 0
+  }));
+  entries.sort((a, b) => (b.score - a.score) || (b.correct - a.correct));
+  const idx = entries.findIndex(e => e.id === playerId);
+  return {
+    rank: idx >= 0 ? idx + 1 : entries.length || 1,
+    total: entries.length || 1
+  };
+}
+
 function promptClassroomJoin(initialPin = '') {
-  // Rate limiting
   if (window.RateLimiter && !window.RateLimiter.check('joinClassroom', 10)) {
-    showToast({ title: 'Error', msg: 'Too many join attempts. Please wait.', type: 'error' });
+    showToast({ title: 'Slow Down', msg: 'Too many join attempts. Please wait a moment.', type: 'error' });
     return;
   }
-  
-  // Show the classroom join modal
+
   const modal = document.getElementById('classroom-join-modal');
   const pinInput = document.getElementById('classroom-pin-input');
   const nameInput = document.getElementById('classroom-player-name');
   const btnSave = document.getElementById('btn-classroom-join-save');
   const btnCancel = document.getElementById('btn-classroom-join-cancel');
   const btnClose = document.getElementById('btn-classroom-join-close');
-  
-  if (!modal || !pinInput || !nameInput) {
-    // Fallback to old prompt method
-    promptClassroomJoinLegacy();
+
+  if (!modal || !pinInput || !nameInput || !btnSave) {
+    showToast({ title: 'Unavailable', msg: 'Classroom join dialog could not be opened.', type: 'error' });
     return;
   }
-  
-  // Pre-fill with player name if available
-  const currentName = state.currentPlayer ? state.currentPlayer.name : 'Player';
-  nameInput.value = currentName;
-  pinInput.value = initialPin ? initialPin.toUpperCase() : '';
-  
+
+  const currentName = (state.currentPlayer && state.currentPlayer.name && !state.currentPlayer.name.startsWith('Guest'))
+    ? state.currentPlayer.name
+    : (state.currentPlayer?.name || '');
+  nameInput.value = currentName === 'Guest' ? '' : currentName;
+  pinInput.value = initialPin ? String(initialPin).trim().toUpperCase() : '';
+
+  const defaultBtnHtml = '<span>Join Game</span>';
+  btnSave.disabled = false;
+  btnSave.innerHTML = defaultBtnHtml;
+
   modal.style.display = 'flex';
-  setTimeout(() => { 
+  syncModalScrollLock();
+
+  setTimeout(() => {
     if (initialPin) {
       nameInput.focus();
     } else {
       pinInput.focus();
     }
-  }, 100);
-  
-  // Handle Save button click
-  const handleSave = () => {
-    const code = pinInput.value.trim();
-    const name = nameInput.value.trim() || 'Player';
-    
-    if (!code) {
-      showToast({ title: 'PIN Required', msg: 'Please enter a Game PIN', type: 'error' });
+  }, 80);
+
+  let isSubmitting = false;
+
+  const closeModal = () => {
+    modal.style.display = 'none';
+    syncModalScrollLock();
+    cleanupListeners();
+  };
+
+  const handleSave = async () => {
+    if (isSubmitting) return;
+    const rawCode = pinInput.value.trim().toUpperCase();
+    const rawName = nameInput.value.trim() || (state.currentPlayer?.name || 'Player');
+
+    if (!rawCode) {
+      showToast({ title: 'PIN Required', msg: 'Enter the Game PIN shown on the host screen.', type: 'error' });
       pinInput.focus();
       return;
     }
-    
+
+    if (window.SecurityModule) {
+      const codeCheck = window.SecurityModule.validateRoomCode(rawCode);
+      if (!codeCheck.valid) {
+        showToast({ title: 'Invalid PIN', msg: codeCheck.error || 'Please check the Game PIN.', type: 'error' });
+        pinInput.focus();
+        return;
+      }
+      const nameCheck = window.SecurityModule.validatePlayerName(rawName);
+      if (!nameCheck.valid) {
+        showToast({ title: 'Invalid Name', msg: nameCheck.error || 'Please enter a valid nickname.', type: 'error' });
+        nameInput.focus();
+        return;
+      }
+    }
+
     if (!window.FirebaseConfig || !window.FirebaseConfig.isAvailable()) {
-      showToast({ title: 'Error', msg: 'Firebase not configured', type: 'error' });
-      modal.style.display = 'none';
+      showToast({ title: 'Connection Ready Check', msg: 'Live multiplayer service is still connecting. Try again in a moment.', type: 'error' });
       return;
     }
-    
-    const database = window.FirebaseConfig.getDatabase();
-    const sanitizedCode = code.toUpperCase();
-    const sanitizedName = window.SecurityModule ? window.SecurityModule.sanitizeHTML(name) : name;
-    const roomRef = database.ref('classrooms/' + sanitizedCode);
-    
-    // Check if room exists
-    roomRef.once('value').then(snapshot => {
+
+    isSubmitting = true;
+    btnSave.disabled = true;
+    btnSave.textContent = 'Joining…';
+
+    try {
+      const database = window.FirebaseConfig.getDatabase();
+      const sanitizedCode = rawCode.replace(/[^A-Z0-9-]/g, '');
+      const sanitizedName = window.SecurityModule ? window.SecurityModule.sanitizeHTML(rawName).slice(0, 22) : rawName.slice(0, 22);
+      const roomRef = database.ref('classrooms/' + sanitizedCode);
+
+      const snapshot = await withClassroomTimeout(roomRef.once('value'), 8000);
       if (!snapshot.exists()) {
-        showToast({ title: 'Room Not Found', msg: 'Please check the Game PIN from the host.', type: 'error' });
+        showToast({ title: 'Room Not Found', msg: `No active classroom found for PIN "${sanitizedCode}".`, type: 'error' });
+        isSubmitting = false;
+        btnSave.disabled = false;
+        btnSave.innerHTML = defaultBtnHtml;
+        pinInput.focus();
         return;
       }
-      
-      const room = snapshot.val();
-      
-      if (room.status === 'finished') {
-        showToast({ title: 'Game Ended', msg: 'This quiz session has already finished.', type: 'error' });
+
+      const room = snapshot.val() || {};
+      if (room.status === 'finished' || room.status === 'cancelled') {
+        showToast({ title: 'Session Ended', msg: 'This classroom game has already finished.', type: 'error' });
+        isSubmitting = false;
+        btnSave.disabled = false;
+        btnSave.innerHTML = defaultBtnHtml;
         return;
       }
-      
-      // Add player to room
-      const playerId = 'player_' + Date.now();
-      roomRef.child('players/' + playerId).set({
+
+      const playerId = 'player_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+      const playerPayload = {
         name: sanitizedName,
         score: 0,
         correct: 0,
+        streak: 0,
         joinedAt: Date.now()
+      };
+
+      await withClassroomTimeout(roomRef.child('players/' + playerId).set(playerPayload), 8000);
+      roomRef.child('lastActivity').set(Date.now()).catch(() => {});
+
+      closeModal();
+      showToast({
+        title: '🎉 You\'re In!',
+        msg: `Joined ${sanitizedCode} as ${sanitizedName}.`,
+        type: 'success',
+        timeout: 3200
       });
-      
-      // Update last activity
-      roomRef.child('lastActivity').set(Date.now());
-      
-      modal.style.display = 'none';
-      showToast({ title: 'Joined!', msg: `Welcome, ${sanitizedName}! Watch the host screen for questions.`, type: 'success', timeout: 4000 });
-      
-      // Listen for game state
-      startClassroomPlayerMode(sanitizedCode, playerId, roomRef, sanitizedName);
-    }).catch(error => {
-      showToast({ title: 'Error', msg: 'Failed to join: ' + error.message, type: 'error' });
-    });
+
+      const hydratedRoom = {
+        ...room,
+        players: { ...(room.players || {}), [playerId]: playerPayload }
+      };
+      startClassroomPlayerMode(sanitizedCode, playerId, roomRef, sanitizedName, hydratedRoom);
+    } catch (error) {
+      isSubmitting = false;
+      btnSave.disabled = false;
+      btnSave.innerHTML = defaultBtnHtml;
+      showToast({ title: 'Could Not Join', msg: error.message || 'Check your connection and try again.', type: 'error' });
+    }
   };
-  
-  // Handle Cancel button
-  const handleCancel = () => {
-    modal.style.display = 'none';
-    cleanup();
-  };
-  
-  // Handle Enter key in inputs
-  const handleKeyPress = (e) => {
+
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      // If on pin input and it's filled, move to name
-      if (e.target === pinInput && pinInput.value.trim()) {
+      if (e.target === pinInput && pinInput.value.trim() && !nameInput.value.trim()) {
         nameInput.focus();
       } else {
-        // Otherwise, submit
         handleSave();
       }
     }
   };
-  
-  // Setup event listeners
-  btnSave.addEventListener('click', handleSave);
-  btnCancel.addEventListener('click', handleCancel);
-  btnClose.addEventListener('click', handleCancel);
-  pinInput.addEventListener('keypress', handleKeyPress);
-  nameInput.addEventListener('keypress', handleKeyPress);
-  
-  // Cleanup function
-  const cleanup = () => {
-    btnSave.removeEventListener('click', handleSave);
-    btnCancel.removeEventListener('click', handleCancel);
-    btnClose.removeEventListener('click', handleCancel);
-    pinInput.removeEventListener('keypress', handleKeyPress);
-    nameInput.removeEventListener('keypress', handleKeyPress);
+
+  const handleBackdrop = (e) => {
+    if (e.target === modal) closeModal();
   };
+
+  btnSave.addEventListener('click', handleSave);
+  if (btnCancel) btnCancel.addEventListener('click', closeModal);
+  if (btnClose) btnClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', handleBackdrop);
+  pinInput.addEventListener('keydown', handleKeyDown);
+  nameInput.addEventListener('keydown', handleKeyDown);
+
+  function cleanupListeners() {
+    btnSave.removeEventListener('click', handleSave);
+    if (btnCancel) btnCancel.removeEventListener('click', closeModal);
+    if (btnClose) btnClose.removeEventListener('click', closeModal);
+    modal.removeEventListener('click', handleBackdrop);
+    pinInput.removeEventListener('keydown', handleKeyDown);
+    nameInput.removeEventListener('keydown', handleKeyDown);
+  }
 }
 
-// Legacy fallback for classroom join using prompts
-function promptClassroomJoinLegacy() {
-  const code = prompt('Enter Game PIN (e.g., FAITH-123):');
-  if (!code) return;
-  
-  // Validate room code
-  if (window.SecurityModule) {
-    const codeValidation = window.SecurityModule.validateRoomCode(code);
-    if (!codeValidation.valid) {
-      showToast({ title: 'Error', msg: codeValidation.error, type: 'error' });
-      return;
+function startClassroomPlayerMode(roomCode, playerId, roomRef, playerName, initialRoom = null) {
+  cleanupClassroomPlayerMode(false);
+
+  state.mode = 'classroom';
+  state.score = 0;
+  state.streak = 0;
+  state.current = null;
+  state.questions = [];
+
+  showGame();
+
+  if (gameTitle) gameTitle.textContent = `🏫 Classroom: ${roomCode}`;
+  if (quizEl) quizEl.style.display = 'block';
+  const welcomeMsg = document.getElementById('welcome-message');
+  if (welcomeMsg) welcomeMsg.style.display = 'none';
+
+  if (timerEl) timerEl.style.display = 'none';
+  if (btnPause) btnPause.style.display = 'none';
+  if (challengeStatusEl) challengeStatusEl.style.display = 'none';
+  if (versusTurnBanner) versusTurnBanner.style.display = 'none';
+  if (btnNext) btnNext.style.display = 'none';
+  if (btnQuit) btnQuit.textContent = 'Leave Room';
+  if (afterRef) afterRef.innerHTML = '';
+
+  const soloScoreChip = document.querySelector('.chip-score');
+  const soloStreakChip = document.querySelector('#streak-chip');
+  const progressChip = document.querySelector('.chip-progress');
+  const progressTrack = document.querySelector('.progress-container-modern');
+  if (soloScoreChip) soloScoreChip.style.display = 'flex';
+  if (soloStreakChip) soloStreakChip.style.display = 'flex';
+  if (progressChip) progressChip.style.display = 'flex';
+  if (progressTrack) progressTrack.style.display = 'none';
+
+  const totalPlanned = (initialRoom?.questions?.length) || (initialRoom?.settings?.questionCount) || 10;
+  if (scoreEl) scoreEl.innerText = '0';
+  if (streakEl) streakEl.innerText = '0';
+  if (qnumEl) qnumEl.innerText = '0';
+  if (qtotalEl) qtotalEl.innerText = String(totalPlanned);
+
+  const session = {
+    roomCode,
+    playerId,
+    playerName,
+    roomRef,
+    timerInterval: null,
+    status: initialRoom?.status || 'lobby',
+    renderedStatus: null,
+    renderedQuestionIdx: -1,
+    hasAnsweredRound: -1,
+    selectedChoiceMeta: null,
+    hasSeenSelf: true,
+    onRoomValue: null
+  };
+  activeClassroomSession = session;
+
+  const stopLocalRoundTimer = () => {
+    if (session.timerInterval) {
+      clearInterval(session.timerInterval);
+      session.timerInterval = null;
     }
-  }
-  
-  const name = prompt('Enter your name:') || 'Player';
-  
-  // Validate player name
-  if (window.SecurityModule) {
-    const nameValidation = window.SecurityModule.validatePlayerName(name);
-    if (!nameValidation.valid) {
-      showToast({ title: 'Error', msg: nameValidation.error, type: 'error' });
-      return;
-    }
-  }
-  
-  if (!window.FirebaseConfig || !window.FirebaseConfig.isAvailable()) {
-    showToast({ title: 'Error', msg: 'Firebase not configured', type: 'error' });
-    return;
-  }
-  
-  const database = window.FirebaseConfig.getDatabase();
-  const sanitizedCode = code.trim().toUpperCase();
-  const sanitizedName = window.SecurityModule ? window.SecurityModule.sanitizeHTML(name.trim()) : name.trim();
-  const roomRef = database.ref('classrooms/' + sanitizedCode);
-  
-  // Check if room exists
-  roomRef.once('value').then(snapshot => {
+  };
+
+  // Render initial lobby view immediately for zero-latency feedback
+  renderClassroomLobbyCard(roomCode, playerName, Object.keys(initialRoom?.players || {}).length || 1);
+  session.renderedStatus = 'lobby';
+
+  session.onRoomValue = (snapshot) => {
+    if (activeClassroomSession !== session) return;
+
     if (!snapshot.exists()) {
-      showToast({ title: 'Error', msg: 'Room not found. Check the PIN.', type: 'error' });
+      showToast({ title: 'Session Ended', msg: 'The host closed this classroom room.', type: 'info', timeout: 4000 });
+      showSetup();
       return;
     }
-    
-    const room = snapshot.val();
-    
-    if (room.status !== 'lobby' && room.status !== 'active' && room.status !== 'question') {
-      showToast({ title: 'Error', msg: 'Game has ended or not started.', type: 'error' });
+
+    const room = snapshot.val() || {};
+    const status = room.status || 'lobby';
+    session.status = status;
+
+    if (status === 'cancelled') {
+      showToast({ title: 'Session Ended', msg: 'The host ended this classroom session.', type: 'info', timeout: 4000 });
+      showSetup();
       return;
     }
-    
-    // Add player to room
-    const playerId = 'player_' + Date.now();
-    roomRef.child('players/' + playerId).set({
-      name: sanitizedName,
-      score: 0,
-      correct: 0,
-      joinedAt: Date.now()
-    });
-    
-    // Update last activity
-    roomRef.child('lastActivity').set(Date.now());
-    
-    showToast({ title: 'Success!', msg: `Joined as ${sanitizedName}. Follow instructions on screen!`, type: 'success', timeout: 8000 });
-    
-    // Listen for game state
-    startClassroomPlayerMode(sanitizedCode, playerId, roomRef, sanitizedName);
-  }).catch(error => {
-    showToast({ title: 'Error', msg: 'Failed to join: ' + error.message, type: 'error' });
-  });
-}
 
-// Classroom Player Mode
-function startClassroomPlayerMode(roomCode, playerId, roomRef, playerName) {
-  // Hide setup, show game area with modified UI
-  setupPanel.style.display = 'none';
-  gameArea.style.display = 'block';
-  
-  document.getElementById('game-title').textContent = `🏫 Classroom: ${roomCode}`;
-  
-  // Track my player state
-  let myScore = 0;
-  let myCorrect = 0;
-  let hasAnsweredCurrent = false;
-  
-  // Listen for score updates
-  roomRef.child(`players/${playerId}`).on('value', (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      myScore = data.score || 0;
-      myCorrect = data.correct || 0;
-      // Assume global variable scoreEl exists, or define it here
-      const scoreEl = document.getElementById('game-score');
-      if (scoreEl) scoreEl.innerText = myScore;
-    }
-  });
-  
-  // Initial waiting state
-  showClassroomLobbyWaiting(roomCode, playerName);
-  
-  // Listen for current question
-  roomRef.child('currentQuestion').on('value', (snapshot) => {
-    const questionIndex = snapshot.val();
-    hasAnsweredCurrent = false;
-    if (questionIndex !== null && questionIndex >= 0) {
-      loadClassroomQuestion(roomRef, questionIndex, playerId);
-    }
-  });
-  
-  // Listen for status changes
-  roomRef.child('status').on('value', (snapshot) => {
-    const status = snapshot.val();
-    if (status === 'results') {
-      showClassroomRoundResults(roomRef, playerId);
-    } else if (status === 'leaderboard') {
-      showClassroomLeaderboardWaiting(myScore);
-    } else if (status === 'finished') {
-      showClassroomFinalResults(myScore, myCorrect);
-    }
-  });
-}
+    const playersMap = room.players || {};
+    const me = playersMap[playerId];
 
-function showClassroomLobbyWaiting(roomCode, playerName) {
-  const qTextEl = document.getElementById('qtext');
-  qTextEl.textContent = `You're in! Waiting for host to start the quiz...`;
-  
-  const answersEl = document.getElementById('answers');
-  answersEl.innerHTML = `
-    <div style="text-align: center; padding: 48px 24px; background: rgba(255,255,255,0.06); border: 2px dashed var(--accent); border-radius: 20px;">
-      <div style="font-size: 56px; margin-bottom: 16px;">🎮</div>
-      <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 8px;">Ready, ${playerName}!</h2>
-      <p style="color: var(--muted); font-size: 16px;">Room Code: <strong style="color: var(--accent);">${roomCode}</strong></p>
-      <p style="color: var(--muted); font-size: 14px; margin-top: 16px;">Watch the main screen for the quiz questions!</p>
-    </div>
-  `;
-}
+    // Detect if host removed player from waiting lobby
+    if (status === 'lobby' && session.hasSeenSelf && !me) {
+      showToast({ title: 'Removed from Lobby', msg: 'You were removed from the classroom lobby by the host.', type: 'warn', timeout: 4000 });
+      showSetup();
+      return;
+    }
 
-// Load classroom question for player
-function loadClassroomQuestion(roomRef, questionIndex, playerId) {
-  roomRef.child('questions').once('value').then(snapshot => {
-    const questions = snapshot.val();
-    if (!questions || !questions[questionIndex]) return;
-    
-    const question = questions[questionIndex];
-    
-    // Check if already answered
-    roomRef.child(`responses/${playerId}`).once('value').then(respSnapshot => {
-      const response = respSnapshot.val();
-      if (response && response.answer !== undefined) {
-        // Already answered - show waiting
-        showClassroomWaiting();
+    if (me) {
+      session.hasSeenSelf = true;
+      state.score = Number(me.score) || 0;
+      state.streak = Number(me.streak) || 0;
+      if (scoreEl) scoreEl.innerText = String(state.score);
+      if (streakEl) streakEl.innerText = String(state.streak);
+    }
+
+    const questions = Array.isArray(room.questions) ? room.questions : [];
+    const totalQ = questions.length || Number(room.settings?.questionCount) || 10;
+    const qIdx = typeof room.currentQuestion === 'number' ? room.currentQuestion : -1;
+    if (qtotalEl) qtotalEl.innerText = String(totalQ);
+    if (qnumEl) qnumEl.innerText = String(qIdx >= 0 ? qIdx + 1 : 0);
+
+    if (status === 'lobby') {
+      stopLocalRoundTimer();
+      session.renderedQuestionIdx = -1;
+      session.hasAnsweredRound = -1;
+      session.selectedChoiceMeta = null;
+      const pCount = Object.keys(playersMap).length || 1;
+      if (session.renderedStatus !== 'lobby') {
+        renderClassroomLobbyCard(roomCode, playerName, pCount);
+        session.renderedStatus = 'lobby';
+      } else {
+        const countEl = document.getElementById('classroom-lobby-count');
+        if (countEl) countEl.textContent = `${pCount} player${pCount === 1 ? '' : 's'} connected`;
+      }
+      return;
+    }
+
+    if (status === 'starting') {
+      stopLocalRoundTimer();
+      session.renderedQuestionIdx = -1;
+      session.hasAnsweredRound = -1;
+      session.selectedChoiceMeta = null;
+      if (session.renderedStatus !== 'starting') {
+        session.renderedStatus = 'starting';
+        renderClassroomGetReadyCard(roomCode);
+      }
+      return;
+    }
+
+    if (status === 'question') {
+      const question = (qIdx >= 0 && questions[qIdx]) ? questions[qIdx] : null;
+      if (!question) return;
+
+      const existingResp = room.responses && room.responses[playerId];
+      const alreadyAnswered = (session.hasAnsweredRound === qIdx) || !!(existingResp && existingResp.answer !== undefined);
+
+      // Update mid-round Scripture Clue dynamically if revealed by host
+      if (room.clueRevealed && Array.isArray(question.verses) && question.verses.length > 0) {
+        const clueSlot = document.getElementById('classroom-clue-slot');
+        if (clueSlot && !clueSlot.hasChildNodes()) {
+          clueSlot.innerHTML = `<div class="classroom-clue-chip">📜 Scripture Clue: <strong>${escapeHtml(question.verses[0])}</strong></div>`;
+        }
+      }
+
+      if (alreadyAnswered) {
+        if (session.renderedStatus !== `locked_${qIdx}`) {
+          stopLocalRoundTimer();
+          session.renderedStatus = `locked_${qIdx}`;
+          const meta = session.selectedChoiceMeta || {};
+          renderClassroomLockedInCard(question, meta.option, meta.icon, meta.color, room.clueRevealed);
+        }
         return;
       }
-      
-      // Show question
-      displayClassroomQuestion(question, questionIndex, roomRef, playerId);
-    });
-  });
+
+      if (session.renderedStatus !== `question_${qIdx}` || session.renderedQuestionIdx !== qIdx) {
+        session.renderedStatus = `question_${qIdx}`;
+        session.renderedQuestionIdx = qIdx;
+        session.selectedChoiceMeta = null;
+        renderClassroomLiveQuestion(session, room, question, qIdx, stopLocalRoundTimer);
+      }
+      return;
+    }
+
+    if (status === 'results') {
+      stopLocalRoundTimer();
+      const roundKey = `results_${qIdx}`;
+      if (session.renderedStatus !== roundKey) {
+        session.renderedStatus = roundKey;
+        const question = (qIdx >= 0 && questions[qIdx]) ? questions[qIdx] : null;
+        const rankInfo = computeClassroomStanding(playersMap, playerId);
+        renderClassroomRoundResultsCard(me, question, rankInfo);
+      }
+      return;
+    }
+
+    if (status === 'leaderboard') {
+      stopLocalRoundTimer();
+      const lbKey = `leaderboard_${qIdx}`;
+      if (session.renderedStatus !== lbKey) {
+        session.renderedStatus = lbKey;
+        const rankInfo = computeClassroomStanding(playersMap, playerId);
+        renderClassroomLeaderboardCard(me, rankInfo, qIdx + 1, totalQ);
+      }
+      return;
+    }
+
+    if (status === 'finished') {
+      stopLocalRoundTimer();
+      if (session.renderedStatus !== 'finished') {
+        session.renderedStatus = 'finished';
+        const rankInfo = computeClassroomStanding(playersMap, playerId);
+        SoundFX.playFanfare();
+        renderClassroomFinalCard(me, rankInfo, totalQ);
+      }
+    }
+  };
+
+  roomRef.on('value', session.onRoomValue);
 }
 
-// Display classroom question for player
-function displayClassroomQuestion(question, questionIndex, roomRef, playerId) {
+function renderClassroomLobbyCard(roomCode, playerName, playerCount) {
+  if (qText) qText.textContent = 'Waiting for the Host to start the game…';
+  if (!answersEl) return;
+  answersEl.innerHTML = `
+    <div class="classroom-player-card">
+      <span class="classroom-status-emoji">🙌</span>
+      <h3>You're in, ${escapeHtml(playerName)}!</h3>
+      <p>See your nickname on the projector or host screen.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:16px;">
+        <span class="verse-badge" style="font-size:14px; padding:6px 14px;">PIN: <strong>${escapeHtml(roomCode)}</strong></span>
+        <span id="classroom-lobby-count" class="verse-badge" style="font-size:14px; padding:6px 14px;">${playerCount} player${playerCount === 1 ? '' : 's'} connected</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderClassroomGetReadyCard(roomCode) {
+  if (qText) qText.textContent = 'Eyes up! The quiz is starting…';
+  if (!answersEl) return;
+  answersEl.innerHTML = `
+    <div class="classroom-player-card">
+      <span class="classroom-status-emoji">⚡</span>
+      <h3>Get Ready!</h3>
+      <p>Question 1 is about to appear — faster answers earn higher points & Faith Streaks!</p>
+      <div style="margin-top:14px;">
+        <span class="verse-badge">Room ${escapeHtml(roomCode)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderClassroomLiveQuestion(session, room, question, qIdx, stopLocalRoundTimer) {
+  stopLocalRoundTimer();
   state.current = question;
-  state.qnum = questionIndex + 1;
-  
-  const qTextEl = document.getElementById('qtext');
-  qTextEl.textContent = question.prompt;
-  
-  const answersEl = document.getElementById('answers');
+  state.qnum = qIdx + 1;
+
+  if (qText) qText.textContent = question.prompt || 'Select the correct answer:';
+  if (!answersEl) return;
   answersEl.innerHTML = '';
-  
+
+  const timePerQ = Math.max(5, Number(room.settings?.timePerQuestion) || 20);
+  const startStamp = Number(room.questionStartTime) || Date.now();
+
+  // Synced progress timer bar + clue slot
+  const topWrap = document.createElement('div');
+  topWrap.style.width = '100%';
+  const timerStrip = document.createElement('div');
+  timerStrip.className = 'classroom-timer-strip';
+  const timerFill = document.createElement('div');
+  timerFill.className = 'classroom-timer-strip-fill';
+  timerStrip.appendChild(timerFill);
+  topWrap.appendChild(timerStrip);
+
+  const clueSlot = document.createElement('div');
+  clueSlot.id = 'classroom-clue-slot';
+  if (room.clueRevealed && Array.isArray(question.verses) && question.verses.length > 0) {
+    clueSlot.innerHTML = `<div class="classroom-clue-chip">📜 Scripture Clue: <strong>${escapeHtml(question.verses[0])}</strong></div>`;
+  }
+  topWrap.appendChild(clueSlot);
+  answersEl.appendChild(topWrap);
+
   const icons = ['▲', '◆', '●', '■'];
-  const colors = ['#e21b3c', '#1368ce', '#ffa602', '#26890c'];
-  
+  const colors = ['#e21b3c', '#1368ce', '#d97706', '#15803d'];
+
   const gridContainer = document.createElement('div');
   gridContainer.className = 'classroom-options-grid';
-  gridContainer.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; width: 100%;';
-  
-  question.options.forEach((option, i) => {
+
+  (question.options || []).forEach((option, i) => {
     const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = `choice-${i + 1}`;
     btn.className = 'classroom-answer-btn';
-    btn.style.cssText = `
-      background: ${colors[i]};
-      color: #ffffff;
-      border: none;
-      border-radius: 16px;
-      padding: 24px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 16px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 18px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-      transition: transform 0.15s ease, filter 0.15s ease;
-    `;
-    
+    btn.style.background = colors[i % colors.length];
     btn.innerHTML = `
-      <span style="font-size: 32px; font-weight: 900; line-height: 1;">${icons[i]}</span>
-      <span style="text-align: left; line-height: 1.3;">${option}</span>
+      <span class="classroom-shape">${icons[i % icons.length]}</span>
+      <span class="classroom-opt-label">${escapeHtml(option)}</span>
     `;
-    
+
     btn.addEventListener('click', () => {
-      if (navigator.vibrate) navigator.vibrate(50);
-      btn.style.transform = 'scale(0.96)';
-      btn.style.filter = 'brightness(1.2)';
-      
-      const answerTime = Date.now();
-      const questionStartTime = state.questionStartTime || answerTime;
-      const timeTaken = (answerTime - questionStartTime) / 1000;
-      
-      // Submit answer
-      roomRef.child(`responses/${playerId}`).set({
+      if (session.hasAnsweredRound === qIdx) return;
+      session.hasAnsweredRound = qIdx;
+      stopLocalRoundTimer();
+
+      if (navigator.vibrate) navigator.vibrate(40);
+      SoundFX.playClick();
+
+      const now = Date.now();
+      const elapsed = Math.max(0, Math.min(timePerQ, (now - startStamp) / 1000));
+      session.selectedChoiceMeta = {
+        option,
+        icon: icons[i % icons.length],
+        color: colors[i % colors.length]
+      };
+      session.renderedStatus = `locked_${qIdx}`;
+
+      session.roomRef.child(`responses/${session.playerId}`).set({
         answer: i,
-        timeTaken: timeTaken,
-        timestamp: answerTime
+        timeTaken: Number(elapsed.toFixed(2)),
+        timestamp: now
+      }).catch((err) => {
+        showToast({ title: 'Sync Warning', msg: 'Could not submit response: ' + err.message, type: 'error' });
       });
-      
-      // Show waiting
-      showClassroomWaiting(option, icons[i], colors[i]);
+
+      const clueNow = Boolean(document.querySelector('#classroom-clue-slot .classroom-clue-chip'));
+      renderClassroomLockedInCard(question, option, icons[i % icons.length], colors[i % colors.length], clueNow);
     });
-    
+
     gridContainer.appendChild(btn);
   });
-  
+
   answersEl.appendChild(gridContainer);
-  
-  // Record question start time
-  roomRef.child('questionStartTime').once('value').then(snapshot => {
-    state.questionStartTime = snapshot.val();
-  });
+
+  // Synced countdown bar with local fallback lock when time expires
+  const updateBar = () => {
+    const elapsed = Math.max(0, (Date.now() - startStamp) / 1000);
+    const remaining = Math.max(0, timePerQ - elapsed);
+    const pct = Math.max(0, Math.min(100, (remaining / timePerQ) * 100));
+    timerFill.style.width = `${pct}%`;
+    if (remaining <= 5) {
+      timerFill.style.background = 'linear-gradient(90deg, #ef4444, #f97316)';
+    }
+    if (remaining <= 0 && session.hasAnsweredRound !== qIdx) {
+      stopLocalRoundTimer();
+      // Disable tiles locally if timer expired while waiting for host reveal
+      gridContainer.querySelectorAll('.classroom-answer-btn').forEach(b => {
+        b.disabled = true;
+      });
+      if (qText) qText.textContent = '⏱️ Time\'s up! Waiting for host to reveal the answer…';
+    }
+  };
+  updateBar();
+  session.timerInterval = setInterval(updateBar, 200);
 }
 
-// Show waiting screen for classroom player
-function showClassroomWaiting(selectedOption, icon, color) {
-  const answersEl = document.getElementById('answers');
+function renderClassroomLockedInCard(question, selectedOption, icon, color, clueShown) {
+  if (qText && question?.prompt) qText.textContent = question.prompt;
+  if (!answersEl) return;
+  const clueHtml = (clueShown && Array.isArray(question?.verses) && question.verses.length > 0)
+    ? `<div id="classroom-clue-slot"><div class="classroom-clue-chip">📜 Scripture Clue: <strong>${escapeHtml(question.verses[0])}</strong></div></div>`
+    : `<div id="classroom-clue-slot"></div>`;
+
   answersEl.innerHTML = `
-    <div style="text-align: center; padding: 48px 20px; background: rgba(255, 255, 255, 0.08); border-radius: 20px; border: 2px solid ${color || 'var(--accent)'};">
-      <div style="font-size: 48px; margin-bottom: 12px;">${icon || '✓'}</div>
-      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Answer Locked In!</h2>
-      ${selectedOption ? `<p style="font-size: 18px; color: var(--text); margin-bottom: 12px;">Selected: <strong>${selectedOption}</strong></p>` : ''}
-      <p style="font-size: 15px; color: var(--muted);">Waiting for time to expire / other players...</p>
+    ${clueHtml}
+    <div class="classroom-player-card" style="border-color: ${color || 'var(--accent)'};">
+      <span class="classroom-status-emoji">${icon || '✓'}</span>
+      <h3>Answer Locked In!</h3>
+      ${selectedOption ? `<p style="color: var(--text); font-size: 17px; margin-bottom: 8px;">Your pick: <strong>${escapeHtml(selectedOption)}</strong></p>` : ''}
+      <p>Hang tight while everyone finishes answering…</p>
     </div>
   `;
 }
 
-// Show round results on player device
-function showClassroomRoundResults(roomRef, playerId) {
-  const answersEl = document.getElementById('answers');
-  roomRef.child(`players/${playerId}`).once('value').then(snapshot => {
-    const p = snapshot.val() || {};
-    answersEl.innerHTML = `
-      <div style="text-align: center; padding: 40px 20px; background: rgba(255, 255, 255, 0.08); border-radius: 20px;">
-        <div style="font-size: 48px; margin-bottom: 8px;">📊</div>
-        <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Round Results on Screen</h2>
-        <div style="font-size: 32px; font-weight: 900; color: var(--accent); margin: 12px 0;">${p.score || 0} pts</div>
-        <p style="color: var(--muted); font-size: 15px;">Check the main screen to see the correct answer breakdown!</p>
+function renderClassroomRoundResultsCard(me, question, rankInfo) {
+  const isCorrect = Boolean(me?.lastRoundCorrect);
+  const roundPts = Number(me?.lastRoundPoints) || 0;
+  const totalPts = Number(me?.score) || 0;
+  const streak = Number(me?.streak) || 0;
+  const correctAns = me?.lastCorrectAnswer || question?.correctAnswer || '';
+  const verses = Array.isArray(question?.verses) && question.verses.length ? question.verses.join(', ') : '';
+
+  if (isCorrect) {
+    if (streak >= 3) SoundFX.playStreak();
+    else SoundFX.playCorrect();
+  } else {
+    SoundFX.playWrong();
+  }
+
+  if (qText) {
+    qText.textContent = isCorrect ? '🎯 Correct Answer!' : '📖 Keep Going!';
+  }
+  if (!answersEl) return;
+
+  answersEl.innerHTML = `
+    <div class="classroom-player-card ${isCorrect ? 'is-correct' : 'is-wrong'}">
+      <span class="classroom-status-emoji">${isCorrect ? '🌟' : '💡'}</span>
+      <h3>${isCorrect ? `+${roundPts} Points!` : 'No Points This Round'}</h3>
+      ${correctAns ? `<p style="color: var(--text); font-size: 16px; margin-bottom: 6px;">Correct Answer: <strong>${escapeHtml(correctAns)}</strong></p>` : ''}
+      ${verses ? `<p style="font-size: 13px; margin-bottom: 12px;">📜 Reference: <strong>${escapeHtml(verses)}</strong></p>` : ''}
+      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:12px;">
+        <span class="verse-badge" style="font-size:14px; padding:6px 14px;">Total: <strong>${totalPts} pts</strong></span>
+        <span class="verse-badge" style="font-size:14px; padding:6px 14px;">Rank: <strong>#${rankInfo.rank} of ${rankInfo.total}</strong></span>
+        ${streak >= 2 ? `<span class="verse-badge" style="font-size:14px; padding:6px 14px;">🔥 ${streak} Faith Streak</span>` : ''}
       </div>
-    `;
-  });
-}
-
-// Show leaderboard waiting
-function showClassroomLeaderboardWaiting(score) {
-  const answersEl = document.getElementById('answers');
-  answersEl.innerHTML = `
-    <div style="text-align: center; padding: 40px 20px; background: rgba(255, 255, 255, 0.08); border-radius: 20px;">
-      <div style="font-size: 48px; margin-bottom: 8px;">🏆</div>
-      <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">Leaderboard Displayed</h2>
-      <div style="font-size: 32px; font-weight: 900; color: var(--accent); margin: 12px 0;">${score || 0} pts</div>
-      <p style="color: var(--muted); font-size: 15px;">Next question starting soon...</p>
     </div>
   `;
 }
 
-// Show final results
-function showClassroomFinalResults(score, correct) {
-  const answersEl = document.getElementById('answers');
+function renderClassroomLeaderboardCard(me, rankInfo, completedQ, totalQ) {
+  if (qText) qText.textContent = `Standings after Question ${completedQ} of ${totalQ}`;
+  if (!answersEl) return;
+  const totalPts = Number(me?.score) || 0;
+  const streak = Number(me?.streak) || 0;
   answersEl.innerHTML = `
-    <div style="text-align: center; padding: 48px 20px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; border: 2px solid var(--accent);">
-      <div style="font-size: 56px; margin-bottom: 12px;">🎉</div>
-      <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 8px;">Quiz Completed!</h2>
-      <div style="font-size: 36px; font-weight: 900; color: var(--accent); margin: 12px 0;">${score || 0} Total Points</div>
-      <p style="color: var(--text); font-size: 18px; margin-bottom: 20px;">Correct answers: <strong>${correct || 0}</strong></p>
-      <button onclick="window.location.reload()" class="primary" style="padding: 12px 28px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer;">Play Again</button>
+    <div class="classroom-player-card">
+      <span class="classroom-status-emoji">🏆</span>
+      <h3>You're in #${rankInfo.rank} Place!</h3>
+      <div class="classroom-points-pill">${totalPts} pts</div>
+      <p>${streak >= 2 ? `🔥 ${streak}-answer Faith Streak active! ` : ''}Get ready for the next question from the host…</p>
     </div>
   `;
+}
+
+function renderClassroomFinalCard(me, rankInfo, totalQ) {
+  if (qText) qText.textContent = '🏁 Classroom Quiz Complete!';
+  if (!answersEl) return;
+  const totalPts = Number(me?.score) || 0;
+  const correctCount = Number(me?.correct) || 0;
+  const medal = rankInfo.rank === 1 ? '🥇' : rankInfo.rank === 2 ? '🥈' : rankInfo.rank === 3 ? '🥉' : '🎉';
+
+  answersEl.innerHTML = `
+    <div class="classroom-player-card is-correct">
+      <span class="classroom-status-emoji">${medal}</span>
+      <h3>Finished #${rankInfo.rank} of ${rankInfo.total}!</h3>
+      <div class="classroom-points-pill">${totalPts} pts</div>
+      <p style="color: var(--text); font-size: 16px; margin-bottom: 18px;">You answered <strong>${correctCount} of ${totalQ}</strong> correctly.</p>
+      <button type="button" id="btn-classroom-finish-home" class="primary" style="padding: 12px 26px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer;">
+        Back to Game Modes
+      </button>
+    </div>
+  `;
+
+  const doneBtn = document.getElementById('btn-classroom-finish-home');
+  if (doneBtn) {
+    doneBtn.addEventListener('click', () => showSetup());
+  }
 }
 
 // Re-localize dynamic pieces when language changes
 window.onWhoBibleLanguageChange = function(lang){
   try{
-    // Re-display player info with new language
     displayPlayerInfo();
-    // Re-render study list (people) to reflect translated events/occupations
     if(document.getElementById('study-panel') && state.people.length>0){
-      renderPeopleList(searchPerson.value || '');
+      renderPeopleList(searchPerson ? searchPerson.value : '');
     }
-    // Rebuild current question prompt and answer labels if a quiz is active
-    if(state.current){
+    if(state.current && state.mode === 'scenarios' && btnNext && btnNext.disabled){
+      renderScenarioQuestion(state.current);
+    } else if(state.current && state.mode !== 'classroom' && state.mode !== 'scenarios'){
       renderQuestion(state.current);
-      // Update answers display text for current choices
       const nodes = Array.from(document.querySelectorAll('#answers .ans'));
       nodes.forEach(node=>{
         const orig = node.dataset.value;
         const q = state.current;
-        node.innerText = (typeof translateAnswerForQuestionType==='function') ? translateAnswerForQuestionType(q.type, orig) : orig;
+        const txtSpan = node.querySelector('.choice-text') || node;
+        txtSpan.innerText = (typeof translateAnswerForQuestionType==='function') ? translateAnswerForQuestionType(q.type, orig) : orig;
       });
     }
   }catch(_){ /* non-fatal */ }
@@ -3912,19 +5087,15 @@ window.onWhoBibleLanguageChange = function(lang){
 
 // Initialize authentication if available
 if (typeof window !== 'undefined') {
-  // Listen for auth state changes (corrected event names with colon)
   document.addEventListener('auth:login', (e) => {
     console.log('User logged in:', e.detail);
-    // Migrate guest data to authenticated user if needed
     if (state.currentPlayer && state.currentPlayer.isGuest) {
-      // TODO: Migrate stats to cloud
       console.log('Migrating guest stats to authenticated account');
     }
   });
   
   document.addEventListener('auth:logout', () => {
     console.log('User logged out, reverting to guest');
-    // Revert to guest user
     state.currentPlayer = createGuestPlayer();
     savePlayer(state.currentPlayer);
     displayPlayerInfo();
@@ -3935,14 +5106,15 @@ if (typeof window !== 'undefined') {
 window.WB = {
   state,
   buildSharedQuestions: (count, diff) => pickQuestionSet(count, diff),
-  startRemoteMatch: (questions, players, myIdx) => {
+  startRemoteMatch: (questions, players, myIdx, settings = {}) => {
     if (window.RemoteChallengeUI && window.RemoteChallengeUI.hide) {
       window.RemoteChallengeUI.hide();
     }
+    cleanupClassroomPlayerMode(false);
     showGame();
-    gameTitle.textContent = '🌐 Remote Challenge';
+    if (gameTitle) gameTitle.textContent = '🌐 Remote Challenge';
     state.mode = 'remote-challenge';
-    state.players = (players && players.length >= 2) ? players : [
+    state.players = (players && players.length >= 2) ? players.map(p => ({ ...p })) : [
       { name: 'Host', score: 0 },
       { name: 'Guest', score: 0 }
     ];
@@ -3953,22 +5125,58 @@ window.WB = {
     state.score = 0;
     state.streak = 0;
     state.results = [];
+
+    // Ensure quiz interface is visible and properly configured when coming from Setup
+    if (quizEl) quizEl.style.display = 'block';
+    const welcomeMsg = document.getElementById('welcome-message');
+    if (welcomeMsg) welcomeMsg.style.display = 'none';
+    if (timerEl) timerEl.style.display = 'none';
+    if (btnPause) btnPause.style.display = 'none';
+
+    const soloScoreChip = document.querySelector('.chip-score');
+    const soloStreakChip = document.querySelector('#streak-chip');
+    const progressChip = document.querySelector('.chip-progress');
+    const progressTrack = document.querySelector('.progress-container-modern');
+    if (soloScoreChip) soloScoreChip.style.display = 'none';
+    if (soloStreakChip) soloStreakChip.style.display = 'none';
+    if (progressChip) progressChip.style.display = 'flex';
+    if (progressTrack) progressTrack.style.display = 'block';
+
     if (challengeStatusEl) challengeStatusEl.style.display = 'flex';
+    if (qnumEl) qnumEl.innerText = '0';
+    if (qtotalEl) qtotalEl.innerText = String(state.qtotal);
+    if (scoreEl) scoreEl.innerText = '0';
+    if (streakEl) streakEl.innerText = '0';
+    if (afterRef) afterRef.innerHTML = '';
+    clearAutoAdvance();
+    if (btnNext) {
+      btnNext.style.display = 'none';
+      btnNext.disabled = true;
+    }
+
     updateVersusHUD();
     stopTimer();
     nextQuestion();
   },
   updateRemoteScores: (players) => {
-    if (players && players.length >= 2) {
+    if (players && players.length >= 2 && state.players && state.players.length >= 2) {
       state.players[0].score = players[0].score || 0;
       state.players[1].score = players[1].score || 0;
       if (p1ScoreEl) p1ScoreEl.textContent = String(players[0].score || 0);
       if (p2ScoreEl) p2ScoreEl.textContent = String(players[1].score || 0);
+      // Refresh summary modal live if local player finished first and is viewing summary
+      if (modalEl && modalEl.style.display === 'flex' && state.mode === 'remote-challenge') {
+        showSummaryModal();
+      }
     }
   },
   onRemoteMatchComplete: () => {
     if (state.mode === 'remote-challenge') {
-      endQuiz();
+      if (state.qtotal > 0) {
+        endQuiz();
+      } else if (modalEl && modalEl.style.display === 'flex') {
+        showSummaryModal();
+      }
     }
   }
 };
@@ -3999,11 +5207,13 @@ function openModernShareModal(customData = null) {
   if (urlEl) urlEl.textContent = sd.url || window.location.href;
   modal.style.display = 'flex';
   window._activeShareData = sd;
+  syncModalScrollLock();
 }
 
 function closeModernShareModal() {
   const modal = document.getElementById('share-modal');
   if (modal) modal.style.display = 'none';
+  syncModalScrollLock();
 }
 
 function setupModernShareEvents() {
@@ -4059,8 +5269,13 @@ function setupModernShareEvents() {
   }
 }
 
-// Setup Simplified Study Controls & Category Pills
+// =========================================
+// Simplified Study Mode Controls & Filters
+// =========================================
 function setupSimplifiedStudyControls() {
+  if (document.body.dataset.studyControlsBound === '1') return;
+  document.body.dataset.studyControlsBound = '1';
+
   const clearBtn = document.getElementById('btn-clear-study-search');
   if (clearBtn && searchPerson) {
     clearBtn.addEventListener('click', () => {
@@ -4079,20 +5294,71 @@ function setupSimplifiedStudyControls() {
       if (sortToggleLabel) {
         sortToggleLabel.textContent = state.studySort === 'name-desc' ? 'Z–A' : 'A–Z';
       }
+      sortToggleBtn.classList.add('active');
+      if (btnShuffleList) btnShuffleList.classList.remove('active');
       if (sortSelect) sortSelect.value = state.studySort;
       renderPeopleList(searchPerson ? searchPerson.value : '');
     });
   }
 
-  const pills = document.querySelectorAll('.study-pill');
-  pills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      pills.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      state.studyCategory = pill.dataset.filter || 'all';
+  // Segmented Testament Tabs (All / Old Testament / New Testament)
+  const testamentGroup = document.getElementById('study-testament-tabs');
+  if (testamentGroup) {
+    testamentGroup.addEventListener('click', (e) => {
+      const btn = e.target.closest('.study-seg-btn');
+      if (!btn) return;
+      testamentGroup.querySelectorAll('.study-seg-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      state.studyTestament = btn.dataset.testament || 'all';
       renderPeopleList(searchPerson ? searchPerson.value : '');
     });
-  });
+  }
+
+  // Difficulty Chips (All Levels / Easy / Medium / Hard)
+  const diffGroup = document.getElementById('study-difficulty-tabs');
+  if (diffGroup) {
+    diffGroup.addEventListener('click', (e) => {
+      const btn = e.target.closest('.study-lvl-chip');
+      if (!btn) return;
+      diffGroup.querySelectorAll('.study-lvl-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.studyDifficulty = btn.dataset.diff || 'all';
+      renderPeopleList(searchPerson ? searchPerson.value : '');
+    });
+  }
+
+  // Reset Filters Button
+  const resetFiltersBtn = document.getElementById('btn-study-reset-filters');
+  if (resetFiltersBtn) {
+    resetFiltersBtn.addEventListener('click', () => {
+      state.studyTestament = 'all';
+      state.studyDifficulty = 'all';
+      state.studyCategory = 'all';
+      state.studySort = 'name-asc';
+      if (searchPerson) searchPerson.value = '';
+      if (clearBtn) clearBtn.style.display = 'none';
+      if (sortToggleLabel) sortToggleLabel.textContent = 'A–Z';
+      if (sortToggleBtn) sortToggleBtn.classList.add('active');
+      if (btnShuffleList) btnShuffleList.classList.remove('active');
+      if (testamentGroup) {
+        testamentGroup.querySelectorAll('.study-seg-btn').forEach(b => {
+          const isAll = b.dataset.testament === 'all';
+          b.classList.toggle('active', isAll);
+          b.setAttribute('aria-selected', isAll ? 'true' : 'false');
+        });
+      }
+      if (diffGroup) {
+        diffGroup.querySelectorAll('.study-lvl-chip').forEach(b => {
+          b.classList.toggle('active', b.dataset.diff === 'all');
+        });
+      }
+      renderPeopleList('');
+    });
+  }
 
   // Setup modal pill toggles in 2-Player Pass & Play modal
   ['challenge-qcount-pills', 'challenge-diff-pills', 'challenge-timer-pills'].forEach(id => {
