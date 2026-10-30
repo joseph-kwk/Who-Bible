@@ -253,67 +253,20 @@ const DEFAULT_EN = {
   challengeModeDesc: "Two players, same device",
   guest: {
     badge: "Guest",
-    badgeTooltip: "Playing as guest - data saved to this device only",
-    deviceOnly: "Device Only",
-    deviceOnlyTooltip: "Your data is stored only on this device. Create an account to save across devices.",
+    badgeTooltip: "Saved on this device",
+    deviceOnly: "Saved on device",
+    deviceOnlyTooltip: "Your name, XP, and streaks save automatically in this browser.",
     welcome: {
-      title: "Playing as Guest",
-      message: "All quiz modes are unlocked! Your progress saves on this device, or create a free account anytime to sync across devices.",
-      primaryButton: "Got it!",
-      secondaryButton: "Create Account"
-    },
-    performance: {
-      title: "Impressive Score!",
-      subtitle: "You scored {score} points! 🎉",
-      primaryButton: "Save My Progress",
-      secondaryButton: "Maybe Later"
-    },
-    engagement: {
-      title: "You're on a Roll!",
-      subtitle: "You've played {games} games — that's dedication!",
-      primaryButton: "Secure My Stats",
-      secondaryButton: "Continue as Guest"
+      title: "Set Your Player Name",
+      message: "Pick a name & avatar for multiplayer rooms and ranks. Progress saves automatically on this device.",
+      primaryButton: "Set Name",
+      secondaryButton: "Later"
     },
     reminder: {
-      title: "Guest Reminder",
-      message: "Your progress is only saved on this device. Clearing browser data will erase your stats. Create a free account to keep everything safe!",
-      primaryButton: "Secure My Stats",
-      secondaryButton: "Continue as Guest"
-    },
-    social: {
-      title: "Account Required",
-      message: "Create a free account to unlock {feature} and play with friends!",
-      primaryButton: "Create Account",
-      secondaryButton: "Not Now"
-    },
-    benefits: {
-      title: "Create Account to Unlock:",
-      save: {
-        title: "Permanent Progress",
-        description: "Never lose your stats, scores, or achievements"
-      },
-      sync: {
-        title: "Cross-Device Sync",
-        description: "Play on phone, tablet, or computer — progress follows you"
-      },
-      leaderboard: {
-        title: "Global Leaderboards",
-        description: "Compete with players worldwide and climb the ranks"
-      },
-      social: {
-        title: "Challenge Friends",
-        description: "Send challenges and play with other believers"
-      },
-      badges: {
-        title: "Earn Badges",
-        description: "Unlock achievements and show your biblical knowledge"
-      }
-    },
-    warning: {
-      title: "You Could Lose Your Progress:",
-      clearBrowser: "Clearing browser data/cache",
-      switchDevice: "Switching to another device or browser",
-      incognito: "Using private/incognito browsing"
+      title: "Still Playing as Guest",
+      message: "Add a display name for multiplayer lobbies and scoreboards. Stats stay saved on this device.",
+      primaryButton: "Set Name",
+      secondaryButton: "Later"
     }
   }
 };

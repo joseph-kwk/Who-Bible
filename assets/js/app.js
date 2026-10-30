@@ -1206,8 +1206,12 @@ function attachHandlers(){
 
   const openProfileModal = () => {
     if (!profileModal) return;
+    window.GuestPrompts?.closeCompact?.();
     if (state.currentPlayer) {
-      if (profileNameInput) profileNameInput.value = state.currentPlayer.name || 'Guest';
+      const currentName = (state.currentPlayer.name || '').trim();
+      if (profileNameInput) {
+        profileNameInput.value = currentName.toLowerCase() === 'guest' ? '' : currentName;
+      }
       selectedAvatar = state.currentPlayer.avatar || '👑';
     }
     // Highlight selected avatar
@@ -1231,7 +1235,14 @@ function attachHandlers(){
     }
     profileModal.style.display = 'flex';
     setModalScrollLock(true);
+    setTimeout(() => {
+      if (profileNameInput) {
+        profileNameInput.focus({ preventScroll: true });
+        if (profileNameInput.value) profileNameInput.select();
+      }
+    }, 50);
   };
+  window.openProfileCustomizer = openProfileModal;
 
   const closeProfileModal = () => {
     if (profileModal) profileModal.style.display = 'none';
@@ -1265,6 +1276,15 @@ function attachHandlers(){
       updatePlayerDisplayName();
       closeProfileModal();
       showToast({ title: 'Profile Updated', msg: `Welcome, ${name}!`, type: 'success', timeout: 2000 });
+    });
+  }
+
+  if (profileNameInput && btnSaveProfile) {
+    profileNameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        btnSaveProfile.click();
+      }
     });
   }
 

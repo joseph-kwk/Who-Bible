@@ -1407,14 +1407,14 @@
   },
   "guest": {
     "badge": "Guest",
-    "badgeTooltip": "Playing as guest - data saved to this device only",
-    "deviceOnly": "Device Only",
-    "deviceOnlyTooltip": "Your data is stored only on this device. Create an account to save across devices.",
+    "badgeTooltip": "Saved on this device",
+    "deviceOnly": "Saved on device",
+    "deviceOnlyTooltip": "Your name, XP, and streaks save automatically in this browser.",
     "welcome": {
-      "title": "Playing as Guest",
-      "message": "All quiz modes are unlocked! Your progress saves on this device, or create a free account anytime to sync across devices.",
-      "primaryButton": "Got it!",
-      "secondaryButton": "Create Account"
+      "title": "Set Your Player Name",
+      "message": "Pick a name & avatar for multiplayer rooms and ranks. Progress saves automatically on this device.",
+      "primaryButton": "Set Name",
+      "secondaryButton": "Later"
     },
     "performance": {
       "title": "Impressive Score!",
@@ -1429,10 +1429,10 @@
       "secondaryButton": "Continue as Guest"
     },
     "reminder": {
-      "title": "Guest Reminder",
-      "message": "Your progress is only saved on this device. Clearing browser data will erase your stats. Create a free account to keep everything safe!",
-      "primaryButton": "Secure My Stats",
-      "secondaryButton": "Continue as Guest"
+      "title": "Still Playing as Guest",
+      "message": "Add a display name for multiplayer lobbies and scoreboards. Stats stay saved on this device.",
+      "primaryButton": "Set Name",
+      "secondaryButton": "Later"
     },
     "social": {
       "title": "Account Required",

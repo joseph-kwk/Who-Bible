@@ -1413,14 +1413,14 @@
   },
   "guest": {
     "badge": "Invitado",
-    "badgeTooltip": "Jugando como invitado - datos guardados solo en este dispositivo",
-    "deviceOnly": "Solo Dispositivo",
-    "deviceOnlyTooltip": "Tus datos se almacenan solo en este dispositivo. Crea una cuenta para guardar en todos los dispositivos.",
+    "badgeTooltip": "Guardado en este dispositivo",
+    "deviceOnly": "En este dispositivo",
+    "deviceOnlyTooltip": "Tu nombre, XP y rachas se guardan en este navegador.",
     "welcome": {
-      "title": "Jugando como Invitado",
-      "message": "¡Acceso completo a todos los cuestionarios! Tus estadísticas se guardan solo en este dispositivo. Crea una cuenta para sincronizar en todos los dispositivos y unirte a las tablas de clasificación.",
-      "primaryButton": "¡Entendido!",
-      "secondaryButton": "Crear Cuenta"
+      "title": "Elige Tu Nombre",
+      "message": "Elige un nombre y avatar para salas multijugador y rangos. Tu progreso se guarda en este dispositivo.",
+      "primaryButton": "Elegir nombre",
+      "secondaryButton": "Más tarde"
     },
     "performance": {
       "title": "¡Puntuación Impresionante!",
@@ -1435,10 +1435,10 @@
       "secondaryButton": "Continuar como Invitado"
     },
     "reminder": {
-      "title": "Recordatorio de Invitado",
-      "message": "Tu progreso solo se guarda en este dispositivo. Borrar los datos del navegador eliminará tus estadísticas. ¡Crea una cuenta gratuita para mantener todo seguro!",
-      "primaryButton": "Asegurar Mis Estadísticas",
-      "secondaryButton": "Continuar como Invitado"
+      "title": "Sigues como Invitado",
+      "message": "Añade un nombre para salas multijugador y marcadores. Tus estadísticas se guardan en este dispositivo.",
+      "primaryButton": "Elegir nombre",
+      "secondaryButton": "Más tarde"
     },
     "social": {
       "title": "Cuenta Requerida",

@@ -1413,14 +1413,14 @@
   },
   "guest": {
     "badge": "Invité",
-    "badgeTooltip": "Jouant en tant qu'invité - données enregistrées uniquement sur cet appareil",
-    "deviceOnly": "Appareil Uniquement",
-    "deviceOnlyTooltip": "Vos données sont stockées uniquement sur cet appareil. Créez un compte pour sauvegarder sur tous les appareils.",
+    "badgeTooltip": "Sauvegardé sur cet appareil",
+    "deviceOnly": "Sur cet appareil",
+    "deviceOnlyTooltip": "Votre nom, XP et séries sont enregistrés dans ce navigateur.",
     "welcome": {
-      "title": "Jouant en Tant qu'Invité",
-      "message": "Accès complet à tous les quiz ! Vos statistiques sont enregistrées uniquement sur cet appareil. Créez un compte pour synchroniser sur tous les appareils et rejoindre les classements.",
-      "primaryButton": "Compris !",
-      "secondaryButton": "Créer un Compte"
+      "title": "Choisissez Votre Pseudo",
+      "message": "Personnalisez votre nom et avatar pour le multijoueur et vos rangs. Sauvegardé sur cet appareil.",
+      "primaryButton": "Choisir",
+      "secondaryButton": "Plus tard"
     },
     "performance": {
       "title": "Score Impressionnant !",
@@ -1435,10 +1435,10 @@
       "secondaryButton": "Continuer en Invité"
     },
     "reminder": {
-      "title": "Rappel Invité",
-      "message": "Votre progression n'est enregistrée que sur cet appareil. Effacer les données du navigateur supprimera vos statistiques. Créez un compte gratuit pour tout garder en sécurité !",
-      "primaryButton": "Sécuriser Mes Stats",
-      "secondaryButton": "Continuer en Invité"
+      "title": "Toujours en Invité",
+      "message": "Ajoutez un pseudo pour les salons multijoueurs et classements. Sauvegardé sur cet appareil.",
+      "primaryButton": "Choisir",
+      "secondaryButton": "Plus tard"
     },
     "social": {
       "title": "Compte Requis",
