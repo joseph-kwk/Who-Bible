@@ -944,19 +944,18 @@ function checkFirstTimeUser() {
     const modal = document.getElementById('welcome-modal');
     if (modal) {
       modal.style.display = 'flex';
-      // Close handler
+      syncModalScrollLock();
       const closeBtn = document.getElementById('btn-welcome-close');
       const okBtn = document.getElementById('btn-welcome-ok');
       const close = () => {
         modal.style.display = 'none';
+        syncModalScrollLock();
         localStorage.setItem('who-bible-visited', 'true');
-        // Show welcome toast after closing modal
-        showToast({ title: getText('brandTitle'), msg: getText('welcomeMessage'), type: 'info', timeout: 4000 });
+        document.dispatchEvent(new CustomEvent('welcomeModalClosed'));
       };
-      if(closeBtn) closeBtn.onclick = close;
-      if(okBtn) okBtn.onclick = close;
-      
-      // Close when clicking outside the modal content
+      if (closeBtn) closeBtn.onclick = close;
+      if (okBtn) okBtn.onclick = close;
+
       modal.addEventListener('click', (e) => {
         if (e.target === modal) {
           close();
@@ -1097,6 +1096,7 @@ function openModeLaunchModal(mode) {
   syncPillsFromSelects();
   updateModeLaunchSummary(mode);
 
+  window.GuestPrompts?.closeCompact?.();
   launchModal.style.display = 'flex';
   syncModalScrollLock();
   setTimeout(() => startBtn?.focus({ preventScroll: true }), 40);
@@ -1724,8 +1724,13 @@ function attachHandlers(){
       }
       const welcomeModal = document.getElementById('welcome-modal');
       if (welcomeModal && welcomeModal.style.display === 'flex') {
-        welcomeModal.style.display = 'none';
-        syncModalScrollLock();
+        const closeBtn = document.getElementById('btn-welcome-close');
+        if (closeBtn) closeBtn.click();
+        else {
+          welcomeModal.style.display = 'none';
+          syncModalScrollLock();
+        }
+        return;
       }
       if (modalEl && modalEl.style.display === 'flex') hideSummaryModal();
       if (playersModal && playersModal.style.display === 'flex') hidePlayersModal();
@@ -2058,6 +2063,7 @@ function showSetup(fromHistory = false, options = {}){
 
 function showGame(fromHistory = false){
   if(!fromHistory) updateHistory('game');
+  window.GuestPrompts?.closeCompact?.();
   setupPanel.style.display = 'none';
   gameArea.style.display = 'flex';
   studyPanel.style.display = 'none';
@@ -2066,6 +2072,7 @@ function showGame(fromHistory = false){
 
 function showStudy(fromHistory = false){
   if(!fromHistory) updateHistory('study');
+  window.GuestPrompts?.closeCompact?.();
   clearAutoAdvance();
   state.mode = 'study';
   setupPanel.style.display = 'none';

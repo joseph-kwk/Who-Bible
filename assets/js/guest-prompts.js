@@ -1,9 +1,8 @@
 /**
  * Guest Prompts System
- * Manages guest user warnings, conversion prompts, and session tracking
+ * Manages guest user welcome notice, milestone conversion prompts, and session tracking
  */
 
-// Guest session tracking
 const guestSession = {
   gamesPlayed: 0,
   daysSinceFirstPlay: 0,
@@ -17,44 +16,122 @@ const guestSession = {
   totalScore: 0
 };
 
-// Constants
 const PROMPT_TRIGGERS = {
   GAMES_FOR_WARNING: 10,
   GAMES_FOR_PERFORMANCE: 5,
   DAYS_BETWEEN_REMINDERS: 7,
-  HIGH_PERFORMANCE_PERCENTILE: 0.8, // Top 20%
+  HIGH_PERFORMANCE_PERCENTILE: 0.8,
   MAX_DISMISSALS_BEFORE_DELAY: 3
 };
+
+// Safe translation lookup with built-in clean English fallbacks so raw keys never leak
+const GUEST_FALLBACKS = {
+  'guest.badge': 'Guest',
+  'guest.badgeTooltip': 'Playing as guest — stats saved on this device',
+  'guest.deviceOnly': 'Device Only',
+  'guest.deviceOnlyTooltip': 'Your data is stored on this device. Create a free account to sync across devices.',
+  'guest.welcome.title': 'Playing as Guest',
+  'guest.welcome.message': 'All quiz modes are unlocked! Your progress saves on this device, or create a free account anytime to sync across devices.',
+  'guest.welcome.primaryButton': 'Got it!',
+  'guest.welcome.secondaryButton': 'Create Account',
+  'guest.performance.title': 'Impressive Score!',
+  'guest.performance.subtitle': 'You scored {score} points!',
+  'guest.performance.primaryButton': 'Save My Progress',
+  'guest.performance.secondaryButton': 'Maybe Later',
+  'guest.engagement.title': "You're on a Roll!",
+  'guest.engagement.subtitle': "You've played {games} games — great dedication!",
+  'guest.engagement.primaryButton': 'Secure My Stats',
+  'guest.engagement.secondaryButton': 'Continue as Guest',
+  'guest.reminder.title': 'Guest Progress Reminder',
+  'guest.reminder.message': 'Your progress is saved on this device only. Create a free account anytime to back up and sync your stats!',
+  'guest.reminder.primaryButton': 'Secure My Stats',
+  'guest.reminder.secondaryButton': 'Continue as Guest',
+  'guest.social.title': 'Account Required',
+  'guest.social.message': 'Create a free account to unlock {feature} and sync with friends!',
+  'guest.social.primaryButton': 'Create Account',
+  'guest.social.secondaryButton': 'Not Now',
+  'guest.benefits.title': 'Create a Free Account to Unlock:',
+  'guest.benefits.save.title': 'Permanent Progress',
+  'guest.benefits.save.description': 'Never lose your stats, scores, or ranks',
+  'guest.benefits.sync.title': 'Cross-Device Sync',
+  'guest.benefits.sync.description': 'Play on phone, tablet, or computer seamlessly',
+  'guest.benefits.leaderboard.title': 'Global Leaderboards',
+  'guest.benefits.leaderboard.description': 'Compete worldwide and climb the ranks',
+  'guest.benefits.social.title': 'Challenge Friends',
+  'guest.benefits.social.description': 'Track head-to-head challenges and history',
+  'guest.benefits.badges.title': 'Earn Badges',
+  'guest.benefits.badges.description': 'Unlock achievements as your Scripture mastery grows',
+  'guest.warning.title': 'Local-Only Storage Note:',
+  'guest.warning.clearBrowser': 'Clearing browser data resets local guest stats',
+  'guest.warning.switchDevice': 'Stats stay on this browser until synced',
+  'guest.warning.incognito': 'Private/incognito windows do not persist stats'
+};
+
+function tGuest(key, params = {}) {
+  let resolved = (typeof window.getText === 'function') ? window.getText(key, params) : key;
+  if (!resolved || resolved === key || resolved.startsWith('guest.')) {
+    resolved = GUEST_FALLBACKS[key] || key;
+    Object.keys(params).forEach(k => {
+      resolved = resolved.split(`{${k}}`).join(String(params[k]));
+    });
+  }
+  return resolved;
+}
+
+function escapeGuestHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[ch]));
+}
+
+function isBlockingOverlayActive() {
+  const welcomeModal = document.getElementById('welcome-modal');
+  if (welcomeModal && welcomeModal.style.display === 'flex') return true;
+  if (document.body && document.body.classList.contains('modal-open')) return true;
+  if (window.state && window.state.mode && window.state.mode !== 'idle') return true;
+  return false;
+}
 
 /**
  * Initialize guest prompts system
  */
 function initGuestPrompts() {
   loadGuestSession();
-  
-  // Listen for game completions
+
   document.addEventListener('gameCompleted', handleGameCompleted);
-  
-  // Listen for social feature attempts
   document.addEventListener('socialFeatureAttempt', handleSocialFeatureAttempt);
-  
-  // Show welcome warning if first time guest
+
+  // Schedule welcome notice smoothly — never colliding with #welcome-modal or active gameplay
   if (isGuestUser() && !guestSession.hasSeenWelcomeWarning) {
-    setTimeout(() => showWelcomeWarning(), 2000);
+    const welcomeModal = document.getElementById('welcome-modal');
+    if (welcomeModal && welcomeModal.style.display === 'flex') {
+      document.addEventListener('welcomeModalClosed', () => {
+        setTimeout(() => {
+          if (isGuestUser() && !guestSession.hasSeenWelcomeWarning && !isBlockingOverlayActive()) {
+            showWelcomeWarning();
+          }
+        }, 1200);
+      }, { once: true });
+    } else {
+      setTimeout(() => {
+        if (isGuestUser() && !guestSession.hasSeenWelcomeWarning && !isBlockingOverlayActive()) {
+          showWelcomeWarning();
+        }
+      }, 1800);
+    }
   }
 }
 
-/**
- * Load guest session from localStorage
- */
 function loadGuestSession() {
   try {
     const saved = localStorage.getItem('who-bible-guest-session');
     if (saved) {
       const data = JSON.parse(saved);
       Object.assign(guestSession, data);
-      
-      // Calculate days since first play
       if (guestSession.firstPlayDate) {
         const daysDiff = Math.floor(
           (Date.now() - new Date(guestSession.firstPlayDate).getTime()) / (1000 * 60 * 60 * 24)
@@ -62,7 +139,6 @@ function loadGuestSession() {
         guestSession.daysSinceFirstPlay = daysDiff;
       }
     } else if (isGuestUser()) {
-      // First time guest
       guestSession.firstPlayDate = new Date().toISOString();
       saveGuestSession();
     }
@@ -71,9 +147,6 @@ function loadGuestSession() {
   }
 }
 
-/**
- * Save guest session to localStorage
- */
 function saveGuestSession() {
   try {
     localStorage.setItem('who-bible-guest-session', JSON.stringify(guestSession));
@@ -82,20 +155,13 @@ function saveGuestSession() {
   }
 }
 
-/**
- * Check if current user is a guest
- */
 function isGuestUser() {
-  // Check if state.currentPlayer exists and is guest
   if (window.state && window.state.currentPlayer) {
     return window.state.currentPlayer.isGuest === true;
   }
   return false;
 }
 
-/**
- * Get player stats for display
- */
 function getPlayerStats() {
   if (window.state && window.state.currentPlayer && window.state.currentPlayer.stats) {
     return window.state.currentPlayer.stats;
@@ -107,369 +173,365 @@ function getPlayerStats() {
   };
 }
 
-/**
- * Handle game completion
- */
 function handleGameCompleted(event) {
   if (!isGuestUser()) return;
-  
   const { score, streak, mode } = event.detail || {};
-  
-  // Update session
+
   guestSession.gamesPlayed++;
   guestSession.totalScore += score || 0;
   guestSession.highestScore = Math.max(guestSession.highestScore, score || 0);
   saveGuestSession();
-  
-  // Check triggers
+
   checkPromptTriggers(score, streak, mode);
 }
 
-/**
- * Check if any prompt should be shown
- */
 function checkPromptTriggers(score, streak, mode) {
-  // High performance prompt (after 5 games with good score)
-  if (guestSession.gamesPlayed >= PROMPT_TRIGGERS.GAMES_FOR_PERFORMANCE && 
+  if (guestSession.gamesPlayed >= PROMPT_TRIGGERS.GAMES_FOR_PERFORMANCE &&
       !guestSession.hasSeenPerformancePrompt &&
       score >= 600) {
-    setTimeout(() => showPerformancePrompt(score), 1000);
+    setTimeout(() => showPerformancePrompt(score), 1200);
     return;
   }
-  
-  // Engagement prompt (after 10 games)
+
   if (guestSession.gamesPlayed >= PROMPT_TRIGGERS.GAMES_FOR_WARNING &&
       !hasRecentPrompt(7)) {
-    setTimeout(() => showEngagementPrompt(), 1000);
+    setTimeout(() => showEngagementPrompt(), 1200);
     return;
   }
-  
-  // Periodic reminder (every 7 days or every 10 games after initial)
+
   if (shouldShowPeriodicReminder()) {
-    setTimeout(() => showPeriodicReminder(), 1000);
-    return;
+    setTimeout(() => showPeriodicReminder(), 1200);
   }
 }
 
-/**
- * Check if user has seen a prompt recently
- */
 function hasRecentPrompt(days) {
   if (!guestSession.lastPromptDate) return false;
-  
   const daysSince = Math.floor(
     (Date.now() - new Date(guestSession.lastPromptDate).getTime()) / (1000 * 60 * 60 * 24)
   );
-  
   return daysSince < days;
 }
 
-/**
- * Check if periodic reminder should show
- */
 function shouldShowPeriodicReminder() {
-  // Don't show if dismissed too many times recently
   if (guestSession.conversionPromptsDismissed >= PROMPT_TRIGGERS.MAX_DISMISSALS_BEFORE_DELAY) {
     return false;
   }
-  
-  // Show every 7 days
   if (guestSession.lastWarningDate) {
     const daysSince = Math.floor(
       (Date.now() - new Date(guestSession.lastWarningDate).getTime()) / (1000 * 60 * 60 * 24)
     );
     return daysSince >= PROMPT_TRIGGERS.DAYS_BETWEEN_REMINDERS;
   }
-  
   return false;
 }
 
-/**
- * Handle social feature attempt (leaderboard, challenges, etc.)
- */
 function handleSocialFeatureAttempt(event) {
   if (!isGuestUser()) return;
-  
   const { feature } = event.detail || {};
-  setTimeout(() => showSocialFeaturePrompt(feature), 500);
+  setTimeout(() => showSocialFeaturePrompt(feature), 400);
 }
 
-/**
- * Show welcome warning for first-time guests
- */
 function showWelcomeWarning() {
-  const getText = window.getText || ((key) => key);
-  
   showCompactPrompt({
-    icon: '🎮',
-    title: getText('guest.welcome.title'),
-    message: getText('guest.welcome.message'),
+    icon: '🕊️',
+    badge: tGuest('guest.deviceOnly'),
+    title: tGuest('guest.welcome.title'),
+    message: tGuest('guest.welcome.message'),
     primaryButton: {
-      text: getText('guest.welcome.primaryButton'),
+      text: tGuest('guest.welcome.primaryButton'),
       action: () => closeCompactPrompt()
     },
     secondaryButton: {
-      text: getText('guest.welcome.secondaryButton'),
+      text: tGuest('guest.welcome.secondaryButton'),
       action: () => {
         closeCompactPrompt();
         triggerAccountCreation();
       }
     }
   });
-  
+
   guestSession.hasSeenWelcomeWarning = true;
   saveGuestSession();
 }
 
-/**
- * Show performance congratulations prompt
- */
 function showPerformancePrompt(score) {
-  const getText = window.getText || ((key) => key);
-  
   showFullModal({
     icon: '🌟',
-    title: getText('guest.performance.title'),
-    subtitle: getText('guest.performance.subtitle', { score }),
+    title: tGuest('guest.performance.title'),
+    subtitle: tGuest('guest.performance.subtitle', { score }),
     stats: getPlayerStats(),
     benefits: [
       {
         icon: '💾',
-        title: getText('guest.benefits.save.title'),
-        description: getText('guest.benefits.save.description')
+        title: tGuest('guest.benefits.save.title'),
+        description: tGuest('guest.benefits.save.description')
       },
       {
         icon: '🏆',
-        title: getText('guest.benefits.leaderboard.title'),
-        description: getText('guest.benefits.leaderboard.description')
+        title: tGuest('guest.benefits.leaderboard.title'),
+        description: tGuest('guest.benefits.leaderboard.description')
       },
       {
         icon: '📱',
-        title: getText('guest.benefits.sync.title'),
-        description: getText('guest.benefits.sync.description')
+        title: tGuest('guest.benefits.sync.title'),
+        description: tGuest('guest.benefits.sync.description')
       }
     ],
     warning: {
-      title: getText('guest.warning.title'),
+      title: tGuest('guest.warning.title'),
       items: [
-        getText('guest.warning.clearBrowser'),
-        getText('guest.warning.switchDevice'),
-        getText('guest.warning.incognito')
+        tGuest('guest.warning.clearBrowser'),
+        tGuest('guest.warning.switchDevice'),
+        tGuest('guest.warning.incognito')
       ]
     },
     primaryButton: {
-      text: getText('guest.performance.primaryButton'),
+      text: tGuest('guest.performance.primaryButton'),
       action: () => {
         closeFullModal();
         triggerAccountCreation();
       }
     },
     secondaryButton: {
-      text: getText('guest.performance.secondaryButton'),
+      text: tGuest('guest.performance.secondaryButton'),
       action: () => {
         closeFullModal();
         recordPromptDismissal();
       }
     }
   });
-  
+
   guestSession.hasSeenPerformancePrompt = true;
   guestSession.lastPromptDate = new Date().toISOString();
   saveGuestSession();
 }
 
-/**
- * Show engagement prompt (after many games)
- */
 function showEngagementPrompt() {
-  const getText = window.getText || ((key) => key);
   const stats = getPlayerStats();
-  
+
   showFullModal({
     icon: '📊',
-    title: getText('guest.engagement.title'),
-    subtitle: getText('guest.engagement.subtitle', { games: stats.gamesPlayed }),
-    stats: stats,
+    title: tGuest('guest.engagement.title'),
+    subtitle: tGuest('guest.engagement.subtitle', { games: stats.gamesPlayed }),
+    stats,
     benefits: [
       {
         icon: '🔄',
-        title: getText('guest.benefits.sync.title'),
-        description: getText('guest.benefits.sync.description')
+        title: tGuest('guest.benefits.sync.title'),
+        description: tGuest('guest.benefits.sync.description')
       },
       {
         icon: '👥',
-        title: getText('guest.benefits.social.title'),
-        description: getText('guest.benefits.social.description')
+        title: tGuest('guest.benefits.social.title'),
+        description: tGuest('guest.benefits.social.description')
       },
       {
         icon: '🎖️',
-        title: getText('guest.benefits.badges.title'),
-        description: getText('guest.benefits.badges.description')
+        title: tGuest('guest.benefits.badges.title'),
+        description: tGuest('guest.benefits.badges.description')
       }
     ],
     warning: {
-      title: getText('guest.warning.title'),
+      title: tGuest('guest.warning.title'),
       items: [
-        getText('guest.warning.clearBrowser'),
-        getText('guest.warning.switchDevice')
+        tGuest('guest.warning.clearBrowser'),
+        tGuest('guest.warning.switchDevice')
       ]
     },
     primaryButton: {
-      text: getText('guest.engagement.primaryButton'),
+      text: tGuest('guest.engagement.primaryButton'),
       action: () => {
         closeFullModal();
         triggerAccountCreation();
       }
     },
     secondaryButton: {
-      text: getText('guest.engagement.secondaryButton'),
+      text: tGuest('guest.engagement.secondaryButton'),
       action: () => {
         closeFullModal();
         recordPromptDismissal();
       }
     }
   });
-  
+
   guestSession.lastPromptDate = new Date().toISOString();
   saveGuestSession();
 }
 
-/**
- * Show periodic reminder
- */
 function showPeriodicReminder() {
-  const getText = window.getText || ((key) => key);
-  
   showCompactPrompt({
-    icon: '⚠️',
-    title: getText('guest.reminder.title'),
-    message: getText('guest.reminder.message'),
+    icon: '🛡️',
+    badge: tGuest('guest.deviceOnly'),
+    title: tGuest('guest.reminder.title'),
+    message: tGuest('guest.reminder.message'),
     primaryButton: {
-      text: getText('guest.reminder.primaryButton'),
+      text: tGuest('guest.reminder.primaryButton'),
       action: () => {
         closeCompactPrompt();
         triggerAccountCreation();
       }
     },
     secondaryButton: {
-      text: getText('guest.reminder.secondaryButton'),
+      text: tGuest('guest.reminder.secondaryButton'),
       action: () => {
         closeCompactPrompt();
         recordPromptDismissal();
       }
     }
   });
-  
+
   guestSession.lastWarningDate = new Date().toISOString();
   saveGuestSession();
 }
 
-/**
- * Show social feature prompt
- */
 function showSocialFeaturePrompt(feature) {
-  const getText = window.getText || ((key) => key);
-  
   showCompactPrompt({
     icon: '🔒',
-    title: getText('guest.social.title'),
-    message: getText('guest.social.message', { feature: feature || 'this feature' }),
+    title: tGuest('guest.social.title'),
+    message: tGuest('guest.social.message', { feature: feature || 'this feature' }),
     primaryButton: {
-      text: getText('guest.social.primaryButton'),
+      text: tGuest('guest.social.primaryButton'),
       action: () => {
         closeCompactPrompt();
         triggerAccountCreation();
       }
     },
     secondaryButton: {
-      text: getText('guest.social.secondaryButton'),
+      text: tGuest('guest.social.secondaryButton'),
       action: () => closeCompactPrompt()
     }
   });
 }
 
-/**
- * Record that user dismissed a prompt
- */
 function recordPromptDismissal() {
   guestSession.conversionPromptsDismissed++;
   saveGuestSession();
 }
 
 /**
- * Show compact prompt (bottom-right notification)
+ * Show refined compact card (bottom-right floating glass card)
  */
 function showCompactPrompt(config) {
-  // Remove existing prompt
   const existing = document.querySelector('.guest-compact-prompt');
   if (existing) existing.remove();
-  
-  const prompt = document.createElement('div');
+
+  const prompt = document.createElement('aside');
   prompt.className = 'guest-compact-prompt';
+  prompt.setAttribute('role', 'status');
+  prompt.setAttribute('aria-live', 'polite');
+
+  const badgeHtml = config.badge
+    ? `<span class="guest-compact-pill">${escapeGuestHtml(config.badge)}</span>`
+    : '';
+
   prompt.innerHTML = `
     <div class="guest-compact-header">
-      <span class="guest-compact-icon">${config.icon}</span>
-      <h3 class="guest-compact-title">${config.title}</h3>
-      <button class="guest-compact-close" aria-label="Close">×</button>
+      <div class="guest-compact-icon-wrap" aria-hidden="true">
+        <span class="guest-compact-icon">${config.icon || '🕊️'}</span>
+      </div>
+      <div class="guest-compact-heading-wrap">
+        <div class="guest-compact-title-row">
+          <h3 class="guest-compact-title">${escapeGuestHtml(config.title)}</h3>
+          ${badgeHtml}
+        </div>
+      </div>
+      <button type="button" class="guest-compact-close" aria-label="Dismiss notification">✕</button>
     </div>
     <div class="guest-compact-body">
-      <p>${config.message}</p>
+      <p>${escapeGuestHtml(config.message)}</p>
     </div>
     <div class="guest-compact-footer">
-      ${config.secondaryButton ? `<button class="btn-text btn-dismiss">${config.secondaryButton.text}</button>` : ''}
-      <button class="btn-primary btn-action">${config.primaryButton.text}</button>
+      ${config.secondaryButton ? `<button type="button" class="guest-btn-secondary btn-dismiss">${escapeGuestHtml(config.secondaryButton.text)}</button>` : ''}
+      <button type="button" class="guest-btn-primary btn-action">${escapeGuestHtml(config.primaryButton.text)}</button>
     </div>
   `;
-  
+
   document.body.appendChild(prompt);
-  
-  // Event listeners
+
+  let autoTimer = null;
+  let remainingMs = 16000;
+  let startedAt = Date.now();
+
+  const dismissSmoothly = (cb) => {
+    if (autoTimer) {
+      clearTimeout(autoTimer);
+      autoTimer = null;
+    }
+    document.removeEventListener('keydown', onEsc);
+    prompt.classList.add('closing');
+    setTimeout(() => {
+      if (prompt.parentNode) prompt.remove();
+      if (typeof cb === 'function') cb();
+    }, 220);
+  };
+
+  const startAutoTimer = () => {
+    startedAt = Date.now();
+    autoTimer = setTimeout(() => {
+      dismissSmoothly(() => recordPromptDismissal());
+    }, remainingMs);
+  };
+
+  const pauseAutoTimer = () => {
+    if (!autoTimer) return;
+    clearTimeout(autoTimer);
+    autoTimer = null;
+    remainingMs = Math.max(3000, remainingMs - (Date.now() - startedAt));
+  };
+
+  const onEsc = (e) => {
+    if (e.key === 'Escape' && prompt.parentNode) {
+      dismissSmoothly(() => recordPromptDismissal());
+    }
+  };
+  document.addEventListener('keydown', onEsc);
+
+  prompt.addEventListener('mouseenter', pauseAutoTimer);
+  prompt.addEventListener('mouseleave', startAutoTimer);
+  prompt.addEventListener('focusin', pauseAutoTimer);
+  prompt.addEventListener('focusout', startAutoTimer);
+
   const closeBtn = prompt.querySelector('.guest-compact-close');
   const actionBtn = prompt.querySelector('.btn-action');
   const dismissBtn = prompt.querySelector('.btn-dismiss');
-  
-  closeBtn.addEventListener('click', () => {
-    prompt.remove();
-    recordPromptDismissal();
-  });
-  
-  actionBtn.addEventListener('click', () => {
-    prompt.remove();
-    config.primaryButton.action();
-  });
-  
-  if (dismissBtn && config.secondaryButton) {
-    dismissBtn.addEventListener('click', () => {
-      prompt.remove();
-      config.secondaryButton.action();
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      dismissSmoothly(() => recordPromptDismissal());
     });
   }
-  
-  // Auto-remove after 15 seconds
-  setTimeout(() => {
-    if (prompt.parentNode) {
-      prompt.remove();
-      recordPromptDismissal();
-    }
-  }, 15000);
+  if (actionBtn) {
+    actionBtn.addEventListener('click', () => {
+      dismissSmoothly(() => config.primaryButton.action());
+    });
+  }
+  if (dismissBtn && config.secondaryButton) {
+    dismissBtn.addEventListener('click', () => {
+      dismissSmoothly(() => config.secondaryButton.action());
+    });
+  }
+
+  startAutoTimer();
 }
 
 /**
- * Show full modal
+ * Show full milestone modal
  */
 function showFullModal(config) {
-  // Remove existing modal
   const existing = document.querySelector('.guest-modal-overlay');
   if (existing) existing.remove();
-  
+
   const modal = document.createElement('div');
-  modal.className = 'guest-modal-overlay';
+  modal.className = 'modal-overlay guest-modal-overlay';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
   modal.innerHTML = `
     <div class="guest-modal">
       <div class="guest-modal-header">
-        <span class="guest-modal-icon">${config.icon}</span>
-        <h2>${config.title}</h2>
-        <p>${config.subtitle}</p>
+        <button type="button" class="guest-modal-close" aria-label="Close modal">✕</button>
+        <span class="guest-modal-icon" aria-hidden="true">${config.icon}</span>
+        <h2>${escapeGuestHtml(config.title)}</h2>
+        <p>${escapeGuestHtml(config.subtitle)}</p>
       </div>
       <div class="guest-modal-body">
         ${config.stats ? renderStatsSection(config.stats) : ''}
@@ -477,48 +539,52 @@ function showFullModal(config) {
         ${config.warning ? renderWarningSection(config.warning) : ''}
       </div>
       <div class="guest-modal-footer">
-        <button class="btn-primary btn-action">${config.primaryButton.text}</button>
-        <button class="btn-secondary btn-dismiss">${config.secondaryButton.text}</button>
+        <button type="button" class="btn-primary btn-action">${escapeGuestHtml(config.primaryButton.text)}</button>
+        <button type="button" class="btn-secondary btn-dismiss">${escapeGuestHtml(config.secondaryButton.text)}</button>
       </div>
     </div>
   `;
-  
+
   document.body.appendChild(modal);
-  
-  // Trigger animation
+  if (typeof window.syncModalScrollLock === 'function') window.syncModalScrollLock();
+
   requestAnimationFrame(() => {
     modal.classList.add('active');
   });
-  
-  // Event listeners
-  const actionBtn = modal.querySelector('.btn-action');
-  const dismissBtn = modal.querySelector('.btn-dismiss');
-  
-  actionBtn.addEventListener('click', () => {
+
+  const closeAndUnlock = (cb) => {
+    document.removeEventListener('keydown', onEsc);
     modal.classList.remove('active');
-    setTimeout(() => modal.remove(), 300);
-    config.primaryButton.action();
+    setTimeout(() => {
+      modal.remove();
+      if (typeof window.syncModalScrollLock === 'function') window.syncModalScrollLock();
+      if (typeof cb === 'function') cb();
+    }, 240);
+  };
+
+  const onEsc = (e) => {
+    if (e.key === 'Escape') {
+      closeAndUnlock(() => recordPromptDismissal());
+    }
+  };
+  document.addEventListener('keydown', onEsc);
+
+  modal.querySelector('.guest-modal-close')?.addEventListener('click', () => {
+    closeAndUnlock(() => recordPromptDismissal());
   });
-  
-  dismissBtn.addEventListener('click', () => {
-    modal.classList.remove('active');
-    setTimeout(() => modal.remove(), 300);
-    config.secondaryButton.action();
+  modal.querySelector('.btn-action')?.addEventListener('click', () => {
+    closeAndUnlock(() => config.primaryButton.action());
   });
-  
-  // Close on overlay click
+  modal.querySelector('.btn-dismiss')?.addEventListener('click', () => {
+    closeAndUnlock(() => config.secondaryButton.action());
+  });
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
-      modal.classList.remove('active');
-      setTimeout(() => modal.remove(), 300);
-      recordPromptDismissal();
+      closeAndUnlock(() => recordPromptDismissal());
     }
   });
 }
 
-/**
- * Render stats section
- */
 function renderStatsSection(stats) {
   return `
     <div class="guest-stats-summary">
@@ -541,24 +607,20 @@ function renderStatsSection(stats) {
   `;
 }
 
-/**
- * Render benefits section
- */
 function renderBenefitsSection(benefits) {
-  const getText = window.getText || ((key) => key);
   const benefitItems = benefits.map(b => `
     <li class="benefit-item">
       <span class="benefit-icon">${b.icon}</span>
       <div class="benefit-content">
-        <h4>${b.title}</h4>
-        <p>${b.description}</p>
+        <h4>${escapeGuestHtml(b.title)}</h4>
+        <p>${escapeGuestHtml(b.description)}</p>
       </div>
     </li>
   `).join('');
-  
+
   return `
     <div class="guest-benefits">
-      <h3>${getText('guest.benefits.title')}</h3>
+      <h3>${escapeGuestHtml(tGuest('guest.benefits.title'))}</h3>
       <ul class="benefit-list">
         ${benefitItems}
       </ul>
@@ -566,17 +628,14 @@ function renderBenefitsSection(benefits) {
   `;
 }
 
-/**
- * Render warning section
- */
 function renderWarningSection(warning) {
-  const warningItems = warning.items.map(item => `<li>${item}</li>`).join('');
-  
+  const warningItems = warning.items.map(item => `<li>${escapeGuestHtml(item)}</li>`).join('');
+
   return `
     <div class="guest-warning-box">
       <span class="guest-warning-icon">⚠️</span>
       <div class="guest-warning-content">
-        <h4>${warning.title}</h4>
+        <h4>${escapeGuestHtml(warning.title)}</h4>
         <ul>
           ${warningItems}
         </ul>
@@ -585,85 +644,59 @@ function renderWarningSection(warning) {
   `;
 }
 
-/**
- * Close compact prompt
- */
 function closeCompactPrompt() {
   const prompt = document.querySelector('.guest-compact-prompt');
-  if (prompt) prompt.remove();
+  if (prompt) {
+    prompt.classList.add('closing');
+    setTimeout(() => prompt.remove(), 220);
+  }
 }
 
-/**
- * Close full modal
- */
 function closeFullModal() {
   const modal = document.querySelector('.guest-modal-overlay');
   if (modal) {
     modal.classList.remove('active');
-    setTimeout(() => modal.remove(), 300);
+    setTimeout(() => {
+      modal.remove();
+      if (typeof window.syncModalScrollLock === 'function') window.syncModalScrollLock();
+    }, 240);
   }
 }
 
-/**
- * Trigger account creation flow
- */
 function triggerAccountCreation() {
-  // Open auth modal (auth-ui.js)
   if (window.openAuthModal) {
     window.openAuthModal('signup');
   } else {
-    // Fallback: Dispatch event that app.js can listen to
     document.dispatchEvent(new CustomEvent('showAccountCreation', {
       detail: { source: 'guest-prompt', preserveStats: true }
     }));
-    
-    // Or directly call player change if available
-    if (window.showPlayerChangeModal) {
-      window.showPlayerChangeModal();
-    }
+    const profileCard = document.getElementById('player-profile-card');
+    if (profileCard) profileCard.click();
   }
 }
 
-/**
- * Add guest badge to player name display
- */
-function addGuestBadge(element, playerName) {
-  if (!isGuestUser()) return;
-  
-  const getText = window.getText || ((key) => key);
+function addGuestBadge(element) {
+  if (!isGuestUser() || !element) return;
   const badge = document.createElement('span');
   badge.className = 'player-badge guest';
-  badge.innerHTML = '👤 ' + getText('guest.badge');
-  badge.title = getText('guest.badge.tooltip');
-  
+  badge.textContent = `👤 ${tGuest('guest.badge')}`;
+  badge.title = tGuest('guest.badgeTooltip');
   element.appendChild(badge);
 }
 
-/**
- * Add device-only indicator
- */
 function addDeviceOnlyIndicator(element) {
-  if (!isGuestUser()) return;
-  
-  const getText = window.getText || ((key) => key);
+  if (!isGuestUser() || !element) return;
   const badge = document.createElement('span');
   badge.className = 'device-only-badge';
-  badge.innerHTML = '📱 ' + getText('guest.deviceOnly');
-  badge.title = getText('guest.deviceOnly.tooltip');
-  
+  badge.textContent = `📱 ${tGuest('guest.deviceOnly')}`;
+  badge.title = tGuest('guest.deviceOnlyTooltip');
   element.appendChild(badge);
 }
 
-/**
- * Get guest session info (for debugging)
- */
 function getGuestSessionInfo() {
   return { ...guestSession };
 }
 
-/**
- * Reset guest session (for testing)
- */
 function resetGuestSession() {
   Object.keys(guestSession).forEach(key => {
     if (typeof guestSession[key] === 'number') guestSession[key] = 0;
@@ -673,10 +706,10 @@ function resetGuestSession() {
   saveGuestSession();
 }
 
-// Export for use in app.js
 if (typeof window !== 'undefined') {
   window.GuestPrompts = {
     init: initGuestPrompts,
+    closeCompact: closeCompactPrompt,
     addBadge: addGuestBadge,
     addDeviceIndicator: addDeviceOnlyIndicator,
     getSessionInfo: getGuestSessionInfo,
