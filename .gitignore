@@ -1,6 +1,9 @@
 # Node modules
 node_modules/
 
+# Firebase cache
+.firebase/
+
 # Tool outputs (large generated files)
 tools/*.json
 tools/*.csv
