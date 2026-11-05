@@ -781,6 +781,7 @@ async function init(){
   initUniversalModalScrollLock();
   attachHandlers(); // Attach listeners immediately
   initFeedback(); // Initialize feedback system
+  initAboutModal(); // Initialize About Who-Bible modal
   initSettingsPills(); // Initialize pill toggle settings UI
   setupModernShareEvents(); // Wire share modal copy & native share actions
   setupSimplifiedStudyControls(); // Wire Study Mode search, sort & filter tabs
@@ -5205,6 +5206,19 @@ window.WB = {
         showSummaryModal();
       }
     }
+  },
+  onRemoteCancelled: (msg) => {
+    if (state.mode === 'remote-challenge') {
+      clearAutoAdvance();
+      if (state.timer) { clearInterval(state.timer); state.timer = null; }
+      showToast({
+        title: 'Match Ended',
+        msg: msg || 'The host has ended the game.',
+        type: 'warn',
+        timeout: 4500
+      });
+      showSetup(false, { scrollToModes: true });
+    }
   }
 };
 
@@ -5397,6 +5411,69 @@ function setupSimplifiedStudyControls() {
       group.querySelectorAll('.modal-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
     });
+  });
+}
+
+// =========================================
+// About Who-Bible Dialog
+// =========================================
+function initAboutModal() {
+  const modal = document.getElementById('about-modal');
+  if (!modal) return;
+  const btnNav = document.getElementById('btn-about-nav');
+  const btnFooter = document.getElementById('btn-about-footer');
+  const btnClose = document.getElementById('btn-about-close');
+  const btnDone = document.getElementById('btn-about-done');
+  const btnToFeedback = document.getElementById('btn-about-to-feedback');
+  const btnToShare = document.getElementById('btn-about-to-share');
+
+  const openAbout = () => {
+    modal.style.display = 'flex';
+    document.documentElement.classList.add('modal-open');
+    if (btnDone) btnDone.focus();
+  };
+
+  const closeAbout = () => {
+    modal.style.display = 'none';
+    syncModalScrollLock();
+  };
+
+  if (btnNav) btnNav.addEventListener('click', openAbout);
+  if (btnFooter) btnFooter.addEventListener('click', openAbout);
+  if (btnClose) btnClose.addEventListener('click', closeAbout);
+
+  if (btnDone) {
+    btnDone.addEventListener('click', () => {
+      closeAbout();
+      const modesEl = document.getElementById('game-modes-section') || document.getElementById('setup-panel');
+      if (modesEl) modesEl.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  if (btnToFeedback) {
+    btnToFeedback.addEventListener('click', () => {
+      closeAbout();
+      const fbBtn = document.getElementById('btn-feedback');
+      if (fbBtn) fbBtn.click();
+    });
+  }
+
+  if (btnToShare) {
+    btnToShare.addEventListener('click', () => {
+      closeAbout();
+      const shareBtn = document.getElementById('btn-share') || document.getElementById('btn-share-footer');
+      if (shareBtn) shareBtn.click();
+    });
+  }
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeAbout();
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'flex') {
+      closeAbout();
+    }
   });
 }
 

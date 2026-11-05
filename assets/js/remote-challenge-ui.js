@@ -190,10 +190,21 @@
       const readyCount = list.filter(([, p]) => p.ready).length;
       joinedSt.textContent = `Players ready: ${readyCount} / ${list.length}`;
     }
+    const readyBox = $('remote-host-ready-container');
     const hb = $('btn-ready-host');
     if (hb) {
-      if (others > 0) hb.style.display = 'inline-flex';
-      else if (!hb.disabled) hb.style.display = 'none';
+      if (others > 0) {
+        if (readyBox) readyBox.style.display = 'block';
+        hb.style.display = 'inline-flex';
+        hb.classList.add('ready-attention');
+        try {
+          if (readyBox) readyBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (_) {}
+      } else if (!hb.disabled) {
+        if (readyBox) readyBox.style.display = 'none';
+        hb.style.display = 'none';
+        hb.classList.remove('ready-attention');
+      }
     }
 
     // In-game: keep opponent scores live
@@ -206,16 +217,31 @@
     window.remoteQuizQuestions = Array.isArray(questions) ? questions : Object.values(questions || {});
   };
 
-  window.onRemoteRoomStatusChange = function (status) {
+  window.onRemoteRoomStatusChange = function (status, cancelledBy) {
     if (status === 'active' && !matchStarted) {
       matchStarted = true;
       hideRemoteModal(false);
       startRemoteQuiz();
-    } else if (status === 'cancelled' && !matchStarted) {
-      if (window.RemoteChallenge && !window.RemoteChallenge.isHost) {
-        toast({ title: 'Room Closed', msg: 'The host closed the room.', type: 'warn', timeout: 3500 });
-        window.RemoteChallenge.leaveRoom(false);
+    } else if (status === 'cancelled') {
+      const isHost = window.RemoteChallenge && window.RemoteChallenge.isHost;
+      const who = cancelledBy || (isHost ? 'Your opponent' : 'The host');
+      const msg = `${who} has ended the game.`;
+
+      if (matchStarted) {
+        matchStarted = false;
+        if (window.WB && window.WB.onRemoteCancelled) {
+          window.WB.onRemoteCancelled(msg);
+        } else {
+          toast({ title: 'Game Ended', msg, type: 'warn', timeout: 4000 });
+          if (window.showSetup) window.showSetup(false, { scrollToModes: true });
+        }
+      } else {
+        toast({ title: 'Room Closed', msg, type: 'warn', timeout: 3500 });
         hideRemoteModal(false);
+      }
+
+      if (window.RemoteChallenge) {
+        window.RemoteChallenge.leaveRoom(false);
       }
     } else if (status === 'completed' && window.WB) {
       window.WB.onRemoteMatchComplete();
@@ -268,6 +294,19 @@
     if (cancelBtn && cancelBtn.dataset.bound !== '1') {
       cancelBtn.dataset.bound = '1';
       cancelBtn.addEventListener('click', () => hideRemoteModal(true));
+    }
+
+    const qrToggle = $('btn-toggle-qr');
+    const qrContainer = $('remote-qr-container');
+    if (qrToggle && qrToggle.dataset.bound !== '1') {
+      qrToggle.dataset.bound = '1';
+      qrToggle.addEventListener('click', () => {
+        if (!qrContainer) return;
+        const isHidden = qrContainer.style.display === 'none';
+        qrContainer.style.display = isHidden ? 'block' : 'none';
+        qrToggle.textContent = isHidden ? '✕ Hide QR' : '📷 QR Code';
+        qrToggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+      });
     }
   }
   document.addEventListener('DOMContentLoaded', setupRemotePills);

@@ -92,6 +92,15 @@ const RemoteChallenge = {
     
     await withTimeout(roomRef.set(roomData), FB_TIMEOUT_MS);
     
+    // Attach onDisconnect to cancel room if host tab closes or drops connection
+    try {
+      roomRef.onDisconnect().update({
+        status: 'cancelled',
+        cancelledBy: 'The host',
+        cancelledAt: Date.now()
+      }).catch(() => {});
+    } catch (_) {}
+
     this.currentRoom = roomCode;
     this.playerNumber = 1;
     this.roomRef = roomRef;
@@ -177,6 +186,11 @@ const RemoteChallenge = {
       currentQuestion: 0
     }), FB_TIMEOUT_MS);
     
+    // If guest drops connection unexpectedly, clean up their slot
+    try {
+      roomRef.child(`players/player${playerNum}`).onDisconnect().remove().catch(() => {});
+    } catch (_) {}
+
     // Update player count
     await roomRef.child('playerCount').set(activePlayersCount + 1);
     
@@ -200,7 +214,15 @@ const RemoteChallenge = {
     this.roomRef.child('status').on('value', (snapshot) => {
       const status = snapshot.val();
       if (window.onRemoteRoomStatusChange) {
-        window.onRemoteRoomStatusChange(status);
+        if (status === 'cancelled') {
+          this.roomRef.child('cancelledBy').once('value').then((cSnap) => {
+            window.onRemoteRoomStatusChange(status, cSnap.val());
+          }).catch(() => {
+            window.onRemoteRoomStatusChange(status, null);
+          });
+        } else {
+          window.onRemoteRoomStatusChange(status, null);
+        }
       }
     });
     
@@ -362,14 +384,29 @@ const RemoteChallenge = {
 
     if (ref) {
       ref.off();
+      try {
+        ref.onDisconnect().cancel();
+        if (pNum) ref.child(`players/player${pNum}`).onDisconnect().cancel();
+      } catch (_) {}
+
       if (notifyRoom) {
         ref.child('status').once('value').then((snap) => {
           const st = snap.val();
-          if (st === 'waiting') {
-            if (wasHost) {
-              ref.child('status').set('cancelled').catch(() => {});
-            } else if (pNum && pNum > 1) {
+          if (wasHost) {
+            ref.update({
+              status: 'cancelled',
+              cancelledBy: 'The host',
+              cancelledAt: Date.now()
+            }).catch(() => {});
+          } else if (pNum && pNum > 1) {
+            if (st === 'waiting') {
               ref.child(`players/player${pNum}`).remove().catch(() => {});
+            } else if (st === 'active') {
+              ref.update({
+                status: 'cancelled',
+                cancelledBy: 'Your opponent',
+                cancelledAt: Date.now()
+              }).catch(() => {});
             }
           }
         }).catch(() => {});

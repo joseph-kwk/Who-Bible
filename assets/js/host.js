@@ -396,6 +396,14 @@ async function createSession() {
 
     await withTimeout(roomRef.set(sessionPayload), FB_OP_TIMEOUT);
 
+    // If host closes browser, automatically notify players that room is closed
+    try {
+      roomRef.onDisconnect().update({
+        status: 'cancelled',
+        lastActivity: Date.now()
+      }).catch(() => {});
+    } catch (_) {}
+
     // Save room in URL & sessionStorage so accidental page refresh recovers seamlessly
     sessionStorage.setItem('wb_host_room', pin);
     history.replaceState(null, '', `?room=${encodeURIComponent(pin)}`);
@@ -431,6 +439,12 @@ async function tryReconnectSession(pin) {
     }
 
     roomRef = candidateRef;
+    try {
+      roomRef.onDisconnect().update({
+        status: 'cancelled',
+        lastActivity: Date.now()
+      }).catch(() => {});
+    } catch (_) {}
     HostState.roomCode = pin;
     HostState.hostName = data.host || 'Host';
     HostState.difficulty = data.settings?.difficulty || 'medium';
@@ -1202,6 +1216,7 @@ async function finishSession() {
   clearQuestionTimers();
   HostState.status = 'finished';
   if (roomRef) {
+    try { roomRef.onDisconnect().cancel(); } catch (_) {}
     roomRef.child('responses').off();
     await roomRef.update({ status: 'finished', lastActivity: Date.now() }).catch(() => {});
   }
@@ -1302,6 +1317,7 @@ async function cancelSession() {
   if (!confirmed) return;
 
   if (roomRef) {
+    try { roomRef.onDisconnect().cancel(); } catch (_) {}
     await roomRef.update({ status: 'cancelled' }).catch(() => {});
     setTimeout(() => {
       if (roomRef) roomRef.remove().catch(() => {});

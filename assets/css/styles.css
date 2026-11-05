@@ -446,6 +446,37 @@ body.day .title-section h1 {
 .share-btn-icon { font-size: 16px; }
 .share-btn-text { font-size: 14px; }
 
+/* ===== ABOUT HEADER BUTTON ===== */
+.nav-about-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 50px;
+  background: var(--glass, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.18));
+  color: var(--text, #fff);
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.nav-about-btn:hover {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: var(--accent, #f59e0b);
+  color: var(--accent, #f59e0b);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2);
+}
+
+.nav-about-btn svg {
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
 /* ===== SIGN IN BUTTON (Distinctive Styling) ===== */
 .auth-signin-btn {
   display: none !important;
@@ -2185,6 +2216,20 @@ button:disabled:hover {
 .footer-action-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 28px var(--shadow-2);
+}
+
+.footer-action-btn.about-btn-footer {
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.footer-action-btn.about-btn-footer:hover {
+  border-color: var(--accent, #f59e0b);
+  background: rgba(245, 158, 11, 0.16);
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.25);
 }
 
 .footer-action-btn.feedback-btn {
@@ -7076,6 +7121,312 @@ body.modal-open {
 
 .summary-modal-footer {
   flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   Remote Challenge Modal & Ready Button Polish
+   ========================================================================== */
+#remote-modal .modal-body {
+  max-height: min(82vh, 680px);
+  padding: 20px 24px;
+}
+
+.remote-share-card {
+  background: var(--card, rgba(30, 41, 59, 0.7));
+  border: 1.5px solid var(--accent, #f59e0b);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 8px 0 14px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.remote-code-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--accent, #f59e0b);
+  margin-bottom: 4px;
+}
+
+.remote-code-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--text, #fff);
+  margin-bottom: 6px;
+  user-select: all;
+}
+
+.remote-code-url {
+  font-size: 12px;
+  color: var(--text-muted, #94a3b8);
+  word-break: break-all;
+  margin-bottom: 12px;
+}
+
+.remote-share-btn-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.remote-ready-container {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(5, 150, 105, 0.08) 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.6);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 12px 0 16px;
+  text-align: center;
+  animation: readyFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
+}
+
+.remote-ready-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 14.5px;
+  color: #6ee7b7;
+  margin-bottom: 12px;
+}
+
+.btn-ready-prominent {
+  width: 100%;
+  max-width: 300px;
+  padding: 13px 26px;
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-ready-prominent:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 28px rgba(16, 185, 129, 0.6);
+}
+
+.btn-ready-prominent.ready-attention {
+  animation: readyPulse 1.8s infinite;
+}
+
+@keyframes readyPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes readyFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.remote-roster-card {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: var(--glass, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 12px;
+  text-align: left;
+}
+
+.remote-roster-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.remote-roster-status-badge {
+  font-size: 11px;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   About Who-Bible Modal
+   ========================================================================== */
+.about-modal-card {
+  max-width: 580px;
+  width: 92%;
+  border-radius: 20px;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  overflow: hidden;
+}
+
+.about-modal-body {
+  padding: 24px 28px;
+  max-height: min(76vh, 620px);
+  overflow-y: auto;
+}
+
+.about-hero-section {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.about-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  border-radius: 50px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: var(--accent, #f59e0b);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.about-tagline {
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+.about-lead {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-muted, #cbd5e1);
+  margin: 0;
+}
+
+.about-features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.about-feature-card {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.about-feature-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.about-feature-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.about-feature-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.about-feature-card h4 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.about-feature-card p {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #94a3b8;
+  margin: 0;
+  padding-left: 30px;
+}
+
+.about-callout {
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.04) 100%);
+  border-left: 3px solid var(--accent, #f59e0b);
+  margin-bottom: 22px;
+  text-align: center;
+}
+
+.about-callout-quote {
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 600;
+  color: #fef08a;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.about-action-links {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.about-primary-btn,
+.about-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 50px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.about-primary-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+}
+
+.about-primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+}
+
+.about-secondary-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--sky-light, #93c5fd);
+}
+
+.about-secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--sky-light, #93c5fd);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 

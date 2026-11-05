@@ -117,6 +117,15 @@
               <!-- Community hidden for now -->
               <a id="nav-community" href="community.html" target="_blank" class="nav-link" rel="noopener"
                 style="display:none;">Community</a>
+              <button id="btn-about-nav" class="nav-about-btn" title="About Who-Bible" aria-label="About Who-Bible" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>About</span>
+              </button>
               <button id="btn-auth-signin" class="auth-signin-btn" aria-label="Sign in or create account"
                 style="display: none;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1070,6 +1079,10 @@
 
         <!-- Middle: Quick Actions -->
         <div class="footer-actions-row">
+          <button id="btn-about-footer" class="footer-action-btn about-btn-footer" type="button">
+            <span>ℹ️</span>
+            <span>About Who-Bible</span>
+          </button>
           <button id="btn-feedback" class="footer-action-btn feedback-btn" type="button">
             <span>💬</span>
             <span>Send Feedback</span>
@@ -1085,7 +1098,7 @@
 
         <!-- Bottom: Copyright + share icons -->
         <div class="footer-bottom">
-          <p class="footer-copy">© <span id="footer-year"></span> Who-Bible · Crafted with ✝️ for Scripture learners
+          <p class="footer-copy">© <span id="footer-year"></span> Who-Bible · Crafted for Scripture learners
             everywhere</p>
           <div class="footer-social-row" style="display: none;">
             <button class="footer-social-btn" id="btn-share-twitter" title="Share on X (Twitter)"
@@ -1460,36 +1473,40 @@
 
         <!-- Step 3: Room Created - Share Link -->
         <div id="remote-step-share" style="display:none;">
-          <div style="text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
-            <h3>Room Created!</h3>
-            <p style="color: var(--muted); font-size: 14px;">Share this PIN or link with your friend:</p>
-
-            <div
-              style="background: var(--card); border: 2px solid var(--accent); border-radius: 12px; padding: 16px; margin: 16px 0;">
-              <div
-                style="font-family: monospace; font-size: 24px; font-weight: 900; color: var(--accent); margin-bottom: 8px;"
-                id="remote-room-code">CODE-123</div>
-              <div style="font-size: 13px; word-break: break-all; color: var(--muted);" id="remote-share-url">URL</div>
+          <div class="remote-share-container">
+            <!-- Compact PIN & Link Card -->
+            <div class="remote-share-card">
+              <div class="remote-code-label">Room PIN</div>
+              <div id="remote-room-code" class="remote-code-value">CODE-123</div>
+              <div id="remote-share-url" class="remote-code-url">URL</div>
+              <div class="remote-share-btn-row">
+                <button id="btn-copy-link" class="secondary" type="button">📋 Copy Link</button>
+                <button id="btn-share-link" class="secondary" type="button">📤 Share</button>
+                <button id="btn-toggle-qr" class="secondary" type="button" aria-expanded="false">📷 QR Code</button>
+              </div>
+              <!-- Collapsible QR Code (clean & compact) -->
+              <div id="remote-qr-container" style="display: none; margin-top: 12px; text-align: center;">
+                <img id="remote-qr-code-img" class="lobby-qr" alt="QR Code"
+                  style="display:none; width: 120px; height: 120px; margin: 0 auto; border-radius: 10px; background: white; padding: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);" />
+              </div>
             </div>
 
-            <!-- QR Code display -->
-            <img id="remote-qr-code-img" class="lobby-qr" alt="QR Code"
-              style="display:none; width: 150px; height: 150px; margin: 12px auto; border-radius: 12px; background: white; padding: 6px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);" />
-
-            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-              <button id="btn-copy-link" class="secondary">📋 Copy Link</button>
-              <button id="btn-share-link" class="secondary">📤 Share</button>
+            <!-- Host Ready Notification & Prominent Action Button (Above roster so never hidden below fold!) -->
+            <div id="remote-host-ready-container" class="remote-ready-container" style="display: none;">
+              <div class="remote-ready-banner">
+                <span class="remote-ready-icon">🎉</span>
+                <span class="remote-ready-text">Opponent connected! Tap below to start:</span>
+              </div>
+              <button id="btn-ready-host" class="primary btn-ready-prominent" type="button">⚡ Ready to Start!</button>
             </div>
 
-            <div style="margin-top: 20px; padding: 16px; background: var(--glass); border-radius: 12px;">
-              <div style="font-size: 14px; margin-bottom: 6px;"><strong>Live Room Roster</strong></div>
-              <div id="remote-opponent-status" style="color: var(--muted); font-size: 13px;">Room created. Waiting for
-                player 2 to join.</div>
+            <!-- Live Roster Card -->
+            <div class="remote-roster-card">
+              <div class="remote-roster-header">
+                <strong>Live Room Roster</strong>
+                <span id="remote-opponent-status" class="remote-roster-status-badge">Waiting for player 2 to join...</span>
+              </div>
               <ul id="remote-roster" class="remote-roster-list"></ul>
-            </div>
-            <div style="margin-top: 16px;">
-              <button id="btn-ready-host" class="primary" style="display:none;">Ready to Start!</button>
             </div>
           </div>
         </div>
@@ -1552,6 +1569,77 @@
       </main>
       <footer class="modal-footer">
         <button id="btn-community-ok" class="primary">Close</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- About Who-Bible Modal -->
+  <div id="about-modal" class="modal-overlay" style="display:none" role="dialog" aria-labelledby="about-modal-title" aria-modal="true">
+    <div class="modal about-modal-card" role="document">
+      <header class="modal-header">
+        <h2 id="about-modal-title">📖 About Who-Bible</h2>
+        <button id="btn-about-close" aria-label="Close about Who-Bible">✕</button>
+      </header>
+      <main class="modal-body about-modal-body">
+        <div class="about-hero-section">
+          <div class="about-badge">✨ Faith & Scripture in Action</div>
+          <h3 class="about-tagline">Why Who-Bible? Why the Bible?</h3>
+          <p class="about-lead">
+            Who-Bible is a fun, uplifting way to discover and learn more about the Bible through interactive trivia — whether you're playing alone or with friends.
+          </p>
+        </div>
+
+        <div class="about-features-grid">
+          <div class="about-feature-card">
+            <div class="about-feature-header">
+              <span class="about-feature-icon">🌱</span>
+              <h4>For Every Level of Learner</h4>
+            </div>
+            <p>Whether you're a complete beginner opening Scripture for the first time, an intermediate learner, or an advanced student, every question is designed to inspire curiosity and growth.</p>
+          </div>
+
+          <div class="about-feature-card">
+            <div class="about-feature-header">
+              <span class="about-feature-icon">🎮</span>
+              <h4>Solo or Together</h4>
+            </div>
+            <p>Explore characters in Study Mode, test your speed in Timed Mode, duel friends online in Remote Challenge, or play as a group in Classroom (Kahoot-style) Mode.</p>
+          </div>
+
+          <div class="about-feature-card">
+            <div class="about-feature-header">
+              <span class="about-feature-icon">📜</span>
+              <h4>Why the Bible?</h4>
+            </div>
+            <p>The Bible is a timeless story of God's love, redemption, courage, and hope. We pair every question with real chapter-and-verse references so you can read the context directly.</p>
+          </div>
+
+          <div class="about-feature-card">
+            <div class="about-feature-header">
+              <span class="about-feature-icon">🔒</span>
+              <h4>Privacy & Data Storage</h4>
+            </div>
+            <p><strong>Stored locally on your device:</strong> Your scores, preferences, and nickname stay saved privately in your browser (<code>localStorage</code>) — no sign-up or accounts required. This data lasts indefinitely until you choose to clear your browser history. Multiplayer rooms are temporary and discarded as soon as matches conclude.</p>
+          </div>
+        </div>
+
+        <div class="about-callout">
+          <p class="about-callout-quote">
+            “Enjoy the journey, give feedback, and share with friends. Let’s get to know more about God and the Bible together!”
+          </p>
+        </div>
+
+        <div class="about-action-links">
+          <button id="btn-about-to-feedback" class="about-secondary-btn" type="button">
+            <span>💬</span> Send Feedback
+          </button>
+          <button id="btn-about-to-share" class="about-primary-btn" type="button">
+            <span>🚀</span> Share with Friends
+          </button>
+        </div>
+      </main>
+      <footer class="modal-footer">
+        <button id="btn-about-done" class="primary" type="button">Let's Play!</button>
       </footer>
     </div>
   </div>
