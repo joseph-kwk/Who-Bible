@@ -484,3 +484,4 @@ updates.forEach(u => {
 
 fs.writeFileSync(peoplePath, JSON.stringify(people, null, 2), 'utf8');
 console.log(`Successfully updated and saved ${applied} people in ${peoplePath}`);
+
