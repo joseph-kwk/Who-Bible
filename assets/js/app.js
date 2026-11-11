@@ -2683,6 +2683,11 @@ function cleanEventPredicate(event) {
   const first = words[0].toLowerCase();
   const rest = words.slice(1).join(' ');
 
+  // If already starts with was, is, had, lived, etc.
+  if (first === 'was' || first === 'is') {
+    return `${first} ${rest}`;
+  }
+
   const passiveVerbs = new Set([
     'swallowed', 'sold', 'turned', 'visited', 'betrayed', 'raised', 'called',
     'anointed', 'cast', 'fed', 'taken', 'converted', 'shipwrecked', 'beheaded',
@@ -2696,12 +2701,15 @@ function cleanEventPredicate(event) {
 
   const titleNouns = new Set([
     'judge', 'first', 'second', 'ancestor', 'father', 'son', 'brother', 
-    'mother', 'sister', 'cousin', 'prophet', 'priest', 'king', 'queen'
+    'mother', 'sister', 'cousin', 'prophet', 'priest', 'king', 'queen',
+    'husband', 'wife', 'grandfather', 'grandmother'
   ]);
   if (titleNouns.has(first)) {
     let article = 'a';
     if (first === 'ancestor') article = 'an';
-    if (first === 'first' || first === 'second') article = 'the';
+    if (['first', 'second', 'father', 'mother', 'husband', 'wife', 'grandfather', 'grandmother'].includes(first)) {
+      article = 'the';
+    }
     return `was ${article} ${first} ${rest}`;
   }
 
@@ -2794,6 +2802,19 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
     'Tax Collector and Disciple', 'Cupbearer to the King', 'Scribe and Teacher of the Law'
   ];
 
+  const poolMothers = Array.from(new Set(distractorPeople.map(p => p.mother).filter(m => isValidContent(m))));
+  const allMotherDistractors = Array.from(new Set([...famousMothers, ...poolMothers]));
+
+  const poolFathers = Array.from(new Set(distractorPeople.map(p => p.father).filter(f => isValidContent(f))));
+  const allFatherDistractors = Array.from(new Set([...famousFathers, ...poolFathers]));
+
+  const poolOccupations = Array.from(new Set(
+    distractorPeople
+      .map(p => (p.occupation || '').split(',')[0].trim())
+      .filter(o => isValidContent(o) && o.length >= 4 && o.length <= 40 && !o.includes('(') && !o.includes(';'))
+  ));
+  const allRoleDistractors = Array.from(new Set([...biblicalRoles, ...poolOccupations]));
+
   const getDistinctNameChoices = (correctName) => {
     const samePoolNames = pool.filter(p => p.name !== correctName).map(p => p.name);
     shuffle(samePoolNames);
@@ -2885,16 +2906,23 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
       prompt = `Which notable scriptural event is recorded for ${person.name}?`;
       answer = correctEv;
 
+      const chosenEvents = new Set([answer]);
       const otherEvents = [];
       for (const other of distractorPeople) {
         if (other.name !== person.name && other.notable_events) {
           for (const oe of other.notable_events) {
-            if (isValidContent(oe) && oe !== correctEv) otherEvents.push(oe);
+            if (isValidContent(oe) && !chosenEvents.has(oe)) {
+              otherEvents.push(oe);
+            }
           }
         }
       }
       shuffle(otherEvents);
-      choices = [answer, ...otherEvents.slice(0, 3)];
+      for (const oe of otherEvents) {
+        if (chosenEvents.size >= 4) break;
+        chosenEvents.add(oe);
+      }
+      choices = Array.from(chosenEvents);
       shuffle(choices);
 
       questions.push({
@@ -2911,7 +2939,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
     } else if (qType === 'mother') {
       prompt = `Who is recorded in scripture as the mother of ${person.name}?`;
       answer = person.mother;
-      const filteredMothers = famousMothers.filter(m => m !== answer);
+      const filteredMothers = allMotherDistractors.filter(m => m !== answer);
       shuffle(filteredMothers);
       choices = [answer, ...filteredMothers.slice(0, 3)];
       shuffle(choices);
@@ -2930,7 +2958,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
     } else if (qType === 'father') {
       prompt = `Who is recorded in scripture as the father of ${person.name}?`;
       answer = person.father;
-      const filteredFathers = famousFathers.filter(f => f !== answer);
+      const filteredFathers = allFatherDistractors.filter(f => f !== answer);
       shuffle(filteredFathers);
       choices = [answer, ...filteredFathers.slice(0, 3)];
       shuffle(choices);
@@ -2949,7 +2977,7 @@ function pickQuestionSet(count, difficulty, peoplePool = null) {
     } else if (qType === 'occupation') {
       prompt = `What was the biblical calling or role of ${person.name}?`;
       answer = person.occupation.split(',')[0].trim();
-      const filteredRoles = biblicalRoles.filter(r => r.toLowerCase() !== answer.toLowerCase());
+      const filteredRoles = allRoleDistractors.filter(r => r.toLowerCase() !== answer.toLowerCase());
       shuffle(filteredRoles);
       choices = [answer, ...filteredRoles.slice(0, 3)];
       shuffle(choices);
