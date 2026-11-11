@@ -647,7 +647,7 @@
 
       <div id="login-lock-banner" class="login-lock-banner" style="display: none;"></div>
 
-      <input type="email" id="admin-email" placeholder="Admin Email" autocomplete="email" required />
+      <input type="text" id="admin-email" placeholder="Admin Username or Email" autocomplete="username" autofocus required />
       <input type="password" id="admin-password" placeholder="Password" autocomplete="current-password" required />
       
       <button id="btn-login" class="primary" type="button">🔐 Secure Sign In</button>
@@ -1071,16 +1071,32 @@
     // ==========================================================================
     // AUTHENTICATION & AUTHORIZATION
     // ==========================================================================
-    btnLogin.addEventListener('click', async () => {
+    // Canonical administrator recovery & notification email
+    const PRIMARY_ADMIN_EMAIL = 'josephkasongo2911@gmail.com';
+
+    // Resolves username alias 'admin' or 'administrator' to canonical account email
+    function resolveAdminEmail(input) {
+      const clean = (input || '').trim();
+      if (!clean) return '';
+      const lower = clean.toLowerCase();
+      if (lower === 'admin' || lower === 'administrator') {
+        return PRIMARY_ADMIN_EMAIL;
+      }
+      return clean;
+    }
+
+    async function handleAdminSignIn() {
       if (checkLoginLockout()) return;
 
-      const email = emailInput.value.trim();
+      const rawUser = emailInput.value.trim();
       const pass = passInput.value.trim();
 
-      if (!email || !pass) {
-        showLoginError('Please enter both email and password.');
+      if (!rawUser || !pass) {
+        showLoginError('Please enter both username/email and password.');
         return;
       }
+
+      const email = resolveAdminEmail(rawUser);
 
       btnLogin.disabled = true;
       btnLogin.textContent = 'Verifying credentials...';
@@ -1092,9 +1108,11 @@
         clearLoginFailures();
       } catch (err) {
         const attempts = recordFailedLogin();
-        let msg = 'Invalid email or password.';
+        let msg = 'Invalid username or password.';
         if (err.code === 'auth/too-many-requests') {
-          msg = 'Too many attempts. Access is temporarily blocked by Firebase.';
+          msg = 'Too many attempts. Access is temporarily locked for security.';
+        } else if (err.code === 'auth/invalid-email') {
+          msg = 'Please enter a valid username (admin) or authorized email.';
         }
         const remaining = Math.max(0, MAX_LOGIN_ATTEMPTS - attempts);
         if (remaining > 0) {
@@ -1107,18 +1125,28 @@
           btnLogin.textContent = '🔐 Secure Sign In';
         }
       }
+    }
+
+    btnLogin.addEventListener('click', handleAdminSignIn);
+
+    // Support pressing Enter key in inputs
+    [emailInput, passInput].forEach(inp => {
+      inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleAdminSignIn();
+        }
+      });
     });
 
-    // Forgot password
+    // Forgot password (routes reset link to recovery email)
     document.getElementById('btn-forgot').addEventListener('click', async () => {
-      const email = emailInput.value.trim();
-      if (!email) {
-        showLoginError('Please enter your admin email above first.');
-        return;
-      }
+      const rawUser = emailInput.value.trim();
+      const email = rawUser ? resolveAdminEmail(rawUser) : PRIMARY_ADMIN_EMAIL;
+
       try {
         await auth.sendPasswordResetEmail(email);
-        loginSuccess.textContent = '✓ Password reset instructions sent to ' + email;
+        loginSuccess.textContent = `✓ Password reset instructions sent to ${email}. Please check your inbox!`;
         loginSuccess.style.display = 'block';
         loginError.style.display = 'none';
       } catch (err) {
@@ -1181,7 +1209,7 @@
         activeAdminUser = user;
         resetSessionInactivity();
 
-        document.getElementById('admin-user-email').textContent = user.email || 'Admin';
+        document.getElementById('admin-user-email').textContent = (user.email && user.email.toLowerCase() === PRIMARY_ADMIN_EMAIL.toLowerCase()) ? 'admin (' + user.email + ')' : (user.email || 'Admin');
         document.getElementById('admin-role-badge').textContent = (adminProfile.role || 'Super Admin').toUpperCase();
 
         loginOverlay.classList.add('hidden');
