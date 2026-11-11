@@ -2272,6 +2272,29 @@ button:disabled:hover {
   margin: 0;
 }
 
+.footer-admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  color: var(--muted, #64748b);
+  opacity: 0.22;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  vertical-align: middle;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.footer-admin-link:hover,
+.footer-admin-link:focus-visible {
+  opacity: 0.85;
+  color: var(--accent, #f59e0b);
+  background: rgba(245, 158, 11, 0.12);
+  transform: scale(1.15);
+  outline: none;
+}
+
 .footer-social-row {
   display: none !important;
 }

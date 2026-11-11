@@ -6,6 +6,18 @@
       ".write": true,
       ".read": "auth != null"
     },
+    "reports": {
+      ".write": true,
+      ".read": "auth != null"
+    },
+    "analytics": {
+      ".write": true,
+      ".read": "auth != null"
+    },
+    "admins": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
     "rooms": {
       "$roomCode": {
         ".read": true,

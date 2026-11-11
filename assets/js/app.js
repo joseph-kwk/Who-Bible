@@ -1693,6 +1693,13 @@ function attachHandlers(){
 
   // Global keyboard shortcuts for fluid playability & accessibility
   window.addEventListener('keydown', (e) => {
+    // Discreet Admin shortcut (Ctrl+Shift+A or Cmd+Shift+A)
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+      e.preventDefault();
+      window.location.href = 'admin.html';
+      return;
+    }
+
     const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
 
     // Escape always closes any active dialog/modal

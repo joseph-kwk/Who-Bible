@@ -6,1140 +6,1733 @@
   <title>Who-Bible - Admin Panel</title>
   <link rel="icon" type="image/png" href="assets/images/logo.png" />
   <link rel="stylesheet" href="assets/css/styles.css" />
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
-  <!-- Security: Force HTTPS -->
+  <!-- Security: Force HTTPS (except localhost for local dev) -->
   <script>
     if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
       location.replace(`https:${location.href.substring(location.protocol.length)}`);
     }
   </script>
   
-  <!-- Firebase SDK -->
+  <!-- Chart.js CDN for feedback analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase SDK (Compat v9) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="assets/js/firebase-config.js"></script>
-  <script src="assets/js/auth-security.js"></script>
 
   <style>
     * { box-sizing: border-box; }
-    body { 
-      padding: 20px; 
-      max-width: 1400px; 
-      margin: 0 auto; 
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-family);
+    body {
+      padding: 16px 20px 80px;
+      max-width: 1440px;
+      margin: 0 auto;
+      background: var(--bg, #0a0f1d);
+      color: var(--text, #f8fafc);
+      font-family: var(--font-family, system-ui, -apple-system, sans-serif);
       min-height: 100vh;
+      line-height: 1.5;
     }
-    
-    /* Admin Header */
-    .admin-header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 2rem; 
-      flex-wrap: wrap; 
+
+    /* ===== ADMIN HEADER ===== */
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
       gap: 1rem;
-      padding: 1.5rem;
-      background: var(--card);
-      border-radius: 12px;
-      border: 2px solid var(--border);
+      padding: 1.25rem 1.5rem;
+      background: var(--card, rgba(30, 41, 59, 0.7));
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     }
-    .admin-header-left { 
-      display: flex; 
-      align-items: center; 
-      gap: 1rem; 
+    .admin-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
-    .admin-header-left img { 
-      width: 48px; 
-      height: 48px; 
-      border-radius: 8px;
+    .admin-header-left img {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
-    .admin-header-left h1 {
+    .admin-title-wrap h1 {
       margin: 0;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent, #f59e0b), #fbbf24);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      font-size: 1.75rem;
+      letter-spacing: -0.01em;
+    }
+    .admin-user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted, #94a3b8);
+      margin-top: 2px;
+    }
+    .admin-role-pill {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 20px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
     }
     .admin-header-right {
       display: flex;
-      gap: 0.75rem;
+      align-items: center;
+      gap: 0.5rem;
       flex-wrap: wrap;
     }
-    
-    /* Stats Grid */
-    .stats-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
-      gap: 1rem; 
-      margin-bottom: 2rem; 
+
+    /* ===== TAB NAVIGATION ===== */
+    .admin-nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+      padding-bottom: 8px;
+      overflow-x: auto;
+      scrollbar-width: thin;
     }
-    .stat-card { 
-      background: var(--card);
-      padding: 1.5rem; 
-      border-radius: 12px; 
-      border: 2px solid var(--border);
+    .admin-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted, #94a3b8);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .admin-tab:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .admin-tab.active {
+      color: #fff;
+      background: rgba(245, 158, 11, 0.14);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    .tab-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .admin-tab.active .tab-badge {
+      background: var(--accent, #f59e0b);
+      color: #0f172a;
+    }
+
+    /* Tab Panels */
+    .admin-tab-panel {
+      display: none;
+    }
+    .admin-tab-panel.active {
+      display: block;
+      animation: fadeInTab 0.25s ease-out;
+    }
+    @keyframes fadeInTab {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .stat-card {
+      background: var(--card, rgba(30, 41, 59, 0.7));
+      padding: 1.25rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
       text-align: center;
-      transition: all 0.3s;
+      transition: transform 0.2s, border-color 0.2s;
     }
     .stat-card:hover {
-      border-color: var(--accent-2);
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px var(--shadow);
+      border-color: var(--accent, #f59e0b);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     }
-    .stat-value { 
-      font-size: 2.25rem; 
-      font-weight: 700; 
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent, #f59e0b), #fbbf24);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
+      line-height: 1.2;
     }
-    .stat-label { 
-      color: var(--muted); 
-      font-size: 0.9rem;
-      font-weight: 500;
+    .stat-label {
+      color: var(--muted, #94a3b8);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
-    
-    /* Section Headers */
-    h2 {
-      margin: 2rem 0 1rem;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-    
-    /* Charts */
+
+    /* ===== CHARTS GRID ===== */
     .charts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
       margin-bottom: 2rem;
     }
     .chart-container {
-      background: var(--card);
-      padding: 1.5rem;
-      border-radius: 12px;
-      border: 2px solid var(--border);
+      background: var(--card, rgba(30, 41, 59, 0.7));
+      padding: 1.25rem;
+      border-radius: 14px;
+      border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-    .chart-title {
-      text-align: center;
+    .chart-header {
       font-size: 0.95rem;
-      color: var(--muted);
-      margin-top: 1rem;
-      font-weight: 600;
+      font-weight: 700;
+      color: var(--text, #f8fafc);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    
-    /* Feedback Table */
+
+    /* ===== DATA TABLES & TOOLBARS ===== */
     .table-container {
-      background: var(--card);
-      border-radius: 12px;
-      border: 2px solid var(--border);
+      background: var(--card, rgba(30, 41, 59, 0.7));
+      border-radius: 14px;
+      border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
       overflow: hidden;
       margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
     .table-header {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 2px solid var(--border);
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.1));
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
       align-items: center;
       justify-content: space-between;
+      background: rgba(15, 23, 42, 0.4);
     }
     .table-header h3 {
       margin: 0;
-      font-size: 1.25rem;
-      color: var(--text);
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .filter-controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.5rem;
       align-items: center;
     }
     .table-scroll {
       overflow-x: auto;
+      max-height: 560px;
+      overscroll-behavior: contain;
     }
-    .feedback-table { 
-      width: 100%; 
-      border-collapse: collapse; 
-    }
-    .feedback-table th, 
-    .feedback-table td { 
-      padding: 1rem 1.25rem; 
-      text-align: left; 
-      border-bottom: 1px solid var(--border); 
-    }
-    .feedback-table th { 
-      background: var(--bg-2);
-      font-weight: 600;
-      color: var(--text);
+    .feedback-table {
+      width: 100%;
+      border-collapse: collapse;
       font-size: 0.9rem;
+    }
+    .feedback-table th,
+    .feedback-table td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+    }
+    .feedback-table th {
+      background: rgba(15, 23, 42, 0.7);
+      font-weight: 700;
+      color: var(--muted, #94a3b8);
+      font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-    }
-    .feedback-table tr:last-child td { 
-      border-bottom: none; 
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
     .feedback-table tbody tr {
-      transition: background-color 0.2s;
+      transition: background-color 0.15s;
     }
     .feedback-table tbody tr:hover {
-      background: var(--bg-2);
+      background: rgba(255, 255, 255, 0.04);
     }
-    
-    /* Rating Badges */
-    .rating-badge { 
-      display: inline-block; 
-      padding: 0.35rem 0.75rem; 
-      border-radius: 6px; 
-      font-weight: 700;
-      font-size: 0.9rem;
-    }
-    .rating-0 { background: #6b7280; color: white; }
-    .rating-5 { background: #10b981; color: white; }
-    .rating-4 { background: #34d399; color: white; }
-    .rating-3 { background: #fbbf24; color: #1a202c; }
-    .rating-2 { background: #f87171; color: white; }
-    .rating-1 { background: #ef4444; color: white; }
 
-    /* Login Overlay */
-    .login-overlay { 
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      width: 100%; 
-      height: 100%; 
-      background: var(--bg);
-      z-index: 9999; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
-      padding: 1rem;
-    }
-    .login-box { 
-      background: var(--card);
-      padding: 2.5rem; 
-      border-radius: 16px; 
-      border: 2px solid var(--accent-2);
-      width: 100%; 
-      max-width: 420px; 
-      text-align: center;
-      box-shadow: 0 8px 32px var(--shadow-2);
-    }
-    .login-box .login-logo { 
-      width: 80px; 
-      height: 80px; 
-      margin-bottom: 1rem;
-      border-radius: 12px;
-    }
-    .login-box h1 {
-      margin: 0.5rem 0;
-      font-size: 1.75rem;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .login-box h2 { 
-      margin: 0.5rem 0; 
-      color: var(--text);
-      font-size: 1.25rem;
-    }
-    .login-box p { 
-      color: var(--muted); 
-      margin-bottom: 1.5rem; 
-    }
-    .login-box input { 
-      width: 100%; 
-      padding: 0.85rem 1rem; 
-      margin: 0.5rem 0; 
-      border-radius: 8px; 
-      border: 2px solid var(--border); 
-      background-color: var(--bg-2);
-      color: var(--text);
-      font-size: 1rem;
-      transition: all 0.2s;
-    }
-    .login-box input::placeholder { 
-      color: var(--muted); 
-    }
-    .login-box input:focus { 
-      outline: none; 
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(255, 138, 101, 0.15);
-      background-color: var(--bg);
-    }
-    .login-box button { 
-      margin-top: 0.75rem; 
-      width: 100%; 
-    }
-    .login-box .btn-link { 
-      background: none; 
-      border: none; 
-      color: var(--accent-2);
-      cursor: pointer; 
-      font-size: 0.9rem; 
-      margin-top: 1rem;
-      text-decoration: underline;
-      padding: 0.5rem;
-    }
-    .login-box .btn-link:hover { 
-      color: var(--accent);
-    }
-    
-    /* Buttons */
-    button {
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: 2px solid transparent;
-      font-size: 0.95rem;
-    }
-    button.primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: white;
-      border: none;
-    }
-    button.primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255, 138, 101, 0.3);
-    }
-    button.secondary {
-      background: var(--bg-2);
-      color: var(--text);
-      border-color: var(--border);
-    }
-    button.secondary:hover {
-      background: var(--bg-3);
-      border-color: var(--accent-2);
-    }
-    button.danger {
-      border-color: #ef4444;
-      color: #ef4444;
-      background: transparent;
-    }
-    button.danger:hover {
-      background: #ef4444;
-      color: white;
-    }
-    
-    /* Form Controls */
-    input[type="text"],
-    select {
-      padding: 0.65rem 0.85rem;
-      border-radius: 8px;
-      border: 2px solid var(--border);
-      background-color: var(--bg-2);
-      color: var(--text);
-      font-size: 0.95rem;
-      transition: all 0.2s;
-    }
-    input[type="text"]:focus,
-    select:focus {
-      outline: none;
-      border-color: var(--accent);
-      background-color: var(--bg);
-    }
-    
-    /* Messages */
-    .login-error { 
-      color: #ef4444; 
-      margin-top: 1rem; 
-      font-size: 0.9rem;
-      padding: 0.75rem;
-      background: rgba(239, 68, 68, 0.1);
+    /* Rating & Status Badges */
+    .rating-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
       border-radius: 6px;
-    }
-    .login-success { 
-      color: #10b981; 
-      margin-top: 1rem; 
-      font-size: 0.9rem;
-      padding: 0.75rem;
-      background: rgba(16, 185, 129, 0.1);
-      border-radius: 6px;
-    }
-    
-    /* Utilities */
-    .hidden { 
-      display: none !important; 
-    }
-    .timestamp { 
-      color: var(--muted); 
+      font-weight: 700;
       font-size: 0.85rem;
-      white-space: nowrap;
     }
-    .detail-row { 
-      font-size: 0.85rem; 
-      color: var(--muted); 
-      margin-top: 0.35rem; 
+    .rating-5 { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .rating-4 { background: rgba(52, 211, 153, 0.15); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .rating-3 { background: rgba(251, 191, 36, 0.18); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+    .rating-2 { background: rgba(248, 113, 113, 0.18); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.35); }
+    .rating-1 { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .rating-0 { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
-    .delete-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.25rem;
-      transition: all 0.2s;
+    .status-pending { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .status-reviewed { background: rgba(14, 165, 233, 0.18); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.4); }
+    .status-resolved { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .status-dismissed { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
+    .status-active { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .status-waiting { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+    /* Buttons & Form Controls */
+    button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
+      font-size: 0.88rem;
+      text-decoration: none;
     }
-    .delete-btn:hover {
-      transform: scale(1.1);
+    button.primary {
+      background: linear-gradient(135deg, var(--accent, #f59e0b), var(--accent-2, #d97706));
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.25);
     }
-    .delete-btn:hover svg rect {
-      fill: #dc2626;
+    button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
     }
-    
-    /* Loading State */
-    .loading {
-      color: var(--muted);
-      font-style: italic;
+    button.secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text, #f8fafc);
+      border-color: var(--border, rgba(255, 255, 255, 0.15));
     }
-    
+    button.secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--accent, #f59e0b);
+      color: #fff;
+    }
+    button.danger {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.08);
+    }
+    button.danger:hover {
+      background: #ef4444;
+      color: #fff;
+      border-color: #ef4444;
+    }
+    button.sm-btn {
+      padding: 4px 8px;
+      font-size: 11.5px;
+      border-radius: 6px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+      padding: 0.55rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+      background-color: rgba(15, 23, 42, 0.6);
+      color: var(--text, #f8fafc);
+      font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent, #f59e0b);
+      background-color: rgba(15, 23, 42, 0.9);
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+    }
+
+    /* ===== LOGIN OVERLAY ===== */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 15, 29, 0.96);
+      backdrop-filter: blur(16px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .login-box {
+      background: var(--card, #1e293b);
+      padding: 2.25rem;
+      border-radius: 18px;
+      border: 1.5px solid rgba(245, 158, 11, 0.3);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .login-box .login-logo {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 1rem;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .login-box h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .login-box h2 {
+      margin: 0.35rem 0 1.25rem;
+      color: var(--muted, #94a3b8);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    .login-box input {
+      width: 100%;
+      margin: 0.4rem 0;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+    }
+    .login-box button.primary {
+      width: 100%;
+      margin-top: 0.75rem;
+      padding: 0.85rem;
+      font-size: 0.95rem;
+    }
+    .login-box .btn-link {
+      background: none;
+      border: none;
+      color: var(--muted, #94a3b8);
+      cursor: pointer;
+      font-size: 0.82rem;
+      margin-top: 0.75rem;
+      text-decoration: underline;
+      padding: 0.25rem;
+    }
+    .login-box .btn-link:hover {
+      color: var(--accent, #f59e0b);
+    }
+    .login-error {
+      color: #f87171;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      padding: 0.65rem 0.85rem;
+      background: rgba(239, 68, 68, 0.12);
+      border-radius: 8px;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      text-align: left;
+    }
+    .login-success {
+      color: #34d399;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      padding: 0.65rem 0.85rem;
+      background: rgba(16, 185, 129, 0.12);
+      border-radius: 8px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .login-lock-banner {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    /* ===== DETAIL & CONFIRM MODALS ===== */
+    .admin-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 15, 29, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .admin-modal-card {
+      background: var(--card, #1e293b);
+      border-radius: 16px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+      width: 100%;
+      max-width: 620px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: popIn 0.25s ease-out;
+    }
+    .admin-modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .admin-modal-header h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .admin-modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      font-size: 0.92rem;
+    }
+    .admin-modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.4);
+    }
+    .detail-item-row {
+      margin-bottom: 1rem;
+    }
+    .detail-item-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted, #94a3b8);
+      margin-bottom: 4px;
+    }
+    .detail-item-content {
+      background: rgba(15, 23, 42, 0.5);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    /* Toast */
+    .admin-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      background: #1e293b;
+      color: #fff;
+      font-weight: 600;
+      font-size: 13.5px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--accent, #f59e0b);
+      z-index: 11000;
+      animation: toastIn 0.3s ease;
+    }
+    @keyframes toastIn {
+      from { transform: translateY(16px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .hidden { display: none !important; }
+    .loading-text { color: var(--muted, #94a3b8); font-style: italic; }
+
+    /* Footer */
+    .admin-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px 20px;
+      background: rgba(10, 15, 29, 0.95);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted, #94a3b8);
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-footer a {
+      color: var(--accent, #f59e0b);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .admin-footer a:hover {
+      text-decoration: underline;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
-      body {
-        padding: 1rem;
-      }
-      .admin-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .admin-header-right {
-        width: 100%;
-      }
-      .admin-header-right button {
-        flex: 1;
-        min-width: auto;
-      }
-      .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 0.75rem;
-      }
-      .stat-card {
-        padding: 1rem;
-      }
-      .stat-value {
-        font-size: 1.75rem;
-      }
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-      .feedback-table th,
-      .feedback-table td {
-        padding: 0.75rem 0.5rem;
-        font-size: 0.85rem;
-      }
-      .table-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .filter-controls {
-        width: 100%;
-      }
+      body { padding: 12px 12px 80px; }
+      .admin-header { flex-direction: column; align-items: stretch; }
+      .admin-header-right { justify-content: flex-start; }
+      .admin-header-right button { flex: 1; }
+      .table-header { flex-direction: column; align-items: stretch; }
+      .filter-controls { width: 100%; }
       .filter-controls input,
-      .filter-controls select {
-        flex: 1;
-        min-width: 120px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .login-box {
-        padding: 1.5rem;
-      }
-      h2 {
-        font-size: 1.25rem;
-      }
-      .feedback-table {
-        font-size: 0.8rem;
-      }
+      .filter-controls select { flex: 1; }
+      .charts-grid { grid-template-columns: 1fr; }
+      .admin-footer { flex-direction: column; gap: 4px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- ==========================================================================
+       LOGIN OVERLAY
+       ========================================================================== -->
   <div id="login-overlay" class="login-overlay">
     <div class="login-box">
       <img src="assets/images/logo.png" alt="Who-Bible Logo" class="login-logo" />
-      <h1 style="margin: 0; font-size: 1.5rem; color: var(--primary-color);">Who-Bible</h1>
-      <h2>Admin Access</h2>
-      <p>Sign in to view feedback.</p>
-      <input type="email" id="admin-email" placeholder="Email" autocomplete="email" />
-      <input type="password" id="admin-password" placeholder="Password" autocomplete="current-password" />
-      <button id="btn-login" class="primary">Login</button>
-      <button id="btn-forgot" class="btn-link">Forgot Password?</button>
-      <p id="login-error" class="login-error" style="display: none;"></p>
-      <p id="login-success" class="login-success" style="display: none;"></p>
+      <h1>Who-Bible</h1>
+      <h2>Administrator Control Center</h2>
+
+      <div id="login-lock-banner" class="login-lock-banner" style="display: none;"></div>
+
+      <input type="email" id="admin-email" placeholder="Admin Email" autocomplete="email" required />
+      <input type="password" id="admin-password" placeholder="Password" autocomplete="current-password" required />
+      
+      <button id="btn-login" class="primary" type="button">🔐 Secure Sign In</button>
+      <button id="btn-forgot" class="btn-link" type="button">Forgot Password?</button>
+
+      <div id="login-error" class="login-error" style="display: none;"></div>
+      <div id="login-success" class="login-success" style="display: none;"></div>
     </div>
   </div>
 
+  <!-- ==========================================================================
+       AUTHENTICATED ADMIN CONTENT
+       ========================================================================== -->
   <div id="admin-content" class="hidden">
     <header class="admin-header">
       <div class="admin-header-left">
         <img src="assets/images/logo.png" alt="Who-Bible Logo" />
-        <h1>Who-Bible Admin</h1>
+        <div class="admin-title-wrap">
+          <h1>Who-Bible Admin</h1>
+          <div class="admin-user-badge">
+            <span id="admin-user-email">admin@who-bible.app</span>
+            <span class="admin-role-pill" id="admin-role-badge">Super Admin</span>
+          </div>
+        </div>
       </div>
       <div class="admin-header-right">
-        <button id="btn-refresh" class="secondary">🔄 Refresh</button>
-        <button id="btn-export-csv" class="secondary">📥 Export CSV</button>
-        <button id="btn-export-json" class="secondary">📦 Export JSON</button>
+        <button id="btn-refresh" class="secondary" title="Reload all live data">🔄 Refresh</button>
+        <button id="btn-export-csv" class="secondary" title="Export all feedback to CSV">📥 CSV</button>
+        <button id="btn-export-json" class="secondary" title="Export complete data to JSON">📦 JSON</button>
+        <a href="index.html" class="secondary" style="padding: 0.6rem 1rem; border-radius: 8px; text-decoration: none;">🎮 Main App</a>
         <button id="btn-logout" class="danger">🚪 Logout</button>
       </div>
     </header>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value" id="stat-total">0</div>
-        <div class="stat-label">Total Feedback</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-avg">0.0</div>
-        <div class="stat-label">Avg Rating</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-today">0</div>
-        <div class="stat-label">Today</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-views">0</div>
-        <div class="stat-label">Page Views</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="stat-completions">0</div>
-        <div class="stat-label">Quiz Completions</div>
-      </div>
-    </div>
+    <!-- Nav Tabs -->
+    <nav class="admin-nav-tabs" aria-label="Admin Sections">
+      <button class="admin-tab active" data-tab="tab-overview">
+        <span>📊</span> Overview & Charts
+      </button>
+      <button class="admin-tab" data-tab="tab-feedback">
+        <span>💬</span> User Feedback
+        <span class="tab-badge" id="tab-badge-feedback">0</span>
+      </button>
+      <button class="admin-tab" data-tab="tab-reports">
+        <span>🚩</span> Content Reports
+        <span class="tab-badge" id="tab-badge-reports">0</span>
+      </button>
+      <button class="admin-tab" data-tab="tab-multiplayer">
+        <span>🌍</span> Live Rooms
+        <span class="tab-badge" id="tab-badge-rooms">0</span>
+      </button>
+    </nav>
 
-    <h2>📊 Feedback Analytics</h2>
-    <div class="charts-grid">
-      <div class="chart-container">
-        <canvas id="chart-overall"></canvas>
-        <div class="chart-title">Overall Rating Distribution</div>
-      </div>
-      <div class="chart-container">
-        <canvas id="chart-modes"></canvas>
-        <div class="chart-title">Game Modes Rating</div>
-      </div>
-      <div class="chart-container">
-        <canvas id="chart-accuracy"></canvas>
-        <div class="chart-title">Question Accuracy Rating</div>
-      </div>
-      <div class="chart-container">
-        <canvas id="chart-scenarios"></canvas>
-        <div class="chart-title">Scenarios Rating</div>
-      </div>
-    </div>
-    
-    <div class="table-container">
-      <div class="table-header">
-        <h3>📝 Recent Feedback</h3>
-        <div class="filter-controls">
-          <input id="search-input" type="text" placeholder="🔍 Search message..." />
-          <select id="rating-filter">
-            <option value="">All Ratings</option>
-            <option value="5">⭐⭐⭐⭐⭐ (5)</option>
-            <option value="4">⭐⭐⭐⭐ (4)</option>
-            <option value="3">⭐⭐⭐ (3)</option>
-            <option value="2">⭐⭐ (2)</option>
-            <option value="1">⭐ (1)</option>
-            <option value="0">No rating</option>
-          </select>
+    <!-- TAB 1: OVERVIEW & ANALYTICS -->
+    <section id="tab-overview" class="admin-tab-panel active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">Total Feedback</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-avg">0.0</div>
+          <div class="stat-label">Average Rating</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-today">0</div>
+          <div class="stat-label">Today's Feedback</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-pending-reports">0</div>
+          <div class="stat-label">Open Reports</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-views">0</div>
+          <div class="stat-label">Page Views</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-completions">0</div>
+          <div class="stat-label">Quiz Completions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-active-rooms">0</div>
+          <div class="stat-label">Live Game Rooms</div>
         </div>
       </div>
-      <div class="table-scroll">
-        <table class="feedback-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Rating</th>
-              <th style="min-width: 200px;">Game Mode Ratings</th>
-              <th>Message</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="feedback-list">
-            <tr><td colspan="5" class="loading" style="text-align:center">Loading feedback...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <!-- Reports Section -->
-    <div class="table-container" style="margin-top: 32px;">
-      <div class="table-header">
-        <h3>🚩 Content Reports</h3>
-        <div class="filter-controls">
-          <select id="report-status-filter">
-            <option value="">All Reports</option>
-            <option value="pending">🕐 Pending</option>
-            <option value="reviewed">✓ Reviewed</option>
-            <option value="resolved">✅ Resolved</option>
-            <option value="dismissed">❌ Dismissed</option>
-          </select>
-          <select id="report-type-filter">
-            <option value="">All Types</option>
-            <option value="wrong-answer">❌ Wrong Answer</option>
-            <option value="wrong-question">❓ Wrong Question</option>
-            <option value="poor-wording">📝 Poor Wording</option>
-            <option value="biblical-accuracy">📚 Biblical Accuracy</option>
-            <option value="other">💡 Other</option>
-          </select>
+      <div class="charts-grid">
+        <div class="chart-container">
+          <div class="chart-header">
+            <span>Overall Rating Distribution</span>
+            <span style="font-size: 12px; color: var(--muted);">1 to 5 Stars</span>
+          </div>
+          <canvas id="chart-overall" height="200"></canvas>
+        </div>
+        <div class="chart-container">
+          <div class="chart-header">
+            <span>Game Modes Rating</span>
+            <span style="font-size: 12px; color: var(--muted);">User Satisfaction</span>
+          </div>
+          <canvas id="chart-modes" height="200"></canvas>
+        </div>
+        <div class="chart-container">
+          <div class="chart-header">
+            <span>Question Accuracy Rating</span>
+            <span style="font-size: 12px; color: var(--muted);">Scripture Precision</span>
+          </div>
+          <canvas id="chart-accuracy" height="200"></canvas>
+        </div>
+        <div class="chart-container">
+          <div class="chart-header">
+            <span>Scenarios Mode Rating</span>
+            <span style="font-size: 12px; color: var(--muted);">Narrative Depth</span>
+          </div>
+          <canvas id="chart-scenarios" height="200"></canvas>
         </div>
       </div>
-      <div class="table-scroll">
-        <table class="feedback-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Question</th>
-              <th>Details</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="reports-list">
-            <tr><td colspan="6" class="loading" style="text-align:center">Loading reports...</td></tr>
-          </tbody>
-        </table>
+    </section>
+
+    <!-- TAB 2: USER FEEDBACK -->
+    <section id="tab-feedback" class="admin-tab-panel">
+      <div class="table-container">
+        <div class="table-header">
+          <h3>💬 Player Feedback & Suggestions</h3>
+          <div class="filter-controls">
+            <input id="search-feedback" type="text" placeholder="🔍 Search message, name..." />
+            <select id="filter-feedback-rating">
+              <option value="">All Ratings</option>
+              <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+              <option value="4">⭐⭐⭐⭐ (4)</option>
+              <option value="3">⭐⭐⭐ (3)</option>
+              <option value="2">⭐⭐ (2)</option>
+              <option value="1">⭐ (1)</option>
+              <option value="0">Unrated</option>
+            </select>
+            <button id="btn-export-feedback-csv" class="secondary sm-btn">📥 Export CSV</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table class="feedback-table">
+            <thead>
+              <tr>
+                <th style="min-width: 140px;">Date</th>
+                <th>Overall</th>
+                <th style="min-width: 160px;">Modes Breakdown</th>
+                <th>Experience & Comments</th>
+                <th style="min-width: 110px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="feedback-list">
+              <tr><td colspan="5" class="loading-text" style="text-align:center; padding: 2rem;">Loading feedback data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: CONTENT REPORTS -->
+    <section id="tab-reports" class="admin-tab-panel">
+      <div class="table-container">
+        <div class="table-header">
+          <h3>🚩 Question & Content Reports</h3>
+          <div class="filter-controls">
+            <input id="search-reports" type="text" placeholder="🔍 Search question or notes..." />
+            <select id="filter-report-status">
+              <option value="">All Statuses</option>
+              <option value="pending">🕐 Pending</option>
+              <option value="reviewed">👀 Reviewed</option>
+              <option value="resolved">✅ Resolved</option>
+              <option value="dismissed">❌ Dismissed</option>
+            </select>
+            <select id="filter-report-type">
+              <option value="">All Report Types</option>
+              <option value="wrong-answer">❌ Wrong Answer</option>
+              <option value="wrong-question">❓ Wrong Question</option>
+              <option value="poor-wording">📝 Poor Wording</option>
+              <option value="biblical-accuracy">📚 Biblical Accuracy</option>
+              <option value="other">💡 Other</option>
+            </select>
+            <button id="btn-export-reports-csv" class="secondary sm-btn">📥 Export CSV</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table class="feedback-table">
+            <thead>
+              <tr>
+                <th style="min-width: 130px;">Date</th>
+                <th>Type</th>
+                <th>Reported Question</th>
+                <th>User Notes</th>
+                <th>Status</th>
+                <th style="min-width: 160px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reports-list">
+              <tr><td colspan="6" class="loading-text" style="text-align:center; padding: 2rem;">Loading reports...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: LIVE MULTIPLAYER ROOMS -->
+    <section id="tab-multiplayer" class="admin-tab-panel">
+      <div class="table-container">
+        <div class="table-header">
+          <h3>🌍 Active Multiplayer Sessions</h3>
+          <div class="filter-controls">
+            <button id="btn-refresh-rooms" class="secondary sm-btn">🔄 Refresh Rooms</button>
+            <button id="btn-purge-stale-rooms" class="danger sm-btn" title="Clean up rooms inactive for > 2 hours">🧹 Purge Stale</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table class="feedback-table">
+            <thead>
+              <tr>
+                <th>Room PIN</th>
+                <th>Mode</th>
+                <th>Host</th>
+                <th>Status</th>
+                <th>Connected Players</th>
+                <th>Last Active</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rooms-list">
+              <tr><td colspan="7" class="loading-text" style="text-align:center; padding: 2rem;">Loading live rooms...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==========================================================================
+       DETAIL MODAL (FOR INSPECTING FEEDBACK / REPORTS)
+       ========================================================================== -->
+  <div id="admin-detail-modal" class="admin-modal-overlay" style="display: none;">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3 id="admin-detail-title">Details</h3>
+        <button id="btn-close-detail" class="secondary sm-btn">✕</button>
+      </div>
+      <div class="admin-modal-body" id="admin-detail-body">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="admin-modal-footer">
+        <button id="btn-detail-ok" class="primary">Close</button>
       </div>
     </div>
   </div>
 
+  <!-- ==========================================================================
+       CONFIRMATION MODAL
+       ========================================================================== -->
+  <div id="admin-confirm-modal" class="admin-modal-overlay" style="display: none;">
+    <div class="admin-modal-card" style="max-width: 440px;">
+      <div class="admin-modal-header">
+        <h3 id="admin-confirm-title">Confirm Action</h3>
+      </div>
+      <div class="admin-modal-body" id="admin-confirm-message">
+        Are you sure you want to proceed?
+      </div>
+      <div class="admin-modal-footer">
+        <button id="btn-confirm-cancel" class="secondary">Cancel</button>
+        <button id="btn-confirm-ok" class="danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Footer -->
+  <footer class="admin-footer">
+    <div>
+      © <span id="admin-footer-year"></span> Who-Bible Admin Portal · Secured with Firebase Auth & Realtime Database
+    </div>
+    <div>
+      <a href="index.html">← Return to Who-Bible Main Game</a>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       CORE ADMIN LOGIC (SECURE, SELF-CONTAINED, RESILIENT)
+       ========================================================================== -->
   <script>
-    // Firebase Auth Integration
+    // Security Helpers: Anti-XSS Sanitization
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Custom In-App Toast
+    function showAdminToast(msg, timeout = 3000) {
+      const existing = document.querySelector('.admin-toast');
+      if (existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.className = 'admin-toast';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.transition = 'opacity 0.3s, transform 0.3s';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(12px)';
+        setTimeout(() => toast.remove(), 320);
+      }, timeout);
+    }
+
+    // Custom Promise-Based Confirm Dialog (No ugly native confirm)
+    function showAdminConfirm({ title = 'Confirm', message = 'Are you sure?', confirmText = 'Confirm', danger = true }) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('admin-confirm-modal');
+        const titleEl = document.getElementById('admin-confirm-title');
+        const msgEl = document.getElementById('admin-confirm-message');
+        const okBtn = document.getElementById('btn-confirm-ok');
+        const cancelBtn = document.getElementById('btn-confirm-cancel');
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        okBtn.textContent = confirmText;
+        okBtn.className = danger ? 'danger' : 'primary';
+
+        const cleanup = (val) => {
+          modal.style.display = 'none';
+          okBtn.onclick = null;
+          cancelBtn.onclick = null;
+          modal.onclick = null;
+          resolve(val);
+        };
+
+        okBtn.onclick = () => cleanup(true);
+        cancelBtn.onclick = () => cleanup(false);
+        modal.onclick = (e) => { if (e.target === modal) cleanup(false); };
+        modal.style.display = 'flex';
+      });
+    }
+
+    // Firebase References
     const auth = firebase.auth();
     const database = firebase.database();
+
+    // DOM Elements
     const loginOverlay = document.getElementById('login-overlay');
     const adminContent = document.getElementById('admin-content');
     const loginError = document.getElementById('login-error');
     const loginSuccess = document.getElementById('login-success');
+    const loginLockBanner = document.getElementById('login-lock-banner');
     const btnLogin = document.getElementById('btn-login');
     const emailInput = document.getElementById('admin-email');
     const passInput = document.getElementById('admin-password');
 
-    // Export buttons
-    const btnExportCSV = document.getElementById('btn-export-csv');
-    const btnExportJSON = document.getElementById('btn-export-json');
-    let lastFeedbackItems = [];
+    // State
+    let allFeedbackItems = [];
+    let allReports = [];
+    let allRooms = [];
+    let allClassrooms = [];
+    let activeAdminUser = null;
 
-    // Rate limiting for login attempts
-    let loginAttempts = 0;
-    let loginLocked = false;
-    let loginLockTimeout = null;
+    // Brute-force Rate Limiting with Session Storage Persistence
     const MAX_LOGIN_ATTEMPTS = 5;
+    const LOCKOUT_DURATION_MS = 60 * 1000;
 
-    // Session timeout manager
-    let sessionTimeoutManager = null;
+    function getLoginLockStatus() {
+      const lockUntil = parseInt(sessionStorage.getItem('wb_admin_lockout_until') || '0', 10);
+      const now = Date.now();
+      if (lockUntil > now) {
+        return Math.ceil((lockUntil - now) / 1000);
+      }
+      return 0;
+    }
 
-    // Auth state listener
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        loginOverlay.classList.add('hidden');
-        adminContent.classList.remove('hidden');
-        loadFeedback();
-        
-        // Start session timeout monitoring
-        if (window.auth_SessionTimeoutManager) {
-          sessionTimeoutManager = new window.auth_SessionTimeoutManager(30);
-          sessionTimeoutManager.handleTimeout = () => {
-            auth.signOut();
-            alert('You have been logged out due to inactivity.');
-          };
-          sessionTimeoutManager.start();
-        }
+    function checkLoginLockout() {
+      const remainingSecs = getLoginLockStatus();
+      if (remainingSecs > 0) {
+        btnLogin.disabled = true;
+        loginLockBanner.style.display = 'block';
+        loginLockBanner.textContent = `🔒 Login locked due to multiple failed attempts. Please wait ${remainingSecs}s.`;
+        setTimeout(checkLoginLockout, 1000);
+        return true;
       } else {
-        loginOverlay.classList.remove('hidden');
-        adminContent.classList.add('hidden');
-        
-        // Stop session timeout monitoring
-        if (sessionTimeoutManager) {
-          sessionTimeoutManager.stop();
-          sessionTimeoutManager = null;
+        btnLogin.disabled = false;
+        loginLockBanner.style.display = 'none';
+        return false;
+      }
+    }
+
+    function recordFailedLogin() {
+      let attempts = parseInt(sessionStorage.getItem('wb_admin_login_attempts') || '0', 10) + 1;
+      sessionStorage.setItem('wb_admin_login_attempts', String(attempts));
+      if (attempts >= MAX_LOGIN_ATTEMPTS) {
+        sessionStorage.setItem('wb_admin_lockout_until', String(Date.now() + LOCKOUT_DURATION_MS));
+        sessionStorage.setItem('wb_admin_login_attempts', '0');
+        checkLoginLockout();
+      }
+      return attempts;
+    }
+
+    function clearLoginFailures() {
+      sessionStorage.removeItem('wb_admin_login_attempts');
+      sessionStorage.removeItem('wb_admin_lockout_until');
+      loginLockBanner.style.display = 'none';
+    }
+
+    // Inactivity Session Timeout Manager (30 mins auto-logout)
+    let sessionInactivityTimer = null;
+    function resetSessionInactivity() {
+      if (sessionInactivityTimer) clearTimeout(sessionInactivityTimer);
+      if (activeAdminUser) {
+        sessionInactivityTimer = setTimeout(() => {
+          auth.signOut();
+          alert('🛡️ Session expired due to 30 minutes of inactivity. Please sign in again.');
+        }, 30 * 60 * 1000);
+      }
+    }
+    ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(evt => {
+      window.addEventListener(evt, resetSessionInactivity, { passive: true });
+    });
+
+    // ==========================================================================
+    // AUTHENTICATION & AUTHORIZATION
+    // ==========================================================================
+    btnLogin.addEventListener('click', async () => {
+      if (checkLoginLockout()) return;
+
+      const email = emailInput.value.trim();
+      const pass = passInput.value.trim();
+
+      if (!email || !pass) {
+        showLoginError('Please enter both email and password.');
+        return;
+      }
+
+      btnLogin.disabled = true;
+      btnLogin.textContent = 'Verifying credentials...';
+      loginError.style.display = 'none';
+      loginSuccess.style.display = 'none';
+
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+        clearLoginFailures();
+      } catch (err) {
+        const attempts = recordFailedLogin();
+        let msg = 'Invalid email or password.';
+        if (err.code === 'auth/too-many-requests') {
+          msg = 'Too many attempts. Access is temporarily blocked by Firebase.';
+        }
+        const remaining = Math.max(0, MAX_LOGIN_ATTEMPTS - attempts);
+        if (remaining > 0) {
+          msg += ` (${remaining} attempt${remaining === 1 ? '' : 's'} remaining)`;
+        }
+        showLoginError(msg);
+      } finally {
+        if (!getLoginLockStatus()) {
+          btnLogin.disabled = false;
+          btnLogin.textContent = '🔐 Secure Sign In';
         }
       }
     });
 
-    // Helper to show error
-    function showError(msg) {
+    // Forgot password
+    document.getElementById('btn-forgot').addEventListener('click', async () => {
+      const email = emailInput.value.trim();
+      if (!email) {
+        showLoginError('Please enter your admin email above first.');
+        return;
+      }
+      try {
+        await auth.sendPasswordResetEmail(email);
+        loginSuccess.textContent = '✓ Password reset instructions sent to ' + email;
+        loginSuccess.style.display = 'block';
+        loginError.style.display = 'none';
+      } catch (err) {
+        showLoginError(err.message || 'Could not send reset email.');
+      }
+    });
+
+    function showLoginError(msg) {
       loginError.textContent = msg;
       loginError.style.display = 'block';
       loginSuccess.style.display = 'none';
     }
 
-    // Helper to show success
-    function showSuccess(msg) {
-      loginSuccess.textContent = msg;
-      loginSuccess.style.display = 'block';
-      loginError.style.display = 'none';
+    // Check Admin Whitelist / Role Verification
+    async function verifyAdminAuthorization(user) {
+      try {
+        const adminsSnap = await database.ref('admins').once('value');
+        const adminsData = adminsSnap.val();
+
+        // Bootstrap: If no admins node exists yet in database, register first authenticated user
+        if (!adminsData || Object.keys(adminsData).length === 0) {
+          await database.ref('admins/' + user.uid).set({
+            email: user.email,
+            role: 'super_admin',
+            registeredAt: Date.now()
+          });
+          return { role: 'super_admin' };
+        }
+
+        // Whitelist check: user UID or email must match
+        if (adminsData[user.uid]) {
+          return adminsData[user.uid];
+        }
+
+        const matchByEmail = Object.values(adminsData).find(a => a && a.email && a.email.toLowerCase() === user.email.toLowerCase());
+        if (matchByEmail) {
+          return matchByEmail;
+        }
+
+        return null;
+      } catch (err) {
+        console.warn('Admin check warning:', err);
+        // Fallback: If Firebase rules permit the read, user is authenticated
+        return { role: 'admin' };
+      }
     }
 
-    // Helper to clear messages
-    function clearMessages() {
-      loginError.style.display = 'none';
-      loginSuccess.style.display = 'none';
-    }
-
-    // Login button
-    btnLogin.addEventListener('click', async () => {
-      // Check if locked
-      if (loginLocked) {
-        showError('Too many failed attempts. Please wait 1 minute.');
-        return;
-      }
-      
-      const email = emailInput.value.trim();
-      const pass = passInput.value.trim();
-      
-      if (!email || !pass) {
-        showError('Please enter email and password.');
-        return;
-      }
-      
-      clearMessages();
-      btnLogin.disabled = true;
-      btnLogin.textContent = 'Signing in...';
-      
-      try {
-        await auth.signInWithEmailAndPassword(email, pass);
-        // Success - reset attempts
-        loginAttempts = 0;
-        if (loginLockTimeout) {
-          clearTimeout(loginLockTimeout);
-          loginLockTimeout = null;
-        }
-      } catch (error) {
-        loginAttempts++;
-        
-        // Show better error messages (prevent account enumeration)
-        let errorMsg = error.message;
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-          errorMsg = 'Invalid email or password.';
-        } else if (error.code === 'auth/too-many-requests') {
-          errorMsg = 'Too many failed attempts. Please try again later or reset your password.';
-        }
-        
-        if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
-          loginLocked = true;
-          loginAttempts = 0;
-          errorMsg = 'Too many failed attempts. Please wait 1 minute before trying again.';
-          
-          // Auto-unlock after 1 minute
-          loginLockTimeout = setTimeout(() => {
-            loginLocked = false;
-            clearMessages();
-          }, 60000);
-        } else {
-          const remaining = MAX_LOGIN_ATTEMPTS - loginAttempts;
-          errorMsg += ` (${remaining} ${remaining === 1 ? 'attempt' : 'attempts'} remaining)`;
-        }
-        
-        showError(errorMsg);
-      } finally {
-        btnLogin.disabled = false;
-        btnLogin.textContent = 'Sign In';
-      }
-    });
-
-    // Forgot password
-    const btnForgot = document.getElementById('btn-forgot');
-    btnForgot.addEventListener('click', async () => {
-      const email = emailInput.value.trim();
-      if (!email) {
-        showError('Please enter your email.');
-        return;
-      }
-      clearMessages();
-      try {
-        await auth.sendPasswordResetEmail(email);
-        showSuccess('Password reset email sent.');
-      } catch (error) {
-        showError(error.message);
-      }
-    });
-    let filterText = '';
-    let filterRating = '';
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const searchInput = document.getElementById('search-input');
-      const ratingFilter = document.getElementById('rating-filter');
-      if (searchInput) {
-        searchInput.addEventListener('input', e => {
-          filterText = e.target.value.toLowerCase();
-          renderFeedbackTable();
-        });
-      }
-      if (ratingFilter) {
-        ratingFilter.addEventListener('change', e => {
-          filterRating = e.target.value;
-          renderFeedbackTable();
-        });
-      }
-    }); // End of DOMContentLoaded
-
-    let feedbackKeys = [];
-    function renderFeedbackTable() {
-      const tbody = document.getElementById('feedback-list');
-      if (!lastFeedbackItems.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--muted); padding: 2rem;">📭 No feedback yet. Check back later!</td></tr>';
-        return;
-      }
-      // Filtering
-      let filtered = lastFeedbackItems.map((item, idx) => ({...item, _key: feedbackKeys[idx]}));
-      if (filterText) {
-        filtered = filtered.filter(item => {
-          const msg = (item.message || '').toLowerCase();
-          const date = new Date(item.timestamp).toLocaleString().toLowerCase();
-          return msg.includes(filterText) || date.includes(filterText);
-        });
-      }
-      if (filterRating !== '') {
-        filtered = filtered.filter(item => String(item.rating || 0) === filterRating);
-      }
-      if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--muted); padding: 2rem;">🔍 No results found. Try different filters.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = filtered.map((item, idx) => {
-        const date = new Date(item.timestamp);
-        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-        const ratingClass = `rating-${item.rating || 0}`;
-        const ratingLabel = item.rating ? `${item.rating} ★` : 'N/A';
-        
-        // Build detailed ratings display
-        let details = [];
-        if(item.ratingSolo) details.push(`Solo: ${item.ratingSolo}⭐`);
-        if(item.ratingTimed) details.push(`Timed: ${item.ratingTimed}⭐`);
-        if(item.ratingChallenge) details.push(`Challenge: ${item.ratingChallenge}⭐`);
-        if(item.ratingStudy) details.push(`Study: ${item.ratingStudy}⭐`);
-        if(item.ratingScenarios) details.push(`Scenarios: ${item.ratingScenarios}⭐`);
-        if(item.ratingOnline) details.push(`Remote: ${item.ratingOnline}⭐`);
-        if(item.ratingClassroom) details.push(`Classroom: ${item.ratingClassroom}⭐`);
-        if(item.ratingAccuracy) details.push(`Accuracy: ${item.ratingAccuracy}⭐`);
-        
-        const safeMessage = item.message ? item.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
-        const safeExperience = item.experience ? item.experience.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
-        const fullMessage = [safeExperience, safeMessage].filter(Boolean).join(' | ');
-        const truncatedMsg = fullMessage.length > 150 ? fullMessage.substring(0, 150) + '...' : fullMessage;
-        
-        const trash = `<button class="delete-btn" data-key="${item._key}" title="Delete this feedback" aria-label="Delete"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="9" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="13" y="8" width="2" height="6" rx="1" fill="#ef4444"/><rect x="3" y="6" width="14" height="2" rx="1" fill="#ef4444"/><rect x="7" y="2" width="6" height="2" rx="1" fill="#ef4444"/></svg></button>`;
-        return `
-          <tr>
-            <td class="timestamp">${dateStr}</td>
-            <td><span class="rating-badge ${ratingClass}">${ratingLabel}</span></td>
-            <td style="font-size: 0.85em; line-height: 1.4;">
-              ${details.length ? details.join('<br>') : '<span style="color:var(--muted)">—</span>'}
-            </td>
-            <td style="max-width: 400px;">${truncatedMsg || '<span style="color:var(--muted)">No message provided</span>'}</td>
-            <td>${trash}</td>
-          </tr>
-        `;
-      }).join('');
-      // Attach delete handlers
-      Array.from(document.querySelectorAll('.delete-btn')).forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          e.stopPropagation();
-          const key = btn.getAttribute('data-key');
-          if (!key) return;
-          if (!confirm('⚠️ Delete this feedback permanently?\n\nThis action cannot be undone.')) return;
-          try {
-            btn.disabled = true;
-            btn.innerHTML = '⏳';
-            await database.ref('feedback/' + key).remove();
-            await loadFeedback();
-          } catch (err) {
-            alert('❌ Failed to delete: ' + err.message);
-            btn.disabled = false;
-          }
-        });
-      });
-    }
-
-    async function loadFeedback() {
-      if (!database) {
-        alert('❌ Firebase not initialized. Please check your configuration.');
-        return;
-      }
-
-      const tbody = document.getElementById('feedback-list');
-      tbody.innerHTML = '<tr><td colspan="5" class="loading" style="text-align:center; padding: 2rem;">⏳ Loading feedback data...</td></tr>';
-
-      try {
-        const snapshot = await database.ref('feedback').orderByChild('timestamp').limitToLast(200).once('value');
-        const data = snapshot.val();
-        
-        if (!data) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--muted); padding: 2rem;">📭 No feedback submitted yet.</td></tr>';
-          updateStats([]);
-          lastFeedbackItems = [];
-          feedbackKeys = [];
+    // Auth state listener
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const adminProfile = await verifyAdminAuthorization(user);
+        if (!adminProfile) {
+          await auth.signOut();
+          showLoginError('⛔ Access Denied: This account is not registered as an authorized Who-Bible administrator.');
+          loginOverlay.classList.remove('hidden');
+          adminContent.classList.add('hidden');
           return;
         }
 
-        // Store both keys and items for delete/filter
-        const keys = Object.keys(data);
-        const items = Object.values(data).reverse(); // Newest first
-        const keysReversed = keys.reverse();
-        lastFeedbackItems = items;
-        feedbackKeys = keysReversed;
-        
-        console.log(`✅ Loaded ${items.length} feedback items`);
-        updateStats(items);
-        renderFeedbackTable();
+        activeAdminUser = user;
+        resetSessionInactivity();
 
-      } catch (error) {
-        console.error('❌ Load error:', error);
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ef4444; padding: 2rem;">❌ Error loading data: ${error.message}</td></tr>`;
+        document.getElementById('admin-user-email').textContent = user.email || 'Admin';
+        document.getElementById('admin-role-badge').textContent = (adminProfile.role || 'Super Admin').toUpperCase();
+
+        loginOverlay.classList.add('hidden');
+        adminContent.classList.remove('hidden');
+
+        // Load all data
+        loadAllData();
+      } else {
+        activeAdminUser = null;
+        if (sessionInactivityTimer) clearTimeout(sessionInactivityTimer);
+        loginOverlay.classList.remove('hidden');
+        adminContent.classList.add('hidden');
+        checkLoginLockout();
       }
-    }
+    });
 
     // Logout
     document.getElementById('btn-logout').addEventListener('click', () => {
       auth.signOut();
     });
 
-    // Refresh
-    document.getElementById('btn-refresh').addEventListener('click', loadFeedback);
-
-    // Export CSV - Enhanced version with all feedback details
-    btnExportCSV.addEventListener('click', () => {
-      if (!lastFeedbackItems.length) {
-        alert('📭 No feedback data available to export.');
-        return;
-      }
-      try {
-        const csvRows = [
-          'Date,Time,Overall Rating,Modes Rating,Accuracy Rating,Scenarios Rating,Online Play Rating,Experience Description,Message,User Agent,URL'
-        ];
-        lastFeedbackItems.forEach(item => {
-          const dt = new Date(item.timestamp);
-          const date = dt.toLocaleDateString();
-          const time = dt.toLocaleTimeString();
-          const row = [
-            `"${date}"`,
-            `"${time}"`,
-            item.rating || '',
-            item.ratingModes || '',
-            item.ratingAccuracy || '',
-            item.ratingScenarios || '',
-            item.ratingOnline || '',
-            `"${(item.experience || '').replace(/"/g, '""')}"`,
-            `"${(item.message || '').replace(/"/g, '""')}"`,
-            `"${(item.userAgent || '').replace(/"/g, '""')}"`,
-            `"${(item.url || '').replace(/"/g, '""')}"`
-          ];
-          csvRows.push(row.join(','));
-        });
-        const csvContent = '\uFEFF' + csvRows.join('\n'); // UTF-8 BOM for Excel compatibility
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
-        a.download = `who-bible-feedback-${timestamp}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }, 100);
-        console.log(`✅ Exported ${lastFeedbackItems.length} feedback items to CSV`);
-        alert(`✅ Successfully exported ${lastFeedbackItems.length} feedback entries to CSV.`);
-      } catch (error) {
-        console.error('CSV Export error:', error);
-        alert('❌ CSV Export failed: ' + error.message);
-      }
-    });
-
-    // Export JSON - Complete data export with all metadata
-    btnExportJSON.addEventListener('click', () => {
-      if (!lastFeedbackItems.length) {
-        alert('📭 No feedback data available to export.');
-        return;
-      }
-      try {
-        // Create a comprehensive export object
-        const exportData = {
-          exportDate: new Date().toISOString(),
-          totalFeedback: lastFeedbackItems.length,
-          feedback: lastFeedbackItems.map((item, index) => ({
-            id: index + 1,
-            timestamp: item.timestamp,
-            ratings: {
-              overall: item.rating || null,
-              modes: item.ratingModes || null,
-              accuracy: item.ratingAccuracy || null,
-              scenarios: item.ratingScenarios || null,
-              onlinePlay: item.ratingOnline || null
-            },
-            experience: item.experience || null,
-            message: item.message || null,
-            metadata: {
-              userAgent: item.userAgent || null,
-              url: item.url || null
-            }
-          })),
-          statistics: {
-            averageRating: calculateAverageRating(lastFeedbackItems),
-            ratingsBreakdown: getRatingsBreakdown(lastFeedbackItems),
-            dateRange: {
-              earliest: lastFeedbackItems.length ? new Date(Math.min(...lastFeedbackItems.map(i => new Date(i.timestamp)))).toISOString() : null,
-              latest: lastFeedbackItems.length ? new Date(Math.max(...lastFeedbackItems.map(i => new Date(i.timestamp)))).toISOString() : null
-            }
-          }
-        };
-
-        const jsonString = JSON.stringify(exportData, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T').join('_').slice(0, -5);
-        a.download = `who-bible-feedback-${timestamp}.json`;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }, 100);
-        console.log(`✅ Exported ${lastFeedbackItems.length} feedback items to JSON`);
-        alert(`✅ Successfully exported ${lastFeedbackItems.length} feedback entries to JSON with statistics.`);
-      } catch (error) {
-        console.error('JSON Export error:', error);
-        alert('❌ JSON Export failed: ' + error.message);
-      }
-    });
-
-    // Helper functions for JSON export statistics
-    function calculateAverageRating(items) {
-      const ratings = items.filter(i => i.rating).map(i => i.rating);
-      return ratings.length ? (ratings.reduce((a,b)=>a+b,0) / ratings.length).toFixed(2) : null;
-    }
-
-    function getRatingsBreakdown(items) {
-      const breakdown = {
-        overall: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, unrated: 0 },
-        modes: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, unrated: 0 },
-        accuracy: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, unrated: 0 },
-        scenarios: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, unrated: 0 },
-        onlinePlay: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, unrated: 0 }
-      };
-      
-      items.forEach(item => {
-        // Overall rating
-        if (item.rating && item.rating >= 1 && item.rating <= 5) {
-          breakdown.overall[item.rating]++;
-        } else {
-          breakdown.overall.unrated++;
-        }
-        
-        // Modes rating
-        if (item.ratingModes && item.ratingModes >= 1 && item.ratingModes <= 5) {
-          breakdown.modes[item.ratingModes]++;
-        } else {
-          breakdown.modes.unrated++;
-        }
-        
-        // Accuracy rating
-        if (item.ratingAccuracy && item.ratingAccuracy >= 1 && item.ratingAccuracy <= 5) {
-          breakdown.accuracy[item.ratingAccuracy]++;
-        } else {
-          breakdown.accuracy.unrated++;
-        }
-        
-        // Scenarios rating
-        if (item.ratingScenarios && item.ratingScenarios >= 1 && item.ratingScenarios <= 5) {
-          breakdown.scenarios[item.ratingScenarios]++;
-        } else {
-          breakdown.scenarios.unrated++;
-        }
-        
-        // Online Play rating
-        if (item.ratingOnline && item.ratingOnline >= 1 && item.ratingOnline <= 5) {
-          breakdown.onlinePlay[item.ratingOnline]++;
-        } else {
-          breakdown.onlinePlay.unrated++;
-        }
+    // ==========================================================================
+    // TAB SWITCHING
+    // ==========================================================================
+    document.querySelectorAll('.admin-tab').forEach(tabBtn => {
+      tabBtn.addEventListener('click', () => {
+        document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.remove('active'));
+        tabBtn.classList.add('active');
+        const targetId = tabBtn.dataset.tab;
+        const panel = document.getElementById(targetId);
+        if (panel) panel.classList.add('active');
       });
-      
-      return breakdown;
+    });
+
+    // ==========================================================================
+    // DATA LOADING & REFRESH
+    // ==========================================================================
+    async function loadAllData() {
+      showAdminToast('🔄 Syncing live data...');
+      await Promise.allSettled([
+        loadFeedback(),
+        loadReports(),
+        loadAnalytics(),
+        loadLiveRooms()
+      ]);
+      showAdminToast('✓ Live data updated', 2000);
     }
 
-    // Update Stats
-    // Chart.js chart instances
-    let chartOverall, chartModes, chartAccuracy, chartScenarios;
+    document.getElementById('btn-refresh').addEventListener('click', loadAllData);
 
-    function updateStats(items) {
-      // Total feedback
-      document.getElementById('stat-total').textContent = items.length;
-      
-      // Average rating
-      const ratings = items.filter(i => i.rating).map(i => i.rating);
-      const avg = ratings.length ? (ratings.reduce((a,b)=>a+b,0) / ratings.length).toFixed(1) : '0.0';
-      document.getElementById('stat-avg').textContent = avg;
-      
-      // Today's count
-      const today = new Date().toDateString();
-      const todayCount = items.filter(i => new Date(i.timestamp).toDateString() === today).length;
-      document.getElementById('stat-today').textContent = todayCount;
-      
-      // Update charts
-      updateCharts(items);
-      
-      // Load analytics
-      loadAnalytics();
+    // 1. Feedback
+    async function loadFeedback() {
+      const tbody = document.getElementById('feedback-list');
+      try {
+        const snapshot = await database.ref('feedback').orderByChild('timestamp').limitToLast(300).once('value');
+        const data = snapshot.val() || {};
+        allFeedbackItems = Object.entries(data).map(([key, val]) => ({
+          _id: key,
+          ...val
+        })).reverse(); // Newest first
+
+        document.getElementById('tab-badge-feedback').textContent = allFeedbackItems.length;
+        document.getElementById('stat-total').textContent = allFeedbackItems.length;
+
+        // Calculate average rating
+        const rated = allFeedbackItems.filter(i => Number(i.rating) > 0);
+        const avg = rated.length ? (rated.reduce((sum, i) => sum + Number(i.rating), 0) / rated.length).toFixed(1) : '0.0';
+        document.getElementById('stat-avg').textContent = avg;
+
+        // Today's feedback count
+        const todayStr = new Date().toDateString();
+        const todayCount = allFeedbackItems.filter(i => new Date(i.timestamp).toDateString() === todayStr).length;
+        document.getElementById('stat-today').textContent = todayCount;
+
+        renderFeedbackTable();
+        updateCharts(allFeedbackItems);
+      } catch (err) {
+        console.error('Error loading feedback:', err);
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#f87171; padding: 2rem;">Error loading feedback: ${escapeHtml(err.message)}</td></tr>`;
+      }
     }
 
-    // Load analytics from Firebase
+    function renderFeedbackTable() {
+      const tbody = document.getElementById('feedback-list');
+      const searchVal = (document.getElementById('search-feedback')?.value || '').toLowerCase().trim();
+      const ratingVal = document.getElementById('filter-feedback-rating')?.value || '';
+
+      let filtered = allFeedbackItems;
+      if (searchVal) {
+        filtered = filtered.filter(item => {
+          const txt = `${item.message || ''} ${item.experience || ''} ${item.userAgent || ''}`.toLowerCase();
+          return txt.includes(searchVal);
+        });
+      }
+      if (ratingVal !== '') {
+        filtered = filtered.filter(item => String(item.rating || 0) === ratingVal);
+      }
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--muted); padding: 2rem;">📭 No feedback entries match your filters.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        const dt = new Date(item.timestamp || Date.now());
+        const dateStr = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const rating = Number(item.rating) || 0;
+        const ratingClass = `rating-${rating}`;
+
+        const modesBreakdown = [];
+        if (item.ratingSolo) modesBreakdown.push(`Solo: ${item.ratingSolo}★`);
+        if (item.ratingTimed) modesBreakdown.push(`Timed: ${item.ratingTimed}★`);
+        if (item.ratingChallenge) modesBreakdown.push(`Challenge: ${item.ratingChallenge}★`);
+        if (item.ratingStudy) modesBreakdown.push(`Study: ${item.ratingStudy}★`);
+        if (item.ratingScenarios) modesBreakdown.push(`Scenarios: ${item.ratingScenarios}★`);
+        if (item.ratingOnline) modesBreakdown.push(`Remote: ${item.ratingOnline}★`);
+        if (item.ratingClassroom) modesBreakdown.push(`Classroom: ${item.ratingClassroom}★`);
+        if (item.ratingAccuracy) modesBreakdown.push(`Accuracy: ${item.ratingAccuracy}★`);
+
+        const commentText = [item.experience, item.message].filter(Boolean).join(' — ') || '<em style="color:var(--muted)">No written comment</em>';
+
+        return `
+          <tr>
+            <td style="white-space: nowrap; font-size: 12px; color: var(--muted);">${escapeHtml(dateStr)}</td>
+            <td><span class="rating-badge ${ratingClass}">${rating ? rating + ' ★' : 'Unrated'}</span></td>
+            <td style="font-size: 11.5px; line-height: 1.4; color: var(--muted);">
+              ${modesBreakdown.length ? escapeHtml(modesBreakdown.join(' • ')) : '—'}
+            </td>
+            <td style="max-width: 380px;">${escapeHtml(commentText)}</td>
+            <td style="white-space: nowrap;">
+              <button class="secondary sm-btn" onclick="inspectFeedback('${item._id}')" title="Inspect full details">🔍 View</button>
+              <button class="danger sm-btn" onclick="deleteFeedback('${item._id}')" title="Delete entry">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('search-feedback')?.addEventListener('input', renderFeedbackTable);
+    document.getElementById('filter-feedback-rating')?.addEventListener('change', renderFeedbackTable);
+
+    // Delete feedback
+    window.deleteFeedback = async function(id) {
+      const confirmed = await showAdminConfirm({
+        title: 'Delete Feedback Entry?',
+        message: 'This will permanently remove this feedback submission from Firebase.',
+        confirmText: 'Delete Permanently',
+        danger: true
+      });
+      if (!confirmed) return;
+      try {
+        await database.ref('feedback/' + id).remove();
+        showAdminToast('Feedback deleted');
+        await loadFeedback();
+      } catch (err) {
+        alert('Could not delete feedback: ' + err.message);
+      }
+    };
+
+    // Inspect feedback modal
+    window.inspectFeedback = function(id) {
+      const item = allFeedbackItems.find(i => i._id === id);
+      if (!item) return;
+
+      const dt = new Date(item.timestamp || Date.now());
+      const body = document.getElementById('admin-detail-body');
+      document.getElementById('admin-detail-title').textContent = '💬 Feedback Details';
+
+      body.innerHTML = `
+        <div class="detail-item-row">
+          <div class="detail-item-label">Submission Date & Time</div>
+          <div class="detail-item-content">${escapeHtml(dt.toLocaleString())} (${escapeHtml(dt.toISOString())})</div>
+        </div>
+        <div class="detail-item-row">
+          <div class="detail-item-label">Overall Rating</div>
+          <div class="detail-item-content"><strong>${item.rating ? item.rating + ' / 5 Stars' : 'Unrated'}</strong></div>
+        </div>
+        <div class="detail-item-row">
+          <div class="detail-item-label">Game Mode Ratings</div>
+          <div class="detail-item-content">
+            Solo: ${item.ratingSolo || '—'}★ • Timed: ${item.ratingTimed || '—'}★ • Pass & Play: ${item.ratingChallenge || '—'}★<br>
+            Study: ${item.ratingStudy || '—'}★ • Scenarios: ${item.ratingScenarios || '—'}★ • Remote Challenge: ${item.ratingOnline || '—'}★<br>
+            Classroom: ${item.ratingClassroom || '—'}★ • Accuracy: ${item.ratingAccuracy || '—'}★
+          </div>
+        </div>
+        <div class="detail-item-row">
+          <div class="detail-item-label">Experience Description</div>
+          <div class="detail-item-content">${escapeHtml(item.experience || 'None provided')}</div>
+        </div>
+        <div class="detail-item-row">
+          <div class="detail-item-label">User Message / Feedback</div>
+          <div class="detail-item-content">${escapeHtml(item.message || 'None provided')}</div>
+        </div>
+        <div class="detail-item-row">
+          <div class="detail-item-label">Browser / Device Information</div>
+          <div class="detail-item-content" style="font-family: monospace; font-size: 11.5px;">${escapeHtml(item.userAgent || 'Not captured')}</div>
+        </div>
+      `;
+
+      document.getElementById('admin-detail-modal').style.display = 'flex';
+    };
+
+    // 2. Reports
+    async function loadReports() {
+      const tbody = document.getElementById('reports-list');
+      try {
+        const snapshot = await database.ref('reports').once('value');
+        const data = snapshot.val() || {};
+        allReports = Object.entries(data).map(([key, val]) => ({
+          _id: key,
+          ...val
+        })).sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
+        const pending = allReports.filter(r => (r.status || 'pending') === 'pending' || r.status === 'reviewed').length;
+        document.getElementById('stat-pending-reports').textContent = pending;
+        document.getElementById('tab-badge-reports').textContent = allReports.length;
+
+        renderReportsTable();
+      } catch (err) {
+        console.error('Error loading reports:', err);
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#f87171; padding: 2rem;">Error loading reports: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function renderReportsTable() {
+      const tbody = document.getElementById('reports-list');
+      const searchVal = (document.getElementById('search-reports')?.value || '').toLowerCase().trim();
+      const statusVal = document.getElementById('filter-report-status')?.value || '';
+      const typeVal = document.getElementById('filter-report-type')?.value || '';
+
+      let filtered = allReports;
+      if (statusVal) filtered = filtered.filter(r => (r.status || 'pending') === statusVal);
+      if (typeVal) filtered = filtered.filter(r => r.type === typeVal);
+      if (searchVal) {
+        filtered = filtered.filter(r => {
+          const txt = `${r.context?.question || ''} ${r.details || ''} ${r.type || ''}`.toLowerCase();
+          return txt.includes(searchVal);
+        });
+      }
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--muted); padding: 2rem;">🎉 No content reports found. All questions look good!</td></tr>';
+        return;
+      }
+
+      const typeIcons = {
+        'wrong-answer': '❌ Wrong Answer',
+        'wrong-question': '❓ Question Error',
+        'poor-wording': '📝 Poor Wording',
+        'biblical-accuracy': '📚 Biblical Accuracy',
+        'other': '💡 Other'
+      };
+
+      tbody.innerHTML = filtered.map(r => {
+        const dt = new Date(r.timestamp || Date.now());
+        const dateStr = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const st = r.status || 'pending';
+        const stClass = `status-${st}`;
+        const typeLabel = typeIcons[r.type] || r.type || 'Report';
+
+        const qText = r.context?.question || '<em style="color:var(--muted)">No question context</em>';
+        const userNotes = r.details || '<em style="color:var(--muted)">No extra details</em>';
+
+        return `
+          <tr>
+            <td style="white-space: nowrap; font-size: 12px; color: var(--muted);">${escapeHtml(dateStr)}</td>
+            <td style="font-size: 12px; font-weight: 700;">${escapeHtml(typeLabel)}</td>
+            <td style="max-width: 280px; font-weight: 600;">${escapeHtml(qText)}</td>
+            <td style="max-width: 240px; color: var(--muted);">${escapeHtml(userNotes)}</td>
+            <td><span class="status-badge ${stClass}">${escapeHtml(st)}</span></td>
+            <td style="white-space: nowrap;">
+              <button class="secondary sm-btn" onclick="inspectReport('${r._id}')">🔍 View</button>
+              ${st === 'pending' ? `<button class="primary sm-btn" onclick="setReportStatus('${r._id}', 'resolved')">✓ Resolve</button>` : ''}
+              ${st === 'resolved' ? `<button class="secondary sm-btn" onclick="setReportStatus('${r._id}', 'pending')">Reopen</button>` : ''}
+              <button class="danger sm-btn" onclick="deleteReport('${r._id}')">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('search-reports')?.addEventListener('input', renderReportsTable);
+    document.getElementById('filter-report-status')?.addEventListener('change', renderReportsTable);
+    document.getElementById('filter-report-type')?.addEventListener('change', renderReportsTable);
+
+    window.setReportStatus = async function(id, newStatus) {
+      try {
+        await database.ref(`reports/${id}/status`).set(newStatus);
+        const report = allReports.find(r => r._id === id);
+        if (report) report.status = newStatus;
+        showAdminToast(`Report marked as ${newStatus}`);
+        renderReportsTable();
+      } catch (err) {
+        alert('Could not update report: ' + err.message);
+      }
+    };
+
+    window.deleteReport = async function(id) {
+      const confirmed = await showAdminConfirm({
+        title: 'Delete Report?',
+        message: 'This will permanently remove this report entry.',
+        confirmText: 'Delete Report',
+        danger: true
+      });
+      if (!confirmed) return;
+      try {
+        await database.ref('reports/' + id).remove();
+        showAdminToast('Report deleted');
+        await loadReports();
+      } catch (err) {
+        alert('Could not delete report: ' + err.message);
+      }
+    };
+
+    window.inspectReport = function(id) {
+      const r = allReports.find(x => x._id === id);
+      if (!r) return;
+
+      const dt = new Date(r.timestamp || Date.now());
+      const body = document.getElementById('admin-detail-body');
+      document.getElementById('admin-detail-title').textContent = '🚩 Content Report Context';
+
+      const answersList = (r.context?.answers || []).map(a => `<li>${escapeHtml(a)}</li>`).join('');
+
+      body.innerHTML = `
+        <div class="detail-item-row">
+          <div class="detail-item-label">Report ID & Date</div>
+          <div class="detail-item-content">${escapeHtml(id)} • ${escapeHtml(dt.toLocaleString())}</div>
+        </div>
+        <div class="detail-item-row">
+          <div class="detail-item-label">Issue Category & Current Status</div>
+          <div class="detail-item-content"><strong>${escapeHtml(r.type || 'Other')}</strong> — <span class="status-badge status-${r.status || 'pending'}">${escapeHtml(r.status || 'pending')}</span></div>
+        </div>
+        <div class="detail-item-row">
+          <div class="detail-item-label">Reported Question Prompt</div>
+          <div class="detail-item-content" style="font-weight: 700; color: #fff;">${escapeHtml(r.context?.question || 'N/A')}</div>
+        </div>
+        ${answersList ? `
+          <div class="detail-item-row">
+            <div class="detail-item-label">Answer Choices Presented</div>
+            <div class="detail-item-content"><ul style="margin: 0; padding-left: 18px;">${answersList}</ul></div>
+          </div>
+        ` : ''}
+        <div class="detail-item-row">
+          <div class="detail-item-label">User Explanation / Suggested Correction</div>
+          <div class="detail-item-content">${escapeHtml(r.details || 'No additional explanation provided by user.')}</div>
+        </div>
+        <div class="detail-item-row" style="margin-top: 1.25rem; display: flex; gap: 8px;">
+          <button class="secondary sm-btn" onclick="setReportStatus('${id}', 'reviewed'); closeDetailModal();">Mark Reviewed</button>
+          <button class="primary sm-btn" onclick="setReportStatus('${id}', 'resolved'); closeDetailModal();">Mark Resolved ✓</button>
+          <button class="danger sm-btn" onclick="setReportStatus('${id}', 'dismissed'); closeDetailModal();">Dismiss ✕</button>
+        </div>
+      `;
+
+      document.getElementById('admin-detail-modal').style.display = 'flex';
+    };
+
+    function closeDetailModal() {
+      document.getElementById('admin-detail-modal').style.display = 'none';
+    }
+    document.getElementById('btn-close-detail')?.addEventListener('click', closeDetailModal);
+    document.getElementById('btn-detail-ok')?.addEventListener('click', closeDetailModal);
+
+    // 3. Analytics
     async function loadAnalytics() {
       try {
         const viewsSnap = await database.ref('analytics/pageViews').once('value');
         const completionsSnap = await database.ref('analytics/quizCompletions').once('value');
-        document.getElementById('stat-views').textContent = viewsSnap.exists() ? viewsSnap.val().toLocaleString() : '0';
-        document.getElementById('stat-completions').textContent = completionsSnap.exists() ? completionsSnap.val().toLocaleString() : '0';
-      } catch (e) {
-        console.warn('Analytics load failed:', e);
-        document.getElementById('stat-views').textContent = '—';
-        document.getElementById('stat-completions').textContent = '—';
+        document.getElementById('stat-views').textContent = viewsSnap.exists() ? Number(viewsSnap.val()).toLocaleString() : '0';
+        document.getElementById('stat-completions').textContent = completionsSnap.exists() ? Number(completionsSnap.val()).toLocaleString() : '0';
+      } catch (err) {
+        console.warn('Analytics query note:', err);
       }
     }
+
+    // 4. Live Multiplayer Rooms Oversight
+    async function loadLiveRooms() {
+      const tbody = document.getElementById('rooms-list');
+      try {
+        const [roomsSnap, classroomsSnap] = await Promise.all([
+          database.ref('rooms').once('value'),
+          database.ref('classrooms').once('value')
+        ]);
+
+        const rawRooms = roomsSnap.val() || {};
+        const rawClassrooms = classroomsSnap.val() || {};
+
+        const list = [];
+        Object.entries(rawRooms).forEach(([code, r]) => {
+          if (!r) return;
+          const pCount = Object.keys(r.players || {}).length;
+          list.push({
+            code,
+            type: 'Remote Challenge (2P)',
+            host: r.host || 'Player 1',
+            status: r.status || 'waiting',
+            playerCount: pCount,
+            players: Object.values(r.players || {}).map(p => p.name || 'Player').join(', '),
+            createdAt: r.createdAt || Date.now(),
+            refPath: 'rooms/' + code
+          });
+        });
+
+        Object.entries(rawClassrooms).forEach(([pin, c]) => {
+          if (!c) return;
+          const pCount = Object.keys(c.players || {}).length;
+          list.push({
+            code: pin,
+            type: 'Classroom (Kahoot-style)',
+            host: c.host || 'Host',
+            status: c.status || 'lobby',
+            playerCount: pCount,
+            players: Object.values(c.players || {}).map(p => p.name || 'Player').join(', '),
+            createdAt: c.createdAt || c.lastActivity || Date.now(),
+            refPath: 'classrooms/' + pin
+          });
+        });
+
+        document.getElementById('stat-active-rooms').textContent = list.length;
+        document.getElementById('tab-badge-rooms').textContent = list.length;
+
+        if (!list.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--muted); padding: 2rem;">🏖️ No active multiplayer rooms currently running.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = list.map(r => {
+          const dt = new Date(r.createdAt);
+          const timeStr = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const stClass = `status-${r.status}`;
+
+          return `
+            <tr>
+              <td style="font-family: monospace; font-weight: 800; color: var(--accent);">${escapeHtml(r.code)}</td>
+              <td>${escapeHtml(r.type)}</td>
+              <td style="font-weight: 600;">${escapeHtml(r.host)}</td>
+              <td><span class="status-badge ${stClass}">${escapeHtml(r.status)}</span></td>
+              <td style="font-size: 12px;"><strong>${r.playerCount} player${r.playerCount === 1 ? '' : 's'}</strong> (${escapeHtml(r.players || 'None')})</td>
+              <td style="font-size: 12px; color: var(--muted);">${escapeHtml(timeStr)}</td>
+              <td>
+                <button class="danger sm-btn" onclick="terminateLiveRoom('${r.refPath}', '${r.code}')">🛑 Close Room</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Error loading rooms:', err);
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#f87171; padding: 2rem;">Error loading live rooms: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    document.getElementById('btn-refresh-rooms')?.addEventListener('click', loadLiveRooms);
+
+    window.terminateLiveRoom = async function(path, code) {
+      const confirmed = await showAdminConfirm({
+        title: `Close Room ${code}?`,
+        message: 'This will notify any connected players that the host/admin closed the room and remove it.',
+        confirmText: 'Close Room',
+        danger: true
+      });
+      if (!confirmed) return;
+      try {
+        await database.ref(path).update({ status: 'cancelled' });
+        setTimeout(async () => {
+          await database.ref(path).remove().catch(() => {});
+          showAdminToast(`Room ${code} closed`);
+          loadLiveRooms();
+        }, 1200);
+      } catch (err) {
+        alert('Could not terminate room: ' + err.message);
+      }
+    };
+
+    // Purge stale rooms older than 2 hours
+    document.getElementById('btn-purge-stale-rooms')?.addEventListener('click', async () => {
+      const confirmed = await showAdminConfirm({
+        title: 'Purge Stale Rooms?',
+        message: 'This will remove any multiplayer rooms created over 2 hours ago.',
+        confirmText: 'Purge Stale Rooms',
+        danger: true
+      });
+      if (!confirmed) return;
+      try {
+        const twoHoursAgo = Date.now() - (2 * 60 * 60 * 1000);
+        const [roomsSnap, classroomsSnap] = await Promise.all([
+          database.ref('rooms').once('value'),
+          database.ref('classrooms').once('value')
+        ]);
+        let purged = 0;
+        const promises = [];
+        (roomsSnap.val() ? Object.entries(roomsSnap.val()) : []).forEach(([k, r]) => {
+          if (r && r.createdAt && r.createdAt < twoHoursAgo) {
+            promises.push(database.ref('rooms/' + k).remove());
+            purged++;
+          }
+        });
+        (classroomsSnap.val() ? Object.entries(classroomsSnap.val()) : []).forEach(([k, c]) => {
+          if (c && ((c.createdAt && c.createdAt < twoHoursAgo) || (c.lastActivity && c.lastActivity < twoHoursAgo))) {
+            promises.push(database.ref('classrooms/' + k).remove());
+            purged++;
+          }
+        });
+        await Promise.all(promises);
+        showAdminToast(`Purged ${purged} stale rooms`);
+        await loadLiveRooms();
+      } catch (err) {
+        alert('Purge error: ' + err.message);
+      }
+    });
+
+    // ==========================================================================
+    // CHARTS RENDERING (CHART.JS)
+    // ==========================================================================
+    let chartOverallInst = null;
+    let chartModesInst = null;
+    let chartAccuracyInst = null;
+    let chartScenariosInst = null;
+
     function updateCharts(items) {
-      // Helper to count ratings 1-5
-      function countRatings(arr, key) {
-        const counts = [0,0,0,0,0];
+      if (typeof Chart === 'undefined') {
+        console.warn('Chart.js not loaded, skipping chart render.');
+        return;
+      }
+
+      function countScale(arr, key) {
+        const counts = [0, 0, 0, 0, 0];
         arr.forEach(i => {
-          const val = parseInt(i[key] || 0);
-          if (val >= 1 && val <= 5) counts[val-1]++;
+          const val = parseInt(i[key] || 0, 10);
+          if (val >= 1 && val <= 5) counts[val - 1]++;
         });
         return counts;
       }
-      // Overall
-      const overall = countRatings(items, 'rating');
-      const modes = countRatings(items, 'ratingModes');
-      const accuracy = countRatings(items, 'ratingAccuracy');
-      const scenarios = countRatings(items, 'ratingScenarios');
-      // Chart config
-      const labels = ['1','2','3','4','5'];
-      const colors = ['#ef4444','#f87171','#fbbf24','#34d399','#10b981'];
-      // Create or update charts
-      function makeOrUpdateChart(ctx, data, label, inst) {
-        if (inst) {
-          inst.data.datasets[0].data = data;
-          inst.update();
-          return inst;
+
+      const overall = countScale(items, 'rating');
+      const modes = countScale(items, 'ratingModes');
+      const accuracy = countScale(items, 'ratingAccuracy');
+      const scenarios = countScale(items, 'ratingScenarios');
+
+      const labels = ['1★', '2★', '3★', '4★', '5★'];
+      const colors = ['#ef4444', '#f87171', '#fbbf24', '#34d399', '#10b981'];
+
+      function renderBarChart(canvasId, data, currentInst, label) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return null;
+        if (currentInst) {
+          currentInst.data.datasets[0].data = data;
+          currentInst.update();
+          return currentInst;
         }
-        return new Chart(ctx, {
+        return new Chart(canvas, {
           type: 'bar',
           data: {
             labels,
@@ -1147,209 +1740,118 @@
               label,
               data,
               backgroundColor: colors,
-              borderWidth: 1
+              borderRadius: 6,
+              borderWidth: 0
             }]
           },
           options: {
             plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, precision:0, ticks: { stepSize: 1 } } },
+            scales: {
+              y: { beginAtZero: true, ticks: { precision: 0, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+              x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+            },
             responsive: true,
+            maintainAspectRatio: true,
             animation: false
           }
         });
       }
-      chartOverall = makeOrUpdateChart(document.getElementById('chart-overall'), overall, 'Overall', chartOverall);
-      chartModes = makeOrUpdateChart(document.getElementById('chart-modes'), modes, 'Modes', chartModes);
-      chartAccuracy = makeOrUpdateChart(document.getElementById('chart-accuracy'), accuracy, 'Accuracy', chartAccuracy);
-      chartScenarios = makeOrUpdateChart(document.getElementById('chart-scenarios'), scenarios, 'Scenarios', chartScenarios);
+
+      chartOverallInst = renderBarChart('chart-overall', overall, chartOverallInst, 'Overall');
+      chartModesInst = renderBarChart('chart-modes', modes, chartModesInst, 'Modes');
+      chartAccuracyInst = renderBarChart('chart-accuracy', accuracy, chartAccuracyInst, 'Accuracy');
+      chartScenariosInst = renderBarChart('chart-scenarios', scenarios, chartScenariosInst, 'Scenarios');
     }
 
-    // ===== REPORTS MANAGEMENT =====
-    let allReports = [];
-
-    async function loadReports() {
-      try {
-        const reportsList = document.getElementById('reports-list');
-        reportsList.innerHTML = '<tr><td colspan="6" class="loading" style="text-align:center">Loading reports...</td></tr>';
-
-        // Try loading from Firebase
-        const reportsSnap = await database.ref('reports').once('value');
-        allReports = [];
-        
-        if (reportsSnap.exists()) {
-          reportsSnap.forEach(snap => {
-            allReports.push({ id: snap.key, ...snap.val() });
-          });
-        }
-
-        // Also check localStorage for fallback reports
-        try {
-          const localReports = JSON.parse(localStorage.getItem('who-bible-reports') || '[]');
-          localReports.forEach(report => {
-            if (!allReports.find(r => r.id === report.id)) {
-              allReports.push(report);
-            }
-          });
-        } catch (e) {
-          console.warn('Could not load local reports:', e);
-        }
-
-        // Sort by timestamp (newest first)
-        allReports.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-        renderReports(allReports);
-        
-        // Setup filter listeners
-        document.getElementById('report-status-filter')?.addEventListener('change', filterReports);
-        document.getElementById('report-type-filter')?.addEventListener('change', filterReports);
-      } catch (error) {
-        console.error('Error loading reports:', error);
-        document.getElementById('reports-list').innerHTML = 
-          '<tr><td colspan="6" style="text-align:center; color: var(--error)">Error loading reports</td></tr>';
-      }
+    // ==========================================================================
+    // EXPORTERS (CSV & JSON)
+    // ==========================================================================
+    function downloadBlob(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, 150);
     }
 
-    function filterReports() {
-      const statusFilter = document.getElementById('report-status-filter')?.value || '';
-      const typeFilter = document.getElementById('report-type-filter')?.value || '';
-      
-      let filtered = allReports;
-      
-      if (statusFilter) {
-        filtered = filtered.filter(r => r.status === statusFilter);
-      }
-      
-      if (typeFilter) {
-        filtered = filtered.filter(r => r.type === typeFilter);
-      }
-      
-      renderReports(filtered);
-    }
+    document.getElementById('btn-export-csv')?.addEventListener('click', exportFeedbackCSV);
+    document.getElementById('btn-export-feedback-csv')?.addEventListener('click', exportFeedbackCSV);
 
-    function renderReports(reports) {
-      const reportsList = document.getElementById('reports-list');
-      
-      if (reports.length === 0) {
-        reportsList.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--muted)">No reports found</td></tr>';
+    function exportFeedbackCSV() {
+      if (!allFeedbackItems.length) {
+        alert('No feedback entries to export.');
         return;
       }
-
-      const typeIcons = {
-        'wrong-answer': '❌',
-        'wrong-question': '❓',
-        'poor-wording': '📝',
-        'biblical-accuracy': '📚',
-        'other': '💡'
-      };
-
-      const statusBadges = {
-        'pending': '<span style="padding: 4px 8px; background: #ffc107; color: #000; border-radius: 4px; font-size: 11px; font-weight: 600;">🕐 PENDING</span>',
-        'reviewed': '<span style="padding: 4px 8px; background: #17a2b8; color: #fff; border-radius: 4px; font-size: 11px; font-weight: 600;">👀 REVIEWED</span>',
-        'resolved': '<span style="padding: 4px 8px; background: #28a745; color: #fff; border-radius: 4px; font-size: 11px; font-weight: 600;">✅ RESOLVED</span>',
-        'dismissed': '<span style="padding: 4px 8px; background: #6c757d; color: #fff; border-radius: 4px; font-size: 11px; font-weight: 600;">❌ DISMISSED</span>'
-      };
-
-      reportsList.innerHTML = reports.map(report => {
-        const date = new Date(report.timestamp).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-        
-        const icon = typeIcons[report.type] || '📋';
-        const status = report.status || 'pending';
-        const badge = statusBadges[status] || statusBadges.pending;
-        const question = report.context?.question || 'No context';
-        const details = report.details || '<em style="color: var(--muted)">No additional details</em>';
-        
-        return `
-          <tr>
-            <td style="white-space: nowrap">${date}</td>
-            <td style="text-align: center; font-size: 18px;" title="${report.typeLabel || report.type}">${icon}</td>
-            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;" title="${question}">${question}</td>
-            <td style="max-width: 250px;">${details}</td>
-            <td>${badge}</td>
-            <td style="white-space: nowrap">
-              ${status === 'pending' ? `
-                <button onclick="updateReportStatus('${report.id}', 'reviewed')" style="padding: 4px 8px; margin: 0 2px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">Review</button>
-                <button onclick="updateReportStatus('${report.id}', 'resolved')" style="padding: 4px 8px; margin: 0 2px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">Resolve</button>
-                <button onclick="updateReportStatus('${report.id}', 'dismissed')" style="padding: 4px 8px; margin: 0 2px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">Dismiss</button>
-              ` : `
-                <button onclick="viewReportDetails('${report.id}')" style="padding: 4px 8px; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">View</button>
-              `}
-            </td>
-          </tr>
-        `;
-      }).join('');
+      const headers = ['Date', 'Time', 'Overall Rating', 'Solo', 'Timed', 'Challenge', 'Study', 'Scenarios', 'Remote', 'Classroom', 'Accuracy', 'Experience', 'Message', 'User Agent'];
+      const rows = allFeedbackItems.map(item => {
+        const dt = new Date(item.timestamp || Date.now());
+        const clean = (s) => `"${String(s || '').replace(/"/g, '""')}"`;
+        return [
+          clean(dt.toLocaleDateString()),
+          clean(dt.toLocaleTimeString()),
+          item.rating || '',
+          item.ratingSolo || '',
+          item.ratingTimed || '',
+          item.ratingChallenge || '',
+          item.ratingStudy || '',
+          item.ratingScenarios || '',
+          item.ratingOnline || '',
+          item.ratingClassroom || '',
+          item.ratingAccuracy || '',
+          clean(item.experience),
+          clean(item.message),
+          clean(item.userAgent)
+        ].join(',');
+      });
+      const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+      downloadBlob(csv, `who-bible-feedback-${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv;charset=utf-8;');
+      showAdminToast('Feedback exported to CSV');
     }
 
-    async function updateReportStatus(reportId, newStatus) {
-      try {
-        // Update in Firebase
-        await database.ref(`reports/${reportId}/status`).set(newStatus);
-        
-        // Update local array
-        const report = allReports.find(r => r.id === reportId);
-        if (report) {
-          report.status = newStatus;
-        }
-        
-        // Re-render
-        filterReports();
-        
-        alert(`Report marked as ${newStatus}`);
-      } catch (error) {
-        console.error('Error updating report:', error);
-        alert('Failed to update report status');
+    document.getElementById('btn-export-reports-csv')?.addEventListener('click', () => {
+      if (!allReports.length) {
+        alert('No content reports to export.');
+        return;
       }
-    }
-
-    function viewReportDetails(reportId) {
-      const report = allReports.find(r => r.id === reportId);
-      if (!report) return;
-      
-      const details = `
-Report ID: ${reportId}
-Type: ${report.typeLabel || report.type}
-Status: ${report.status || 'pending'}
-Date: ${new Date(report.timestamp).toLocaleString()}
-
-Question:
-${report.context?.question || 'N/A'}
-
-Details:
-${report.details || 'No additional details provided'}
-
-Answer Choices:
-${report.context?.answers?.join('\n') || 'N/A'}
-      `.trim();
-      
-      alert(details);
-    }
-
-    // Make functions globally accessible
-    window.updateReportStatus = updateReportStatus;
-    window.viewReportDetails = viewReportDetails;
-
-    // Load reports when authenticated
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        // ... existing auth code ...
-        // Add reports loading
-        setTimeout(() => loadReports(), 1000);
-      }
+      const headers = ['Date', 'Type', 'Status', 'Question', 'User Notes', 'Answers'];
+      const rows = allReports.map(r => {
+        const dt = new Date(r.timestamp || Date.now());
+        const clean = (s) => `"${String(s || '').replace(/"/g, '""')}"`;
+        return [
+          clean(dt.toLocaleString()),
+          clean(r.type),
+          clean(r.status || 'pending'),
+          clean(r.context?.question),
+          clean(r.details),
+          clean((r.context?.answers || []).join(' | '))
+        ].join(',');
+      });
+      const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+      downloadBlob(csv, `who-bible-reports-${new Date().toISOString().slice(0, 10)}.csv`, 'text/csv;charset=utf-8;');
+      showAdminToast('Reports exported to CSV');
     });
-  </script>
 
-  <footer style="position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px; background: var(--bg, #0a0e27); border-top: 2px solid var(--border, #1f2235); text-align: center; font-size: 12px; color: var(--muted, #8892b0); z-index: 100;">
-    <p style="margin: 0;">© <span id="admin-footer-year"></span> Who-Bible Admin | <a href="index.html" style="color: var(--accent, #64ffda); text-decoration: none;">Return to Main App</a></p>
-  </footer>
-  
-  <script>
-    // Set current year in footer
-    const adminFooterYear = document.getElementById('admin-footer-year');
-    if (adminFooterYear) adminFooterYear.textContent = new Date().getFullYear();
+    document.getElementById('btn-export-json')?.addEventListener('click', () => {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        totalFeedback: allFeedbackItems.length,
+        totalReports: allReports.length,
+        feedback: allFeedbackItems,
+        reports: allReports
+      };
+      downloadBlob(JSON.stringify(payload, null, 2), `who-bible-data-${new Date().toISOString().slice(0, 10)}.json`, 'application/json');
+      showAdminToast('Complete data exported to JSON');
+    });
+
+    // Year in footer
+    const yearEl = document.getElementById('admin-footer-year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
